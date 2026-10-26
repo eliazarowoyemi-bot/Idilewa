@@ -6968,7 +6968,7 @@ import {
                 </div>
               </div>
               <div class="journey-step-visual">
-                <img src="${imageUrl('journey-step-1.png')}" alt="Understand oral knowledge illustration" loading="eager" />
+                <img src="${imageUrl('story-grandmother.jpg')}" alt="An elder sharing language and stories with children" loading="eager" />
               </div>
             </a>
 
@@ -6985,7 +6985,7 @@ import {
                 </div>
               </div>
               <div class="journey-step-visual">
-                <img src="${imageUrl('journey-step-2.png')}" alt="Choose a genre illustration" loading="eager" />
+                <img src="${imageUrl('page-index-2.jpg')}" alt="A learner exploring illustrated language cards" loading="eager" />
               </div>
             </a>
 
@@ -7002,7 +7002,7 @@ import {
                 </div>
               </div>
               <div class="journey-step-visual">
-                <img src="${imageUrl('journey-step-3.png')}" alt="Read a proverb illustration" loading="eager" />
+                <img src="${imageUrl('page-owe-1.jpg')}" alt="An educator sharing a Yorùbá proverb book" loading="eager" />
               </div>
             </a>
 
@@ -7019,7 +7019,7 @@ import {
                 </div>
               </div>
               <div class="journey-step-visual">
-                <img src="${imageUrl('journey-step-4.png')}" alt="Listen to a voice illustration" loading="eager" />
+                <img src="${imageUrl('listening-reader.jpg')}" alt="A learner listening to a story with headphones" loading="eager" />
               </div>
             </a>
 
@@ -7036,7 +7036,7 @@ import {
                 </div>
               </div>
               <div class="journey-step-visual">
-                <img src="${imageUrl('journey-step-5.png')}" alt="Ask for context illustration" loading="eager" />
+                <img src="${imageUrl('page-oral-1.jpg')}" alt="An elder and children sharing an oral story" loading="eager" />
               </div>
             </a>
 
@@ -7053,7 +7053,7 @@ import {
                 </div>
               </div>
               <div class="journey-step-visual">
-                <img src="${imageUrl('journey-step-6.png')}" alt="Share respectfully illustration" loading="eager" />
+                <img src="${imageUrl('hero-reader.jpg')}" alt="A child reading a storybook" loading="eager" />
               </div>
             </a>
           </div>
