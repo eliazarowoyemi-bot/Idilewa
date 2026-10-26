@@ -200,8 +200,8 @@ import {
     curriculum: {
       title: 'Curriculum',
       eyebrow: 'Curriculum',
-      desc: 'Standards-aligned STEAM lessons infused with Yoruba, Igbo, Hausa and African cultural concepts from Kindergarten to Grade 8.',
-      icon: 'layers', image: 'code-kids.jpg', imageAlt: 'African students exploring STEAM and coding curriculum',
+      desc: 'Standards-aligned STEM lessons infused with Yoruba, Igbo, Hausa and African cultural concepts from Kindergarten to Grade 8.',
+      icon: 'layers', image: 'code-kids.jpg', imageAlt: 'African students exploring STEM and coding curriculum',
       active: 0, flow: ['Choose Grade Band', 'Explore Concepts', 'Teach Lesson', 'Code Live'],
       cta: 'Open Code Studio', ctaRoute: 'coding',
       cards: [
@@ -806,7 +806,7 @@ import {
       ['sparkles', 'Made for discovery', 'Short activities help learners build confidence at their own pace.'],
       ['layers', 'Culture in context', 'Stories and language learning stay connected to community.'],
       ['volume', 'Listen and speak', 'Hear phrases, practice pronunciation and explore tonal patterns.'],
-      ['code', 'Create with code', 'Build computational thinking through interactive STEAM lessons.']
+      ['code', 'Create with code', 'Build computational thinking through interactive STEM lessons.']
     ];
     return `<section class="home-benefits-section home-ribbon-section" aria-labelledby="home-benefits-title"><div class="container"><div class="home-section-heading"><span class="section-kicker">A learning space for every kind of curious</span><h2 id="home-benefits-title">Why Idilewa?</h2><p>Language, culture and technology belong in the same learning journey.</p></div><div class="home-benefits-grid">${benefits.map(([glyph,title,copy]) => `<article class="home-benefit"><span class="home-benefit-icon">${icon(glyph, 24)}</span><h3>${title}</h3><p>${copy}</p></article>`).join('')}</div></div></section>`;
   }
@@ -814,7 +814,7 @@ import {
   function renderHomeAppPreview() {
     const previews = [
       { title: 'Hear a greeting', label: 'Yorùbá · Language', copy: 'Start with a phrase, then listen for the tones that shape its meaning.', image: 'page-languages-1.jpg', route: 'languages', action: 'Explore languages' },
-      { title: 'Make something', label: 'Code · STEAM', copy: 'Turn your ideas into small programs in a welcoming code studio.', image: 'code-kids.jpg', route: 'coding', action: 'Open Code Studio' },
+      { title: 'Make something', label: 'Code · STEM', copy: 'Turn your ideas into small programs in a welcoming code studio.', image: 'code-kids.jpg', route: 'coding', action: 'Open Code Studio' },
       { title: 'Find a story', label: 'Stories · Culture', copy: 'Read and listen to stories that invite sharing across generations.', image: 'story-grandmother.jpg', route: 'ere', action: 'Read a story' },
       { title: 'Practice a sound', label: 'Voice Lessons', copy: 'Build confidence with vowels, consonants and guided speaking practice.', image: 'listening-reader.jpg', route: 'voice_lessons', action: 'Start a lesson' }
     ];
@@ -833,12 +833,12 @@ import {
       <div class="home-app-swipe-area"><div class="home-app-swipe-heading"><div><span class="section-kicker">Look around</span><h3>One space. Many ways to grow.</h3></div></div>
         <div class="home-app-swipe-track" id="home-app-swipe-track" tabindex="0" aria-label="Automatically scrolling Idilewa learning previews">${previews.map((item, index) => renderPreviewCard(item, index)).join('')}${previews.map((item, index) => renderPreviewCard(item, index, true)).join('')}</div><div class="home-app-swipe-hint">Swipe or scroll to explore <span aria-hidden="true">→</span></div>
       </div>
-    </div></section><section class="home-principles-strip" aria-label="Idilewa learning principles"><div class="container"><span>${icon('globe', 17)} African languages</span><span>${icon('people', 17)} Family learning</span><span>${icon('leaf', 17)} Culture with context</span><span>${icon('code', 17)} STEAM for young makers</span></div></section>`;
+    </div></section><section class="home-principles-strip" aria-label="Idilewa learning principles"><div class="container"><span>${icon('globe', 17)} African languages</span><span>${icon('people', 17)} Family learning</span><span>${icon('leaf', 17)} Culture with context</span><span>${icon('code', 17)} STEM for young makers</span></div></section>`;
   }
 
   function renderLegacyHome() {
     const featureCards = [
-      { title: 'K–8 STEAM Curriculum', desc: 'Standards-aligned lessons infused with African culture.', icon: 'layers', route: 'curriculum', tone: 'blue', tag: 'Curriculum', image: 'page-languages-1.jpg' },
+      { title: 'K–8 STEM Curriculum', desc: 'Standards-aligned lessons infused with African culture.', icon: 'layers', route: 'curriculum', tone: 'blue', tag: 'Curriculum', image: 'page-languages-1.jpg' },
       { title: 'Code in your language', desc: 'Interactive bilingual coding studio for kids.', icon: 'code', route: 'coding', tone: 'yellow', tag: 'Interactive IDE', image: 'code-kids.jpg' },
       { title: 'Voice Lessons', desc: 'Start with Yorùbá sounds, then practice pitch and pronunciation across African languages.', icon: 'mic', route: 'voice_lessons', tone: 'mint', tag: 'Interactive Audio Lessons', image: 'listening-reader.jpg' },
       { title: 'Read & listen', desc: 'Hear words, voices and ideas.', icon: 'headphones', route: 'voices', tone: 'mint', tag: 'Audio & text', image: 'listening-reader.jpg' },
@@ -995,14 +995,14 @@ import {
             </div>
           </div>
 
-          <!-- Pillar 5: K-8 Code & STEAM -->
+          <!-- Pillar 5: K-8 Code & STEM -->
           <div class="journey-card-3d tone-blue">
             <div class="journey-card-header">
               <div class="journey-3d-step-badge">Pillar 05 · Koodu</div>
               <span class="journey-3d-glyph">&lt;/&gt;</span>
             </div>
             <div class="journey-3d-content">
-              <h3>Indigenous STEAM &amp; Code</h3>
+              <h3>Indigenous STEM &amp; Code</h3>
               <p>K-8 computational thinking in African languages. Unplugged logic for K–2, turtle geometry for 3–5, full syntax for 6–8.</p>
               <ul class="journey-highlights" aria-label="Key features">
                 <li><span>✓</span> Code in Yorùbá (ṣe, ti, fun, pada)</li>
@@ -1127,10 +1127,10 @@ import {
 
   function renderHome() {
     const languages = [
-      { id: 'yoruba', name: 'Yorùbá', flag: '🇳🇬', image: 'yoruba-kids-culture.jpg', alt: 'Young learners exploring Yorùbá culture' },
-      { id: 'igbo', name: 'Igbo', flag: '🇳🇬', image: 'african-kids-friends.jpg', alt: 'Children learning together' },
-      { id: 'hausa', name: 'Hausa', flag: '🇳🇬', image: 'yoruba-educator-man.jpg', alt: 'An educator sharing language learning' },
-      { id: 'swahili', name: 'Kiswahili', flag: '🇹🇿', image: 'listening-reader.jpg', alt: 'A learner listening to a language lesson' }
+      { id: 'yoruba', name: 'Yorùbá', flag: '🇳🇬', image: 'child-language-yoruba.jpg', alt: 'Yorùbá child wearing blue traditional clothing and a headwrap' },
+      { id: 'igbo', name: 'Igbo', flag: '🇳🇬', image: 'child-language-igbo.jpg', alt: 'Igbo child wearing patterned traditional clothing and a red cap' },
+      { id: 'hausa', name: 'Hausa', flag: '🇳🇬', image: 'child-language-hausa.jpg', alt: 'Hausa child wearing an embroidered outfit and patterned cap' },
+      { id: 'swahili', name: 'Kiswahili', flag: '🇹🇿', image: 'child-language-swahili.jpg', alt: 'Child wearing a yellow patterned headscarf and traditional clothing' }
     ];
     const pathways = [
       { icon: 'book', title: 'Learn', copy: 'African languages', route: 'voice-language' },
@@ -1853,7 +1853,7 @@ import {
       badge: 'Ages 5–8',
       desc: 'Foundational computer science, unplugged problem solving, directional robot logic, and early digital citizenship.',
       flowchart: {
-        title: 'K–2nd Grade STEAM Progression Roadmap',
+        title: 'K–2nd Grade STEM Progression Roadmap',
         image: 'https://cdn.prod.website-files.com/67515ca117da61ac21154553/688763017d473a3cf18f822b_flowchart_k-2nd.png',
         summary: 'From pattern recognition and story-led algorithms to loop repetitions and beginner physical robotics.'
       },
@@ -1904,7 +1904,7 @@ import {
       badge: 'Ages 8–11',
       desc: 'Visual block programming, Scratch games, micro:bit physical computing, electrical circuits, and safe digital creation.',
       flowchart: {
-        title: '3rd–5th Grade STEAM Progression Infographic',
+        title: '3rd–5th Grade STEM Progression Infographic',
         image: 'https://cdn.prod.website-files.com/67515ca117da61ac21154553/68876243a382cb50defa2dff_infographic_3rd-5th.png',
         summary: 'From Scratch animation and game physics to microcontrollers, sensor engineering, and floor plan CAD.'
       },
@@ -1955,7 +1955,7 @@ import {
       badge: 'Ages 11–15+',
       desc: 'Transition to line-based languages (Python, JavaScript, HTML/CSS), 3D CAD modeling, cybersecurity defense, and artificial intelligence.',
       flowchart: {
-        title: 'Middle School Computer Science & STEAM Roadmap',
+        title: 'Middle School Computer Science & STEM Roadmap',
         image: 'https://cdn.prod.website-files.com/67515ca117da61ac21154553/689080b566fcae4ee8198124_US%20General%20Flowchart%20Middle%20School.png',
         summary: 'From text-based coding to OOP architecture, data encryption, web publication, and AI ethics.'
       },
@@ -2567,7 +2567,7 @@ import {
           '<div class="curriculum-meta-row">' +
             '<span>' + icon('book', 15) + ' <strong>' + esc(foundGrade.lessonCount) + '</strong></span>' +
             '<span>' + icon('clock', 15) + ' <strong>' + esc(foundGrade.duration) + '</strong></span>' +
-            '<span>' + icon('sparkles', 15) + ' STEAM & Robotics Integrated</span>' +
+            '<span>' + icon('sparkles', 15) + ' STEM & Robotics Integrated</span>' +
           '</div>' +
         '</div>' +
         '<div class="curriculum-modal-body">' +
@@ -2630,7 +2630,7 @@ import {
               '<strong>' + esc(bilingualNote) + '</strong>' +
             '</div>' +
             '<div class="lesson-quick-challenge">' +
-              '<h4>' + icon('sparkles', 16) + ' Maker STEAM Challenge:</h4>' +
+              '<h4>' + icon('sparkles', 16) + ' Maker STEM Challenge:</h4>' +
               '<p>Try applying this concept in our interactive sandbox or robot garden quest!</p>' +
             '</div>' +
           '</div>' +
@@ -2695,7 +2695,7 @@ import {
         id: 'shapes_star',
         title: '🎨 Àwòrán Ìràwọ̀ & Adire (Canvas Graphics)',
         filename: 'aworan_irawo.yoruba',
-        code: '# Fa Ìràwọ̀ ati Onígun Adire lori Canvas\nbẹ̀rẹ̀_àwòrán()\nyi_awo("ofeefe")\nfa_irawo(180, 120, 5, 50, 22)\n\nyi_awo("alawọ-ewe")\nkọ_ọ̀rọ̀("Ìràwọ̀ Idíléwà STEAM 🚀", 80, 240)',
+        code: '# Fa Ìràwọ̀ ati Onígun Adire lori Canvas\nbẹ̀rẹ̀_àwòrán()\nyi_awo("ofeefe")\nfa_irawo(180, 120, 5, 50, 22)\n\nyi_awo("alawọ-ewe")\nkọ_ọ̀rọ̀("Ìràwọ̀ Idíléwà STEM 🚀", 80, 240)',
         explainer: [
           '<b>bẹ̀rẹ̀_àwòrán()</b>: Nu ìbòjú kí o bẹ̀rẹ̀ àwòrán tuntun.',
           '<b>yi_awo("ofeefe")</b>: Yí àwọ̀ pen sí ofeefe (yellow/gold).',
@@ -2706,7 +2706,7 @@ import {
         id: 'age_calc',
         title: '🧮 Ìṣirò Ọjọ́-Orí (Age & Grade Calculator)',
         filename: 'isiro_ojo_ori.yoruba',
-        code: '# Ìṣirò Ọjọ́-orí ati Ipò Ẹkọ STEAM\njẹ́ ọdún_ìbí = 2016\njẹ́ ọdún_yìí = 2026\njẹ́ ọjọ́_orí = ọdún_yìí - ọdún_ìbí\n\ntẹ_jade("Ọjọ́-orí rẹ jẹ́ ọdún: " + ọjọ́_orí)\nbí ọjọ́_orí >= 10 {\n    tẹ_jade("Ipò: Upper Elementary / Middle School African Innovator! 🚀")\n} kò_bá_jẹ́ {\n    tẹ_jade("Ipò: Lower Elementary STEAM Seedling! 🌱")\n}',
+        code: '# Ìṣirò Ọjọ́-orí ati Ipò Ẹkọ STEM\njẹ́ ọdún_ìbí = 2016\njẹ́ ọdún_yìí = 2026\njẹ́ ọjọ́_orí = ọdún_yìí - ọdún_ìbí\n\ntẹ_jade("Ọjọ́-orí rẹ jẹ́ ọdún: " + ọjọ́_orí)\nbí ọjọ́_orí >= 10 {\n    tẹ_jade("Ipò: Upper Elementary / Middle School African Innovator! 🚀")\n} kò_bá_jẹ́ {\n    tẹ_jade("Ipò: Lower Elementary STEM Seedling! 🌱")\n}',
         explainer: [
           '<b>jẹ́ ọjọ́_orí = ọdún_yìí - ọdún_ìbí</b>: Ṣe ìṣirò ìyàtọ̀ láàárín ọdún méjì.',
           '<b>bí ... kò_bá_jẹ́</b>: Pín ọmọ sí ìpele ẹ̀kọ́ tí ó tọ́.'
@@ -2798,7 +2798,7 @@ import {
         id: 'decision_tree_swahili',
         title: '💡 Hekima na Uamuzi (Wisdom & Logic)',
         filename: 'hekima.swahili',
-        code: '# Maamuzi kwa Kiswahili\nweka uaminifu = kweli\nweka alama = 85\n\nkama uaminifu == kweli {\n    andika("Uaminifu ni msingi thabiti wa maisha!")\n    kama alama >= 80 {\n        andika("Hongera: Matokeo bora ya STEAM! (+25 XP) 🌟")\n    }\n} vinginevyo {\n    andika("Zingatia uaminifu na bidii.")\n}',
+        code: '# Maamuzi kwa Kiswahili\nweka uaminifu = kweli\nweka alama = 85\n\nkama uaminifu == kweli {\n    andika("Uaminifu ni msingi thabiti wa maisha!")\n    kama alama >= 80 {\n        andika("Hongera: Matokeo bora ya STEM! (+25 XP) 🌟")\n    }\n} vinginevyo {\n    andika("Zingatia uaminifu na bidii.")\n}',
         explainer: [
           '<b>kama ... vinginevyo</b>: Masharti ya uamuzi (if/else).'
         ]
@@ -2809,7 +2809,7 @@ import {
         id: 'bilingual_python',
         title: '🐍 Python Bilingual Studio',
         filename: 'african_steam.py',
-        code: '# Bilingual African STEAM Python\nstudent = "Young African Innovator"\nlanguages = ["Yorùbá", "Igbo", "Hausa", "Swahili"]\n\nprint(f"E ku aaro / Nnoo / Sannu / Hujambo {student}!")\nfor lang in languages:\n    print(f"✓ Empowering kids to code in {lang} 🌍")',
+        code: '# Bilingual African STEM Python\nstudent = "Young African Innovator"\nlanguages = ["Yorùbá", "Igbo", "Hausa", "Swahili"]\n\nprint(f"E ku aaro / Nnoo / Sannu / Hujambo {student}!")\nfor lang in languages:\n    print(f"✓ Empowering kids to code in {lang} 🌍")',
         explainer: [
           '<b>for lang in languages:</b>: Loop through each indigenous African language.',
           '<b>print(...)</b>: Output formatted strings to terminal.'
@@ -2817,9 +2817,9 @@ import {
       },
       {
         id: 'math_python',
-        title: '🔢 African STEAM Math Calculator',
+        title: '🔢 African STEM Math Calculator',
         filename: 'calculator.py',
-        code: '# African STEAM Math Calculator\nnum1 = 12\nnum2 = 8\ntotal = num1 + num2\nproduct = num1 * num2\n\nprint("STEAM Innovation Hub Calculations:")\nprint(f"Sum of {num1} + {num2} = {total}")\nprint(f"Product of {num1} x {num2} = {product}")\nif total >= 20:\n    print("✓ Threshold reached: Super Junior Engineer! 🚀")',
+        code: '# African STEM Math Calculator\nnum1 = 12\nnum2 = 8\ntotal = num1 + num2\nproduct = num1 * num2\n\nprint("STEM Innovation Hub Calculations:")\nprint(f"Sum of {num1} + {num2} = {total}")\nprint(f"Product of {num1} x {num2} = {product}")\nif total >= 20:\n    print("✓ Threshold reached: Super Junior Engineer! 🚀")',
         explainer: [
           '<b>total = num1 + num2</b>: Mathematical arithmetic.',
           '<b>if total >= 20:</b>: Conditional evaluation.'
@@ -2827,9 +2827,9 @@ import {
       },
       {
         id: 'loop_python',
-        title: '🚀 Rocket Countdown & STEAM Greetings',
+        title: '🚀 Rocket Countdown & STEM Greetings',
         filename: 'countdown.py',
-        code: '# African Satellite STEAM Launch\nhub = "Idilewa African Space & STEAM Lab"\nprint(f"Initiating launch sequence from {hub}...")\n\nfor count in [5, 4, 3, 2, 1]:\n    print(f"T-minus {count} seconds...")\n\nprint("🚀 Blast off! Empowering Africa\'s next tech innovators!")',
+        code: '# African Satellite STEM Launch\nhub = "Idilewa African Space & STEM Lab"\nprint(f"Initiating launch sequence from {hub}...")\n\nfor count in [5, 4, 3, 2, 1]:\n    print(f"T-minus {count} seconds...")\n\nprint("🚀 Blast off! Empowering Africa\'s next tech innovators!")',
         explainer: [
           '<b>for count in [5, 4, 3, 2, 1]:</b>: Countdown sequence loop.',
           '<b>print(...)</b>: Terminal output.'
@@ -4291,17 +4291,17 @@ import {
 
         '<div class="c4k-hero-content-wrapper">' +
           '<div class="c4k-badge-pill">' +
-            icon('sparkles', 16) + ' <span>IDILEWA CODE FOR KIDS · K-8 INDIGENOUS STEAM CURRICULUM</span>' +
+            icon('sparkles', 16) + ' <span>IDILEWA CODE FOR KIDS · K-8 INDIGENOUS STEM CURRICULUM</span>' +
           '</div>' +
           '<h1 class="c4k-3d-main-heading">Curriculum</h1>' +
           '<p class="c4k-3d-sub-lead">' +
-            'From Kindergarten to Grade 8 · Engaging STEAM, Algorithmic Thinking & Indigenous Language Coding for Young African Innovators.' +
+            'From Kindergarten to Grade 8 · Engaging STEM, Algorithmic Thinking & Indigenous Language Coding for Young African Innovators.' +
           '</p>' +
 
           '<!-- Quick Jump Action Pills -->' +
           '<div class="c4k-quick-pills-row">' +
             '<button type="button" class="c4k-nav-pill active" data-action="coding-jump-band" data-band="curriculum-bands">' + icon('layers', 14) + ' K-8 Curriculum</button>' +
-            '<button type="button" class="c4k-nav-pill" data-action="coding-jump-band" data-band="free-lessons">' + icon('book', 14) + ' Free STEAM Lessons (' + C4K_FREE_LESSONS.length + ')</button>' +
+            '<button type="button" class="c4k-nav-pill" data-action="coding-jump-band" data-band="free-lessons">' + icon('book', 14) + ' Free STEM Lessons (' + C4K_FREE_LESSONS.length + ')</button>' +
             routeLink('coding', icon('code', 14) + ' Code IDE', 'c4k-nav-pill') +
           '</div>' +
 
@@ -4313,7 +4313,7 @@ import {
                 '<div class="c4k-hub-text">' +
                   '<h3>Lower Elementary</h3>' +
                   '<p class="c4k-grade-tag">Kindergarten – Grade 2</p>' +
-                  '<p class="c4k-desc">Visual Block Patterns, Unplugged Logic & African Cultural STEAM Storytelling.</p>' +
+                  '<p class="c4k-desc">Visual Block Patterns, Unplugged Logic & African Cultural STEM Storytelling.</p>' +
                 '</div>' +
                 '<div class="c4k-card-cta"><span>Explore Grades K–2</span> ' + icon('arrow-right', 14) + '</div>' +
               '</div>' +
@@ -4418,9 +4418,9 @@ import {
       '<!-- 5. Section: Free Lessons (Teach Computer Science Today) in Cards -->' +
       '<section class="c4k-free-lessons-section" id="free-lessons" aria-labelledby="free-lessons-title">' +
         '<div class="c4k-free-header text-center">' +
-          '<div class="c4k-free-badge">' + icon('sparkles', 16) + ' <span>30+ FREE STEAM LESSONS</span></div>' +
+          '<div class="c4k-free-badge">' + icon('sparkles', 16) + ' <span>30+ FREE STEM LESSONS</span></div>' +
           '<h2 class="c4k-free-title" id="free-lessons-title">Teach Computer Science Today</h2>' +
-          '<p class="text-sub-heading-free-lessons">Jump directly into ready-to-teach, standards-aligned STEAM lessons infused with Yoruba, Igbo, Hausa and African cultural concepts.</p>' +
+          '<p class="text-sub-heading-free-lessons">Jump directly into ready-to-teach, standards-aligned STEM lessons infused with Yoruba, Igbo, Hausa and African cultural concepts.</p>' +
         '</div>' +
 
         '<div class="c4k-filter-box">' +
@@ -4433,7 +4433,7 @@ import {
               '<button type="button" class="c4k-band-pill ' + (flow.filter === '68' ? 'is-active' : '') + '" data-action="coding-filter-band" data-band="68">6–8+ Middle School</button>' +
             '</div>' +
             '<div class="c4k-count-badge">' +
-              '<span>Showing <strong>' + filteredLessons.length + '</strong> of ' + C4K_FREE_LESSONS.length + ' free STEAM lessons</span>' +
+              '<span>Showing <strong>' + filteredLessons.length + '</strong> of ' + C4K_FREE_LESSONS.length + ' free STEM lessons</span>' +
             '</div>' +
           '</div>' +
 
@@ -4467,9 +4467,9 @@ import {
           '<div class="c4k-subscribe-wrapper">' +
             '<div class="c4k-subscribe-content">' +
               '<span class="badge badge-curriculum-orange">Stay Connected</span>' +
-              '<h3 class="heading-3 c4k-sub-title">Get Free Monthly African STEAM Lessons</h3>' +
+              '<h3 class="heading-3 c4k-sub-title">Get Free Monthly African STEM Lessons</h3>' +
               '<div class="text-lg text-color-bright-overlay-80 max-width-480">' +
-                'Join thousands of teachers and families getting culturally rich STEAM lesson plans, robotics challenges, and coding activities with African language roots.' +
+                'Join thousands of teachers and families getting culturally rich STEM lesson plans, robotics challenges, and coding activities with African language roots.' +
               '</div>' +
               '<form class="c4k-subscribe-form" data-form="coding-subscribe">' +
                 '<input type="email" name="email" placeholder="Enter your school or guardian email…" required class="c4k-sub-input" />' +
@@ -5184,7 +5184,7 @@ import {
     const profile = getProfileDetails();
     const interests = [
       ['speaking', 'Speaking & listening'], ['stories', 'Stories & culture'],
-      ['coding', 'Coding & STEAM'], ['family', 'Learning with family']
+      ['coding', 'Coding & STEM'], ['family', 'Learning with family']
     ];
     return `<section class="profile-editor" aria-labelledby="profile-editor-title">
       <div class="profile-editor-heading"><span class="section-kicker">Your account · your learning path</span><h2 id="profile-editor-title">Complete your profile</h2><p>Tell us how you want to learn. You can update these details any time.</p></div>
@@ -8763,7 +8763,7 @@ import {
       const countEl = document.getElementById('freeLessonsCount');
       const filtered = filterFreeLessons();
       if (grid) grid.innerHTML = renderFreeLessonCards(filtered);
-      if (countEl) countEl.textContent = `Showing ${filtered.length} of ${C4K_FREE_LESSONS.length} free STEAM lessons`;
+      if (countEl) countEl.textContent = `Showing ${filtered.length} of ${C4K_FREE_LESSONS.length} free STEM lessons`;
     }
   });
 
@@ -8930,7 +8930,7 @@ import {
       const email = String(data.get('email') || '').trim();
       if (email) {
         form.reset();
-        showToast(`🎉 Thank you for subscribing (${email})! You will receive Code for Kids STEAM updates.`, 'success');
+        showToast(`🎉 Thank you for subscribing (${email})! You will receive Code for Kids STEM updates.`, 'success');
       }
     } else if (type === 'lesson-response') {
       const response = String(data.get('response') || '').trim();

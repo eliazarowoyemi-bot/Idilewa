@@ -35,7 +35,7 @@ export function createWelcomeEmail({ name, loginUrl, logoUrl = 'https://idilewa.
     {
       number: '04',
       title: 'Create with code',
-      description: 'Explore playful coding and K–8 STEAM activities, with pathways for families and educators.',
+      description: 'Explore playful coding and K–8 STEM activities, with pathways for families and educators.',
       color: '#fff5d9',
     },
   ];
@@ -52,7 +52,7 @@ export function createWelcomeEmail({ name, loginUrl, logoUrl = 'https://idilewa.
               </td></tr>`).join('');
   return {
     subject: 'Welcome to Idilewa — keep your language close',
-    text: `Ẹ káàbọ̀, ${displayName}!\n\nWelcome to Idilewa, a learning space for African languages, culture and technology. Your learning space is ready whenever you are.\n\nFOUR WAYS TO BEGIN\n\n01 · Learn a language\nBuild everyday vocabulary in Yorùbá, Igbo, Hausa and Kiswahili with guided learning paths.\n\n02 · Listen, speak and explore\nTry voice lessons, hear tones and greetings, and grow your confidence one practice at a time.\n\n03 · Discover stories and culture\nRead and listen to African stories, proverbs and cultural learning made to be shared.\n\n04 · Create with code\nExplore playful coding and K–8 STEAM activities, with pathways for families and educators.\n\nYour journey is yours to shape. Start with one activity, then return whenever you are ready to keep learning.\n\nSign in to open your learning space: ${loginUrl}\n\nIf you did not create this account, you can safely ignore this email. Your password is never included in email.\n\nWith warmth,\nThe Idilewa team`,
+    text: `Ẹ káàbọ̀, ${displayName}!\n\nWelcome to Idilewa, a learning space for African languages, culture and technology. Your learning space is ready whenever you are.\n\nFOUR WAYS TO BEGIN\n\n01 · Learn a language\nBuild everyday vocabulary in Yorùbá, Igbo, Hausa and Kiswahili with guided learning paths.\n\n02 · Listen, speak and explore\nTry voice lessons, hear tones and greetings, and grow your confidence one practice at a time.\n\n03 · Discover stories and culture\nRead and listen to African stories, proverbs and cultural learning made to be shared.\n\n04 · Create with code\nExplore playful coding and K–8 STEM activities, with pathways for families and educators.\n\nYour journey is yours to shape. Start with one activity, then return whenever you are ready to keep learning.\n\nSign in to open your learning space: ${loginUrl}\n\nIf you did not create this account, you can safely ignore this email. Your password is never included in email.\n\nWith warmth,\nThe Idilewa team`,
     html: `<!doctype html>
 <html lang="en">
   <head>

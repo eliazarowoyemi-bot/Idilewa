@@ -1,6 +1,6 @@
 # Idilewa — Preserving African Culture. Promoting Technology.
 
-A family- and community-centered web application for African language learning, oral traditions, cultural storytelling, and K–8 indigenous coding and STEAM.
+A family- and community-centered web application for African language learning, oral traditions, cultural storytelling, and K–8 indigenous coding and STEM.
 
 ---
 
@@ -13,7 +13,7 @@ The experience unifies:
 - **Language Discovery:** Foundation learning for Yorùbá, Igbo, Hausa, and Kiswahili, alongside planned paths for Twi, Wolof, isiZulu, and Fulfulde.
 - **African Voice Trainer & Sound Studio:** 60 structured lessons across Beginner, Intermediate, and Advanced tiers, Do-Re-Mi tone melodies, and phonetic visualizers.
 - **Living Stories & Oral Traditions:** Òwe (proverbs), Oríkì (praise poetry & remembrance), Ifá educational overviews, and intergenerational family stories.
-- **Code for Kids (K–8 STEAM):** Indigenous coding environment (*ÈdèKoodu*) with turtle graphics, bilingual keyword maps, and grade-band curriculums.
+- **Code for Kids (K–8 STEM):** Indigenous coding environment (*ÈdèKoodu*) with turtle graphics, bilingual keyword maps, and grade-band curriculums.
 - **Family & Educator Stewardship:** Parent/guardian consent demonstrations and tutor discovery with privacy-conscious safeguarding.
 
 ---
@@ -60,7 +60,7 @@ The application incorporates a restrained, performant Three.js 3D engine integra
      - **Pillar 02 (Ohùn):** Voice & Tonal Melody Studio
      - **Pillar 03 (Òwe & Oríkì):** Oral Traditions & Attributed Wisdom
      - **Pillar 04 (Ìtàn):** Stories That Travel & Family Reading
-     - **Pillar 05 (Koodu):** Indigenous STEAM & Code for Kids
+     - **Pillar 05 (Koodu):** Indigenous STEM & Code for Kids
 3. **Route 3D Stages:**
    - **Coding (`#/coding`):** 3D Yoruba Hologram Matrix Cube & Rotating Glyphs (`init3DCodingCanvas`).
    - **Stories (`#/ere`, `#/oral`):** 3D Sacred Story Drum, Cowrie Shell & Magic Story Orb (`init3DStoryCanvas`).
@@ -89,7 +89,7 @@ The application is bundled with Vite as an ES module web application:
 
 ## 5. Cultural World Application Blueprint
 
-The Cultural World (`#/world`) is the learner-facing hub for Idilewa's existing language, oral-heritage and K–8 STEAM experiences. It adds an interactive map without replacing the working single-page application or making existing lessons inaccessible.
+The Cultural World (`#/world`) is the learner-facing hub for Idilewa's existing language, oral-heritage and K–8 STEM experiences. It adds an interactive map without replacing the working single-page application or making existing lessons inaccessible.
 
 ### Route and learning architecture
 
@@ -102,7 +102,7 @@ HTML entry shell
     │   ├── Ohùn · Voice           #/trainer → voice and pronunciation activities
     │   ├── Ìtàn · Stories          #/ere → reading and story activities
     │   ├── Òwe · Wisdom            #/owe → proverbs, context and reflection
-    │   └── Kóòdù · Create          #/coding → existing K–8 coding and STEAM studio
+    │   └── Kóòdù · Create          #/coding → existing K–8 coding and STEM studio
     └── #/passport                 Existing profile, progress, streak and milestone view
         └── #/profile              Same profile view for backwards compatibility
 
@@ -132,7 +132,7 @@ Route arrivals and sheet/card interactions use short, damped CSS timing curves; 
 
 ### Educational module contract
 
-Each biome offers a short orientation and a next-step action, then hands learning off to the established Idilewa module. Language lessons follow the language → level → module → lesson sequence; voice practice keeps its existing pronunciation and tonal-learning structure; stories and proverbs retain context and attribution; coding continues to use the K–8 STEAM curriculum. The map is a navigation and discovery layer, not a claim that all cultural material is complete or community-reviewed.
+Each biome offers a short orientation and a next-step action, then hands learning off to the established Idilewa module. Language lessons follow the language → level → module → lesson sequence; voice practice keeps its existing pronunciation and tonal-learning structure; stories and proverbs retain context and attribution; coding continues to use the K–8 STEM curriculum. The map is a navigation and discovery layer, not a claim that all cultural material is complete or community-reviewed.
 
 ---
 
@@ -172,7 +172,7 @@ All 37 HTML entries declared in the active `vite.config.js` are supported:
 | | `#/guides` (`guides.html`) | Living culture guides: greetings, naming traditions, customs, and festivals. |
 | | `#/human` (`human.html`) | People and community portal highlighting educators and culture bearers. |
 | | `#/keepers` (`keepers.html`) | Culture keepers page foregrounding attribution, privacy, and community agency. |
-| **Coding & STEAM** | `#/coding` (`coding.html`) | Code for Kids (K–8): grade bands, African-language coding lessons, browser HTML/CSS/JavaScript previews, and additional compiler runtimes when the private runner is configured. |
+| **Coding & STEM** | `#/coding` (`coding.html`) | Code for Kids (K–8): grade bands, African-language coding lessons, browser HTML/CSS/JavaScript previews, and additional compiler runtimes when the private runner is configured. |
 | **Community & Safety**| `#/about` (`about.html`) | Origin story and philosophy of Idilewa. |
 | | `#/method` (`method.html`) | Pedagogical progression connecting listening, cultural context, and practice. |
 | | `#/connect_teachers` (`connect_teachers.html`)| Sample tutor directory requiring parent-approved code (demo-only, no live bookings). |
@@ -263,7 +263,7 @@ RESEND_API_KEY=your-email-provider-api-key
 RESEND_FROM_EMAIL=Idilewa <no-reply@your-verified-domain.example>
 ```
 
-After Supabase creates an account, the app requests a welcome email from `/api/auth/welcome`. The server verifies the new account through Supabase and sends the message through Resend to the email address on that account; it does not depend on the user remaining signed in. The responsive welcome message introduces Idilewa and four ways to begin: language learning, voice practice, stories and culture, and coding/STEAM. Its sign-in link returns the user to the canonical production login page. Supabase still sends the separate sign-up verification code, so configure its Auth email template to use `{{ .Token }}` as described above. A failed welcome-email delivery is reported without discarding the newly created account.
+After Supabase creates an account, the app requests a welcome email from `/api/auth/welcome`. The server verifies the new account through Supabase and sends the message through Resend to the email address on that account; it does not depend on the user remaining signed in. The responsive welcome message introduces Idilewa and four ways to begin: language learning, voice practice, stories and culture, and coding/STEM. Its sign-in link returns the user to the canonical production login page. Supabase still sends the separate sign-up verification code, so configure its Auth email template to use `{{ .Token }}` as described above. A failed welcome-email delivery is reported without discarding the newly created account.
 
 Never expose `SUPABASE_SERVICE_ROLE_KEY`, `GUARDIAN_TOKEN_SECRET` or the Resend key in a `VITE_` variable. Verify the sender domain and rate-limit policies before launch. Set `APP_BASE_URL` to the canonical HTTPS site origin. With `GUARDIAN_TOKEN_SECRET` set to the same secret in your shell, run `node scripts/create-educator-invite.mjs`; provide the printed SQL to a trusted Supabase operator, then share the code with the intended educator once. The database consumes it atomically during account creation.
 

@@ -13,7 +13,7 @@ The product brings several learning modes into one web experience:
 - Language discovery and structured beginner-to-advanced learning paths.
 - Listening, pronunciation, tonal awareness, and sample speech practice.
 - Stories and oral traditions, including proverbs (Òwe), praise poetry (Oríkì), and cultural introductions.
-- A K-8 coding and STEAM space that connects programming ideas to African languages and cultural examples.
+- A K-8 coding and STEM space that connects programming ideas to African languages and cultural examples.
 - Learner progress and family/tutor discovery concepts, with parent consent as a prerequisite for child-tutor connections.
 
 The repository is best understood as a rich interactive prototype with a growing server-backed boundary, not a fully deployed learning service. The shared client application integrates Supabase Auth and separate translation, Yoruba-code, phoneme-data, and Three.js modules. Sign-up/sign-in require configured Supabase Auth. The Code page supports local African-language lessons and browser-based web previews; additional compiler runtimes require the Vercel API routes and a configured private Judge0 CE service. Production safeguarding, real tutor communication, reviewed language media, and durable learner records remain work to complete.
@@ -30,7 +30,7 @@ Language learning can become detached from the family, community, history, and e
 - Encourage practice through short, understandable steps rather than a single intimidating course.
 - Teach listening and pronunciation alongside written words and meanings.
 - Place proverbs, stories, oral forms, and cultural context beside language instruction.
-- Let young learners encounter computational thinking and STEAM in culturally familiar contexts.
+- Let young learners encounter computational thinking and STEM in culturally familiar contexts.
 - Give families and educators a visible role in supporting children.
 - Treat consent, attribution, cultural nuance, and privacy as core product requirements.
 
@@ -58,7 +58,7 @@ Language learning can become detached from the family, community, history, and e
 3. **Follow a course.** The intended structure is language -> level -> module -> lesson. The code describes three levels and 20 lessons per level, organized into four modules.
 4. **Practice.** Lesson views include a prompt, short activity, answers or response fields, feedback, and local progress behavior. The voice trainer adds selectable phrases, tone examples, speed settings, lesson navigation, and a recording/analysis flow.
 5. **Explore culture through oral forms.** Learners can move from the oral-traditions overview into stories, proverbs, Oríkì, voice samples, and introductory Ifá/Odu pages. Some experiences gate later steps on a previous comprehension check.
-6. **Create with code.** The coding route introduces K-8 curriculum bands, a language-aware code environment, and free STEAM lessons. Challenges use points and completion state.
+6. **Create with code.** The coding route introduces K-8 curriculum bands, a language-aware code environment, and free STEM lessons. Challenges use points and completion state.
 7. **Reflect and continue.** Learners can save sample stories, write a proverb reflection, view progress, and revisit course or culture routes.
 8. **Connect with an educator (intended flow).** A child requests family approval; a guardian completes the consent flow and may approve a specific tutor; the child verifies a code; the tutor validates the matching code before seeing an anonymous assignment. In the current demo, these checks are local browser checks and do not establish real identity or secure authorization.
 
@@ -119,7 +119,7 @@ The trainer UI includes six language choices (Yorùbá, Igbo, Hausa, Kiswahili, 
 
 | Entry / route | Purpose and current experience |
 |---|---|
-| `coding.html` / `coding` | K-8 Code for Kids/STEAM experience. Shows K-2, grades 3-5, and grades 6-8 curriculum bands; code-in-your-language lessons; browser-based HTML/CSS/JavaScript previews; and an IDE that can discover and run installed runtimes through the Vercel API and private Judge0 CE. Compiler availability depends on the deployed runner configuration. |
+| `coding.html` / `coding` | K-8 Code for Kids/STEM experience. Shows K-2, grades 3-5, and grades 6-8 curriculum bands; code-in-your-language lessons; browser-based HTML/CSS/JavaScript previews; and an IDE that can discover and run installed runtimes through the Vercel API and private Judge0 CE. Compiler availability depends on the deployed runner configuration. |
 | `about.html` / `about` | Product story: culture, community language, oral tradition, and technology belong together. Shared editorial layout with cards to related areas. |
 | `method.html` / `method` | Learning-method overview that connects listening, practice, and cultural context. Describes a clear progression from language through lesson; links to voice, practice, and oral culture. |
 | `connect_teachers.html` / `connect_teachers` | Family/learner-facing sample tutor directory. Filters illustrative educator profiles and teaching focus; requires a guardian-approved code before a demo introduction request. The page expressly says profiles/schedules are sample data and no booking or message is sent. |
@@ -183,7 +183,7 @@ The HTML shells use `#fbfcf8` as their theme-color metadata. This is close to, b
 - The actual app's trainer UI and `app.js` contain their own trainer curriculum and event behavior. The shared app imports the translation and sound-reference modules, but the trainer still uses its own lesson data.
 - Browser audio and speech support varies by platform and installed voices. Browser speech output should not be described as a verified native recording.
 
-### Coding and STEAM
+### Coding and STEM
 
 - The interface includes a K-8 curriculum concept, grade-band cards, free lesson search/category/grade filters, IDE-like input/output, and challenge completion feedback.
 - `src/yorubaCodeEngine.js` separately defines Yoruba keyword aliases, color words, lesson examples, transpilation, code execution, and a Yoruba-term speech helper.

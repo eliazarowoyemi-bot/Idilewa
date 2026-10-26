@@ -36,14 +36,21 @@ test('auth callback exchanges confirmation sessions and safely routes recovery',
   assert.match(viteConfigSource, /'auth-callback'/);
 });
 
-test('homepage uses only the supplied family learning photo as the hero artwork', async () => {
+test('homepage hero and language cards use their supplied images in language order', async () => {
   assert.match(appSource, /src="\/assets\/home-family-learning\.jpg"/);
   assert.match(appSource, /src="\/assets\/\$\{language\.image\}"/);
   assert.match(appSource, /src="\/assets\/story-grandmother\.jpg"/);
   assert.doesNotMatch(appSource, /home-hero-illustration\.svg|home-hero-art-label/);
-  assert.doesNotMatch(appSource, /idilewa-family-view\.png/);
+  assert.match(appSource, /id: 'yoruba', name: 'Yorùbá'[^\\n]*image: 'child-language-yoruba\.jpg'/);
+  assert.match(appSource, /id: 'igbo', name: 'Igbo'[^\\n]*image: 'child-language-igbo\.jpg'/);
+  assert.match(appSource, /id: 'hausa', name: 'Hausa'[^\\n]*image: 'child-language-hausa\.jpg'/);
+  assert.match(appSource, /id: 'swahili', name: 'Kiswahili'[^\\n]*image: 'child-language-swahili\.jpg'/);
   const photo = await readFile(new URL('../public/assets/home-family-learning.jpg', import.meta.url));
   assert.deepEqual([...photo.subarray(0, 2)], [0xff, 0xd8]);
+  for (const name of ['yoruba', 'igbo', 'hausa', 'swahili']) {
+    const languageImage = await readFile(new URL(`../public/assets/child-language-${name}.jpg`, import.meta.url));
+    assert.deepEqual([...languageImage.subarray(0, 2)], [0xff, 0xd8]);
+  }
 });
 
 test('adult sign-in is password-based and child sign-in uses a parent-issued passcode', () => {

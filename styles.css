@@ -3128,9 +3128,11 @@ h3 { font-size: 17px; line-height: 1.25; font-weight: 760; }
 
 .journey-step-badge {
   display: inline-flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 7px;
   margin-bottom: 8px;
+  min-width: 0;
 }
 
 .journey-step-num {
@@ -3144,11 +3146,13 @@ h3 { font-size: 17px; line-height: 1.25; font-weight: 760; }
 }
 
 .journey-step-tag {
+  min-width: 0;
   font-size: 9.5px;
   font-weight: 850;
   letter-spacing: 0.07em;
   color: #6d7d71;
   text-transform: uppercase;
+  overflow-wrap: anywhere;
 }
 
 .journey-step-title {
@@ -4307,7 +4311,7 @@ h3 { font-size: 17px; line-height: 1.25; font-weight: 760; }
 }
 
 /* ==========================================================================
-   CODE FOR KIDS (C4K) REDESIGNED CURRICULUM & STEAM SYSTEM (Idilewa Palette)
+   CODE FOR KIDS (C4K) REDESIGNED CURRICULUM & STEM SYSTEM (Idilewa Palette)
    ========================================================================== */
 
 .c4k-redesigned-page {
@@ -9810,7 +9814,7 @@ body[data-page="login"] #main > .modern-auth-page > .auth-layer-guide {
   .landing-language-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
   .landing-language-card { position: relative; min-width: 0; overflow: hidden; border: 1px solid #e9efea; border-radius: 13px; background: #fff; transition: transform .18s ease, box-shadow .18s ease; }
   .landing-language-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(28, 56, 38, .1); }
-  .landing-language-card img { width: 100%; aspect-ratio: 1.13; object-fit: cover; }
+  .landing-language-card img { width: 100%; aspect-ratio: .84; object-fit: cover; object-position: center top; }
   .landing-language-flag { position: absolute; top: 8px; left: 8px; display: grid; width: 25px; height: 25px; place-items: center; overflow: hidden; border: 2px solid white; border-radius: 50%; background: white; font-size: 18px; box-shadow: 0 2px 6px rgba(0,0,0,.12); }
   .landing-language-name { display: block; padding: 9px 9px 2px; font-size: 12px; font-weight: 800; }
   .landing-language-action { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 2px 9px 10px; color: #79847d; font-size: 9px; font-weight: 650; }
@@ -9896,7 +9900,7 @@ body[data-page="login"] #main > .modern-auth-page > .auth-layer-guide {
     .landing-section-heading p { font-size: 10px; line-height: 1.4; }
     .landing-section-heading > .text-link { flex: 0 0 auto; font-size: 10px; }
     .landing-language-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
-    .landing-language-card img { aspect-ratio: 1.35; }
+    .landing-language-card img { aspect-ratio: .84; }
     .landing-language-name { font-size: 11px; }
     .landing-language-action { font-size: 8px; }
     .landing-voice-card { grid-template-columns: 38px minmax(0, 1fr); gap: 10px; padding: 15px; }
@@ -10421,4 +10425,34 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
   .world-sheet-backdrop,
   .world-lesson-sheet { animation-duration: .01ms; }
   .world-zone-card, .world-zone-arrow, .mobile-tab { transition-duration: .01ms; }
+}
+
+@media (max-width: 900px) {
+  .journey-step-card,
+  .journey-step-content { min-width: 0; }
+  .adult-pathway-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trainer-tabs-wrap { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .trainer-level-tab { min-width: 0; gap: 8px; padding: 12px; }
+  .level-label { min-width: 0; }
+  .section-heading,
+  .code-section-heading { flex-wrap: wrap; align-items: flex-start; }
+  .section-heading > .text-link,
+  .code-section-heading > .text-link { margin: 0; }
+}
+
+@media (max-width: 760px) {
+  .adult-pathway-grid { grid-template-columns: minmax(0, 1fr); }
+}
+
+@media (max-width: 620px) {
+  .section-heading,
+  .landing-section-heading,
+  .code-section-heading { gap: 8px; }
+  .section-heading > .text-link,
+  .landing-section-heading > .text-link,
+  .code-section-heading > .text-link { flex: 0 1 auto; }
+  .dashboard-panel { padding: 18px; }
+  .family-learner-grid,
+  .educator-learner-grid { grid-template-columns: minmax(0, 1fr); }
+  .adult-learning-hero { padding: 24px 20px; }
 }

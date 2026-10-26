@@ -66,7 +66,7 @@ export const CULTURAL_BIOMES = [
     id: 'code',
     title: 'Kóòdù · Create',
     shortTitle: 'Maker ridge',
-    description: 'Build ideas with creative coding and K–8 STEAM activities.',
+    description: 'Build ideas with creative coding and K–8 STEM activities.',
     phrase: 'Imagine · make · share',
     translation: null,
     route: 'coding',
