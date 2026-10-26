@@ -3217,7 +3217,8 @@ h3 { font-size: 17px; line-height: 1.25; font-weight: 760; }
 
 .journey-step-card[data-step="1"] .journey-step-visual img { object-position: 22% center; }
 .journey-step-card[data-step="3"] .journey-step-visual img { object-position: 68% center; }
-.journey-step-card[data-step="6"] .journey-step-visual img { object-position: 72% center; }
+.journey-step-card[data-step="4"] .journey-step-visual img { object-position: 74% center; }
+.journey-step-card[data-step="6"] .journey-step-visual img { object-position: 84% center; }
 
 .journey-step-card:hover .journey-step-visual img {
   transform: scale(1.05);
