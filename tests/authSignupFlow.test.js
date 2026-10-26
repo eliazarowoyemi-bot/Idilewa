@@ -7,18 +7,33 @@ const supabaseClientSource = await readFile(new URL('../src/supabaseClient.js', 
 
 test('signup offers adult accounts without guardian consent and retains child approval', () => {
   assert.match(appSource, /data-role="adult"[^>]*role="radio" aria-checked=/);
-  assert.match(appSource, /Adult accounts can be created directly and do not require parent or guardian consent/);
+  assert.match(appSource, /Adult accounts do not need parent or guardian approval, but must confirm their email/);
   assert.match(appSource, /const accountType = data\.get\('accountType'\) === 'adult' \? 'adult' : 'child';/);
   assert.match(appSource, /accountType === 'child'\s*&&\s*\(!verifiedGuardianSignup/);
   assert.match(appSource, /!signUp \|\| !isChild \|\| verifiedGuardianSignup/);
   assert.match(appSource, /Create Adult Learning Space/);
 });
 
-test('successful signup returns to sign-in rather than navigating into the app', async () => {
-  assert.match(appSource, /await signOutAccount\(\{ notify: false \}\);\s*signupEmailForSignin = email\.toLowerCase\(\);[\s\S]*?navigate\('login', \{ mode: 'signin' \}, true\);/);
-  assert.match(appSource, /Account created\. Sign in with your email and password\./);
-  assert.match(supabaseClientSource, /if \(!data\.session\) \{\s*throw new Error\('The account was created, but Supabase did not start a session/);
-  assert.match(await readFile(new URL('../supabase/config.toml', import.meta.url), 'utf8'), /\[auth\.email\]\s*enable_confirmations = false/);
+test('signup handles both immediate sessions and confirmation-required accounts', async () => {
+  assert.match(appSource, /if \(!session\) \{[\s\S]*?Account created\. Check your email to confirm it; the link will return you to Idilewa\./);
+  assert.doesNotMatch(appSource, /await signOutAccount\(\{ notify: false \}\)/);
+  assert.match(supabaseClientSource, /confirmationRequired: !data\.session/);
+  assert.match(supabaseClientSource, /emailRedirectTo: new URL\('\/auth-callback\.html\?next=index'/);
+  assert.match(await readFile(new URL('../auth-callback.html', import.meta.url), 'utf8'), /src="\.\/src\/authCallback\.js"/);
+  assert.match(await readFile(new URL('../supabase/config.toml', import.meta.url), 'utf8'), /\[auth\.email\]\s*enable_confirmations = true/);
+  assert.match(supabaseClientSource, /export async function resendSignupConfirmation\(email\)/);
+  assert.match(appSource, /data-action="resend-signup-confirmation"/);
+});
+
+test('auth callback exchanges confirmation sessions and safely routes recovery', async () => {
+  const callbackSource = await readFile(new URL('../src/authCallback.js', import.meta.url), 'utf8');
+  const viteConfigSource = await readFile(new URL('../vite.config.js', import.meta.url), 'utf8');
+  assert.match(supabaseClientSource, /exchangeCodeForSession\(code\)/);
+  assert.match(supabaseClientSource, /export async function restoreAuthSession\(\)/);
+  assert.match(callbackSource, /callback\?\.type === 'recovery'/);
+  assert.match(callbackSource, /updateAccountPassword\(password\)/);
+  assert.match(callbackSource, /includes\(next \|\| ''\)/);
+  assert.match(viteConfigSource, /'auth-callback'/);
 });
 
 test('homepage uses only the supplied family learning photo as the hero artwork', async () => {

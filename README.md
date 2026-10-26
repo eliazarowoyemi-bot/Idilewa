@@ -1,4 +1,4 @@
-# idílẹ́wà — Preserving African Culture. Promoting Technology.
+# Idilewa — Preserving African Culture. Promoting Technology.
 
 A family- and community-centered web application for African language learning, oral traditions, cultural storytelling, and K–8 indigenous coding and STEAM.
 
@@ -6,7 +6,7 @@ A family- and community-centered web application for African language learning, 
 
 ## 1. Product Purpose & Philosophy
 
-Idilewa (branded in the interface as **“idílẹ́wà”**) connects language acquisition with oral memory, listening, cultural context, and future-facing technology education. 
+Idilewa connects language acquisition with oral memory, listening, cultural context, and future-facing technology education.
 Culture is treated as **living knowledge carried by people** across generations—not as static decoration.
 
 The experience unifies:
@@ -87,9 +87,56 @@ The application is bundled with Vite as an ES module web application:
 - **`src/supabaseClient.js`:** Supabase authentication and database persistence layer with local browser storage offline-first fallback.
 - **`styles.css`:** Curated design tokens, responsive breakpoints, typography, 3D scroll animations, and accessibility styles.
 
+## 5. Cultural World Application Blueprint
+
+The Cultural World (`#/world`) is the learner-facing hub for Idilewa's existing language, oral-heritage and K–8 STEAM experiences. It adds an interactive map without replacing the working single-page application or making existing lessons inaccessible.
+
+### Route and learning architecture
+
+```text
+HTML entry shell
+└── app.js                         Hash router, app state, delegated actions
+    ├── #/login                    Existing Supabase onboarding and account access
+    ├── #/world                    Cultural World dashboard and interactive map
+    │   ├── Èdè · Language         #/course?lang=yoruba → curriculum and lesson routes
+    │   ├── Ohùn · Voice           #/trainer → voice and pronunciation activities
+    │   ├── Ìtàn · Stories          #/ere → reading and story activities
+    │   ├── Òwe · Wisdom            #/owe → proverbs, context and reflection
+    │   └── Kóòdù · Create          #/coding → existing K–8 coding and STEAM studio
+    └── #/passport                 Existing profile, progress, streak and milestone view
+        └── #/profile              Same profile view for backwards compatibility
+
+src/
+├── culturalWorld.js               Low-poly map, camera rig and biome definitions
+├── threeScene.js                  Shared Three.js scenes and visual helpers
+├── translationEngine.js           Curated phrasebook and tone audio
+├── voiceGradeCurriculum.js        Voice lesson structure
+├── yorubaCodeEngine.js            Yoruba coding lessons and interpreter
+├── supabaseClient.js              Auth, profile and account-backed learning data
+└── server/                        Server-side email, consent and dashboard services
+```
+
+The current application uses its existing centralized route/state coordinator and browser storage conventions. Supabase remains authoritative for account identity and database-backed role checks; the existing profile view remains the passport so lesson counts and streaks are not duplicated. The new map's content and route IDs live together in `CULTURAL_BIOMES`, while DOM rendering stays in the app coordinator.
+
+### 3D map and interactions
+
+`initCulturalWorld(container, onSelect)` builds a small, reusable Three.js scene from shared low-polygon geometries, a curved path and five color-coded learning biomes. A warm directional key light, cool sky fill, shadowed ground and restrained metal-free materials keep the map legible and light enough for mobile GPUs. Device pixel ratio is capped at 1.5; the scene disposes geometry, materials, observers and animation frames when the learner leaves the route.
+
+Pointer drag pans with bounded inertia, wheel/touchpad input moves the camera along a `CatmullRomCurve3` path, and raycasts on a biome open the same lesson sheet as the accessible list of real buttons. The sheet links to existing curriculum, voice, story, proverb and coding routes rather than duplicating or fabricating lesson content. The Yorùbá greeting displays its English meaning; other paths do not present English labels as translations. If WebGL is unavailable, the map surface becomes a clear fallback while all five keyboard- and screen-reader-accessible route buttons remain usable.
+
+### Art direction, motion and responsive layout
+
+The shared semantic tokens now center terracotta (`--clay`), royal indigo (`--royal-indigo`), sahara gold (`--sahara-gold`) and savannah green (`--savannah-green`), with warm paper and neutral surfaces. The world page uses these tokens consistently for its illustration, cards, sheet, controls and focus/hover states. Mobile navigation is a safe-area-aware, floating glass dock; the lesson sheet is bottom-docked and scroll-contained.
+
+Route arrivals and sheet/card interactions use short, damped CSS timing curves; native pointer events and camera interpolation keep drag response continuous without a framework bridge. `prefers-reduced-motion` removes non-essential movement. This repository is a vanilla-JavaScript Vite SPA, so the implementation deliberately uses its existing router, Three.js, and CSS rather than adding React, Framer Motion, GSAP, a second state store, or a physics engine just to reproduce their basic transitions. Physical collision simulation is not needed for the map's bounded camera and lightweight marker response.
+
+### Educational module contract
+
+Each biome offers a short orientation and a next-step action, then hands learning off to the established Idilewa module. Language lessons follow the language → level → module → lesson sequence; voice practice keeps its existing pronunciation and tonal-learning structure; stories and proverbs retain context and attribution; coding continues to use the K–8 STEAM curriculum. The map is a navigation and discovery layer, not a claim that all cultural material is complete or community-reviewed.
+
 ---
 
-## 5. Page & Route Inventory (37 HTML Entries)
+## 6. Page & Route Inventory (37 HTML Entries)
 
 All 37 HTML entries declared in the active `vite.config.js` are supported:
 
@@ -174,16 +221,19 @@ The Code page runs Yorùbá/Igbo/Hausa/Kiswahili lessons and HTML, CSS, and Java
 
 In Code Studio, drag the divider above the console to resize the output panel, or focus it and use the arrow keys. The chosen height is saved in the current browser.
 
-Configure these values in `.env.local` for the Vite client and in the Vercel project environment settings for production:
+Configure these values in `.env.local` for the Vite client and in the deployment environment settings:
 
 ```dotenv
+VITE_CONVEX_URL=https://your-deployment.convex.cloud
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-public-key
 JUDGE0_URL=https://your-private-judge0-service.example
 JUDGE0_AUTH_TOKEN=your-private-runner-token
 ```
 
-`VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are public client configuration; enforce access with Supabase Auth policies and database row-level security. For existing deployments, `SUPABASE_PUBLIC_URL` and `SUPABASE_ANON_KEY` are also supported; Vite exposes only these two explicitly named variables to browser code. `JUDGE0_URL` and `JUDGE0_AUTH_TOKEN` are server-side secrets and must never use the `VITE_` prefix or be placed in browser code. Keep Judge0 private and configure execution time and memory limits.
+`VITE_CONVEX_URL`, `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are public client configuration, not secrets. The client forwards the current Supabase access token to Convex and refreshes it when required. `convex/auth.config.ts` configures Convex to verify Idilewa Supabase tokens using the Supabase JWKS endpoint and ES256 signing key; do not copy a private JWT signing key into the app. For existing deployments, `SUPABASE_PUBLIC_URL` and `SUPABASE_ANON_KEY` are also supported by the Supabase client. `JUDGE0_URL` and `JUDGE0_AUTH_TOKEN` are server-side secrets and must never use the `VITE_` prefix or be placed in browser code. Keep Judge0 private and configure execution time and memory limits.
+
+Run `npx convex dev` in one terminal to deploy Convex functions and auth configuration to the configured development deployment, then run `npm run dev` in another terminal for the Vite app. The `convex/auth.whoami` query can be used to verify that a Supabase session is recognized by Convex. This auth bridge does not itself migrate Supabase tables or the existing Vercel API routes; keep those services active until their Convex replacements and data migration are separately implemented and validated.
 
 The production canonical site is `https://www.idilewa.com`. The Vercel project redirects its apex and stable Vercel aliases to this hostname; use the DNS records shown in the Vercel domain settings for both `idilewa.com` and `www.idilewa.com`.
 
@@ -199,7 +249,7 @@ The migration files in this repository are not proof that a remote database has 
 
 Run `supabase link --project-ref <project-ref>` and `supabase db push --linked` after verifying the target project. Do not enable account registration until the migrations complete successfully; deployment does not apply database migrations. Never test account creation against production with an unowned test address.
 
-Configure the Supabase Auth email template to send the numeric `{{ .Token }}` code for sign-up, sign-in, and password recovery; enable email confirmation and allow the production URL in Auth redirect settings. Set the minimum password length to 12 in the Supabase Auth password policy. The app enforces 12–128 characters plus uppercase, lowercase, number and symbol at sign-up and password recovery; existing sign-in passwords are not blocked by that client-side minimum. All account types can request an individual email OTP to sign in or recover a password; the account role is verified against the private profile after code validation. Actual inbox delivery depends on the Supabase SMTP/provider configuration and must be tested using a mailbox you control. Keep local and production auth configuration pointed at their intended projects; accounts do not transfer between Supabase projects.
+Enable Supabase email confirmation, configure the branded confirmation template to use `{{ .ConfirmationURL }}`, and allow `https://www.idilewa.com/auth-callback.html` in Auth redirect settings. Set the minimum password length to 12 in the Supabase Auth password policy. The app enforces 12–128 characters plus uppercase, lowercase, number and symbol at sign-up and password recovery; existing sign-in passwords are not blocked by that client-side minimum. Adults sign in with email and password; child sign-in uses a parent-issued one-time passcode, and password recovery uses a one-time code. Account roles are checked against the private profile after authentication. Actual inbox delivery depends on the Supabase SMTP/provider configuration and must be tested using a mailbox you control. Keep local and production auth configuration pointed at their intended projects; accounts do not transfer between Supabase projects.
 
 New child registration stays paused until guardian approval email delivery has a sender on a domain verified in Resend. Existing child accounts can still sign in; adult and invited educator registration remain available. Do not set `RESEND_FROM_EMAIL` to a public mailbox address such as Gmail.
 

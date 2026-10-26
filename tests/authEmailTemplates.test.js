@@ -7,26 +7,27 @@ const templateNames = ['confirmation', 'magic_link', 'recovery', 'email_change']
 test('authentication templates are Idilewa branded and retain their required Supabase variables', async () => {
   for (const name of templateNames) {
     const template = await readFile(new URL(`../supabase/templates/${name}.html`, import.meta.url), 'utf8');
-    assert.match(template, /idílẹ́wà/);
+    assert.match(template, /Idilewa/);
     assert.match(template, /<!doctype html>/i);
-    if (name !== 'confirmation') {
+    if (name === 'confirmation') {
+      assert.match(template, /{{ \.ConfirmationURL }}/);
+    } else {
       assert.match(template, /{{ \.Token }}/);
-    }
-    if (name !== 'confirmation') {
       assert.match(template, /{{ \.ConfirmationURL }}/);
     }
   }
 });
 
-test('direct signup disables confirmation and the frontend has no signup code step', async () => {
+test('signup requires email confirmation and the frontend has no signup code step', async () => {
   const template = await readFile(new URL('../supabase/templates/confirmation.html', import.meta.url), 'utf8');
   const config = await readFile(new URL('../supabase/config.toml', import.meta.url), 'utf8');
   const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
-  assert.match(config, /^\[auth\.email\]\s*[\s\S]*?^enable_confirmations = false$/m);
+  assert.match(config, /^\[auth\.email\]\s*[\s\S]*?^enable_confirmations = true$/m);
   assert.doesNotMatch(app, /signup-otp|verifySignupOtp|resendSignupOtp/);
-  assert.doesNotMatch(template, /YOUR CONFIRMATION CODE/);
+  assert.match(template, /{{ \.ConfirmationURL }}/);
+  assert.match(app, /data-action="resend-signup-confirmation"/);
   assert.match(template, /https:\/\/www\.idilewa\.com\/assets\/idilewa-email-logo\.png\?v=2/);
-  assert.match(template, /alt="idílẹ́wà — Language · culture · future"/);
+  assert.match(template, /alt="Idilewa — Language · culture · future"/);
   assert.doesNotMatch(template, /LANGUAGE · CULTURE · CURIOSITY|>È<\/td>/);
 });
 
@@ -39,7 +40,7 @@ test('email logo is a real PNG that can be served from public assets', async () 
 
 test('Supabase project config deploys all four branded authentication templates', async () => {
   const config = await readFile(new URL('../supabase/config.toml', import.meta.url), 'utf8');
-  assert.match(config, /^\[auth\.email\]\s*[\s\S]*?^enable_confirmations = false$/m);
+  assert.match(config, /^\[auth\.email\]\s*[\s\S]*?^enable_confirmations = true$/m);
   for (const name of templateNames) {
     assert.match(config, new RegExp(`\\[auth\\.email\\.template\\.${name}\\]`));
     assert.match(config, new RegExp(`content_path = \"\\./supabase/templates/${name}\\.html\"`));

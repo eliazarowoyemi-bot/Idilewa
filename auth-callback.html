@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#fbfcf8" />
+  <title>Confirm your Idilewa account</title>
+  <link rel="stylesheet" href="./styles.css" />
+  <script type="module" src="./src/authCallback.js"></script>
+</head>
+<body>
+  <main class="main-content auth-callback-shell" tabindex="-1">
+    <section class="profile-card" aria-labelledby="authCallbackTitle">
+      <h1 id="authCallbackTitle">Confirm your Idilewa account</h1>
+      <p id="authCallbackStatus" role="status" aria-live="polite">Checking your secure sign-in link…</p>
+      <form id="authRecoveryForm" class="auth-form" hidden>
+        <div class="form-group">
+          <label for="authRecoveryPassword" class="form-label">New password</label>
+          <input id="authRecoveryPassword" class="form-input" type="password" autocomplete="new-password" minlength="12" maxlength="128" required />
+        </div>
+        <div class="form-group">
+          <label for="authRecoveryConfirm" class="form-label">Confirm new password</label>
+          <input id="authRecoveryConfirm" class="form-input" type="password" autocomplete="new-password" minlength="12" maxlength="128" required />
+        </div>
+        <p class="form-helper-text">Use 12–128 characters with uppercase and lowercase letters, a number, and a symbol.</p>
+        <p id="authRecoveryError" class="auth-inline-error" role="alert" hidden></p>
+        <button class="button button-primary" type="submit">Update password</button>
+      </form>
+      <a id="authCallbackLogin" class="text-link" href="/#/login?mode=signin" hidden>Return to sign in</a>
+    </section>
+  </main>
+</body>
+</html>

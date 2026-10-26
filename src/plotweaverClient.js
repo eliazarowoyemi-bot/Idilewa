@@ -1,7 +1,10 @@
 function getApiBase() {
   const configured = import.meta.env?.VITE_PLOTWEAVER_API_BASE_URL?.trim().replace(/\/+$/, '');
   if (configured) return configured;
-  if (typeof window !== 'undefined' && window.location.hostname.endsWith('.github.io')) {
+  if (typeof window !== 'undefined'
+    && (window.location.hostname.endsWith('.github.io')
+      || window.location.hostname === 'localhost'
+      || window.location.hostname === '127.0.0.1')) {
     return 'https://www.idilewa.com';
   }
   return '';
@@ -61,6 +64,29 @@ export async function synthesizePlotweaverSpeech({ text, language, voiceId }) {
   });
   if (!response.ok) throw await responseError(response);
   return response.blob();
+}
+
+export function speakWithDeviceVoice(text, language) {
+  const voiceWindow = typeof window === 'undefined' ? null : window;
+  if (!voiceWindow?.speechSynthesis
+    || typeof voiceWindow.SpeechSynthesisUtterance !== 'function') {
+    return Promise.reject(new Error('Device speech is not available in this browser.'));
+  }
+
+  const utterance = new voiceWindow.SpeechSynthesisUtterance(text);
+  utterance.lang = language;
+  return new Promise((resolve, reject) => {
+    utterance.onend = resolve;
+    utterance.onerror = (event) => reject(new Error(
+      `Device speech could not play this phrase${event?.error ? ` (${event.error})` : ''}.`,
+    ));
+    try {
+      voiceWindow.speechSynthesis.cancel();
+      voiceWindow.speechSynthesis.speak(utterance);
+    } catch (error) {
+      reject(error);
+    }
+  });
 }
 
 export async function translateWithPlotweaver({ text, sourceLanguage, targetLanguage }) {

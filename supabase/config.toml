@@ -1,7 +1,7 @@
 project_id = "idilewa-com"
 
 [auth.email]
-enable_confirmations = false
+enable_confirmations = true
 
 [auth.email.template.confirmation]
 subject = "Welcome to Idilewa"

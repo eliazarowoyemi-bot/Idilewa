@@ -32,6 +32,7 @@ export const supabase = isSupabaseConfigured
     auth: {
       persistSession: true,
       autoRefreshToken: true,
+      flowType: 'pkce',
     },
   })
   : null;
@@ -40,6 +41,7 @@ const LOCAL_STORAGE_KEY_USER = 'idilewa_auth_user';
 const LOCAL_STORAGE_KEY_PROGRESS = 'idilewa_db_progress';
 const LOCAL_STORAGE_KEY_CODE = 'idilewa_db_code';
 const LOCAL_STORAGE_KEY_VOICE = 'idilewa_db_voice';
+let authStateSubscription = null;
 
 function getLocalItem(key, fallback = []) {
   try {
@@ -71,6 +73,40 @@ function requirePersistedResult(data, error, message) {
   if (error) throw new Error(message, { cause: error });
   if (!data) throw new Error(message);
   return data;
+}
+
+export function normalizeAuthError(error, operation) {
+  const code = typeof error?.code === 'string' ? error.code.toLowerCase() : '';
+  const message = typeof error?.message === 'string' ? error.message.toLowerCase() : '';
+  const status = Number(error?.status);
+
+  if (code === 'email_not_confirmed' || /email.*not confirmed/.test(message)) {
+    return 'Confirm your email using the link we sent before signing in. You can request a new confirmation link below.';
+  }
+  if (code === 'invalid_credentials' || /invalid login credentials|invalid password/.test(message)) {
+    return 'The email or password is incorrect. Check your details or use Forgot password to reset your password.';
+  }
+  if (code === 'user_already_exists' || /user already registered|already registered/.test(message)) {
+    return 'An account may already use this email. Sign in or use Forgot password to recover access.';
+  }
+  if (code === 'weak_password' || /password.*(too short|at least|weak)/.test(message)) {
+    return 'Choose a stronger password that meets the requirements shown on the form.';
+  }
+  if (/over_.*rate|rate limit|too many requests/.test(`${code} ${message}`)) {
+    return 'Too many attempts. Wait a little before trying again.';
+  }
+  if (operation === 'signup' && status >= 500) {
+    return 'Your account could not be created because profile setup failed. Please try again later or contact Idilewa support.';
+  }
+  if (status === 502 || status === 503 || status >= 500) {
+    return 'The account service is temporarily unavailable. Please try again shortly.';
+  }
+  if (error instanceof TypeError || /failed to fetch|networkerror/.test(message)) {
+    return 'Could not reach the account service. Check your connection and try again.';
+  }
+  return typeof error?.message === 'string' && error.message.trim()
+    ? error.message
+    : 'Authentication failed. Please try again.';
 }
 
 export function isSignupPasswordValid(password) {
@@ -208,53 +244,136 @@ export async function signUp({ email, password, name, role = 'child', guardianAc
         ...(role === 'child' ? { guardian_access_request_id: guardianAccessRequestId } : {}),
         ...(role === 'educator' ? { educator_invite_id: educatorInviteId } : {}),
       },
+      emailRedirectTo: new URL('/auth-callback.html?next=index', window.location.origin).toString(),
     },
   });
-  if (error) throw new Error(error.message, { cause: error });
+  if (error) throw new Error(normalizeAuthError(error, 'signup'), { cause: error });
   if (!data?.user) throw new Error('The authentication service did not return an account.');
   if (Array.isArray(data.user.identities) && data.user.identities.length === 0) {
     throw new Error('Could not create an account with this email. If you already registered, sign in or use Forgot password.');
   }
 
-  if (!data.session) {
-    throw new Error('The account was created, but Supabase did not start a session. Email confirmation must be disabled in the hosted Supabase auth settings before sign-up can complete.');
-  }
-
   let welcomeEmailError = '';
-  try {
-    const response = await fetch('/api/auth/welcome', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-      body: JSON.stringify({ userId: data.user.id }),
-    });
-    const result = await response.json();
-    if (!response.ok) {
-      welcomeEmailError = typeof result?.error === 'string'
-        ? result.error
+  if (data.session) {
+    try {
+      const response = await fetch('/api/auth/welcome', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ userId: data.user.id }),
+      });
+      const result = await response.json();
+      if (!response.ok) {
+        welcomeEmailError = typeof result?.error === 'string'
+          ? result.error
+          : 'Your account is ready, but the welcome email could not be sent.';
+      }
+    } catch (error) {
+      welcomeEmailError = error instanceof Error
+        ? `Your account is ready, but the welcome email could not be sent: ${error.message}`
         : 'Your account is ready, but the welcome email could not be sent.';
     }
-  } catch (error) {
-    welcomeEmailError = error instanceof Error
-      ? `Your account is ready, but the welcome email could not be sent: ${error.message}`
-      : 'Your account is ready, but the welcome email could not be sent.';
   }
 
-  let userRecord;
+  let userRecord = mapAuthUser(data.user, { ...data.user.user_metadata, name: userName, role });
   try {
-    userRecord = data.session
-      ? await loadAccountProfile(client, data.user)
-      : mapAuthUser(data.user, { ...data.user.user_metadata, name: userName, role });
+    if (data.session) userRecord = await loadAccountProfile(client, data.user);
   } catch (profileError) {
-    if (data.session) {
-      const { error: signOutError } = await client.auth.signOut();
-      if (signOutError) {
-        throw new Error('The account profile could not be loaded and its session could not be cleared.', { cause: signOutError });
-      }
+    const { error: signOutError } = await client.auth.signOut({ scope: 'local' });
+    if (signOutError) {
+      throw new Error('The account profile could not be loaded and its session could not be cleared.', { cause: signOutError });
     }
     throw profileError;
   }
   if (data.session) setLocalItem(LOCAL_STORAGE_KEY_USER, userRecord);
-  return { user: userRecord, session: data.session, error: null, welcomeEmailError };
+  return {
+    user: userRecord,
+    session: data.session,
+    confirmationRequired: !data.session,
+    error: null,
+    welcomeEmailError,
+  };
+}
+
+export async function resendSignupConfirmation(email) {
+  const client = requireSupabase();
+  const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+    throw new Error('Enter a valid email address before requesting a new confirmation link.');
+  }
+  const { error } = await client.auth.resend({
+    type: 'signup',
+    email: normalizedEmail,
+    options: {
+      emailRedirectTo: new URL('/auth-callback.html?next=index', window.location.origin).toString(),
+    },
+  });
+  if (error) throw new Error(normalizeAuthError(error, 'resend'), { cause: error });
+}
+
+export async function restoreAuthSession() {
+  const client = requireSupabase();
+  const { data, error } = await client.auth.getSession();
+  if (error) throw new Error('Your saved sign-in session could not be checked.', { cause: error });
+  if (!authStateSubscription) {
+    const { data: authState } = client.auth.onAuthStateChange((event) => {
+      if (event !== 'SIGNED_OUT') return;
+      try {
+        localStorage.removeItem(LOCAL_STORAGE_KEY_USER);
+      } catch (storageError) {
+        console.error('The signed-out account cache could not be cleared.', storageError);
+      }
+    });
+    authStateSubscription = authState.subscription;
+  }
+  if (!data.session?.user) {
+    localStorage.removeItem(LOCAL_STORAGE_KEY_USER);
+    return null;
+  }
+
+  try {
+    const userRecord = await loadAccountProfile(client, data.session.user);
+    setLocalItem(LOCAL_STORAGE_KEY_USER, userRecord);
+    return userRecord;
+  } catch (profileError) {
+    const { error: signOutError } = await client.auth.signOut({ scope: 'local' });
+    if (signOutError) {
+      throw new Error('Your account profile could not be restored and the local session could not be cleared.', { cause: signOutError });
+    }
+    localStorage.removeItem(LOCAL_STORAGE_KEY_USER);
+    throw profileError;
+  }
+}
+
+export async function completeAuthCallback(callbackUrl = window.location.href) {
+  const client = requireSupabase();
+  const url = new URL(callbackUrl);
+  const callbackParams = new URLSearchParams(url.hash.replace(/^#/, ''));
+  const callbackError = url.searchParams.get('error_description')
+    || callbackParams.get('error_description')
+    || url.searchParams.get('error')
+    || callbackParams.get('error');
+  if (callbackError) throw new Error(callbackError);
+
+  const { data: sessionData, error: sessionError } = await client.auth.getSession();
+  if (sessionError) throw new Error('The sign-in link could not be checked.', { cause: sessionError });
+  let session = sessionData.session;
+  const code = url.searchParams.get('code');
+  if (!session && code) {
+    const { data, error } = await client.auth.exchangeCodeForSession(code);
+    if (error) throw new Error(normalizeAuthError(error, 'callback'), { cause: error });
+    session = data.session;
+  }
+  if (!session?.user) {
+    throw new Error('This sign-in link is invalid or has expired. Request a new link and try again.');
+  }
+
+  const userRecord = await loadAccountProfile(client, session.user);
+  setLocalItem(LOCAL_STORAGE_KEY_USER, userRecord);
+  return {
+    user: userRecord,
+    session,
+    type: url.searchParams.get('type') || callbackParams.get('type') || '',
+  };
 }
 
 export async function requestSigninOtp(email, purpose = 'child-signin') {
@@ -282,7 +401,7 @@ export async function verifySigninOtp({ email, token, expectedRole, purpose = 'c
     token,
     type: purpose === 'password-reset' ? 'recovery' : 'magiclink',
   });
-  if (error) throw new Error(error.message, { cause: error });
+  if (error) throw new Error(normalizeAuthError(error, 'verification'), { cause: error });
   if (!data?.user || !data.session) throw new Error('Email verification did not return a signed-in account.');
 
   let userRecord;
@@ -322,7 +441,7 @@ export async function signIn({ email, password, expectedRole }) {
     email: normalizedEmail,
     password,
   });
-  if (error) throw new Error(error.message, { cause: error });
+  if (error) throw new Error(normalizeAuthError(error, 'signin'), { cause: error });
   if (!data?.user || !data.session) throw new Error('The authentication service did not return a signed-in session.');
 
   let userRecord;

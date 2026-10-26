@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import brandLogoUrl from './assets/idilewa-brand.svg';
+import './src/convexClient.js';
+import { CULTURAL_BIOMES, initCulturalWorld } from './src/culturalWorld.js';
 import {
   init3DCodeRobotGlyphs,
   init3DAuthCanvas,
@@ -19,6 +21,7 @@ import {
   createPlotweaverVoice,
   getPlotweaverLanguages,
   getPlotweaverVoices,
+  speakWithDeviceVoice,
   synthesizePlotweaverSpeech,
   transcribeWithPlotweaver,
   translateWithPlotweaver
@@ -49,6 +52,8 @@ import {
   signOut as signOutAccount,
   signIn as signInAccount,
   signUp as signUpAccount,
+  resendSignupConfirmation,
+  restoreAuthSession,
   requestSigninOtp,
   verifySigninOtp,
   sendAuthActivityEmail,
@@ -67,7 +72,7 @@ import {
 } from './src/voiceGradeCurriculum.js';
 
 /* Idilewa responsive learning prototype — dependency free, client-side demo. */
-(() => {
+(async () => {
   'use strict';
 
   const canonicalHost = 'www.idilewa.com';
@@ -92,10 +97,10 @@ import {
     'voice-language', 'voice-grade', 'voice-audio', 'voice-practice',
     'voice-text-to-speech', 'voice-cloning', 'voice-speech-to-text', 'voice-translation',
     'curriculum',
-    'index', 'about', 'base', 'coding', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
+    'index', 'about', 'base', 'coding', 'coding-studio', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
     'ere', 'ere_game', 'game', 'guides', 'human', 'ifa', 'ifa_odu', 'individuals', 'keepers', 'library',
     'kids', 'languages', 'lesson', 'login', 'method', 'oral', 'oral_genre', 'oriki', 'owe',
-    'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'payment', 'pricing', 'profile', 'schools',
+    'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'passport', 'payment', 'pricing', 'profile', 'schools', 'world',
     'voices'
   ];
   const REMOVED_ROUTES = new Set(['adult', 'parent_dashboard', 'educator_dashboard', 'tutor']);
@@ -365,6 +370,7 @@ import {
 
   const NAV = [
     { label: 'Home', route: 'index', group: 'home' },
+    { label: 'Explore', route: 'world', group: 'world' },
     { label: 'Curriculum', route: 'curriculum', group: 'curriculum' },
     { label: 'Code', route: 'coding', group: 'code' },
     { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' }
@@ -376,8 +382,10 @@ import {
   ];
 
   const NAV_GROUPS = {
+    world: 'world',
+    profile: 'world', passport: 'world',
     curriculum: 'curriculum',
-    coding: 'code',
+    coding: 'code', 'coding-studio': 'code',
     trainer: 'trainer', voice_lessons: 'trainer',
     languages: 'curriculum', course: 'curriculum', lesson: 'curriculum', kids: 'curriculum', individuals: 'curriculum',
     oral: 'read', oral_genre: 'read', oriki: 'read', owe: 'read', owe_add: 'read',
@@ -391,6 +399,9 @@ import {
   const LABELS = Object.fromEntries(ROUTES.map((r) => [r, r === 'index' ? 'Home' : r.replaceAll('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())]));
   LABELS.curriculum = 'Curriculum';
   LABELS.coding = 'Code';
+  LABELS['coding-studio'] = 'Start Coding';
+  LABELS.world = 'Cultural World';
+  LABELS.passport = 'Learning passport';
   Object.assign(LABELS, {
     'voice-language': 'Choose a voice lesson language',
     'voice-grade': 'Choose a voice lesson grade',
@@ -454,6 +465,15 @@ import {
       filter: 'all', category: 'all', lessonSearch: '', completedLessons: [],
       lastPracticeDate: '', completed: [], draft: '', result: '',
       questCommands: [], questTrail: [], questResult: '',
+      codeCategory: 'characters',
+      codeCharacter: 'boy',
+      codeMessage: 'Hello, friends!',
+      codeSourceLanguage: 'en',
+      codeTargetLanguage: 'yo',
+      codeBlocks: ['event', 'character', 'say', 'language', 'translate'],
+      codeUndo: [], codeRedo: [],
+      codeOutput: 'Ẹ n lẹ́ o, ẹ̀yin ọ̀rẹ́ mi!',
+      codeStatus: 'Your message is ready to run.',
       ideLang: 'yoruba', idePresetId: 'hello_world',
       ideCode: '# Kí Ilé Ayé ní Èdè Yorùbá\njẹ́ orúkọ = "Ọmọ Yorùbá"\ntẹ_jade("Ẹ n lẹ́ o, " + orúkọ + "! Ẹ káàbọ̀ sí Idíléwà.")\ntẹ_jade("A n kọ́ koodu ní èdè abínibí wa lónìí! ✨")',
       ideOutput: '> [Idilewa Engine v2.4 Online]\n> Ẹ n lẹ́ o, Ọmọ Yorùbá! Ẹ káàbọ̀ sí Idíléwà.\n> A n kọ́ koodu ní èdè abínibí wa lónìí! ✨\n✓ Àṣeyọrí: Execution completed in 0.02ms (+10 Maker XP)',
@@ -516,6 +536,16 @@ import {
           questCommands: Array.isArray(stored.coding?.questCommands) ? stored.coding.questCommands.filter((step) => ['up', 'right', 'down', 'left'].includes(step)).slice(0, 12) : [],
           questTrail: Array.isArray(stored.coding?.questTrail) ? stored.coding.questTrail.filter((cell) => typeof cell === 'string').slice(0, 20) : [],
           questResult: typeof stored.coding?.questResult === 'string' ? stored.coding.questResult : '',
+          codeCategory: ['characters', 'actions', 'looks', 'sounds', 'events', 'control'].includes(stored.coding?.codeCategory) ? stored.coding.codeCategory : defaults.coding.codeCategory,
+          codeCharacter: ['boy', 'girl', 'cat', 'dog'].includes(stored.coding?.codeCharacter) ? stored.coding.codeCharacter : defaults.coding.codeCharacter,
+          codeMessage: typeof stored.coding?.codeMessage === 'string' ? stored.coding.codeMessage.slice(0, 120) : defaults.coding.codeMessage,
+          codeSourceLanguage: ['en', 'yo', 'ig', 'ha', 'sw'].includes(stored.coding?.codeSourceLanguage) ? stored.coding.codeSourceLanguage : defaults.coding.codeSourceLanguage,
+          codeTargetLanguage: ['yo', 'ig', 'ha', 'sw', 'fr', 'es'].includes(stored.coding?.codeTargetLanguage) ? stored.coding.codeTargetLanguage : defaults.coding.codeTargetLanguage,
+          codeBlocks: Array.isArray(stored.coding?.codeBlocks) ? stored.coding.codeBlocks.filter((block) => ['event', 'character', 'say', 'language', 'translate', 'wave', 'jump', 'dance', 'sound', 'repeat'].includes(block)).slice(0, 12) : defaults.coding.codeBlocks,
+          codeUndo: Array.isArray(stored.coding?.codeUndo) ? stored.coding.codeUndo.filter(Array.isArray).slice(-20) : [],
+          codeRedo: Array.isArray(stored.coding?.codeRedo) ? stored.coding.codeRedo.filter(Array.isArray).slice(-20) : [],
+          codeOutput: typeof stored.coding?.codeOutput === 'string' ? stored.coding.codeOutput.slice(0, 500) : defaults.coding.codeOutput,
+          codeStatus: typeof stored.coding?.codeStatus === 'string' ? stored.coding.codeStatus.slice(0, 160) : defaults.coding.codeStatus,
           ideSidebar: ['explorer', 'extensions'].includes(stored.coding?.ideSidebar) ? stored.coding.ideSidebar : 'explorer',
           ideOutputHeight: Number.isInteger(stored.coding?.ideOutputHeight)
             ? Math.min(900, Math.max(170, stored.coding.ideOutputHeight))
@@ -603,7 +633,7 @@ import {
   }
 
   const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[ch]));
-  const imageUrl = (filename) => window.__IDILEWA_ASSETS__?.[filename] || `./assets/${filename}`;
+  const imageUrl = (filename) => window.__IDILEWA_ASSETS__?.[filename] || `/assets/${filename}`;
   const icon = (name, size = 20, extraClass = '') => `<svg class="icon ${extraClass}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ICONS.sparkles}</svg>`;
   const getLanguage = (id = state.currentLang) => {
     const active = LANGUAGES.find((l) => l.id === id);
@@ -734,12 +764,12 @@ import {
     }
     const items = [
       { route: 'index', label: 'Home', ico: 'home' },
+      { route: 'world', label: 'Explore', ico: 'globe' },
       { route: 'library', label: 'Library', ico: 'book' },
-      { route: 'game', label: 'Game', ico: 'sparkles' },
       { route: 'coding', label: 'Code', ico: 'code' },
-      { route: 'profile', label: 'Progress', ico: 'user' }
+      { route: 'passport', label: 'Passport', ico: 'user' }
     ];
-    document.getElementById('mobile-nav').innerHTML = items.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="mobile-tab ${page === item.route ? 'active' : ''}">${icon(item.ico, 19)}<span>${item.label}</span></a>`).join('');
+    document.getElementById('mobile-nav').innerHTML = items.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="mobile-tab ${page === item.route || (item.route === 'coding' && page === 'coding-studio') ? 'active' : ''}">${icon(item.ico, 19)}<span>${item.label}</span></a>`).join('');
   }
 
   function renderFooter(page) {
@@ -1118,6 +1148,7 @@ import {
             <div class="landing-hero-actions">
               ${routeLink('voice-language', `Start Learning ${icon('arrow', 16)}`, 'button button-primary')}
               ${routeLink('ere', `Explore Stories ${icon('arrow', 16)}`, 'button button-outline')}
+              ${routeLink('world', `Explore the World ${icon('compass', 16)}`, 'button button-soft')}
             </div>
             <div class="landing-hero-proof"><span>${icon('globe', 17)}</span><span>Culture, creativity and learning<br />for every generation.</span></div>
           </div>
@@ -3776,7 +3807,7 @@ import {
     });
   }
 
-  function renderCoding() {
+  function renderLegacyCoding() {
     const flow = state.coding;
     const ideLang = flow.ideLang || 'yoruba';
     const presetsForLang = getIdePresets(ideLang);
@@ -3992,6 +4023,239 @@ import {
         '</div>' +
       '</section>' +
     '</div>';
+  }
+
+  const CODE_LANGUAGES = [
+    { id: 'yo', name: 'Yorùbá', flag: '🇳🇬' },
+    { id: 'ig', name: 'Igbo', flag: '🇳🇬' },
+    { id: 'ha', name: 'Hausa', flag: '🇳🇬' },
+    { id: 'sw', name: 'Swahili', flag: '🇹🇿' },
+    { id: 'fr', name: 'French', flag: '🇫🇷' },
+    { id: 'es', name: 'Spanish', flag: '🇪🇸' },
+  ];
+  const CODE_SAMPLE_TRANSLATIONS = {
+    yo: 'Ẹ n lẹ́ o, ẹ̀yin ọ̀rẹ́ mi!',
+    ig: 'Ndewo, ndị enyi!',
+    ha: 'Sannu, abokai!',
+    sw: 'Habari, marafiki!',
+    fr: 'Bonjour, les amis !',
+    es: '¡Hola, amigos!',
+  };
+
+  function getCodeSampleTranslation(message, language) {
+    if (message.trim().toLowerCase().replace(/[.!?]+$/, '') === 'hello, friends') {
+      return CODE_SAMPLE_TRANSLATIONS[language] || '';
+    }
+    const translation = translateText(message, language);
+    return translation.exact ? translation.translated : '';
+  }
+
+  const CODE_BLOCK_CATEGORIES = [
+    { id: 'characters', label: 'Characters', icon: 'user', color: 'purple' },
+    { id: 'actions', label: 'Actions', icon: 'arrow', color: 'green' },
+    { id: 'looks', label: 'Looks', icon: 'sparkles', color: 'pink' },
+    { id: 'sounds', label: 'Sounds', icon: 'music', color: 'orange' },
+    { id: 'events', label: 'Events', icon: 'play', color: 'yellow' },
+    { id: 'control', label: 'Control', icon: 'filter', color: 'blue' },
+  ];
+
+  const CODE_BLOCK_OPTIONS = {
+    characters: [
+      { id: 'character', label: 'Choose a character', detail: 'Add a character to your story' },
+      { id: 'character', label: 'Choose a friend', detail: 'Invite another character' },
+    ],
+    actions: [
+      { id: 'wave', label: 'Wave hello', detail: 'Make your character wave' },
+      { id: 'jump', label: 'Jump', detail: 'Make your character jump' },
+      { id: 'dance', label: 'Dance', detail: 'Add a happy dance' },
+    ],
+    looks: [
+      { id: 'say', label: 'Say something', detail: 'Show a speech bubble' },
+      { id: 'say', label: 'Change appearance', detail: 'Give your character a new look' },
+    ],
+    sounds: [{ id: 'sound', label: 'Play a sound', detail: 'Add a sound to your story' }],
+    events: [{ id: 'event', label: 'When you click start', detail: 'Start your code with an event' }],
+    control: [
+      { id: 'repeat', label: 'Repeat an action', detail: 'Make something happen again' },
+      { id: 'translate', label: 'Translate the message', detail: 'Share your words in another language' },
+    ],
+  };
+
+  function renderCodeBlock(block, index, editable = false) {
+    const remove = editable
+      ? `<button class="code-block-remove" type="button" data-action="code-remove-block" data-index="${index}" aria-label="Remove block">×</button>`
+      : '';
+    const content = {
+      event: '<span>when</span><b class="code-flag-mark">⚑</b><span>clicked</span>',
+      character: `<span>🧒</span><span>choose character</span><select aria-label="Choose a character" data-action="code-character-select"><option value="boy" ${state.coding.codeCharacter === 'boy' ? 'selected' : ''}>Boy</option><option value="girl" ${state.coding.codeCharacter === 'girl' ? 'selected' : ''}>Girl</option><option value="cat" ${state.coding.codeCharacter === 'cat' ? 'selected' : ''}>Cat</option><option value="dog" ${state.coding.codeCharacter === 'dog' ? 'selected' : ''}>Dog</option></select>`,
+      say: `<span>say</span><input type="text" maxlength="120" value="${esc(state.coding.codeMessage)}" aria-label="Your message" data-input="code-message">`,
+      language: `<span>in</span><select aria-label="Message language" data-action="code-source-language"><option value="en" ${state.coding.codeSourceLanguage === 'en' ? 'selected' : ''}>English</option><option value="yo" ${state.coding.codeSourceLanguage === 'yo' ? 'selected' : ''}>Yorùbá</option><option value="ig" ${state.coding.codeSourceLanguage === 'ig' ? 'selected' : ''}>Igbo</option><option value="ha" ${state.coding.codeSourceLanguage === 'ha' ? 'selected' : ''}>Hausa</option><option value="sw" ${state.coding.codeSourceLanguage === 'sw' ? 'selected' : ''}>Swahili</option></select>`,
+      translate: '<span>🌐</span><span>translate</span><span>to other languages</span>',
+      wave: '<span>👋</span><span>wave hello</span>',
+      jump: '<span>⬆</span><span>jump</span>',
+      dance: '<span>✨</span><span>dance</span>',
+      sound: '<span>♫</span><span>play a sound</span>',
+      repeat: '<span>↻</span><span>repeat</span>',
+    }[block] || '<span>add an action</span>';
+    return `<div class="code-block code-block-${esc(block)}" draggable="${editable}" data-block-index="${index}">${content}${remove}</div>`;
+  }
+
+  function renderCodeLanguageTiles(selectedLanguage, action = 'code-target-language') {
+    return CODE_LANGUAGES.map((language) => `<button class="code-language-tile ${selectedLanguage === language.id ? 'is-selected' : ''}" type="button" data-action="${action}" data-language="${language.id}" aria-pressed="${selectedLanguage === language.id}"><span aria-hidden="true">${language.flag}</span><strong>${language.name}</strong></button>`).join('');
+  }
+
+  function renderCoding() {
+    const languages = CODE_LANGUAGES;
+    const preview = getCodeSampleTranslation(state.coding.codeMessage, state.coding.codeTargetLanguage) || state.coding.codeOutput;
+    return `<div class="code-design-page code-landing-page">
+      <section class="code-design-landing-hero">
+        <div class="code-landing-copy">
+          <span class="code-design-kicker">${icon('code', 16)} Code &amp; Translate</span>
+          <h1>Let’s Code<br><em>&amp; Translate!</em></h1>
+          <p>Turn your ideas into a program and see it in different languages. It’s fun, easy and super cool!</p>
+          <button class="code-primary-button" type="button" data-route="coding-studio">${icon('play', 16)} Start Coding ${icon('arrow', 16)}</button>
+        </div>
+        <div class="code-landing-art" aria-label="Young makers coding with their Idilewa robot">
+          <img class="code-landing-kids" src="./assets/code-reference-children.png" alt="Young friends building a coding project together" />
+          <img class="code-landing-robot" src="./assets/code-reference-buddy.png" alt="Idilewa coding robot" />
+          <span class="code-speech-bubble code-speech-bubble-purple">Code today...</span>
+          <span class="code-speech-bubble code-speech-bubble-green">...speak tomorrow!</span>
+          <span class="code-doodle code-doodle-one" aria-hidden="true">✦</span>
+          <span class="code-doodle code-doodle-two" aria-hidden="true">✧</span>
+        </div>
+      </section>
+      <section class="code-landing-preview" aria-label="Preview the block coding studio">
+        <div class="code-preview-palette"><h2>Build Your Code</h2><p>Drag blocks to create your own message.</p>${CODE_BLOCK_CATEGORIES.slice(0, 4).map((category) => `<span><i class="code-category-icon ${category.color}">${icon(category.icon, 16)}</i>${category.label}</span>`).join('')}</div>
+        <div class="code-preview-workspace">
+          <div class="code-preview-toolbar"><span>↶</span><span>↷</span><button type="button" data-route="coding-studio">${icon('play', 13)} Run My Code</button></div>
+          ${['event', 'character', 'say', 'language', 'translate'].map((block, index) => renderCodeBlock(block, index)).join('')}
+          <button class="code-preview-hand" type="button" data-route="coding-studio" aria-label="Start coding">☝</button>
+        </div>
+        <div class="code-preview-result"><h2>Your Message</h2><div class="code-message-preview"><span class="code-character-face">🧒🏾</span><p>Hello, friends!<small>(English)</small></p></div><label for="code-landing-language">Translate to:</label><select id="code-landing-language" data-action="code-landing-language">${languages.map((language) => `<option value="${language.id}" ${state.coding.codeTargetLanguage === language.id ? 'selected' : ''}>${language.flag} ${language.name}</option>`).join('')}</select><div class="code-translation-preview"><span class="code-character-face">${esc(state.coding.codeCharacter === 'girl' ? '👧🏾' : state.coding.codeCharacter === 'cat' ? '🐱' : state.coding.codeCharacter === 'dog' ? '🐶' : '🧒🏾')}</span><p>${esc(preview || 'Run your code to see a translation.')}<small>(${esc(languages.find((language) => language.id === state.coding.codeTargetLanguage)?.name || 'Yorùbá')})</small></p><button type="button" aria-label="Hear translation" data-action="code-speak-output">🔊</button></div></div>
+      </section>
+      <section class="code-language-band"><div class="code-language-band-copy"><span class="code-globe-mark">${icon('globe', 27)}</span><div><h2>See Your Result in<br>Different Languages</h2><p>Explore and learn how your message sounds in Nigerian and other languages.</p></div></div><div class="code-language-tiles">${renderCodeLanguageTiles(state.coding.codeTargetLanguage)}</div></section>
+      <section class="code-why-love"><h2>Why Kids Love It</h2><div>${[
+        ['💡', 'Builds Creativity', 'Turn your imagination into real code.'],
+        ['🧠', 'Improves Thinking', 'Solve problems and learn step by step.'],
+        ['🌍', 'Connects Cultures', 'Speak and understand new languages.'],
+        ['⭐', 'Makes Learning Fun', 'Games, rewards and cool characters!'],
+      ].map(([emoji, title, text]) => `<article><span>${emoji}</span><div><strong>${title}</strong><p>${text}</p></div></article>`).join('')}</div></section>
+    </div>`;
+  }
+
+  function renderCodingStudio() {
+    const flow = state.coding;
+    const category = CODE_BLOCK_CATEGORIES.find((item) => item.id === flow.codeCategory) || CODE_BLOCK_CATEGORIES[0];
+    const blocks = Array.isArray(flow.codeBlocks) ? flow.codeBlocks : defaults.coding.codeBlocks;
+    const languages = CODE_LANGUAGES;
+    const source = flow.codeMessage || 'Hello, friends!';
+    const translation = flow.codeSourceLanguage === 'en' ? getCodeSampleTranslation(source, flow.codeTargetLanguage || 'yo') : '';
+    const result = translation || flow.codeOutput;
+    const characters = { boy: '🧒🏾', girl: '👧🏾', cat: '🐱', dog: '🐶' };
+    return `<div class="code-design-page code-studio-page">
+      <section class="code-studio-hero">
+        <div class="code-studio-hero-copy"><a class="code-back-link" href="#/coding" data-route="coding">${icon('arrow', 15)} Back to Home</a><h1>Start <em>Coding</em></h1><p>Drag the blocks, build your code,<br>and bring your ideas to life!</p></div>
+        <div class="code-studio-hero-art"><img class="code-studio-kids" src="./assets/code-reference-children.png" alt="Young coders creating a project together" /><img class="code-studio-buddy" src="./assets/code-reference-buddy.png" alt="Idilewa robot cheering on young coders" /><span class="code-speech-bubble code-speech-bubble-purple">Small Steps...<br>Big Dreams!</span><span class="code-studio-spark" aria-hidden="true">✦ ✨ ✧</span></div>
+      </section>
+      <section class="code-studio-workbench" aria-label="Block coding workspace">
+        <aside class="code-studio-sidebar">
+          <nav class="code-block-categories" aria-label="Code block categories">${CODE_BLOCK_CATEGORIES.map((item) => `<button type="button" class="${item.id === category.id ? 'is-active' : ''}" data-action="code-select-category" data-category="${item.id}" aria-pressed="${item.id === category.id}"><i class="code-category-icon ${item.color}">${icon(item.icon, 17)}</i>${item.label}</button>`).join('')}</nav>
+          <h2>${esc(category.label)}</h2>
+          <div class="code-character-grid">${(category.id === 'characters' ? [
+            { value: 'boy', label: 'Boy', emoji: characters.boy },
+            { value: 'girl', label: 'Girl', emoji: characters.girl },
+            { value: 'cat', label: 'Cat', emoji: characters.cat },
+            { value: 'dog', label: 'Dog', emoji: characters.dog },
+          ] : CODE_BLOCK_OPTIONS[category.id].map((option) => ({ ...option, value: option.id, emoji: category.icon === 'user' ? characters.boy : category.id === 'actions' ? '👋' : category.id === 'sounds' ? '♫' : category.id === 'events' ? '⚑' : '✨' }))).map((item) => `<button type="button" class="code-character-card ${flow.codeCharacter === item.value ? 'is-selected' : ''}" draggable="true" data-action="${category.id === 'characters' ? 'code-set-character' : 'code-add-block'}" data-character="${item.value}" data-block="${item.value}" aria-label="${esc(item.label)}"><span>${item.emoji}</span><strong>${esc(item.label)}</strong></button>`).join('')}</div>
+        </aside>
+        <section class="code-studio-editor" aria-labelledby="code-studio-title">
+          <div class="code-studio-editor-head"><h2 id="code-studio-title">${icon('code', 18)} My Code</h2><div><button type="button" data-action="code-undo" aria-label="Undo" ${flow.codeUndo.length ? '' : 'disabled'}>↶</button><button type="button" data-action="code-redo" aria-label="Redo" ${flow.codeRedo.length ? '' : 'disabled'}>↷</button><button type="button" class="code-clear-button" data-action="code-clear">⌫ Clear</button></div></div>
+          <div class="code-drop-zone" data-code-drop-zone aria-label="Drop code blocks here">${blocks.length ? blocks.map((block, index) => renderCodeBlock(block, index, true)).join('') : '<p class="code-drop-hint">Drag a block here to begin your story!</p>'}</div>
+          <button class="code-primary-button code-run-button" type="button" data-action="code-run">${icon('play', 17)} Run My Code</button>
+          <p class="code-run-status" id="code-run-status" role="status">${esc(flow.codeStatus || 'Your message is ready to run.')}</p>
+        </section>
+        <aside class="code-studio-result" aria-labelledby="code-result-title">
+          <h2 id="code-result-title">${icon('sparkles', 20)} Your Result</h2>
+          <div class="code-result-illustration"><img src="./assets/code-reference-children.png" alt="A young learner shares a friendly greeting" /><span class="code-result-speech">${esc(source)}</span></div>
+          <label class="code-target-label" for="code-target-language">Translate To</label>
+          <select id="code-target-language" data-action="code-target-select">${languages.map((language) => `<option value="${language.id}" ${flow.codeTargetLanguage === language.id ? 'selected' : ''}>${language.flag} ${language.name}</option>`).join('')}</select>
+          <div class="code-result-translation"><span class="code-character-face">${characters[flow.codeCharacter] || characters.boy}</span><strong lang="${esc(flow.codeTargetLanguage)}">${esc(result || 'Run your code to see a translation.')}</strong><button type="button" data-action="code-speak-output" aria-label="Listen to translated message">🔊</button></div>
+          <div class="code-language-tiles code-studio-language-tiles">${renderCodeLanguageTiles(flow.codeTargetLanguage)}</div>
+        </aside>
+      </section>
+    </div>`;
+  }
+
+  function setCodeBlocks(nextBlocks) {
+    const previous = Array.isArray(state.coding.codeBlocks) ? state.coding.codeBlocks : [];
+    state.coding.codeUndo = [...state.coding.codeUndo, previous].slice(-20);
+    state.coding.codeRedo = [];
+    state.coding.codeBlocks = nextBlocks.slice(0, 12);
+    state.coding.codeStatus = 'Your blocks are ready. Press Run My Code to try them!';
+    saveState();
+    render();
+  }
+
+  async function runCodeStudio() {
+    const messageInput = document.querySelector('[data-input="code-message"]');
+    const message = (messageInput?.value || state.coding.codeMessage || '').trim();
+    const status = document.getElementById('code-run-status');
+    if (!state.coding.codeBlocks.includes('say')) {
+      if (status) {
+        status.textContent = 'Add a “say something” block to your code first.';
+        status.classList.add('is-retry');
+      }
+      return;
+    }
+    if (!message) {
+      if (status) {
+        status.textContent = 'Add a message to your “say” block first.';
+        status.classList.add('is-retry');
+      }
+      return;
+    }
+    state.coding.codeMessage = message;
+    state.coding.codeStatus = 'Running your code…';
+    if (status) {
+      status.textContent = state.coding.codeStatus;
+      status.classList.remove('is-retry', 'is-success');
+    }
+    const targetLanguage = state.coding.codeTargetLanguage || 'yo';
+    try {
+      const sample = state.coding.codeSourceLanguage === 'en'
+        ? getCodeSampleTranslation(message, targetLanguage)
+        : '';
+      const phrasebook = state.coding.codeSourceLanguage === 'en'
+        ? translateText(message, targetLanguage)
+        : { exact: false };
+      const result = sample
+        ? { translated: sample }
+        : phrasebook.exact
+          ? phrasebook
+          : await translateWithProvider(message, targetLanguage, state.coding.codeSourceLanguage || 'en');
+      if (!result.translated) throw new Error('No translation was returned for that message.');
+      state.coding.codeOutput = result.translated;
+      state.coding.codeStatus = 'Your code ran successfully! Your message is ready to share.';
+      saveState();
+      const output = document.querySelector('.code-result-translation strong');
+      const bubble = document.querySelector('.code-result-speech');
+      if (output) output.textContent = result.translated;
+      if (bubble) bubble.textContent = message;
+      if (status) {
+        status.textContent = state.coding.codeStatus;
+        status.classList.remove('is-retry');
+        status.classList.add('is-success');
+      }
+    } catch (error) {
+      const messageText = error instanceof Error ? error.message : 'Your code could not be translated. Please try again.';
+      state.coding.codeStatus = messageText;
+      saveState();
+      if (status) {
+        status.textContent = messageText;
+        status.classList.add('is-retry');
+        status.classList.remove('is-success');
+      }
+    }
   }
 
 
@@ -4934,7 +5198,7 @@ import {
     </section>`;
   }
 
-  function renderProfile() {
+  function renderProfile({ passport = false } = {}) {
     const profile = getProfileDetails();
     const name = profile.name.trim() || 'Learner';
     const initial = name.charAt(0).toUpperCase();
@@ -4944,7 +5208,7 @@ import {
     const latestReflection = state.reflections[0];
     const reflectionText = latestReflection?.thought ? `${esc(latestReflection.thought.slice(0, 72))}${latestReflection.thought.length > 72 ? '…' : ''}` : 'Your reflections will appear here after you save one.';
     return `<div class="container route-page profile-page profile-dashboard">
-      <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>My profile</strong></div>
+      <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>${passport ? 'Learning passport' : 'My profile'}</strong></div>
       <section class="profile-cover" aria-label="Your Idilewa learning space">
         <img src="./assets/page-profile-1.jpg" alt="" />
         <div class="profile-cover-overlay"></div>
@@ -4993,6 +5257,127 @@ import {
       </div>
       <p class="profile-privacy-note">${icon('lock', 15)} Photos and guest profile details stay in this browser. Sign in to connect your learning preferences to your account.</p>
     </div>`;
+  }
+
+  function renderCulturalWorld() {
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? 'A bright beginning' : hour < 18 ? 'A good time to explore' : 'A quiet moment to discover';
+    const zones = CULTURAL_BIOMES.map((biome, index) => `
+      <button class="world-zone-card world-zone-${biome.id}" type="button" data-action="cultural-zone" data-zone="${biome.id}" aria-label="Explore ${esc(biome.title)}">
+        <span class="world-zone-index">0${index + 1}</span>
+        <span class="world-zone-glyph" aria-hidden="true">${esc(biome.icon)}</span>
+        <span class="world-zone-copy"><strong>${esc(biome.title)}</strong><small>${esc(biome.shortTitle)}</small></span>
+        <span class="world-zone-arrow" aria-hidden="true">↗</span>
+      </button>`).join('');
+
+    return `<div class="world-app-page">
+      <section class="world-welcome">
+        <div class="world-welcome-copy">
+          <span class="world-eyebrow"><span></span> IDILEWA · CULTURAL WORLD</span>
+          <h1>${greeting},<br /><em>young explorer.</em></h1>
+          <p>Language, living stories, and new ideas grow together here. Choose a place on the map to begin.</p>
+          <div class="world-welcome-actions">
+            <span class="world-time-note">${icon('sparkles', 15)} Your next discovery is waiting</span>
+            ${routeLink('passport', 'Open your passport', 'world-passport-link')}
+          </div>
+        </div>
+        <aside class="world-streak-card" aria-label="Learning streak">
+          <span class="world-streak-icon" aria-hidden="true">✳</span>
+          <span class="world-streak-caption">YOUR RHYTHM</span>
+          <strong>${state.streak}<small> days</small></strong>
+          <span class="world-streak-foot">Every visit helps your learning grow.</span>
+        </aside>
+      </section>
+
+      <section class="world-explorer" aria-labelledby="world-map-title">
+        <header class="world-section-heading">
+          <div><span class="world-section-kicker">A living learning landscape</span><h2 id="world-map-title">Where will curiosity take you?</h2></div>
+          <span class="world-map-hint">${icon('compass', 16)} Drag to wander · tap a place to open</span>
+        </header>
+        <div class="world-map-layout">
+          <div class="world-map-stage">
+            <div class="world-map-atmosphere" aria-hidden="true"></div>
+            <div id="cultural-world-canvas" class="world-map-canvas-wrap" role="img" aria-label="Interactive 3D map with five cultural learning places">
+              <div class="world-map-loading" aria-hidden="true"><span>✳</span><small>Preparing your world…</small></div>
+            </div>
+            <div class="world-map-label world-map-label-north">A world of living knowledge</div>
+            <div class="world-map-legend"><span></span> Five places to learn, listen & create</div>
+            <div class="world-map-controls" aria-hidden="true"><span>↔</span><span>↕</span></div>
+          </div>
+          <div class="world-zone-list" aria-label="Choose a learning place">${zones}</div>
+        </div>
+      </section>
+
+      <section class="world-portfolio-preview" aria-labelledby="world-portfolio-title">
+        <div><span class="world-section-kicker">Your learning story</span><h2 id="world-portfolio-title">Small steps become a beautiful journey.</h2><p>Keep your lessons, practice rhythm, and milestones together in your learning passport.</p></div>
+        ${routeLink('passport', `Visit your passport ${icon('arrow', 16)}`, 'button button-primary world-portfolio-button')}
+      </section>
+    </div>`;
+  }
+
+  function openCulturalZone(zoneId) {
+    const biome = CULTURAL_BIOMES.find((item) => item.id === zoneId);
+    if (!biome) return;
+    const currentFocus = document.activeElement;
+    worldSheetReturnFocus = currentFocus instanceof HTMLElement && currentFocus !== document.body
+      ? currentFocus
+      : null;
+    const root = document.getElementById('modal-root');
+    root.innerHTML = `<div class="world-sheet-backdrop" data-action="close-modal">
+      <section class="world-lesson-sheet" role="dialog" aria-modal="true" aria-labelledby="world-sheet-title" data-sheet-route="${esc(biome.route)}">
+        <div class="world-sheet-grabber" aria-hidden="true"></div>
+        <button class="world-sheet-close" type="button" data-action="close-modal" aria-label="Close learning place">×</button>
+        <span class="world-sheet-glyph world-zone-${esc(biome.id)}" aria-hidden="true">${esc(biome.icon)}</span>
+        <span class="world-section-kicker">${esc(biome.title)}</span>
+        <h2 id="world-sheet-title">${esc(biome.chapter)}</h2>
+        <p>${esc(biome.description)}</p>
+        <div class="world-lesson-note">
+          <small>${biome.translation ? 'Yorùbá · English meaning' : 'A learning path'}</small>
+          <strong>${esc(biome.phrase)}</strong>
+          ${biome.translation ? `<span>${esc(biome.translation)}</span>` : ''}
+        </div>
+        <div class="world-sheet-footer"><span>${icon('shield', 15)} ${esc(biome.ageNote)}</span>
+          <button class="button button-primary" type="button" data-action="launch-cultural-zone" data-zone="${esc(biome.id)}">Explore this place ${icon('arrow', 15)}</button>
+        </div>
+      </section>
+    </div>`;
+    const sheet = root.querySelector('.world-lesson-sheet');
+    const closeButton = root.querySelector('.world-sheet-close');
+    closeButton?.focus();
+    const grabber = root.querySelector('.world-sheet-grabber');
+    let dragStartY = 0;
+    let dragStartTime = 0;
+    grabber?.addEventListener('pointerdown', (event) => {
+      dragStartY = event.clientY;
+      dragStartTime = performance.now();
+      if (sheet) sheet.style.transition = 'none';
+      grabber.setPointerCapture(event.pointerId);
+    });
+    grabber?.addEventListener('pointermove', (event) => {
+      if (!grabber.hasPointerCapture(event.pointerId) || !sheet) return;
+      sheet.style.transform = `translateY(${Math.max(0, event.clientY - dragStartY)}px)`;
+    });
+    const finishSheetDrag = (event) => {
+      if (!grabber?.hasPointerCapture(event.pointerId) || !sheet) return;
+      const distance = Math.max(0, event.clientY - dragStartY);
+      const elapsed = Math.max(1, performance.now() - dragStartTime);
+      if (distance > 100 || distance / elapsed > 0.75) {
+        closeModal();
+      } else {
+        sheet.style.transition = '';
+        sheet.style.transform = '';
+      }
+    };
+    grabber?.addEventListener('pointerup', finishSheetDrag);
+    grabber?.addEventListener('pointercancel', finishSheetDrag);
+  }
+
+  let worldSheetReturnFocus = null;
+  function closeModal() {
+    const isWorldSheet = document.querySelector('.world-lesson-sheet');
+    document.getElementById('modal-root').innerHTML = '';
+    if (isWorldSheet && worldSheetReturnFocus?.isConnected) worldSheetReturnFocus.focus();
+    worldSheetReturnFocus = null;
   }
 
   function renderContact() {
@@ -5185,7 +5570,7 @@ import {
                 <span class="role-tag">No parent consent</span>
               </button>
             </div>
-            <p class="form-helper-text">${isChild ? 'Child accounts need a parent or guardian to approve sign-up. No email confirmation code is required after approval.' : 'Adult accounts can be created directly and do not require parent or guardian consent or email confirmation.'}</p>
+            <p class="form-helper-text">${isChild ? 'Child accounts need a parent or guardian to approve sign-up, then must confirm their email before signing in.' : 'Adult accounts do not need parent or guardian approval, but must confirm their email before signing in.'}</p>
           </div>
           ` : ''}
 
@@ -5203,6 +5588,7 @@ import {
             <div class="input-with-icon">
               <input id="authEmail" type="email" name="email" class="form-input" autocomplete="email" placeholder="learner@example.com" value="${signUp && verifiedGuardianSignup ? esc(verifiedGuardianSignup.email) : !signUp && signupEmailForSignin ? esc(signupEmailForSignin) : ''}" ${signUp && verifiedGuardianSignup ? 'readonly' : ''} required />
             </div>
+            ${!signUp && !isChild ? '<button class="forgot-link" type="button" data-action="resend-signup-confirmation">Resend confirmation email</button>' : ''}
           </div>
 
           ${signUp || !isChild ? `<div class="form-group">
@@ -5232,7 +5618,7 @@ import {
             <div class="input-with-icon">
               <input id="guardianEmail" type="email" name="guardianEmail" class="form-input" autocomplete="email" placeholder="parent@example.com" required />
             </div>
-            <p class="form-helper-text">We’ll email your parent or guardian a private approval link. After they approve, your one-time sign-up code will be sent to your email above.</p>
+            <p class="form-helper-text">We’ll email your parent or guardian a private approval link. After approval, confirm your email using the link sent to the address above.</p>
             <button class="button button-outline" type="button" data-action="request-guardian-approval">Email my parent for approval</button>
           </div>
           <div class="form-group consent-form-group">
@@ -5528,37 +5914,43 @@ import {
       if (typeof text !== 'string' || !text.trim() || text.length > 1_000) {
         throw new Error('Speech text must contain 1–1,000 characters.');
       }
-      const blob = await synthesizePlotweaverSpeech({
-        text,
-        language,
-        voiceId: document.getElementById('plotweaver-voice-select')?.value
-          || state.trainer.voiceId
-          || undefined,
-      });
       if (activePlotweaverAudio) {
         activePlotweaverAudio.pause();
         activePlotweaverAudio = null;
       }
       if (activePlotweaverObjectUrl) URL.revokeObjectURL(activePlotweaverObjectUrl);
-      const objectUrl = URL.createObjectURL(blob);
-      activePlotweaverObjectUrl = objectUrl;
-      activePlotweaverAudio = new Audio(objectUrl);
-      activePlotweaverAudio.addEventListener('ended', () => {
-        if (activePlotweaverObjectUrl === objectUrl) {
-          activePlotweaverAudio = null;
-          URL.revokeObjectURL(objectUrl);
-          activePlotweaverObjectUrl = '';
-        }
-      }, { once: true });
+      activePlotweaverObjectUrl = '';
+      const voiceId = document.getElementById('plotweaver-voice-select')?.value
+        || state.trainer.voiceId
+        || undefined;
       try {
+        const blob = await synthesizePlotweaverSpeech({ text, language, voiceId });
+        const objectUrl = URL.createObjectURL(blob);
+        activePlotweaverObjectUrl = objectUrl;
+        activePlotweaverAudio = new Audio(objectUrl);
+        activePlotweaverAudio.addEventListener('ended', () => {
+          if (activePlotweaverObjectUrl === objectUrl) {
+            activePlotweaverAudio = null;
+            URL.revokeObjectURL(objectUrl);
+            activePlotweaverObjectUrl = '';
+          }
+        }, { once: true });
         await activePlotweaverAudio.play();
-      } catch (error) {
+        return 'plotweaver';
+      } catch (serviceError) {
+        activePlotweaverAudio?.pause();
         activePlotweaverAudio = null;
-        if (activePlotweaverObjectUrl === objectUrl) {
-          URL.revokeObjectURL(objectUrl);
-          activePlotweaverObjectUrl = '';
+        if (activePlotweaverObjectUrl) URL.revokeObjectURL(activePlotweaverObjectUrl);
+        activePlotweaverObjectUrl = '';
+        if (voiceId) throw serviceError;
+        try {
+          await speakWithDeviceVoice(text, language);
+          return 'device';
+        } catch (deviceError) {
+          const serviceMessage = serviceError instanceof Error ? serviceError.message : 'Idilewa voice audio is unavailable.';
+          const deviceMessage = deviceError instanceof Error ? deviceError.message : 'Device speech is unavailable.';
+          throw new Error(`${serviceMessage} ${deviceMessage}`);
         }
-        throw error;
       }
     }
 
@@ -5579,7 +5971,7 @@ import {
 
     async function playNativeTrainerVoice(phrase, lang = "yoruba", speed = 1.0, syllables = []) {
       if (syllables?.length) playLessonTonalSequence(syllables, speed);
-      await playPlotweaverSpeech(phrase, trainerLanguageCode(lang));
+      return playPlotweaverSpeech(phrase, trainerLanguageCode(lang));
     }
 
     async function startTrainerRecording(lessonId) {
@@ -6127,12 +6519,14 @@ import {
       case 'voice-speech-to-text':
       case 'voice-translation': return renderVoiceFeaturePage(page, params);
       case 'index': return renderHome();
+      case 'world': return renderCulturalWorld();
       case 'languages':
       case 'learn':
       case 'curriculum': return renderCurriculum();
       case 'course': return renderCourse(params);
       case 'lesson': return renderLesson(params);
       case 'coding': return renderCoding();
+      case 'coding-studio': return renderCodingStudio();
       case 'ere': return renderStories();
       case 'ere_game': return renderStoryGame(params);
       case 'oral': return renderOral();
@@ -6151,6 +6545,7 @@ import {
       case 'voices': return renderVoices();
       case 'pricing': return renderPricing();
       case 'profile': return renderProfile();
+      case 'passport': return renderProfile({ passport: true });
       case 'contact': return renderContact();
       case 'privacy': return renderPrivacy();
       case 'login': return renderLogin();
@@ -6317,7 +6712,7 @@ import {
       if (breadcrumb) output = output.replace(breadcrumb[0], `${breadcrumb[0]}${banner}`);
       else output = output.replace(/(<div class="container route-page[^"]*">)/, `$1${banner}`);
     }
-    return output;
+    return output.replace(/(\bsrc=["'])\.\/assets\//gi, '$1/assets/');
   }
 
   const PAGE_LAYER_CATEGORIES = ['Orient', 'Understand', 'Information object', 'Context / example', 'Practice / decision', 'Reflect / continue'];
@@ -6743,6 +7138,7 @@ import {
   }
 
   let activeCodeRobotScene = null;
+  let activeWorldScene = null;
   let homePreviewTimers = [];
 
   function startHomePreviewMotion() {
@@ -6803,6 +7199,10 @@ import {
       activeCodeRobotScene.destroy();
       activeCodeRobotScene = null;
     }
+    if (activeWorldScene) {
+      activeWorldScene.destroy();
+      activeWorldScene = null;
+    }
     const location = parseLocation();
     if (location.removedRoute) {
       navigate('index', {}, true);
@@ -6823,11 +7223,9 @@ import {
     const pageMarkup = assignUniqueRouteImages(page, renderPage(page, params))
       .replace(/(?:African )?Voice (?:African Language )?Trainer/gi, 'Voice Lessons')
       .replace(/Voice Studio/gi, 'Voice Lessons');
-    if (page === 'coding') {
+    if (page === 'coding' || page === 'coding-studio') {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = `${pageMarkup}${renderFooter(page)}`;
-      initializeIdeRuntimes();
-      initializeTranslationLanguages('ide-output-language');
     } else if (page === 'login') {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = `${pageMarkup}${renderFooter(page)}`;
@@ -6837,6 +7235,10 @@ import {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = `${pageMarkup}${renderPageInformationLayers(page)}${renderFooter(page)}`;
     }
+    const mainElement = document.getElementById('main');
+    mainElement.classList.remove('route-enter');
+    void mainElement.offsetWidth;
+    mainElement.classList.add('route-enter');
     ensureSingleSharedFooter();
     if (page === 'owe' && ['meaning', 'story', 'reflection'].includes(params.section)) {
       window.requestAnimationFrame(() => {
@@ -6848,6 +7250,11 @@ import {
     if (page === 'coding') {
       const codeRobotGlyphs = document.getElementById('codeRobotGlyphCanvas');
       if (codeRobotGlyphs) activeCodeRobotScene = init3DCodeRobotGlyphs(codeRobotGlyphs);
+    } else if (page === 'world') {
+      const worldCanvas = document.getElementById('cultural-world-canvas');
+      if (worldCanvas) {
+        activeWorldScene = initCulturalWorld(worldCanvas, (zoneId) => openCulturalZone(zoneId));
+      }
     } else if (page === 'trainer' || page === 'voice_lessons') {
       const audioCanvas = document.getElementById('waveformCanvas');
       if (audioCanvas) init3DAudioVisualizer(audioCanvas);
@@ -7110,7 +7517,21 @@ import {
     switch (action) {
       case 'toggle-menu': toggleMobileMenu(); break;
       case 'open-search': openSearch(); break;
-      case 'close-modal': document.getElementById('modal-root').innerHTML = ''; break;
+      case 'close-modal': closeModal(); break;
+      case 'cultural-zone':
+        openCulturalZone(el.dataset.zone || '');
+        break;
+      case 'launch-cultural-zone': {
+        const biome = CULTURAL_BIOMES.find((item) => item.id === el.dataset.zone);
+        if (!biome) break;
+        document.getElementById('modal-root').innerHTML = '';
+        if (biome.language) {
+          state.currentLang = biome.language;
+          saveState();
+        }
+        navigate(biome.route, biome.language ? { lang: biome.language } : {});
+        break;
+      }
       case 'open-ai-helper': openAiHelper(el.dataset.topic || 'general'); break;
       case 'ai-suggestion': {
         const input = document.getElementById('aiHelperQuestion');
@@ -7123,6 +7544,86 @@ import {
       case 'consent-signup':
         state.authRole = 'child'; state.loginMode = 'signup'; saveState(); navigate('login'); break;
       
+      case 'code-select-category': {
+        const category = el.dataset.category;
+        if (!CODE_BLOCK_CATEGORIES.some((item) => item.id === category)) break;
+        state.coding.codeCategory = category;
+        saveState();
+        render();
+        break;
+      }
+      case 'code-set-character': {
+        const character = el.dataset.character;
+        if (!['boy', 'girl', 'cat', 'dog'].includes(character)) break;
+        state.coding.codeCharacter = character;
+        if (!state.coding.codeBlocks.includes('character')) {
+          state.coding.codeBlocks = [...state.coding.codeBlocks, 'character'].slice(0, 12);
+        }
+        saveState();
+        render();
+        break;
+      }
+      case 'code-add-block': {
+        const block = el.dataset.block;
+        if (!['event', 'character', 'say', 'language', 'translate', 'wave', 'jump', 'dance', 'sound', 'repeat'].includes(block)) break;
+        if (state.coding.codeBlocks.length >= 12) {
+          showToast('Your story has room for 12 blocks. Remove one to add another.');
+          break;
+        }
+        setCodeBlocks([...state.coding.codeBlocks, block]);
+        break;
+      }
+      case 'code-remove-block': {
+        const index = Number(el.dataset.index);
+        if (!Number.isInteger(index) || index < 0 || index >= state.coding.codeBlocks.length) break;
+        setCodeBlocks(state.coding.codeBlocks.filter((_, blockIndex) => blockIndex !== index));
+        break;
+      }
+      case 'code-clear':
+        state.coding.codeUndo = [...state.coding.codeUndo, state.coding.codeBlocks].slice(-20);
+        state.coding.codeRedo = [];
+        state.coding.codeBlocks = [];
+        state.coding.codeStatus = 'Your workspace is clear. Add a block to begin!';
+        saveState();
+        render();
+        break;
+      case 'code-undo': {
+        if (!state.coding.codeUndo.length) break;
+        state.coding.codeRedo = [...state.coding.codeRedo, state.coding.codeBlocks].slice(-20);
+        state.coding.codeBlocks = state.coding.codeUndo.at(-1);
+        state.coding.codeUndo = state.coding.codeUndo.slice(0, -1);
+        saveState();
+        render();
+        break;
+      }
+      case 'code-redo': {
+        if (!state.coding.codeRedo.length) break;
+        state.coding.codeUndo = [...state.coding.codeUndo, state.coding.codeBlocks].slice(-20);
+        state.coding.codeBlocks = state.coding.codeRedo.at(-1);
+        state.coding.codeRedo = state.coding.codeRedo.slice(0, -1);
+        saveState();
+        render();
+        break;
+      }
+      case 'code-target-language': {
+        const language = el.dataset.language;
+        if (!CODE_LANGUAGES.some((item) => item.id === language)) break;
+        state.coding.codeTargetLanguage = language;
+        saveState();
+        render();
+        break;
+      }
+      case 'code-run':
+        void runCodeStudio();
+        break;
+      case 'code-speak-output':
+        if (!state.coding.codeOutput) {
+          showToast('Run your code before listening to the translated message.');
+          break;
+        }
+        void playPlotweaverSpeech(state.coding.codeOutput, state.coding.codeTargetLanguage || 'yo')
+          .catch((error) => showToast(error instanceof Error ? error.message : 'Idilewa could not play the translation.', 'error'));
+        break;
       case 'ide-set-lang': {
         const lang = el.dataset.lang || 'yoruba';
         state.coding.ideLang = lang;
@@ -7495,6 +7996,9 @@ import {
       }
       case 'speak-voice-lesson': {
         void playPlotweaverSpeech(el.dataset.phrase || '', 'yo')
+          .then((source) => {
+            if (source === 'device') showToast('Using your device voice for this lesson.');
+          })
           .catch((error) => showToast(error instanceof Error ? error.message : 'Idilewa could not generate this sound.', 'error'));
         break;
       }
@@ -7507,8 +8011,10 @@ import {
           break;
         }
         if (status) status.textContent = 'Generating audio with Idilewa…';
-        void playPlotweaverSpeech(text, language).then(() => {
-          if (status) status.textContent = 'Audio is playing. The generated audio is not saved.';
+        void playPlotweaverSpeech(text, language).then((source) => {
+          if (status) status.textContent = source === 'device'
+            ? 'Playing with your device voice. This audio is not saved.'
+            : 'Audio is playing. The generated audio is not saved.';
         }).catch((error) => {
           if (status) status.textContent = error instanceof Error ? error.message : 'Idilewa could not generate this audio.';
         });
@@ -7745,6 +8251,17 @@ import {
       case 'request-guardian-approval': void submitGuardianRequest(el); break;
       case 'verify-guardian-code': void verifyGuardianCode(el); break;
       case 'request-password-reset': void requestPasswordResetCode(el); break;
+      case 'resend-signup-confirmation':
+        {
+        const emailInput = document.getElementById('authEmail');
+        if (!emailInput?.reportValidity()) break;
+        el.disabled = true;
+        void resendSignupConfirmation(emailInput.value)
+          .then(() => showToast('If this account still needs confirmation, a new link has been sent. Check your inbox and spam folder.', 'success'))
+          .catch((error) => showToast(error instanceof Error ? error.message : 'A confirmation email could not be sent.', 'error'))
+          .finally(() => { if (el.isConnected) el.disabled = false; });
+        break;
+        }
       case 'request-child-signin-code': void requestChildSigninCode(el); break;
       case 'resend-signin-otp':
         if (!pendingSignin?.email) break;
@@ -7853,7 +8370,7 @@ import {
         const activeLesson = currentTierLessons.find((l) => l.id === lessonId) || currentTierLessons[0];
         if (activeLesson) {
           void playNativeTrainerVoice(activeLesson.phrase, state.trainer.lang, state.trainer.speed || 1.0, activeLesson.syllables)
-            .then(() => showToast('Playing Idilewa-generated audio.'))
+            .then((source) => showToast(source === 'device' ? 'Using your device voice for this lesson.' : 'Playing Idilewa-generated audio.'))
             .catch((error) => showToast(error instanceof Error ? error.message : 'Idilewa could not generate lesson audio.', 'error'));
         }
         break;
@@ -8038,6 +8555,27 @@ import {
 
   document.addEventListener('change', (event) => {
     const el = event.target;
+    if (el.matches('#code-target-language, #code-landing-language')) {
+      if (!CODE_LANGUAGES.some((language) => language.id === el.value)) return;
+      state.coding.codeTargetLanguage = el.value;
+      saveState();
+      render();
+      return;
+    }
+    if (el.matches('[data-action="code-character-select"]')) {
+      if (!['boy', 'girl', 'cat', 'dog'].includes(el.value)) return;
+      state.coding.codeCharacter = el.value;
+      saveState();
+      render();
+      return;
+    }
+    if (el.matches('[data-action="code-source-language"]')) {
+      if (!['en', 'yo', 'ig', 'ha', 'sw'].includes(el.value)) return;
+      state.coding.codeSourceLanguage = el.value;
+      saveState();
+      render();
+      return;
+    }
     if (el.matches('.translation-speed-select select')) {
       handleAction('translation-speech-speed', el);
       return;
@@ -8124,6 +8662,13 @@ import {
 
   document.addEventListener('input', (event) => {
     const target = event.target;
+    if (target.matches('[data-input="code-message"]')) {
+      state.coding.codeMessage = target.value.slice(0, 120);
+      const speechBubble = document.querySelector('.code-result-speech');
+      if (speechBubble) speechBubble.textContent = state.coding.codeMessage;
+      saveState();
+      return;
+    }
     if (target.id === 'voice-translation-input') {
       const count = document.getElementById('voice-translation-character-count');
       if (count) count.textContent = String(target.value.length);
@@ -8145,6 +8690,39 @@ import {
         const visible = (state.libraryFilter === 'all' || card.dataset.libraryKind === state.libraryFilter) && card.textContent.toLowerCase().includes(query);
         card.hidden = !visible;
         if (visible) visibleCount += 1;
+      });
+
+      document.addEventListener('dragstart', (event) => {
+        const block = event.target.closest('[data-action="code-add-block"], [data-action="code-set-character"]');
+        if (!block || !event.dataTransfer) return;
+        event.dataTransfer.setData('application/x-idilewa-block', JSON.stringify({
+          action: block.dataset.action,
+          block: block.dataset.block,
+          character: block.dataset.character,
+        }));
+        event.dataTransfer.effectAllowed = 'copy';
+      });
+
+      document.addEventListener('dragover', (event) => {
+        if (!event.target.closest('[data-code-drop-zone]')) return;
+        event.preventDefault();
+        if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
+      });
+
+      document.addEventListener('drop', (event) => {
+        const dropZone = event.target.closest('[data-code-drop-zone]');
+        if (!dropZone || !event.dataTransfer) return;
+        event.preventDefault();
+        try {
+          const dropped = JSON.parse(event.dataTransfer.getData('application/x-idilewa-block'));
+          if (dropped.action === 'code-set-character') {
+            handleAction('code-set-character', { dataset: { character: dropped.character } });
+          } else if (dropped.action === 'code-add-block') {
+            handleAction('code-add-block', { dataset: { block: dropped.block } });
+          }
+        } catch {
+          showToast('That block could not be added. Please try again.', 'error');
+        }
       });
       const empty = document.querySelector('[data-library-empty]');
       if (empty) empty.hidden = visibleCount > 0;
@@ -8468,21 +9046,16 @@ import {
           });
           welcomeEmailError = deliveryError;
           if (!session) {
-            throw new Error('The account service did not open a session. Email confirmation is still enabled in Supabase; account creation cannot continue until the hosted setting is corrected.');
+            verifiedGuardianSignup = null;
+            try { sessionStorage.removeItem('idilewa-guardian-signup'); } catch (_) {}
+            state.loginMode = 'signin';
+            navigate('login', { mode: 'signin' }, true);
+            showToast('Account created. Check your email to confirm it; the link will return you to Idilewa.', 'success');
+            return;
           }
-          await signOutAccount({ notify: false });
           signupEmailForSignin = email.toLowerCase();
           verifiedGuardianSignup = null;
           try { sessionStorage.removeItem('idilewa-guardian-signup'); } catch (_) {}
-          state.loginMode = 'signin';
-          navigate('login', { mode: 'signin' }, true);
-          showToast(
-            welcomeEmailError
-              ? `Account created. ${welcomeEmailError}`
-              : 'Account created. Sign in with your email and password.',
-            welcomeEmailError ? 'error' : 'success'
-          );
-          return;
         } else {
           await signInAccount({ email, password, expectedRole: 'adult' });
         }
@@ -8539,19 +9112,26 @@ import {
 
   document.addEventListener('keydown', (event) => {
     if (event.key === 'Escape') {
-      document.getElementById('modal-root').innerHTML = '';
+      closeModal();
       closeMobileMenu();
     }
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
       event.preventDefault(); openSearch();
     }
-    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter' && parseLocation().page === 'coding') {
+    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter' && ['coding', 'coding-studio'].includes(parseLocation().page)) {
       event.preventDefault();
-      const runButton = document.querySelector('[data-action="ide-run-code"]');
-      if (runButton) handleAction('ide-run-code', runButton);
+      const runButton = document.querySelector('[data-action="code-run"]');
+      if (runButton) handleAction('code-run', runButton);
     }
   });
 
   window.addEventListener('hashchange', render);
+  if (isSupabaseConfigured) {
+    try {
+      await restoreAuthSession();
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Your saved sign-in session could not be restored.', 'error');
+    }
+  }
   render();
 })();

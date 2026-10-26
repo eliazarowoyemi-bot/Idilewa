@@ -6,7 +6,7 @@
 
 ## 1. Executive Summary
 
-Idilewa (branded in the interface as idílẹ́wà) is a culturally grounded, family-oriented learning platform concept. Its central goal is to help children, families, independent learners, educators, and language communities keep African languages close while connecting language learning to culture, oral knowledge, stories, and technology education.
+Idilewa is a culturally grounded, family-oriented learning platform concept. Its central goal is to help children, families, independent learners, educators, and language communities keep African languages close while connecting language learning to culture, oral knowledge, stories, and technology education.
 
 The product brings several learning modes into one web experience:
 
