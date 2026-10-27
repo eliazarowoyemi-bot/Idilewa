@@ -5217,58 +5217,17 @@ import {
   }
 
   function renderCulturalWorld() {
-    const hour = new Date().getHours();
-    const greeting = hour < 12 ? 'A bright beginning' : hour < 18 ? 'A good time to explore' : 'A quiet moment to discover';
-    const zones = CULTURAL_BIOMES.map((biome, index) => `
-      <button class="world-zone-card world-zone-${biome.id}" type="button" data-action="cultural-zone" data-zone="${biome.id}" aria-label="Explore ${esc(biome.title)}">
-        <span class="world-zone-index">0${index + 1}</span>
-        <span class="world-zone-glyph" aria-hidden="true">${esc(biome.icon)}</span>
-        <span class="world-zone-copy"><strong>${esc(biome.title)}</strong><small>${esc(biome.shortTitle)}</small></span>
-        <span class="world-zone-arrow" aria-hidden="true">↗</span>
-      </button>`).join('');
+    const zones = CULTURAL_BIOMES.map((biome) => `
+      <button class="world-artwork-hotspot world-artwork-zone world-artwork-zone-${biome.id}" type="button" data-action="cultural-zone" data-zone="${biome.id}" aria-label="Explore ${esc(biome.title)}"></button>`).join('');
 
-    return `<div class="world-app-page">
-      <section class="world-welcome">
-        <div class="world-welcome-copy">
-          <span class="world-eyebrow"><span></span> IDILEWA · CULTURAL WORLD</span>
-          <h1>${greeting},<br /><em>young explorer.</em></h1>
-          <p>Language, living stories, and new ideas grow together here. Choose a place on the map to begin.</p>
-          <div class="world-welcome-actions">
-            <span class="world-time-note">${icon('sparkles', 15)} Your next discovery is waiting</span>
-            ${routeLink('passport', 'Open your passport', 'world-passport-link')}
-          </div>
-        </div>
-        <aside class="world-streak-card" aria-label="Learning streak">
-          <span class="world-streak-icon" aria-hidden="true">✳</span>
-          <span class="world-streak-caption">YOUR RHYTHM</span>
-          <strong>${state.streak}<small> days</small></strong>
-          <span class="world-streak-foot">Every visit helps your learning grow.</span>
-        </aside>
-      </section>
-
-      <section class="world-explorer" aria-labelledby="world-map-title">
-        <header class="world-section-heading">
-          <div><span class="world-section-kicker">A living learning landscape</span><h2 id="world-map-title">Where will curiosity take you?</h2></div>
-          <span class="world-map-hint">${icon('compass', 16)} Drag to wander · tap a place to open</span>
-        </header>
-        <div class="world-map-layout">
-          <div class="world-map-stage">
-            <div class="world-map-atmosphere" aria-hidden="true"></div>
-            <div id="cultural-world-canvas" class="world-map-canvas-wrap" role="img" aria-label="Interactive 3D map with five cultural learning places">
-              <div class="world-map-loading" aria-hidden="true"><span>✳</span><small>Preparing your world…</small></div>
-            </div>
-            <div class="world-map-label world-map-label-north">A world of living knowledge</div>
-            <div class="world-map-legend"><span></span> Five places to learn, listen & create</div>
-            <div class="world-map-controls" aria-hidden="true"><span>↔</span><span>↕</span></div>
-          </div>
-          <div class="world-zone-list" aria-label="Choose a learning place">${zones}</div>
-        </div>
-      </section>
-
-      <section class="world-portfolio-preview" aria-labelledby="world-portfolio-title">
-        <div><span class="world-section-kicker">Your learning story</span><h2 id="world-portfolio-title">Small steps become a beautiful journey.</h2><p>Keep your lessons, practice rhythm, and milestones together in your learning passport.</p></div>
-        ${routeLink('passport', `Visit your passport ${icon('arrow', 16)}`, 'button button-primary world-portfolio-button')}
-      </section>
+    return `<div class="world-artwork-page">
+      <h1 class="world-artwork-title">A Bigger World Awaits</h1>
+      <div class="world-artwork-frame" role="group" aria-label="Explore languages and cultures">
+        <img src="./assets/cultural-world-replacement.png" width="768" height="860" alt="A Bigger World Awaits. Discover new languages, learn about cultures, and explore the world one lesson at a time." />
+        <button class="world-artwork-hotspot world-artwork-start" type="button" data-action="cultural-zone" data-zone="language" aria-label="Start exploring"></button>
+        ${zones}
+        ${routeLink('passport', '<span class="sr-only">Get started: open your learning passport</span>', 'world-artwork-hotspot world-artwork-passport')}
+      </div>
     </div>`;
   }
 

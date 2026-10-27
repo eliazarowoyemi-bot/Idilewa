@@ -10238,6 +10238,65 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
   animation: idilewa-route-arrive 420ms var(--motion-route) both;
 }
 
+.world-artwork-page {
+  width: min(768px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 20px 0 42px;
+}
+.world-artwork-title, .world-artwork-passport .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+.world-artwork-frame {
+  position: relative;
+  width: 100%;
+}
+.world-artwork-frame > img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.world-artwork-hotspot {
+  position: absolute;
+  display: block;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  cursor: pointer;
+}
+.world-artwork-start {
+  top: 26.3%;
+  left: 3.2%;
+  width: 24%;
+  height: 5.2%;
+}
+.world-artwork-zone {
+  left: 65.5%;
+  width: 32.5%;
+  height: 5.7%;
+}
+.world-artwork-zone-language { top: 43.1%; }
+.world-artwork-zone-voice { top: 48.8%; }
+.world-artwork-zone-stories { top: 54.5%; }
+.world-artwork-zone-proverbs { top: 60.2%; }
+.world-artwork-zone-code { top: 65.9%; }
+.world-artwork-passport {
+  top: 90.2%;
+  left: 2.8%;
+  width: 23%;
+  height: 5.4%;
+}
+.world-artwork-hotspot:focus-visible {
+  outline: 3px solid #0c5737;
+  outline-offset: 3px;
+  background: rgba(255,255,255,.2);
+}
 .world-app-page {
   --world-ink: #292720;
   --world-subtle: #756d60;
