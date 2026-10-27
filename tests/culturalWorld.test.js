@@ -7,27 +7,54 @@ import { CULTURAL_BIOMES } from '../src/culturalWorld.js';
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const stylesSource = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 const culturalWorldArtwork = await readFile(new URL('../public/assets/cultural-world-replacement.png', import.meta.url));
+const culturalWorldArtwork5k = await readFile(new URL('../public/assets/cultural-world-replacement-5k.jpg', import.meta.url));
+
+function getJpegDimensions(image) {
+  const startOfFrameMarkers = new Set([0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf]);
+  let offset = 2;
+  while (offset < image.length) {
+    if (image[offset] !== 0xff) {
+      offset += 1;
+      continue;
+    }
+    const marker = image[offset + 1];
+    offset += 2;
+    if (marker === 0xd8 || marker === 0xd9 || marker === 0x01 || (marker >= 0xd0 && marker <= 0xd7)) continue;
+    if (offset + 7 > image.length) return null;
+    if (startOfFrameMarkers.has(marker)) {
+      return { width: image.readUInt16BE(offset + 5), height: image.readUInt16BE(offset + 3) };
+    }
+    offset += image.readUInt16BE(offset);
+  }
+  return null;
+}
 
 test('Cultural World uses the supplied artwork unchanged and aligns its interactive areas', () => {
   assert.equal(createHash('sha256').update(culturalWorldArtwork).digest('hex'), 'a24f8ac67f8281e5b3398627fac46574e043b4dbf282f5630a64962120914df8');
   assert.equal(culturalWorldArtwork.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
   assert.equal(culturalWorldArtwork.readUInt32BE(16), 877);
   assert.equal(culturalWorldArtwork.readUInt32BE(20), 768);
+  assert.deepEqual(getJpegDimensions(culturalWorldArtwork5k), { width: 5000, height: 4379 });
 
   const culturalWorld = appSource.slice(
     appSource.indexOf('function renderCulturalWorld()'),
     appSource.indexOf('function openCulturalZone')
   );
-  assert.match(culturalWorld, /src="\.\/assets\/cultural-world-replacement\.png" width="877" height="768"/);
+  assert.match(culturalWorld, /src="\.\/assets\/cultural-world-replacement\.png" srcset="\.\/assets\/cultural-world-replacement\.png 877w, \.\/assets\/cultural-world-replacement-5k\.jpg 5000w" sizes="\(min-width: 1232px\) 1200px, calc\(100vw - 32px\)" width="877" height="768"/);
   assert.match(culturalWorld, /aria-label="Start exploring"/);
   assert.match(culturalWorld, /data-action="cultural-zone" data-zone="\$\{biome\.id\}"/);
   assert.match(culturalWorld, /world-artwork-top-languages/);
   assert.match(culturalWorld, /world-artwork-language-marker-\$\{id\}/);
   assert.match(culturalWorld, /routeLink\('profile', '<span class="sr-only">Start your learning journey: open your profile<\/span>'/);
   assert.match(stylesSource, /\.world-artwork-hotspot \.sr-only\s*\{[^}]*clip-path: inset\(50%\);/s);
-  assert.match(stylesSource, /\.world-artwork-zone-language \{ top: 58\.9%; \}/);
-  assert.match(stylesSource, /\.world-artwork-profile \{\s*top: 83\.8%;/);
-  assert.match(stylesSource, /\.world-artwork-page\s*\{[^}]*width: min\(768px, calc\(100% - 32px\)\);/);
+  assert.match(stylesSource, /\.world-artwork-start \{\s*top: 23%;\s*left: 3\.5%;/);
+  assert.match(stylesSource, /\.world-artwork-language-marker-french \{ top: 55%; left: 19%; \}/);
+  assert.match(stylesSource, /\.world-artwork-language-marker-english \{ top: 58\.5%; left: 4%; \}/);
+  assert.match(stylesSource, /\.world-artwork-language-marker-mandarin \{ top: 58\.5%; left: 32%; \}/);
+  assert.match(stylesSource, /\.world-artwork-language-marker-spanish \{ top: 69\.5%; left: 7%; \}/);
+  assert.match(stylesSource, /\.world-artwork-language-marker-swahili \{ top: 73\.5%; left: 22%; \}/);
+  assert.match(stylesSource, /\.world-artwork-profile \{\s*top: 81\.5%;/);
+  assert.match(stylesSource, /\.world-artwork-page\s*\{[^}]*width: min\(1200px, calc\(100% - 32px\)\);/);
   assert.match(stylesSource, /\.world-artwork-frame > img\s*\{[^}]*width: 100%;[^}]*max-width: 100%;[^}]*height: auto;/s);
   assert.doesNotMatch(appSource, /passport/i);
   assert.match(appSource, /route: 'profile', label: 'Profile', ico: 'user'/);

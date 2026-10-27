@@ -5234,7 +5234,7 @@ import {
     return `<div class="world-artwork-page">
       <h1 class="world-artwork-title">A Bigger World Awaits</h1>
       <div class="world-artwork-frame" role="group" aria-label="Explore languages and cultures">
-        <img src="./assets/cultural-world-replacement.png" width="877" height="768" alt="Idilewa's bigger world of language, voice, stories, wisdom and coding." />
+        <img src="./assets/cultural-world-replacement.png" srcset="./assets/cultural-world-replacement.png 877w, ./assets/cultural-world-replacement-5k.jpg 5000w" sizes="(min-width: 1232px) 1200px, calc(100vw - 32px)" width="877" height="768" alt="Idilewa's bigger world of language, voice, stories, wisdom and coding." />
         <button class="world-artwork-hotspot world-artwork-start" type="button" data-action="cultural-zone" data-zone="language" aria-label="Start exploring"></button>
         ${routeLink('languages', '<span class="sr-only">Browse available Idilewa language courses</span>', 'world-artwork-hotspot world-artwork-top-languages', 'aria-label="Browse available Idilewa language courses"')}
         ${zones}
