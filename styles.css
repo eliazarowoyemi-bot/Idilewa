@@ -10274,23 +10274,23 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
   cursor: pointer;
 }
 .world-artwork-start {
-  top: 23%;
-  left: 3.5%;
-  width: 20%;
+  top: 35%;
+  left: 5%;
+  width: 21%;
   height: 5%;
 }
 .world-artwork-zone {
-  left: 66%;
-  width: 30%;
-  height: 4.5%;
+  left: 65%;
+  width: 32%;
+  height: 6%;
 }
-.world-artwork-zone-language { top: 58.9%; }
-.world-artwork-zone-voice { top: 63.3%; }
-.world-artwork-zone-stories { top: 67.7%; }
-.world-artwork-zone-proverbs { top: 72.1%; }
-.world-artwork-zone-code { top: 76.5%; }
+.world-artwork-zone-language { top: 53.4%; }
+.world-artwork-zone-voice { top: 61%; }
+.world-artwork-zone-stories { top: 68.9%; }
+.world-artwork-zone-proverbs { top: 76.8%; }
+.world-artwork-zone-code { top: 84.1%; }
 .world-artwork-profile {
-  top: 81.5%;
+  top: 91.5%;
   left: 66%;
   width: 30%;
   height: 5%;
@@ -10302,14 +10302,14 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
   height: 12%;
 }
 .world-artwork-language-marker {
-  width: 10%;
+  width: 12%;
   height: 5%;
 }
-.world-artwork-language-marker-english { top: 58.5%; left: 4%; }
-.world-artwork-language-marker-french { top: 55%; left: 19%; }
-.world-artwork-language-marker-mandarin { top: 58.5%; left: 32%; }
-.world-artwork-language-marker-spanish { top: 69.5%; left: 7%; }
-.world-artwork-language-marker-swahili { top: 73.5%; left: 22%; }
+.world-artwork-language-marker-english { top: 56%; left: 6%; }
+.world-artwork-language-marker-french { top: 53.5%; left: 26%; }
+.world-artwork-language-marker-mandarin { top: 56%; left: 48%; }
+.world-artwork-language-marker-spanish { top: 75.5%; left: 10%; }
+.world-artwork-language-marker-swahili { top: 72.5%; left: 38%; }
 .world-artwork-hotspot .sr-only {
   position: absolute;
   width: 1px;
