@@ -113,6 +113,20 @@ export function getOralVowelSpeechText(toneExample) {
   return `${toneExample.char}. ${exampleWord}`;
 }
 
+export const ORAL_VOWEL_TONES = [
+  { id: 'high', label: 'High tone (Mí)', exampleIndex: 0 },
+  { id: 'mid', label: 'Mid tone (Re)', exampleIndex: 1 },
+  { id: 'low', label: 'Low tone (Dò)', exampleIndex: 2 }
+];
+
+export function getOralVowelSequenceSpeechText(tone) {
+  const toneSequence = ORAL_VOWEL_TONES.find((item) => item.id === tone);
+  if (!toneSequence) throw new RangeError(`Unknown Yorùbá vowel tone: ${tone}`);
+  return ORAL_VOWELS
+    .map((vowel) => vowel.toneExamples[toneSequence.exampleIndex].char)
+    .join('. ');
+}
+
 export const NASAL_VOWELS = [
   { char: 'An', lower: 'an', example: 'Ìtàn', translation: 'Story / Heritage', sound: 'ahn (nasal)', icon: '📜' },
   { char: 'Ẹn', lower: 'ẹn', example: 'Ẹ̀nìyàn', translation: 'Human being', sound: 'ehn (nasal)', icon: '👥' },

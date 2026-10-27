@@ -1,7 +1,12 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { getOralVowelSpeechText, ORAL_VOWELS } from '../src/vowelsConsonantsData.js';
+import {
+  getOralVowelSequenceSpeechText,
+  getOralVowelSpeechText,
+  ORAL_VOWELS,
+  ORAL_VOWEL_TONES
+} from '../src/vowelsConsonantsData.js';
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 
@@ -30,4 +35,19 @@ test('oral vowel speech text includes the tone-marked vowel and omits the Englis
 
   assert.equal(getOralVowelSpeechText(highToneẸ), 'Ẹ́. Ẹ́yẹ');
   assert.doesNotMatch(getOralVowelSpeechText(highToneẸ), /\(Bird\)/);
+});
+
+test('vowel sequence playback sends all seven vowels with the selected tone marks', () => {
+  assert.deepEqual(
+    ORAL_VOWEL_TONES.map(({ id }) => getOralVowelSequenceSpeechText(id)),
+    [
+      'Á. É. Ẹ́. Í. Ó. Ọ́. Ú',
+      'A. E. Ẹ. I. O. Ọ. U',
+      'À. È. Ẹ̀. Ì. Ò. Ọ̀. Ù'
+    ]
+  );
+  assert.throws(() => getOralVowelSequenceSpeechText('unknown'), RangeError);
+  assert.match(appSource, /getOralVowelSequenceSpeechText\(tone\.id\)/);
+  assert.match(appSource, /Listen for all seven vowel sounds in each tone/);
+  assert.doesNotMatch(appSource, /data-phrase="A\. I\. E\. O\. U\."/);
 });

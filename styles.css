@@ -7543,7 +7543,9 @@ body[data-page="login"] .main-content { padding: 0; }
 .voice-sound-list small { color: var(--muted); font-size: 10px; font-weight: 550; }
 .voice-diphthong-note { display: grid; gap: 7px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #e7ece5; }
 .voice-diphthong-note strong { font-size: 11px; }
-.voice-diphthong-note button { justify-self: start; }
+.voice-diphthong-note button { justify-self: stretch; justify-content: space-between; }
+.voice-diphthong-note button strong { color: var(--green-dark); font-size: 10px; }
+.voice-diphthong-note button span { letter-spacing: .04em; }
 .voice-diphthong-note small, .voice-translation-panel > small { color: var(--muted); font-size: 10px; }
 .voice-translation-panel { display: grid; gap: 8px; margin-top: 14px; padding: 18px; border-radius: 12px; color: var(--ink); background: #f0f6ef; }
 .voice-translation-panel h2 { margin: 1px 0 3px; font-size: 19px; }
