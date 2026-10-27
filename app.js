@@ -373,9 +373,9 @@ import {
   const NAV = [
     { label: 'Home', route: 'index', group: 'home' },
     { label: 'Explore', route: 'world', group: 'world' },
-    { label: 'Curriculum', route: 'curriculum', group: 'curriculum' },
+    { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' },
     { label: 'Code', route: 'coding', group: 'code' },
-    { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' }
+    { label: 'Curriculum', route: 'curriculum', group: 'curriculum' }
   ];
   const MENU_NAV = [...NAV,
     { label: 'Read & listen', route: 'oral', group: 'read' },

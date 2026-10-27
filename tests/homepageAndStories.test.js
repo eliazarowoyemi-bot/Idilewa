@@ -50,6 +50,15 @@ test('homepage uses the approved bilingual font families and removes the video C
   assert.match(styleSource, /landing-hero-actions \.button[\s\S]*?min-height: 48px;[\s\S]*?font-size: 14px/);
 });
 
+test('main and expanded mobile navigation order lessons between Explore and Code', () => {
+  const navSource = appSource.match(/const NAV = \[([\s\S]*?)\n  \];/)?.[1];
+  assert.ok(navSource, 'main navigation list should exist');
+  const navLabels = [...navSource.matchAll(/label: '([^']+)'/g)].map((match) => match[1]);
+
+  assert.deepEqual(navLabels, ['Home', 'Explore', 'Voice Lessons', 'Code', 'Curriculum']);
+  assert.match(appSource, /const MENU_NAV = \[\.\.\.NAV,/);
+});
+
 test('homepage language photos do not have country-symbol overlays', () => {
   const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderLanguageCard'));
 
