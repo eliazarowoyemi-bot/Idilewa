@@ -102,7 +102,7 @@ import {
     'index', 'about', 'base', 'coding', 'coding-studio', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
     'ere', 'ere_game', 'game', 'guides', 'human', 'ifa', 'ifa_odu', 'individuals', 'keepers', 'library',
     'kids', 'languages', 'lesson', 'login', 'method', 'oral', 'oral_genre', 'oriki', 'owe',
-    'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'passport', 'payment', 'pricing', 'profile', 'schools', 'world',
+    'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'payment', 'pricing', 'profile', 'schools', 'world',
     'voices'
   ];
   const REMOVED_ROUTES = new Set(['adult', 'parent_dashboard', 'educator_dashboard', 'tutor']);
@@ -385,7 +385,7 @@ import {
 
   const NAV_GROUPS = {
     world: 'world',
-    profile: 'world', passport: 'world',
+    profile: 'world',
     curriculum: 'curriculum',
     coding: 'code', 'coding-studio': 'code',
     trainer: 'trainer', voice_lessons: 'trainer',
@@ -403,7 +403,6 @@ import {
   LABELS.coding = 'Code';
   LABELS['coding-studio'] = 'Start Coding';
   LABELS.world = 'Cultural World';
-  LABELS.passport = 'Learning passport';
   Object.assign(LABELS, {
     'voice-language': 'Choose a voice lesson language',
     'voice-grade': 'Choose a voice lesson grade',
@@ -769,7 +768,7 @@ import {
       { route: 'world', label: 'Explore', ico: 'globe' },
       { route: 'library', label: 'Library', ico: 'book' },
       { route: 'coding', label: 'Code', ico: 'code' },
-      { route: 'passport', label: 'Passport', ico: 'user' }
+      { route: 'profile', label: 'Profile', ico: 'user' }
     ];
     document.getElementById('mobile-nav').innerHTML = items.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="mobile-tab ${page === item.route || (item.route === 'coding' && page === 'coding-studio') ? 'active' : ''}">${icon(item.ico, 19)}<span>${item.label}</span></a>`).join('');
   }
@@ -5155,7 +5154,7 @@ import {
     </section>`;
   }
 
-  function renderProfile({ passport = false } = {}) {
+  function renderProfile() {
     const profile = getProfileDetails();
     const name = profile.name.trim() || 'Learner';
     const initial = name.charAt(0).toUpperCase();
@@ -5165,7 +5164,7 @@ import {
     const latestReflection = state.reflections[0];
     const reflectionText = latestReflection?.thought ? `${esc(latestReflection.thought.slice(0, 72))}${latestReflection.thought.length > 72 ? '…' : ''}` : 'Your reflections will appear here after you save one.';
     return `<div class="container route-page profile-page profile-dashboard">
-      <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>${passport ? 'Learning passport' : 'My profile'}</strong></div>
+      <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>My profile</strong></div>
       <section class="profile-cover" aria-label="Your Idilewa learning space">
         <img src="./assets/page-profile-1.jpg" alt="" />
         <div class="profile-cover-overlay"></div>
@@ -5223,10 +5222,9 @@ import {
     return `<div class="world-artwork-page">
       <h1 class="world-artwork-title">A Bigger World Awaits</h1>
       <div class="world-artwork-frame" role="group" aria-label="Explore languages and cultures">
-        <img src="./assets/cultural-world-replacement.png" width="768" height="860" alt="A Bigger World Awaits. Discover new languages, learn about cultures, and explore the world one lesson at a time." />
+        <img src="./assets/cultural-world-replacement.png" width="768" height="646" alt="A Bigger World Awaits. Discover new languages, learn about cultures, and explore the world one lesson at a time." />
         <button class="world-artwork-hotspot world-artwork-start" type="button" data-action="cultural-zone" data-zone="language" aria-label="Start exploring"></button>
         ${zones}
-        ${routeLink('passport', '<span class="sr-only">Get started: open your learning passport</span>', 'world-artwork-hotspot world-artwork-passport')}
       </div>
     </div>`;
   }
@@ -6492,7 +6490,6 @@ import {
       case 'voices': return renderVoices();
       case 'pricing': return renderPricing();
       case 'profile': return renderProfile();
-      case 'passport': return renderProfile({ passport: true });
       case 'contact': return renderContact();
       case 'privacy': return renderPrivacy();
       case 'login': return renderLogin();

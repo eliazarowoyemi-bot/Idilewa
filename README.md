@@ -103,8 +103,7 @@ HTML entry shell
     │   ├── Ìtàn · Stories          #/ere → reading and story activities
     │   ├── Òwe · Wisdom            #/owe → proverbs, context and reflection
     │   └── Kóòdù · Create          #/coding → existing K–8 coding and STEM studio
-    └── #/passport                 Existing profile, progress, streak and milestone view
-        └── #/profile              Same profile view for backwards compatibility
+    └── #/profile                  Learner profile, progress, streak and milestone view
 
 src/
 ├── culturalWorld.js               Low-poly map, camera rig and biome definitions
@@ -116,7 +115,7 @@ src/
 └── server/                        Server-side email, consent and dashboard services
 ```
 
-The current application uses its existing centralized route/state coordinator and browser storage conventions. Supabase remains authoritative for account identity and database-backed role checks; the existing profile view remains the passport so lesson counts and streaks are not duplicated. The new map's content and route IDs live together in `CULTURAL_BIOMES`, while DOM rendering stays in the app coordinator.
+The current application uses its existing centralized route/state coordinator and browser storage conventions. Supabase remains authoritative for account identity and database-backed role checks; the profile view remains the single source for lesson counts and streaks. The map's content and route IDs live together in `CULTURAL_BIOMES`, while DOM rendering stays in the app coordinator.
 
 ### 3D map and interactions
 
