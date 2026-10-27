@@ -6137,15 +6137,25 @@ import {
                 </div>
                 <section class="voice-foundations" aria-labelledby="voice-foundations-title">
                   <div class="section-heading">
-                    <div><span class="section-kicker">Start here · Yorùbá sound foundations</span><h2 id="voice-foundations-title">Vowels, consonants &amp; tone</h2><p>Learn the mouth sounds before moving into words and conversation. Listen to the vowel sequences or choose a consonant to hear Idilewa pronounce it.</p></div>
+                    <div><span class="section-kicker">Start here · Yorùbá sound foundations</span><h1 id="voice-foundations-title">Vowels, consonants &amp; tone</h1><p>Learn the mouth sounds before moving into words and conversation. Listen to the vowel sequences or choose a consonant to hear Idilewa pronounce it.</p></div>
                   </div>
                   <div class="voice-foundation-grid">
                     <article class="voice-foundation-block"><h3>Oral vowels</h3><p>Listen to all seven Yorùbá vowels in each tone.</p><div class="voice-vowel-sequences"><strong>Listen for all seven vowel sounds in each tone</strong>${oralVowelSequences}<small>Listen for one clear vowel at a time; the marks guide the Yorùbá pitch.</small></div></article>
                     <article class="voice-foundation-block"><h3>Consonants</h3><p>Notice sounds such as Yorùbá <strong>gb</strong> and <strong>ṣ</strong>, which differ from English.</p><div class="voice-sound-list">${CONSONANTS.map((item) => `<button type="button" data-action="speak-voice-lesson" data-phrase="${esc(item.char)}. ${esc(item.example)}" title="${esc(item.desc)}">${esc(item.char)} <small>${esc(item.sound)}</small></button>`).join('')}</div></article>
                     <article class="voice-foundation-block"><h3>Nasal vowels</h3><p>Let nasal vowels resonate gently and notice their distinct sounds.</p><div class="voice-sound-list">${NASAL_VOWELS.map((item) => `<button type="button" data-action="speak-voice-lesson" data-phrase="${esc(item.char)}. ${esc(item.example)}" title="${esc(item.sound)}">${esc(item.char)} <small>${esc(item.sound)}</small></button>`).join('')}</div></article>
                   </div>
-                  ${renderVoiceCloneTools()}
                 </section>
+                <section class="voice-foundations-next" aria-labelledby="voice-foundations-next-title">
+                  <div><span class="section-kicker">Ready for the next step?</span><h2 id="voice-foundations-next-title">Choose what to try next</h2></div>
+                  <nav aria-label="Next voice lesson activities">
+                    ${routeLink('voice-language', `${icon('book', 16)} Start a guided lesson`, 'button button-primary')}
+                    ${routeLink('voice-practice', `${icon('mic', 16)} Practice a phrase`, 'button button-outline')}
+                    ${routeLink('voice_lessons', `${icon('arrow', 15)} More voice activities`, 'button button-outline')}
+                  </nav>
+                </section>
+                <details class="voice-trainer-expanded">
+                  <summary><span>More practice options</span><small>Choose a language, explore all lessons, and track your progress</small></summary>
+                  <div class="voice-trainer-expanded-content">
         <section class="trainer-hero">
           <div class="trainer-hero-copy">
             <div class="trainer-hero-badge">
@@ -6407,7 +6417,9 @@ import {
             View Certificate Progress ${icon("arrow", 15)}
           </button>
         </section>
-      </div>`;
+                  </div>
+                </details>
+              </div>`;
     }
 
 

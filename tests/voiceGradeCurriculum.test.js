@@ -78,6 +78,17 @@ test('Voice Lessons opens a compact navigation hub and keeps detailed practice o
   assert.doesNotMatch(trainerPage, /renderVoiceLessonsDashboard\(\)/);
   assert.match(trainerPage, /Back to Voice Lessons/);
   assert.match(trainerPage, /voice-foundations/);
+  assert.match(trainerPage, /Choose what to try next/);
+  assert.match(trainerPage, /Start a guided lesson/);
+  assert.match(trainerPage, /Practice a phrase/);
+  assert.match(trainerPage, /<details class="voice-trainer-expanded">/);
+  assert.match(trainerPage, /<summary><span>More practice options<\/span>/);
+  assert.match(trainerPage, /trainer-hero/);
+  const foundationSection = trainerPage.slice(
+    trainerPage.indexOf('<section class="voice-foundations"'),
+    trainerPage.indexOf('<section class="voice-foundations-next"')
+  );
+  assert.doesNotMatch(foundationSection, /renderVoiceCloneTools/);
 });
 
 test('choosing a voice lesson language opens lessons directly with back and lesson navigation', () => {
