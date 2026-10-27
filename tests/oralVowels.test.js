@@ -49,5 +49,8 @@ test('vowel sequence playback sends all seven vowels with the selected tone mark
   assert.throws(() => getOralVowelSequenceSpeechText('unknown'), RangeError);
   assert.match(appSource, /getOralVowelSequenceSpeechText\(tone\.id\)/);
   assert.match(appSource, /Listen for all seven vowel sounds in each tone/);
+  assert.match(appSource, /data-action="speak-yoruba-vowel-sequence"/);
+  assert.match(appSource, /getRecommendedPlotweaverVoice\('yo'\)/);
+  assert.match(appSource, /voiceId: voice\.voice_id,\s*allowDeviceFallback: false/);
   assert.doesNotMatch(appSource, /data-phrase="A\. I\. E\. O\. U\."/);
 });

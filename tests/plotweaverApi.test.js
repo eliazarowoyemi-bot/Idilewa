@@ -87,8 +87,9 @@ test('speech requests keep the key server-side and return provider audio', async
       assert.equal(String(url), 'https://api.plotweaver.app/v1/speech');
       assert.equal(options.headers['X-API-Key'], 'test-plotweaver-key');
       assert.deepEqual(JSON.parse(options.body), {
-        text: 'Ẹ káàárọ̀',
+        text: 'Á. É. Ẹ́. Í. Ó. Ọ́. Ú',
         language: 'yo',
+        voice_id: 'morenike',
       });
       return new Response(new Uint8Array([1, 2, 3]), {
         status: 200,
@@ -97,7 +98,11 @@ test('speech requests keep the key server-side and return provider audio', async
     },
     run: async () => {
       const response = createResponse();
-      const body = Buffer.from(JSON.stringify({ text: 'Ẹ káàárọ̀', language: 'yo' }));
+      const body = Buffer.from(JSON.stringify({
+        text: 'Á. É. Ẹ́. Í. Ó. Ọ́. Ú',
+        language: 'yo',
+        voice_id: 'morenike',
+      }));
       await plotweaverHandler(request({
         method: 'POST',
         path: 'speech',

@@ -20,6 +20,7 @@ import {
 import {
   createPlotweaverVoice,
   getPlotweaverLanguages,
+  getRecommendedPlotweaverVoice,
   getPlotweaverVoices,
   speakWithDeviceVoice,
   synthesizePlotweaverSpeech,
@@ -5861,6 +5862,7 @@ import {
     let voiceTranscriptionResult = null;
     let activePlotweaverAudio = null;
     let activePlotweaverObjectUrl = '';
+    let recommendedYorubaVoicePromise = null;
     let translationSpeechSpeed = 1;
 
     function getAudioContext() {
@@ -5913,7 +5915,7 @@ import {
       return { yoruba: 'yo', igbo: 'ig', hausa: 'ha', swahili: 'sw', zulu: 'zu', twi: 'ak' }[lang] || 'yo';
     }
 
-    async function playPlotweaverSpeech(text, language) {
+    async function playPlotweaverSpeech(text, language, { voiceId: requestedVoiceId, allowDeviceFallback = true } = {}) {
       if (typeof text !== 'string' || !text.trim() || text.length > 1_000) {
         throw new Error('Speech text must contain 1–1,000 characters.');
       }
@@ -5923,7 +5925,8 @@ import {
       }
       if (activePlotweaverObjectUrl) URL.revokeObjectURL(activePlotweaverObjectUrl);
       activePlotweaverObjectUrl = '';
-      const voiceId = document.getElementById('plotweaver-voice-select')?.value
+      const voiceId = requestedVoiceId
+        || document.getElementById('plotweaver-voice-select')?.value
         || state.trainer.voiceId
         || undefined;
       try {
@@ -5945,7 +5948,7 @@ import {
         activePlotweaverAudio = null;
         if (activePlotweaverObjectUrl) URL.revokeObjectURL(activePlotweaverObjectUrl);
         activePlotweaverObjectUrl = '';
-        if (voiceId) throw serviceError;
+        if (voiceId || !allowDeviceFallback) throw serviceError;
         try {
           await speakWithDeviceVoice(text, language);
           return 'device';
@@ -5955,6 +5958,21 @@ import {
           throw new Error(`${serviceMessage} ${deviceMessage}`);
         }
       }
+    }
+
+    async function playYorubaVowelSequence(text) {
+      if (!recommendedYorubaVoicePromise) {
+        recommendedYorubaVoicePromise = getRecommendedPlotweaverVoice('yo')
+          .catch((error) => {
+            recommendedYorubaVoicePromise = null;
+            throw error;
+          });
+      }
+      const voice = await recommendedYorubaVoicePromise;
+      return playPlotweaverSpeech(text, 'yo', {
+        voiceId: voice.voice_id,
+        allowDeviceFallback: false,
+      });
     }
 
     async function playVoiceTranslation({ replay = false } = {}) {
@@ -6103,7 +6121,7 @@ import {
       `)).join('');
       const oralVowelSequences = ORAL_VOWEL_TONES.map((tone) => {
         const speechText = getOralVowelSequenceSpeechText(tone.id);
-        return `<button type="button" lang="yo" data-action="speak-voice-lesson" data-phrase="${esc(speechText)}" aria-label="Listen to all seven oral vowels in ${esc(tone.label.toLowerCase())}"><strong>${esc(tone.label)}</strong><span>${esc(speechText.replaceAll('. ', ' · '))}</span></button>`;
+        return `<button type="button" lang="yo" data-action="speak-yoruba-vowel-sequence" data-phrase="${esc(speechText)}" aria-label="Listen to all seven oral vowels in ${esc(tone.label.toLowerCase())}"><strong>${esc(tone.label)}</strong><span>${esc(speechText.replaceAll('. ', ' · '))}</span></button>`;
       }).join('');
 
       return `<div class="container route-page trainer-page">
@@ -8011,6 +8029,14 @@ import {
             if (source === 'device') showToast('Using your device voice for this lesson.');
           })
           .catch((error) => showToast(error instanceof Error ? error.message : 'Idilewa could not generate this sound.', 'error'));
+        break;
+      }
+      case 'speak-yoruba-vowel-sequence': {
+        void playYorubaVowelSequence(el.dataset.phrase || '')
+          .catch((error) => showToast(
+            error instanceof Error ? error.message : 'Native Yorùbá vowel audio could not be generated.',
+            'error',
+          ));
         break;
       }
       case 'plotweaver-speak-text': {

@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { speakWithDeviceVoice } from '../src/plotweaverClient.js';
+import {
+  getRecommendedPlotweaverVoice,
+  speakWithDeviceVoice
+} from '../src/plotweaverClient.js';
 
 test('device speech uses the requested language and resolves when playback ends', async () => {
   const previousWindow = globalThis.window;
@@ -51,5 +54,57 @@ test('device speech reports playback errors instead of pretending audio played',
   } finally {
     if (previousWindow === undefined) delete globalThis.window;
     else globalThis.window = previousWindow;
+  }
+});
+
+test('recommended Plotweaver voice lookup chooses the recommended native voice for Yorùbá', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async (url) => {
+    assert.equal(String(url), '/api/plotweaver/voices?language=yo&type=builtin');
+    return new Response(JSON.stringify([
+      {
+        voice_id: 'cross-lingual',
+        name: 'Cross-lingual',
+        languages: ['yo'],
+        native_languages: ['en'],
+        is_native: false,
+        recommended: true
+      },
+      {
+        voice_id: 'yoruba-native',
+        name: 'Yoruba Native',
+        languages: ['yo'],
+        native_languages: ['yo'],
+        is_native: true,
+        recommended: true
+      }
+    ]));
+  };
+
+  try {
+    const voice = await getRecommendedPlotweaverVoice('yo');
+    assert.equal(voice.voice_id, 'yoruba-native');
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('recommended Plotweaver voice lookup rejects when no native voice is available', async () => {
+  const originalFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(JSON.stringify([
+    {
+      voice_id: 'cross-lingual',
+      name: 'Cross-lingual',
+      languages: ['yo'],
+      native_languages: ['en'],
+      is_native: false,
+      recommended: true
+    }
+  ]));
+
+  try {
+    await assert.rejects(getRecommendedPlotweaverVoice('yo'), /No native Plotweaver voice/);
+  } finally {
+    globalThis.fetch = originalFetch;
   }
 });

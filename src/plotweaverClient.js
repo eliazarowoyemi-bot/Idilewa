@@ -52,6 +52,23 @@ export async function getPlotweaverVoices({ language, type } = {}) {
     && typeof voice?.name === 'string');
 }
 
+export async function getRecommendedPlotweaverVoice(language) {
+  const voices = await getPlotweaverVoices({ language, type: 'builtin' });
+  const supportsLanguage = (voice) => Array.isArray(voice.languages)
+    && voice.languages.includes(language);
+  const isNative = (voice) => voice.is_native === true
+    && Array.isArray(voice.native_languages)
+    && voice.native_languages.includes(language);
+  const voice = voices.find((item) => item.recommended === true
+      && isNative(item) && supportsLanguage(item))
+    || voices.find((item) => isNative(item) && supportsLanguage(item));
+
+  if (!voice) {
+    throw new Error(`No native Plotweaver voice is available for ${language}.`);
+  }
+  return voice;
+}
+
 export async function synthesizePlotweaverSpeech({ text, language, voiceId }) {
   const response = await fetch(endpoint('speech'), {
     method: 'POST',
