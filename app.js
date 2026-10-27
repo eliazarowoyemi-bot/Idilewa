@@ -4719,33 +4719,13 @@ import {
         '</div>' +
       '</header>' +
 
-      '<div class="curriculum-tools-grid" aria-label="Language learning tools">' +
-        '<article class="curriculum-tool-card curriculum-tool-translate">' +
-          '<div class="curriculum-tool-heading"><span class="curriculum-tool-icon">' + icon('globe', 20) + '</span><div><h2>Translation</h2><p>Translate between supported languages and hear the result.</p></div></div>' +
-          '<p class="curriculum-tool-note">Work through 50 guided phrases, then compare your translation with the sample.</p>' +
-          routeLink('voice-translation', `${icon('globe', 15)} Open Translation ${icon('arrow', 14)}`, 'curriculum-tool-button curriculum-tool-button-wide') +
-        '</article>' +
-        '<article class="curriculum-tool-card curriculum-tool-speech">' +
-          '<div class="curriculum-tool-heading"><span class="curriculum-tool-icon">' + icon('volume', 20) + '</span><div><h2>Text to Speech</h2><p>Type a sentence and hear it spoken in your chosen language.</p></div></div>' +
-          '<p class="curriculum-tool-note">Practise listening and pronunciation with 50 guided lessons.</p>' +
-          routeLink('voice-text-to-speech', `${icon('volume', 15)} Open Text to Speech ${icon('arrow', 14)}`, 'curriculum-tool-button curriculum-tool-button-wide') +
-        '</article>' +
-
-        '<article class="curriculum-tool-card curriculum-tool-transcribe">' +
-          '<div class="curriculum-tool-heading"><span class="curriculum-tool-icon">' + icon('mic', 20) + '</span><div><h2>Speech to Text</h2><p>Speak into your microphone and see your words written down.</p></div></div>' +
-          '<div class="curriculum-transcribe-preview"><span class="curriculum-sound-mark" aria-hidden="true">▮ ▮ ▮ ▮ ▮</span><span>I love learning!</span></div>' +
-          '<p class="curriculum-tool-note">Speak 50 guided phrases and compare each transcription with its sample.</p>' +
-          routeLink('voice-speech-to-text', `${icon('mic', 15)} Open Speech to Text ${icon('arrow', 14)}`, 'curriculum-tool-button curriculum-tool-button-wide') +
-        '</article>' +
-
-        '<article class="curriculum-tool-card curriculum-tool-clone">' +
-          '<div class="curriculum-tool-heading"><span class="curriculum-tool-icon">' + icon('music', 20) + '</span><div><h2>Voice Cloning</h2><p>Create your own voice or clone a familiar voice with permission.</p></div></div>' +
-          '<ol class="curriculum-clone-steps"><li><span>1</span>Record</li><li><span>2</span>Train</li><li><span>3</span>Use</li></ol>' +
-          '<p class="curriculum-tool-note">Practise 50 guided phrases with a built-in voice or a clone you are permitted to use.</p>' +
-          routeLink('voice-cloning', `${icon('mic', 15)} Open Voice Cloning ${icon('arrow', 14)}`, 'curriculum-tool-button curriculum-tool-button-wide') +
-        '</article>' +
-
-      '</div>' +
+      '<nav class="curriculum-tools-artwork" aria-label="Choose a voice lesson activity">' +
+        '<img src="./assets/voice-lessons-tools.jpg" width="1080" height="360" alt="Four illustrated voice lesson activities: Translation, Text to Speech, Speech to Text, and Voice Cloning." />' +
+        routeLink('voice-translation', '<span class="sr-only">Open Translation</span>', 'curriculum-tools-hotspot curriculum-tools-hotspot-translation', 'aria-label="Open Translation"') +
+        routeLink('voice-text-to-speech', '<span class="sr-only">Open Text to Speech</span>', 'curriculum-tools-hotspot curriculum-tools-hotspot-speech', 'aria-label="Open Text to Speech"') +
+        routeLink('voice-speech-to-text', '<span class="sr-only">Open Speech to Text</span>', 'curriculum-tools-hotspot curriculum-tools-hotspot-transcribe', 'aria-label="Open Speech to Text"') +
+        routeLink('voice-cloning', '<span class="sr-only">Open Voice Cloning</span>', 'curriculum-tools-hotspot curriculum-tools-hotspot-clone', 'aria-label="Open Voice Cloning"') +
+      '</nav>' +
 
       (state.translationLessons.length ? '<section class="translation-saved-lessons" aria-labelledby="translation-saved-lessons-title"><span class="section-kicker">Your practice list</span><h2 id="translation-saved-lessons-title">Translations added to lessons</h2><div>' + state.translationLessons.map((item) => `<article><div><strong>${esc(item.translated)}</strong><small>${esc(item.source)} · ${esc(item.languageName)}</small></div><button type="button" data-action="open-saved-translation" data-id="${esc(item.id)}">Practice</button></article>`).join('') + '</div></section>' : '') +
 

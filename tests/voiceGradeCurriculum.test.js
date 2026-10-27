@@ -10,6 +10,18 @@ import {
 } from '../src/voiceGradeCurriculum.js';
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+const voiceLessonToolsImage = await readFile(new URL('../public/assets/voice-lessons-tools.jpg', import.meta.url));
+
+test('Voice Lessons uses the supplied unchanged activity artwork with accessible activity links', () => {
+  assert.equal(voiceLessonToolsImage.subarray(0, 2).toString('hex'), 'ffd8');
+  assert.match(appSource, /src="\.\/assets\/voice-lessons-tools\.jpg" width="1080" height="360"/);
+  assert.match(appSource, /aria-label="Choose a voice lesson activity"/);
+  assert.match(appSource, /curriculum-tools-hotspot-translation/);
+  assert.match(appSource, /curriculum-tools-hotspot-speech/);
+  assert.match(appSource, /curriculum-tools-hotspot-transcribe/);
+  assert.match(appSource, /curriculum-tools-hotspot-clone/);
+  assert.doesNotMatch(appSource, /<article class="curriculum-tool-card curriculum-tool-/);
+});
 
 test('each grade has its own non-overlapping lesson set within its difficulty band', () => {
   const lessons = Array.from({ length: 20 }, (_, index) => ({ id: index + 1 }));
