@@ -12,6 +12,7 @@ import {
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const voiceLessonToolsImage = await readFile(new URL('../public/assets/voice-lessons-tools.jpg', import.meta.url));
 const voiceLessonsWelcomeImage = await readFile(new URL('../public/assets/voice-lessons-welcome.jpg', import.meta.url));
+const voiceLessonsDashboardImage = await readFile(new URL('../public/assets/voice-lessons-dashboard.jpg', import.meta.url));
 
 test('Voice Lessons welcome banner uses the supplied original image and preserves its lesson action', () => {
   const dashboard = appSource.slice(
@@ -33,6 +34,19 @@ test('Voice Lessons uses the supplied unchanged activity artwork with accessible
   assert.match(appSource, /curriculum-tools-hotspot-transcribe/);
   assert.match(appSource, /curriculum-tools-hotspot-clone/);
   assert.doesNotMatch(appSource, /<article class="curriculum-tool-card curriculum-tool-/);
+});
+
+test('Voice Lessons replaces the language, grade, and progress area with supplied dashboard artwork', () => {
+  const dashboard = appSource.slice(
+    appSource.indexOf('function renderVoiceLessonsDashboard()'),
+    appSource.indexOf('const STORY_READINGS')
+  );
+  assert.equal(voiceLessonsDashboardImage.subarray(0, 2).toString('hex'), 'ffd8');
+  assert.match(dashboard, /src="\.\/assets\/voice-lessons-dashboard\.jpg" width="1037" height="379"/);
+  assert.match(dashboard, /curriculum-dashboard-hotspot-language/);
+  assert.match(dashboard, /curriculum-dashboard-hotspot-grade/);
+  assert.match(dashboard, /curriculum-dashboard-hotspot-start/);
+  assert.doesNotMatch(dashboard, /curriculum-dashboard-bottom|curriculum-progress-banner/);
 });
 
 test('each grade has its own non-overlapping lesson set within its difficulty band', () => {

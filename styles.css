@@ -8046,6 +8046,7 @@ body[data-page="coding"] .coding-page.ide-fullscreen-page.ide-page-root { width:
   gap: 17px;
   padding: 18px 0 34px;
 }
+.curriculum-dashboard-title { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
 .curriculum-welcome-banner {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(270px, .86fr);
@@ -8068,6 +8069,14 @@ body[data-page="coding"] .coding-page.ide-fullscreen-page.ide-page-root { width:
 .curriculum-welcome-sticker { position: absolute; z-index: 2; top: 16px; right: 16px; display: grid; width: 62px; height: 62px; place-content: center; border: 2px solid #fff; border-radius: 50%; background: #fff5c7; color: #487435; font-size: 9px; font-weight: 850; line-height: 1.15; text-align: center; transform: rotate(8deg); }
 .curriculum-tools-artwork { position: relative; width: 100%; }
 .curriculum-tools-artwork > img { display: block; width: 100%; height: auto; }
+.curriculum-dashboard-art { position: relative; width: 100%; }
+.curriculum-dashboard-art > img { display: block; width: 100%; height: auto; }
+.curriculum-dashboard-hotspot { position: absolute; top: 0; height: 68%; }
+.curriculum-dashboard-hotspot-language { left: 0; width: 33%; }
+.curriculum-dashboard-hotspot-grade { left: 33%; width: 27%; }
+.curriculum-dashboard-hotspot-start { top: 57%; left: 55%; width: 15%; height: 10%; }
+.curriculum-dashboard-hotspot:focus-visible { outline: 3px solid #164d32; outline-offset: -4px; border-radius: 10px; }
+.curriculum-dashboard-art .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
 .voice-lessons-welcome-art { position: relative; width: 100%; overflow: hidden; border-radius: 16px; }
 .voice-lessons-welcome-art > img { display: block; width: 100%; height: auto; }
 .voice-lessons-welcome-link { position: absolute; top: 69%; left: 3%; width: 27%; height: 15%; border-radius: 999px; }

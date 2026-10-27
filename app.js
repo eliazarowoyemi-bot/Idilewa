@@ -4694,15 +4694,8 @@ import {
   }
 
   function renderVoiceLessonsDashboard() {
-    const completedCount = Object.keys(state.trainer.completed || {}).length;
-    const progressPercent = Math.round((completedCount / 60) * 100);
-    const languages = [
-      ['yoruba', 'Yorùbá'],
-      ['igbo', 'Igbo'],
-      ['hausa', 'Hausa'],
-      ['swahili', 'Kiswahili']
-    ];
     return '<section class="curriculum-dashboard" aria-labelledby="curriculum-dashboard-title">' +
+      '<h1 class="curriculum-dashboard-title" id="curriculum-dashboard-title">Your Voice Lessons</h1>' +
       '<nav class="voice-lessons-welcome-art" aria-label="Start Voice Lessons">' +
         '<img src="./assets/voice-lessons-welcome.jpg" width="1056" height="372" alt="Idilewa Voice Lessons: choose a grade, then dive into fun, interactive lessons that build real speaking confidence." fetchpriority="high" />' +
         routeLink('voice-language', '<span class="sr-only">Start a guided lesson</span>', 'voice-lessons-welcome-link', 'aria-label="Start a guided lesson"') +
@@ -4718,30 +4711,12 @@ import {
 
       (state.translationLessons.length ? '<section class="translation-saved-lessons" aria-labelledby="translation-saved-lessons-title"><span class="section-kicker">Your practice list</span><h2 id="translation-saved-lessons-title">Translations added to lessons</h2><div>' + state.translationLessons.map((item) => `<article><div><strong>${esc(item.translated)}</strong><small>${esc(item.source)} · ${esc(item.languageName)}</small></div><button type="button" data-action="open-saved-translation" data-id="${esc(item.id)}">Practice</button></article>`).join('') + '</div></section>' : '') +
 
-      '<div class="curriculum-dashboard-bottom">' +
-        '<section class="curriculum-picker-card" aria-labelledby="curriculum-picker-title">' +
-          '<div class="curriculum-picker-section"><div class="curriculum-picker-heading"><span class="curriculum-picker-icon">' + icon('globe', 18) + '</span><div><h2 id="curriculum-picker-title">Choose Your Language</h2><p>Pick a language to explore and learn.</p></div></div>' +
-            '<div class="curriculum-language-options">' +
-              languages.map(([id, name]) => '<button type="button" class="curriculum-language-option ' + (state.trainer.lang === id ? 'is-active' : '') + '" data-route="voice-language" data-lang="' + id + '">' + name + '</button>').join('') +
-            '</div>' +
-          '</div>' +
-          '<div class="curriculum-picker-section"><div class="curriculum-picker-heading"><span class="curriculum-picker-icon curriculum-picker-icon-warm">' + icon('layers', 18) + '</span><div><h2>Subjects &amp; Grades</h2><p>Choose a grade to jump into your curriculum.</p></div></div>' +
-            '<div class="curriculum-grade-options">' +
-              VOICE_GRADE_PATHS.map((grade) => '<button type="button" class="curriculum-grade-option" data-route="voice-audio" data-grade="' + grade.id + '" data-level="' + grade.level + '" data-lang="' + state.trainer.lang + '">' + grade.name + '</button>').join('') +
-            '</div>' +
-          '</div>' +
-        '</section>' +
-
-        '<aside class="curriculum-path-card" aria-labelledby="curriculum-path-title">' +
-          '<div class="curriculum-path-heading"><span>' + icon('sparkles', 17) + '</span><div><h2 id="curriculum-path-title">My Learning Path</h2><small>Step by step</small></div></div>' +
-          '<div class="curriculum-progress-copy"><strong>' + completedCount + ' of 60 lessons</strong><span>' + progressPercent + '% complete</span></div>' +
-          '<div class="curriculum-progress-track" role="progressbar" aria-label="Voice lesson progress" aria-valuemin="0" aria-valuemax="60" aria-valuenow="' + completedCount + '"><span style="width:' + progressPercent + '%"></span></div>' +
-          '<ol class="curriculum-path-steps"><li class="is-complete"><a href="#/voice-language" data-route="voice-language"><span>' + icon('check', 12) + '</span>Choose your language</a></li><li><a href="#/voice-text-to-speech" data-route="voice-text-to-speech"><span>2</span>Text to Speech</a></li><li><a href="#/voice-cloning" data-route="voice-cloning"><span>3</span>Voice Cloning</a></li><li><a href="#/voice-speech-to-text" data-route="voice-speech-to-text"><span>4</span>Speech to Text</a></li><li><a href="#/voice-translation" data-route="voice-translation"><span>5</span>Translation</a></li></ol>' +
-          '<a href="#/voice-audio" class="curriculum-path-link" data-route="voice-audio" data-lang="' + state.trainer.lang + '" data-level="' + state.trainer.level + '">Start learning ' + icon('arrow', 14) + '</a>' +
-        '</aside>' +
-      '</div>' +
-
-      '<div class="curriculum-progress-banner"><img src="./assets/code-reference-children.png" alt="" loading="lazy" /><div><h2>Small steps. Big progress!</h2><p>Learn · Practise · Share · Explore the world</p></div></div>' +
+      '<nav class="curriculum-dashboard-art" aria-label="Choose a language, grade, or learning path">' +
+        '<img src="./assets/voice-lessons-dashboard.jpg" width="1037" height="379" alt="Voice lesson dashboard with language choices, grade levels, learning progress, and a learner ready to start." loading="lazy" />' +
+        routeLink('voice-language', '<span class="sr-only">Choose your language</span>', 'curriculum-dashboard-hotspot curriculum-dashboard-hotspot-language', 'aria-label="Choose your language"') +
+        routeLink('voice-grade', '<span class="sr-only">Choose a grade</span>', 'curriculum-dashboard-hotspot curriculum-dashboard-hotspot-grade', 'aria-label="Choose a grade"') +
+        routeLink('voice-audio', '<span class="sr-only">Start learning</span>', 'curriculum-dashboard-hotspot curriculum-dashboard-hotspot-start', `aria-label="Start learning" data-lang="${esc(state.trainer.lang)}" data-level="${esc(state.trainer.level)}"`) +
+      '</nav>' +
     '</section>';
   }
 
