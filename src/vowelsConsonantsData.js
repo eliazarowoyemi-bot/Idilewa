@@ -108,6 +108,11 @@ export const ORAL_VOWELS = [
   }
 ];
 
+export function getOralVowelSpeechText(toneExample) {
+  const exampleWord = toneExample.word.replace(/\s+\([^)]*\)$/, '');
+  return `${toneExample.char}. ${exampleWord}`;
+}
+
 export const NASAL_VOWELS = [
   { char: 'An', lower: 'an', example: 'Ìtàn', translation: 'Story / Heritage', sound: 'ahn (nasal)', icon: '📜' },
   { char: 'Ẹn', lower: 'ẹn', example: 'Ẹ̀nìyàn', translation: 'Human being', sound: 'ehn (nasal)', icon: '👥' },

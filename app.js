@@ -30,7 +30,8 @@ import {
   ORAL_VOWELS,
   NASAL_VOWELS,
   CONSONANTS,
-  TONE_MARKS
+  TONE_MARKS,
+  getOralVowelSpeechText
 } from './src/vowelsConsonantsData.js';
 import {
   YORUBA_KEYWORDS,
@@ -6095,6 +6096,10 @@ import {
         ? Math.round(Object.values(state.trainer.completed).reduce((acc, v) => acc + (v.score || 90), 0) / completedCount) 
         : 96;
 
+      const oralVowelSounds = ORAL_VOWELS.flatMap((item) => item.toneExamples.map((toneExample) => `
+        <button type="button" data-action="speak-voice-lesson" data-phrase="${esc(getOralVowelSpeechText(toneExample))}" aria-label="${esc(`${item.name}, ${toneExample.tone} tone`)}" title="${esc(`${toneExample.tone}: ${toneExample.word}`)}">${esc(toneExample.char)} <small>${esc(item.ipa)}</small></button>
+      `)).join('');
+
       return `<div class="container route-page trainer-page">
                 ${renderVoiceLessonsDashboard()}
                 <section class="voice-foundations" aria-labelledby="voice-foundations-title">
@@ -6102,7 +6107,7 @@ import {
                     <div><span class="section-kicker">Start here · Yorùbá sound foundations</span><h2 id="voice-foundations-title">Vowels, consonants &amp; tone</h2><p>Learn the mouth sounds before moving into words and conversation. Choose a sound to hear Idilewa pronounce it.</p></div>
                   </div>
                   <div class="voice-foundation-grid">
-                    <article class="voice-foundation-block"><h3>Oral vowels</h3><p>Seven distinct vowel sounds, each with high, mid and low tone examples.</p><div class="voice-sound-list">${ORAL_VOWELS.map((item) => `<button type="button" data-action="speak-voice-lesson" data-phrase="${esc(item.char)}. ${esc(item.example)}" title="${esc(item.ipa)}">${esc(item.char)} <small>${esc(item.ipa)}</small></button>`).join('')}</div></article>
+                    <article class="voice-foundation-block"><h3>Oral vowels</h3><p>Choose a tone-marked vowel to hear it with a Yorùbá example.</p><div class="voice-sound-list">${oralVowelSounds}</div></article>
                     <article class="voice-foundation-block"><h3>Consonants</h3><p>Notice sounds such as Yorùbá <strong>gb</strong> and <strong>ṣ</strong>, which differ from English.</p><div class="voice-sound-list">${CONSONANTS.map((item) => `<button type="button" data-action="speak-voice-lesson" data-phrase="${esc(item.char)}. ${esc(item.example)}" title="${esc(item.desc)}">${esc(item.char)} <small>${esc(item.sound)}</small></button>`).join('')}</div></article>
                     <article class="voice-foundation-block"><h3>Nasal vowels &amp; vowel pairs</h3><p>Let nasal vowels resonate gently. Adjacent vowels are usually pronounced distinctly across syllables, not forced into English-style glides.</p><div class="voice-sound-list">${NASAL_VOWELS.map((item) => `<button type="button" data-action="speak-voice-lesson" data-phrase="${esc(item.char)}. ${esc(item.example)}" title="${esc(item.sound)}">${esc(item.char)} <small>${esc(item.sound)}</small></button>`).join('')}</div><div class="voice-diphthong-note"><strong>Listen for vowel sequences</strong><button type="button" data-action="speak-voice-lesson" data-phrase="A. I. E. O. U.">a · i · e · o · u</button><small>Keep each vowel clear when two meet; local pronunciation can vary by word and speaker.</small></div></article>
                   </div>
