@@ -5222,9 +5222,10 @@ import {
     return `<div class="world-artwork-page">
       <h1 class="world-artwork-title">A Bigger World Awaits</h1>
       <div class="world-artwork-frame" role="group" aria-label="Explore languages and cultures">
-        <img src="./assets/cultural-world-replacement.png" width="768" height="646" alt="A Bigger World Awaits. Discover new languages, learn about cultures, and explore the world one lesson at a time." />
+        <img src="./assets/cultural-world-replacement.png" width="877" height="768" alt="Idilewa's bigger world of language, voice, stories, wisdom and coding." />
         <button class="world-artwork-hotspot world-artwork-start" type="button" data-action="cultural-zone" data-zone="language" aria-label="Start exploring"></button>
         ${zones}
+        ${routeLink('profile', '<span class="sr-only">Start your learning journey: open your profile</span>', 'world-artwork-hotspot world-artwork-profile')}
       </div>
     </div>`;
   }

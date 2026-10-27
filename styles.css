@@ -10274,21 +10274,27 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
   cursor: pointer;
 }
 .world-artwork-start {
-  top: 26.3%;
-  left: 3.2%;
-  width: 24%;
-  height: 5.2%;
+  top: 41%;
+  left: 5.7%;
+  width: 20%;
+  height: 5%;
 }
 .world-artwork-zone {
-  left: 65.5%;
-  width: 32.5%;
-  height: 5.7%;
+  left: 66%;
+  width: 30%;
+  height: 4.2%;
 }
-.world-artwork-zone-language { top: 43.1%; }
-.world-artwork-zone-voice { top: 48.8%; }
-.world-artwork-zone-stories { top: 54.5%; }
-.world-artwork-zone-proverbs { top: 60.2%; }
-.world-artwork-zone-code { top: 65.9%; }
+.world-artwork-zone-language { top: 58.9%; }
+.world-artwork-zone-voice { top: 63.3%; }
+.world-artwork-zone-stories { top: 67.7%; }
+.world-artwork-zone-proverbs { top: 72.1%; }
+.world-artwork-zone-code { top: 76.5%; }
+.world-artwork-profile {
+  top: 80.4%;
+  left: 66%;
+  width: 30%;
+  height: 4.5%;
+}
 .world-artwork-hotspot:focus-visible {
   outline: 3px solid #0c5737;
   outline-offset: 3px;

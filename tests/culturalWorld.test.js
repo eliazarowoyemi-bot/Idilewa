@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { CULTURAL_BIOMES } from '../src/culturalWorld.js';
@@ -7,18 +8,22 @@ const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const stylesSource = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 const culturalWorldArtwork = await readFile(new URL('../public/assets/cultural-world-replacement.png', import.meta.url));
 
-test('Cultural World artwork excludes the travel banner and aligns to the hero image', () => {
+test('Cultural World uses the supplied artwork unchanged and aligns its interactive areas', () => {
+  assert.equal(createHash('sha256').update(culturalWorldArtwork).digest('hex'), 'a24f8ac67f8281e5b3398627fac46574e043b4dbf282f5630a64962120914df8');
   assert.equal(culturalWorldArtwork.subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
-  assert.equal(culturalWorldArtwork.readUInt32BE(16), 768);
-  assert.equal(culturalWorldArtwork.readUInt32BE(20), 646);
+  assert.equal(culturalWorldArtwork.readUInt32BE(16), 877);
+  assert.equal(culturalWorldArtwork.readUInt32BE(20), 768);
 
   const culturalWorld = appSource.slice(
     appSource.indexOf('function renderCulturalWorld()'),
     appSource.indexOf('function openCulturalZone')
   );
-  assert.match(culturalWorld, /src="\.\/assets\/cultural-world-replacement\.png" width="768" height="646"/);
+  assert.match(culturalWorld, /src="\.\/assets\/cultural-world-replacement\.png" width="877" height="768"/);
   assert.match(culturalWorld, /aria-label="Start exploring"/);
   assert.match(culturalWorld, /data-action="cultural-zone" data-zone="\$\{biome\.id\}"/);
+  assert.match(culturalWorld, /routeLink\('profile', '<span class="sr-only">Start your learning journey: open your profile<\/span>'/);
+  assert.match(stylesSource, /\.world-artwork-zone-language \{ top: 58\.9%; \}/);
+  assert.match(stylesSource, /\.world-artwork-profile \{\s*top: 80\.4%;/);
   assert.match(stylesSource, /\.world-artwork-page\s*\{[^}]*width: min\(768px, calc\(100% - 32px\)\);/);
   assert.match(stylesSource, /\.world-artwork-frame > img\s*\{[^}]*width: 100%;[^}]*max-width: 100%;[^}]*height: auto;/s);
   assert.doesNotMatch(appSource, /passport/i);
