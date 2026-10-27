@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
@@ -87,23 +88,12 @@ test('mobile landing layouts and story navigation have responsive no-overflow ru
   assert.match(styleSource, /\.story-navigation-link \{[\s\S]*?min-height: 44px/);
 });
 
-test('homepage journey cards use full-resolution photos without forced image rendering', async () => {
-  const imageNames = [
-    'story-grandmother.jpg',
-    'page-index-2.jpg',
-    'page-owe-1.jpg',
-    'listening-reader.jpg',
-    'page-oral-1.jpg',
-    'hero-reader.jpg'
-  ];
+test('homepage How It Works section uses the supplied artwork unchanged', async () => {
+  const image = await readFile(new URL('../public/assets/how-it-works-journey-reference.jpg', import.meta.url));
 
-  for (const imageName of imageNames) {
-    assert.ok(appSource.includes(`imageUrl('${imageName}')`), `${imageName} is used by the journey cards`);
-    const image = await readFile(new URL(`../assets/${imageName}`, import.meta.url));
-    const { width, height } = jpegDimensions(image);
-    assert.ok(width >= 900 && height >= 500, `${imageName} should remain sharp at card size (${width}x${height})`);
-  }
-
-  assert.doesNotMatch(appSource, /imageUrl\('journey-step-[1-6]\.png'\)/);
-  assert.doesNotMatch(styleSource, /\.journey-step-visual img\s*\{[^}]*image-rendering:/s);
+  assert.equal(createHash('sha256').update(image).digest('hex'), 'fb715733b68f5d740cf11f5b52f3618de53644cb2ebe56071e2e0e07ab482005');
+  assert.deepEqual(jpegDimensions(image), { width: 1080, height: 720 });
+  assert.match(appSource, /<section class="container how-it-works-journey-section"[\s\S]*?<img class="how-it-works-journey-image" src="\$\{imageUrl\('how-it-works-journey-reference\.jpg'\)\}"/);
+  assert.doesNotMatch(appSource, /journey-step-card|journey-step-visual/);
+  assert.match(styleSource, /\.how-it-works-journey-image\s*\{[^}]*width: 100%;[^}]*height: auto;/s);
 });
