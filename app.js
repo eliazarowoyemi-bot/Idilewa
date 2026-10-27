@@ -663,7 +663,7 @@ import {
     }
     const [path, query = ''] = hash.split('?');
     let page = path.split('/')[0] || 'index';
-    if (page === 'languages' || page === 'learn') page = 'curriculum';
+    if (page === 'learn') page = 'curriculum';
     const params = Object.fromEntries(new URLSearchParams(query));
     if (OWE_ROUTE_SECTIONS[page]) {
       params.section = params.section || OWE_ROUTE_SECTIONS[page];
@@ -5218,13 +5218,27 @@ import {
   function renderCulturalWorld() {
     const zones = CULTURAL_BIOMES.map((biome) => `
       <button class="world-artwork-hotspot world-artwork-zone world-artwork-zone-${biome.id}" type="button" data-action="cultural-zone" data-zone="${biome.id}" aria-label="Explore ${esc(biome.title)}"></button>`).join('');
+    const languageMarkers = [
+      ['english', 'English'],
+      ['french', 'French'],
+      ['mandarin', 'Mandarin'],
+      ['spanish', 'Spanish'],
+      ['swahili', 'Swahili']
+    ].map(([id, name]) => routeLink(
+      'languages',
+      `<span class="sr-only">Browse available language courses from the ${name} map marker</span>`,
+      `world-artwork-hotspot world-artwork-language-marker world-artwork-language-marker-${id}`,
+      `aria-label="Browse available language courses from the ${name} map marker"`
+    )).join('');
 
     return `<div class="world-artwork-page">
       <h1 class="world-artwork-title">A Bigger World Awaits</h1>
       <div class="world-artwork-frame" role="group" aria-label="Explore languages and cultures">
         <img src="./assets/cultural-world-replacement.png" width="877" height="768" alt="Idilewa's bigger world of language, voice, stories, wisdom and coding." />
         <button class="world-artwork-hotspot world-artwork-start" type="button" data-action="cultural-zone" data-zone="language" aria-label="Start exploring"></button>
+        ${routeLink('languages', '<span class="sr-only">Browse available Idilewa language courses</span>', 'world-artwork-hotspot world-artwork-top-languages', 'aria-label="Browse available Idilewa language courses"')}
         ${zones}
+        ${languageMarkers}
         ${routeLink('profile', '<span class="sr-only">Start your learning journey: open your profile</span>', 'world-artwork-hotspot world-artwork-profile')}
       </div>
     </div>`;
@@ -6466,9 +6480,9 @@ import {
       case 'voice-translation': return renderVoiceFeaturePage(page, params);
       case 'index': return renderHome();
       case 'world': return renderCulturalWorld();
-      case 'languages':
       case 'learn':
       case 'curriculum': return renderCurriculum();
+      case 'languages': return renderLanguages();
       case 'course': return renderCourse(params);
       case 'lesson': return renderLesson(params);
       case 'coding': return renderCoding();

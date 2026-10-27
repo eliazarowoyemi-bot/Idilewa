@@ -21,9 +21,12 @@ test('Cultural World uses the supplied artwork unchanged and aligns its interact
   assert.match(culturalWorld, /src="\.\/assets\/cultural-world-replacement\.png" width="877" height="768"/);
   assert.match(culturalWorld, /aria-label="Start exploring"/);
   assert.match(culturalWorld, /data-action="cultural-zone" data-zone="\$\{biome\.id\}"/);
+  assert.match(culturalWorld, /world-artwork-top-languages/);
+  assert.match(culturalWorld, /world-artwork-language-marker-\$\{id\}/);
   assert.match(culturalWorld, /routeLink\('profile', '<span class="sr-only">Start your learning journey: open your profile<\/span>'/);
+  assert.match(stylesSource, /\.world-artwork-hotspot \.sr-only\s*\{[^}]*clip-path: inset\(50%\);/s);
   assert.match(stylesSource, /\.world-artwork-zone-language \{ top: 58\.9%; \}/);
-  assert.match(stylesSource, /\.world-artwork-profile \{\s*top: 80\.4%;/);
+  assert.match(stylesSource, /\.world-artwork-profile \{\s*top: 83\.8%;/);
   assert.match(stylesSource, /\.world-artwork-page\s*\{[^}]*width: min\(768px, calc\(100% - 32px\)\);/);
   assert.match(stylesSource, /\.world-artwork-frame > img\s*\{[^}]*width: 100%;[^}]*max-width: 100%;[^}]*height: auto;/s);
   assert.doesNotMatch(appSource, /passport/i);
@@ -43,6 +46,8 @@ test('the cultural world covers Idilewa language, voice, oral culture, and codin
 test('the world and profile are routed through the existing Idilewa SPA', () => {
   assert.match(appSource, /case 'world': return renderCulturalWorld\(\);/);
   assert.match(appSource, /case 'profile': return renderProfile\(\);/);
+  assert.match(appSource, /case 'learn':\s*case 'curriculum': return renderCurriculum\(\);\s*case 'languages': return renderLanguages\(\);/);
+  assert.match(appSource, /if \(page === 'learn'\) page = 'curriculum';/);
   assert.match(appSource, /routeLink\('world', `Explore the World/);
   assert.match(appSource, /initCulturalWorld\(worldCanvas, \(zoneId\) => openCulturalZone\(zoneId\)\)/);
   assert.match(appSource, /case 'launch-cultural-zone': \{/);

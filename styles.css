@@ -10290,10 +10290,37 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .world-artwork-zone-proverbs { top: 72.1%; }
 .world-artwork-zone-code { top: 76.5%; }
 .world-artwork-profile {
-  top: 80.4%;
+  top: 83.8%;
   left: 66%;
   width: 30%;
   height: 4.5%;
+}
+.world-artwork-top-languages {
+  top: 12%;
+  left: 88%;
+  width: 8%;
+  height: 15%;
+}
+.world-artwork-language-marker {
+  width: 12%;
+  height: 4.5%;
+}
+.world-artwork-language-marker-english { top: 58%; left: 11%; }
+.world-artwork-language-marker-french { top: 54%; left: 33%; }
+.world-artwork-language-marker-mandarin { top: 59%; left: 49%; }
+.world-artwork-language-marker-spanish { top: 70%; left: 16%; }
+.world-artwork-language-marker-swahili { top: 74%; left: 43%; }
+.world-artwork-hotspot .sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  border: 0;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
 }
 .world-artwork-hotspot:focus-visible {
   outline: 3px solid #0c5737;
