@@ -4686,6 +4686,13 @@ import {
     return `<div class="container route-page ${pageClass}"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span>${routeLink('voice_lessons', 'Voice Lessons')}<span>/</span><strong>${esc(title)}</strong></div><section class="voice-feature-header"><div><span class="section-kicker">${esc(kicker)} · Voice Lessons</span><h1>${esc(titleText)}</h1><p>${esc(description)}</p></div>${routeLink('voice_lessons', `${icon('arrow', 14, 'voice-arrow-back')} All Voice Lessons`, 'button button-outline')}</section>${lessonNavigation}<section class="voice-feature-content">${content}</section>${lessonNavigation}</div>`;
   }
 
+  function renderVoiceLessonsHome() {
+    return `<div class="container route-page voice-lessons-home">
+      <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>Voice Lessons</strong></div>
+      ${renderVoiceLessonsDashboard()}
+    </div>`;
+  }
+
   function renderVoiceLessonsDashboard() {
     const completedCount = Object.keys(state.trainer.completed || {}).length;
     const progressPercent = Math.round((completedCount / 60) * 100);
@@ -4699,8 +4706,12 @@ import {
       '<header class="curriculum-welcome-banner">' +
         '<div class="curriculum-welcome-copy">' +
           '<span class="curriculum-welcome-kicker">IDILEWA · LEARN TOGETHER</span>' +
-          '<h1 id="curriculum-dashboard-title">Your Learning Curriculum</h1>' +
-          '<p>Explore powerful tools to listen, speak, create and connect in any language. You can do it!</p>' +
+          '<h1 id="curriculum-dashboard-title">Your Voice Lessons</h1>' +
+          '<p>Choose a language or grade, then pick an activity to listen, speak and learn.</p>' +
+          '<nav class="curriculum-welcome-actions" aria-label="Quick voice lesson links">' +
+            routeLink('voice-language', 'Start a guided lesson ' + icon('arrow', 14), 'button button-primary') +
+            routeLink('trainer', 'Explore sound foundations ' + icon('arrow', 14), 'button button-outline') +
+          '</nav>' +
         '</div>' +
         '<div class="curriculum-welcome-art">' +
           '<img src="./assets/code-kids.jpg" alt="Two young learners exploring a coding activity together" loading="eager" />' +
@@ -6120,7 +6131,10 @@ import {
       }).join('');
 
       return `<div class="container route-page trainer-page">
-                ${renderVoiceLessonsDashboard()}
+                <div class="voice-trainer-toolbar">
+                  <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span>${routeLink('voice_lessons', 'Voice Lessons')}<span>/</span><strong>Sound foundations &amp; practice</strong></div>
+                  ${routeLink('voice_lessons', `${icon('arrow', 14, 'voice-arrow-back')} Back to Voice Lessons`, 'button button-outline')}
+                </div>
                 <section class="voice-foundations" aria-labelledby="voice-foundations-title">
                   <div class="section-heading">
                     <div><span class="section-kicker">Start here · Yorùbá sound foundations</span><h2 id="voice-foundations-title">Vowels, consonants &amp; tone</h2><p>Learn the mouth sounds before moving into words and conversation. Listen to the vowel sequences or choose a consonant to hear Idilewa pronounce it.</p></div>
@@ -6132,12 +6146,6 @@ import {
                   </div>
                   ${renderVoiceCloneTools()}
                 </section>
-        <div class="breadcrumbs">
-          ${routeLink("index", "Home")}<span>/</span>
-          ${routeLink("languages", "Languages")}<span>/</span>
-            <strong>Voice Lessons</strong>
-        </div>
-
         <section class="trainer-hero">
           <div class="trainer-hero-copy">
             <div class="trainer-hero-badge">
@@ -6532,7 +6540,7 @@ import {
 
   function renderPage(page, params) {
     switch (page) {
-      case 'voice_lessons':
+      case 'voice_lessons': return renderVoiceLessonsHome();
       case 'trainer': return renderTrainer(params);
       case 'voice-language':
       case 'voice-grade':

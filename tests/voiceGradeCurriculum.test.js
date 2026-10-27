@@ -58,6 +58,28 @@ test('voice feature pages each receive 50 guided lessons per language', () => {
   assert.match(appSource, /data-action="plotweaver-speak-text"/);
 });
 
+test('Voice Lessons opens a compact navigation hub and keeps detailed practice on its own route', () => {
+  const voiceLessonsHome = appSource.slice(
+    appSource.indexOf('function renderVoiceLessonsHome()'),
+    appSource.indexOf('function renderVoiceLessonsDashboard()')
+  );
+  const trainerPage = appSource.slice(
+    appSource.indexOf('function renderTrainer(params)'),
+    appSource.indexOf('function formatDashboardDate')
+  );
+
+  assert.match(appSource, /case 'voice_lessons': return renderVoiceLessonsHome\(\);/);
+  assert.match(appSource, /case 'trainer': return renderTrainer\(params\);/);
+  assert.match(voiceLessonsHome, /renderVoiceLessonsDashboard\(\)/);
+  assert.doesNotMatch(voiceLessonsHome, /voice-foundations|trainerStudio|trainer-hero/);
+  assert.match(appSource, /Your Voice Lessons/);
+  assert.match(appSource, /Start a guided lesson/);
+  assert.match(appSource, /Explore sound foundations/);
+  assert.doesNotMatch(trainerPage, /renderVoiceLessonsDashboard\(\)/);
+  assert.match(trainerPage, /Back to Voice Lessons/);
+  assert.match(trainerPage, /voice-foundations/);
+});
+
 test('choosing a voice lesson language opens lessons directly with back and lesson navigation', () => {
   const languagePicker = appSource.slice(
     appSource.indexOf("if (page === 'voice-language')"),
