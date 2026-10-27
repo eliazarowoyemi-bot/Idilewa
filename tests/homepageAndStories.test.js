@@ -44,9 +44,19 @@ test('homepage uses the approved bilingual font families and removes the video C
   assert.doesNotMatch(homeSource, /visual-journey-3d-section|Talking Drum|Living Glyphs/);
   assert.match(appSource, /case 'index': return renderHome\(\);/);
   assert.doesNotMatch(homeSource, /Watch Video/);
+  assert.doesNotMatch(homeSource, /landing-language-flag|flag: '🇳🇬'|flag: '🇹🇿'/);
   assert.match(styleSource, /landing-hero-copy h1[\s\S]*?font-size: 28px;[\s\S]*?line-height: 33px/);
   assert.match(styleSource, /landing-hero-copy > p[\s\S]*?font-size: 14px;[\s\S]*?line-height: 22px/);
   assert.match(styleSource, /landing-hero-actions \.button[\s\S]*?min-height: 48px;[\s\S]*?font-size: 14px/);
+});
+
+test('homepage language photos do not have country-symbol overlays', () => {
+  const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderLanguageCard'));
+
+  assert.equal((homeSource.match(/class="landing-language-card"/g) || []).length, 1);
+  assert.match(homeSource, /class="landing-language-name">\$\{language\.name\}/);
+  assert.doesNotMatch(homeSource, /landing-language-flag|language\.flag/);
+  assert.doesNotMatch(styleSource, /\.landing-language-flag/);
 });
 
 test('every story card opens its own bilingual reader with previous and next navigation', () => {

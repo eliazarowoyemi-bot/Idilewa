@@ -1128,10 +1128,10 @@ import {
 
   function renderHome() {
     const languages = [
-      { id: 'yoruba', name: 'Yorùbá', flag: '🇳🇬', image: 'child-language-yoruba.jpg', alt: 'Yorùbá child wearing blue traditional clothing and a headwrap' },
-      { id: 'igbo', name: 'Igbo', flag: '🇳🇬', image: 'child-language-igbo.jpg', alt: 'Igbo child wearing patterned traditional clothing and a red cap' },
-      { id: 'hausa', name: 'Hausa', flag: '🇳🇬', image: 'child-language-hausa.jpg', alt: 'Hausa child wearing an embroidered outfit and patterned cap' },
-      { id: 'swahili', name: 'Kiswahili', flag: '🇹🇿', image: 'child-language-swahili.jpg', alt: 'Child wearing a yellow patterned headscarf and traditional clothing' }
+      { id: 'yoruba', name: 'Yorùbá', image: 'child-language-yoruba.jpg', alt: 'Yorùbá child wearing blue traditional clothing and a headwrap' },
+      { id: 'igbo', name: 'Igbo', image: 'child-language-igbo.jpg', alt: 'Igbo child wearing patterned traditional clothing and a red cap' },
+      { id: 'hausa', name: 'Hausa', image: 'child-language-hausa.jpg', alt: 'Hausa child wearing an embroidered outfit and patterned cap' },
+      { id: 'swahili', name: 'Kiswahili', image: 'child-language-swahili.jpg', alt: 'Child wearing a yellow patterned headscarf and traditional clothing' }
     ];
     const pathways = [
       { icon: 'book', title: 'Learn', copy: 'African languages', route: 'voice-language' },
@@ -1168,7 +1168,7 @@ import {
           <section class="landing-languages" aria-labelledby="landing-languages-title">
             <div class="landing-section-heading"><div><span class="section-kicker">Our languages</span><h2 id="landing-languages-title">Start with your language</h2><p>Choose a language to begin your learning journey.</p></div>${routeLink('languages', `View all ${icon('arrow', 14)}`, 'text-link')}</div>
             <div class="landing-language-grid">
-              ${languages.map((language) => `<a class="landing-language-card" href="#/voice-grade?lang=${language.id}" data-route="voice-grade" data-lang="${language.id}" aria-label="Choose a grade for ${language.name}"><img src="/assets/${language.image}" alt="${language.alt}" loading="lazy" /><span class="landing-language-flag" aria-hidden="true">${language.flag}</span><span class="landing-language-name">${language.name}</span><span class="landing-language-action">Learn · Speak · Explore ${icon('arrow', 13)}</span></a>`).join('')}
+              ${languages.map((language) => `<a class="landing-language-card" href="#/voice-grade?lang=${language.id}" data-route="voice-grade" data-lang="${language.id}" aria-label="Choose a grade for ${language.name}"><img src="/assets/${language.image}" alt="${language.alt}" loading="lazy" /><span class="landing-language-name">${language.name}</span><span class="landing-language-action">Learn · Speak · Explore ${icon('arrow', 13)}</span></a>`).join('')}
             </div>
           </section>
 

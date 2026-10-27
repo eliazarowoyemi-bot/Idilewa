@@ -9818,7 +9818,6 @@ body[data-page="login"] #main > .modern-auth-page > .auth-layer-guide {
   .landing-language-card { position: relative; min-width: 0; overflow: hidden; border: 1px solid #e9efea; border-radius: 13px; background: #fff; transition: transform .18s ease, box-shadow .18s ease; }
   .landing-language-card:hover { transform: translateY(-3px); box-shadow: 0 12px 25px rgba(28, 56, 38, .1); }
   .landing-language-card img { width: 100%; aspect-ratio: .84; object-fit: cover; object-position: center top; }
-  .landing-language-flag { position: absolute; top: 8px; left: 8px; display: grid; width: 25px; height: 25px; place-items: center; overflow: hidden; border: 2px solid white; border-radius: 50%; background: white; font-size: 18px; box-shadow: 0 2px 6px rgba(0,0,0,.12); }
   .landing-language-name { display: block; padding: 9px 9px 2px; font-size: 12px; font-weight: 800; }
   .landing-language-action { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding: 2px 9px 10px; color: #79847d; font-size: 9px; font-weight: 650; }
   .landing-language-action .icon { color: #11844d; }
