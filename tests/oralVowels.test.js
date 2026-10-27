@@ -10,7 +10,7 @@ import {
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 
-test('oral vowel soundboard provides tone-marked choices for every vowel', () => {
+test('oral vowel soundboard presents only the three tone-marked seven-vowel sequences', () => {
   assert.equal(ORAL_VOWELS.length, 7);
   assert.ok(ORAL_VOWELS.every((vowel) => vowel.toneExamples.length === 3));
   assert.deepEqual(
@@ -25,8 +25,10 @@ test('oral vowel soundboard provides tone-marked choices for every vowel', () =>
       ['Ú', 'U', 'Ù']
     ]
   );
-  assert.match(appSource, /item\.toneExamples\.map/);
-  assert.match(appSource, /getOralVowelSpeechText\(toneExample\)/);
+  assert.doesNotMatch(appSource, /oralVowelSounds|item\.toneExamples\.map|getOralVowelSpeechText/);
+  assert.match(appSource, /class="voice-vowel-sequences"/);
+  assert.match(appSource, /<h3>Oral vowels<\/h3>[\s\S]*?\$\{oralVowelSequences\}/);
+  assert.doesNotMatch(appSource, /voice-diphthong-note|Nasal vowels &amp; vowel pairs/);
 });
 
 test('oral vowel speech text includes the tone-marked vowel and omits the English gloss', () => {

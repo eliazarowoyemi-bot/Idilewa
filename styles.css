@@ -7538,15 +7538,16 @@ body[data-page="login"] .main-content { padding: 0; }
 .voice-foundation-block h3 { margin: 0 0 5px; font-size: 16px; }
 .voice-foundation-block > p { min-height: 48px; margin: 0 0 12px; color: var(--muted); font-size: 12px; line-height: 1.5; }
 .voice-sound-list { display: flex; flex-wrap: wrap; gap: 6px; }
-.voice-sound-list button, .voice-diphthong-note button { display: inline-flex; align-items: center; gap: 5px; min-height: 36px; padding: 5px 9px; border: 1px solid #dce8da; border-radius: 7px; color: var(--green-dark); background: #f7fbf5; cursor: pointer; font-weight: 800; }
-.voice-sound-list button:hover, .voice-diphthong-note button:hover { border-color: var(--green); background: #eaf6ec; }
+.voice-sound-list button { display: inline-flex; align-items: center; gap: 5px; min-height: 36px; padding: 5px 9px; border: 1px solid #dce8da; border-radius: 7px; color: var(--green-dark); background: #f7fbf5; cursor: pointer; font-weight: 800; }
+.voice-sound-list button:hover { border-color: var(--green); background: #eaf6ec; }
 .voice-sound-list small { color: var(--muted); font-size: 10px; font-weight: 550; }
-.voice-diphthong-note { display: grid; gap: 7px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #e7ece5; }
-.voice-diphthong-note strong { font-size: 11px; }
-.voice-diphthong-note button { justify-self: stretch; justify-content: space-between; }
-.voice-diphthong-note button strong { color: var(--green-dark); font-size: 10px; }
-.voice-diphthong-note button span { letter-spacing: .04em; }
-.voice-diphthong-note small, .voice-translation-panel > small { color: var(--muted); font-size: 10px; }
+.voice-vowel-sequences { display: grid; gap: 7px; margin-top: 12px; padding-top: 10px; border-top: 1px solid #e7ece5; }
+.voice-vowel-sequences > strong { font-size: 11px; }
+.voice-vowel-sequences button { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 4px 10px; width: 100%; min-height: 36px; padding: 6px 9px; border: 1px solid #dce8da; border-radius: 7px; color: var(--green-dark); background: #f7fbf5; cursor: pointer; font-weight: 800; }
+.voice-vowel-sequences button:hover { border-color: var(--green); background: #eaf6ec; }
+.voice-vowel-sequences button strong { font-size: 10px; }
+.voice-vowel-sequences button span { letter-spacing: .04em; }
+.voice-vowel-sequences small, .voice-translation-panel > small { color: var(--muted); font-size: 10px; }
 .voice-translation-panel { display: grid; gap: 8px; margin-top: 14px; padding: 18px; border-radius: 12px; color: var(--ink); background: #f0f6ef; }
 .voice-translation-panel h2 { margin: 1px 0 3px; font-size: 19px; }
 .voice-translation-panel > div > p { margin: 0; color: var(--muted); font-size: 12px; }
