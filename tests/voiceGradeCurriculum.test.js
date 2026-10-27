@@ -11,6 +11,18 @@ import {
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const voiceLessonToolsImage = await readFile(new URL('../public/assets/voice-lessons-tools.jpg', import.meta.url));
+const voiceLessonsWelcomeImage = await readFile(new URL('../public/assets/voice-lessons-welcome.jpg', import.meta.url));
+
+test('Voice Lessons welcome banner uses the supplied original image and preserves its lesson action', () => {
+  const dashboard = appSource.slice(
+    appSource.indexOf('function renderVoiceLessonsDashboard()'),
+    appSource.indexOf('const STORY_READINGS')
+  );
+  assert.equal(voiceLessonsWelcomeImage.subarray(0, 2).toString('hex'), 'ffd8');
+  assert.match(dashboard, /src="\.\/assets\/voice-lessons-welcome\.jpg" width="1056" height="372"/);
+  assert.match(dashboard, /routeLink\('voice-language', '<span class="sr-only">Start a guided lesson<\/span>'/);
+  assert.doesNotMatch(dashboard, /curriculum-welcome-copy|curriculum-welcome-art|Every<br \/>voice matters/);
+});
 
 test('Voice Lessons uses the supplied unchanged activity artwork with accessible activity links', () => {
   assert.equal(voiceLessonToolsImage.subarray(0, 2).toString('hex'), 'ffd8');
@@ -84,9 +96,9 @@ test('Voice Lessons opens a compact navigation hub and keeps detailed practice o
   assert.match(appSource, /case 'trainer': return renderTrainer\(params\);/);
   assert.match(voiceLessonsHome, /renderVoiceLessonsDashboard\(\)/);
   assert.doesNotMatch(voiceLessonsHome, /voice-foundations|trainerStudio|trainer-hero/);
-  assert.match(appSource, /Your Voice Lessons/);
+  assert.match(appSource, /voice-lessons-welcome\.jpg/);
   assert.match(appSource, /Start a guided lesson/);
-  assert.match(appSource, /Explore sound foundations/);
+  assert.doesNotMatch(voiceLessonsHome, /Explore sound foundations/);
   assert.doesNotMatch(trainerPage, /renderVoiceLessonsDashboard\(\)/);
   assert.match(trainerPage, /Back to Voice Lessons/);
   assert.match(trainerPage, /voice-foundations/);

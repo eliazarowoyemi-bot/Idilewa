@@ -4703,21 +4703,10 @@ import {
       ['swahili', 'Kiswahili']
     ];
     return '<section class="curriculum-dashboard" aria-labelledby="curriculum-dashboard-title">' +
-      '<header class="curriculum-welcome-banner">' +
-        '<div class="curriculum-welcome-copy">' +
-          '<span class="curriculum-welcome-kicker">IDILEWA · LEARN TOGETHER</span>' +
-          '<h1 id="curriculum-dashboard-title">Your Voice Lessons</h1>' +
-          '<p>Choose a language or grade, then pick an activity to listen, speak and learn.</p>' +
-          '<nav class="curriculum-welcome-actions" aria-label="Quick voice lesson links">' +
-            routeLink('voice-language', 'Start a guided lesson ' + icon('arrow', 14), 'button button-primary') +
-            routeLink('trainer', 'Explore sound foundations ' + icon('arrow', 14), 'button button-outline') +
-          '</nav>' +
-        '</div>' +
-        '<div class="curriculum-welcome-art">' +
-          '<img src="./assets/code-kids.jpg" alt="Two young learners exploring a coding activity together" loading="eager" />' +
-          '<span class="curriculum-welcome-sticker">Every<br />voice matters!</span>' +
-        '</div>' +
-      '</header>' +
+      '<nav class="voice-lessons-welcome-art" aria-label="Start Voice Lessons">' +
+        '<img src="./assets/voice-lessons-welcome.jpg" width="1056" height="372" alt="Idilewa Voice Lessons: choose a grade, then dive into fun, interactive lessons that build real speaking confidence." fetchpriority="high" />' +
+        routeLink('voice-language', '<span class="sr-only">Start a guided lesson</span>', 'voice-lessons-welcome-link', 'aria-label="Start a guided lesson"') +
+      '</nav>' +
 
       '<nav class="curriculum-tools-artwork" aria-label="Choose a voice lesson activity">' +
         '<img src="./assets/voice-lessons-tools.jpg" width="1080" height="360" alt="Four illustrated voice lesson activities: Translation, Text to Speech, Speech to Text, and Voice Cloning." />' +
