@@ -56,7 +56,7 @@ test('main and expanded mobile navigation order lessons between Explore and Code
   assert.ok(navSource, 'main navigation list should exist');
   const navLabels = [...navSource.matchAll(/label: '([^']+)'/g)].map((match) => match[1]);
 
-  assert.deepEqual(navLabels, ['Home', 'Explore', 'Voice Lessons', 'Code', 'Curriculum']);
+  assert.deepEqual(navLabels, ['Home', 'Explore', 'Voice Lessons', 'AI Conversations', 'Code', 'Curriculum']);
   assert.match(appSource, /const MENU_NAV = \[\.\.\.NAV,/);
 });
 

@@ -98,6 +98,8 @@ import {
     'voice_lessons',
     'voice-language', 'voice-grade', 'voice-audio', 'voice-practice',
     'voice-text-to-speech', 'voice-cloning', 'voice-speech-to-text', 'voice-translation',
+    'ai-conversations', 'ai-login', 'ai-signup', 'ai-dashboard', 'ai-chat', 'ai-everyday',
+    'ai-voice', 'ai-history', 'ai-analytics', 'ai-profile', 'ai-children', 'ai-messages', 'ai-settings',
     'curriculum',
     'index', 'about', 'base', 'coding', 'coding-studio', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
     'ere', 'ere_game', 'game', 'guides', 'human', 'ifa', 'ifa_odu', 'individuals', 'keepers', 'library',
@@ -374,6 +376,7 @@ import {
     { label: 'Home', route: 'index', group: 'home' },
     { label: 'Explore', route: 'world', group: 'world' },
     { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' },
+    { label: 'AI Conversations', route: 'ai-conversations', group: 'ai-conversations' },
     { label: 'Code', route: 'coding', group: 'code' },
     { label: 'Curriculum', route: 'curriculum', group: 'curriculum' }
   ];
@@ -386,6 +389,19 @@ import {
   const NAV_GROUPS = {
     world: 'world',
     profile: 'world',
+    'ai-conversations': 'ai-conversations',
+    'ai-login': 'ai-conversations',
+    'ai-signup': 'ai-conversations',
+    'ai-dashboard': 'ai-conversations',
+    'ai-chat': 'ai-conversations',
+    'ai-everyday': 'ai-conversations',
+    'ai-voice': 'ai-conversations',
+    'ai-history': 'ai-conversations',
+    'ai-analytics': 'ai-conversations',
+    'ai-profile': 'ai-conversations',
+    'ai-children': 'ai-conversations',
+    'ai-messages': 'ai-conversations',
+    'ai-settings': 'ai-conversations',
     curriculum: 'curriculum',
     coding: 'code', 'coding-studio': 'code',
     trainer: 'trainer', voice_lessons: 'trainer',
@@ -426,6 +442,19 @@ import {
   LABELS.payment = 'Payment';
   LABELS.trainer = 'Voice Lessons';
   LABELS.voice_lessons = 'Voice Lessons';
+  LABELS['ai-conversations'] = 'AI Conversations';
+  LABELS['ai-login'] = 'AI Conversations sign in';
+  LABELS['ai-signup'] = 'AI Conversations account';
+  LABELS['ai-dashboard'] = 'Conversation dashboard';
+  LABELS['ai-chat'] = 'Choose a conversation';
+  LABELS['ai-everyday'] = 'Everyday Life';
+  LABELS['ai-voice'] = 'Voice Practice';
+  LABELS['ai-history'] = 'Conversation History';
+  LABELS['ai-analytics'] = 'Learning Analytics';
+  LABELS['ai-profile'] = 'My Profile';
+  LABELS['ai-children'] = 'My Children';
+  LABELS['ai-messages'] = 'Messages';
+  LABELS['ai-settings'] = 'Settings';
 
   const defaults = {
     currentLang: 'yoruba',
@@ -714,7 +743,7 @@ import {
   }
 
   function renderHeader(page) {
-    if (page === 'login') {
+    if (page === 'login' || page.startsWith('ai-')) {
       document.getElementById('site-header').innerHTML = '';
       return;
     }
@@ -759,7 +788,7 @@ import {
 
   function renderMobileNav(page) {
     const currentUser = getCurrentUser();
-    if (currentUser?.role === 'parent' || currentUser?.role === 'educator') {
+    if (page.startsWith('ai-') || currentUser?.role === 'parent' || currentUser?.role === 'educator') {
       document.getElementById('mobile-nav').innerHTML = '';
       return;
     }
@@ -5309,6 +5338,363 @@ import {
     worldSheetReturnFocus = null;
   }
 
+  const AI_CONVERSATION_LANGUAGES = [
+    { id: 'yoruba', name: 'Yorùbá', greeting: 'Ẹ káàárọ̀', meaning: 'Good morning', flag: '🇳🇬', speech: 'yo' },
+    { id: 'igbo', name: 'Igbo', greeting: 'Ndewo', meaning: 'Hello', flag: '🇳🇬', speech: 'ig' },
+    { id: 'hausa', name: 'Hausa', greeting: 'Sannu', meaning: 'Hello', flag: '🇳🇬', speech: 'ha' },
+    { id: 'swahili', name: 'Swahili', greeting: 'Habari', meaning: 'How are you?', flag: '🇹🇿', speech: 'sw' }
+  ];
+  const AI_CONVERSATION_STORAGE_KEY = 'idilewa-ai-conversations';
+  let aiAuthReturnRoute = 'ai-dashboard';
+  let aiConversationLanguage = state.currentLang;
+  let aiConversationRecords = null;
+  let aiVoiceRecorder = null;
+  let aiVoiceStream = null;
+  let aiVoiceChunks = [];
+  let aiVoiceTranscriptionPending = false;
+  let aiVoiceTranscriptionRequested = false;
+  let aiVoicePhraseIndex = 0;
+  let aiVoiceTranscript = '';
+  let aiAutoSpeak = false;
+
+  function getAiConversationLanguage(language = aiConversationLanguage) {
+    return AI_CONVERSATION_LANGUAGES.find((item) => item.id === language) || AI_CONVERSATION_LANGUAGES[0];
+  }
+
+  function getAiConversationRecords() {
+    if (aiConversationRecords) return aiConversationRecords;
+    try {
+      const saved = JSON.parse(localStorage.getItem(AI_CONVERSATION_STORAGE_KEY) || '[]');
+      if (!Array.isArray(saved)) throw new Error('Saved conversation history is not a list.');
+      aiConversationRecords = saved.filter((item) => item
+        && typeof item.id === 'string'
+        && typeof item.language === 'string'
+        && AI_CONVERSATION_LANGUAGES.some((language) => language.id === item.language)
+        && typeof item.title === 'string'
+        && Number.isFinite(item.updatedAt)
+        && Array.isArray(item.messages))
+        .map((item) => ({
+          id: item.id.slice(0, 100),
+          language: item.language,
+          title: item.title.slice(0, 80),
+          updatedAt: item.updatedAt,
+          messages: item.messages
+            .filter((message) => message && ['learner', 'assistant'].includes(message.role) && typeof message.text === 'string')
+            .slice(-40)
+            .map((message) => ({ role: message.role, text: message.text.slice(0, 500), at: Number(message.at) || item.updatedAt }))
+        }))
+        .slice(-30);
+    } catch (error) {
+      console.error('Could not read the local AI conversation history.', error);
+      aiConversationRecords = [];
+    }
+    return aiConversationRecords;
+  }
+
+  function saveAiConversationRecords() {
+    try {
+      localStorage.setItem(AI_CONVERSATION_STORAGE_KEY, JSON.stringify(getAiConversationRecords().slice(-30)));
+      return true;
+    } catch (error) {
+      console.error('Could not save the local AI conversation history.', error);
+      return false;
+    }
+  }
+
+  function getAiCurrentConversation() {
+    return getAiConversationRecords().find((item) => item.id === `everyday-${aiConversationLanguage}`) || null;
+  }
+
+  function renderAiBrand() {
+    return `<a class="ai-brand" href="#/ai-conversations" data-route="ai-conversations" aria-label="Idilewa AI Conversations home"><span class="ai-brand-globe">${icon('globe', 21)}</span><span><strong>IDILEWA</strong><small>Learn · Speak · Grow</small></span></a>`;
+  }
+
+  function renderAiLanding() {
+    const languagePills = AI_CONVERSATION_LANGUAGES.map((language) => `<span class="ai-language-pill"><span aria-hidden="true">${language.flag}</span>${language.name}</span>`).join('');
+    return `<div class="ai-landing">
+      <header class="ai-landing-header">${renderAiBrand()}<nav aria-label="AI Conversations navigation"><button type="button" data-action="ai-scroll" data-target="ai-how-it-works">How it works</button><button type="button" data-action="ai-scroll" data-target="ai-languages">Languages</button><a href="#/ai-login?next=ai-dashboard" data-route="ai-login" data-next="ai-dashboard">Log in</a><a class="ai-button ai-button-green ai-button-small" href="#/ai-signup?next=ai-dashboard" data-route="ai-signup" data-next="ai-dashboard">Create account</a></nav></header>
+      <main class="ai-landing-main">
+        <section class="ai-hero">
+          <div class="ai-hero-copy"><span class="ai-eyebrow"><span></span> Speak a little more every day</span><h1>AI Conversations</h1><h2>Practice. Improve. Speak<br />with confidence.</h2><p>Build your language skills through natural, interactive conversation practice at your own pace.</p>
+            <div class="ai-hero-actions"><a class="ai-button ai-button-green" href="#/ai-chat" data-route="ai-chat">Start Conversation ${icon('arrow', 16)}</a><a class="ai-button ai-button-quiet" href="#/ai-dashboard" data-route="ai-dashboard">Open dashboard</a></div>
+            <div class="ai-hero-language-list" id="ai-languages" aria-label="Available conversation languages">${languagePills}</div>
+            <p class="ai-preview-note">Guided practice preview · sample replies are offline, not live AI.</p>
+          </div>
+          <div class="ai-hero-art"><img src="./assets/voice-lessons-welcome.jpg" alt="Young learners smiling as they practise speaking together" /><div class="ai-chat-bubble">Let’s<br />Chat! <span>✦</span></div><div class="ai-art-caption"><span class="ai-art-pulse"></span> Your voice, your pace</div></div>
+        </section>
+        <section class="ai-landing-features" id="ai-how-it-works" aria-label="Conversation practice features">
+          <article><span class="ai-feature-icon">${icon('people', 19)}</span><h2>Natural conversations</h2><p>Explore everyday situations with friendly language prompts.</p></article>
+          <article><span class="ai-feature-icon">${icon('check', 19)}</span><h2>Real-time feedback</h2><p>Review your spoken practice with a helpful transcript.</p></article>
+          <article><span class="ai-feature-icon">${icon('leaf', 19)}</span><h2>Learn at your pace</h2><p>Choose your language and keep each practice short.</p></article>
+        </section>
+      </main>
+      <footer class="ai-landing-footer">${renderAiBrand()}<span>Language · Culture · Future</span><a href="#/privacy" data-route="privacy">Privacy</a></footer>
+    </div>`;
+  }
+
+  function renderAiAuth(mode) {
+    const signup = mode === 'signup';
+    const title = signup ? 'Create Your Account' : 'Welcome Back';
+    const image = signup ? 'page-profile-1.jpg' : 'voice-lessons-welcome.jpg';
+    const alt = signup ? 'A learner enjoying a language activity at home' : 'Learners practising languages together';
+    return `<div class="ai-auth-page">
+      <header class="ai-auth-header">${renderAiBrand()}<a href="#/ai-conversations" data-route="ai-conversations">Back to AI Conversations</a></header>
+      <main class="ai-auth-layout">
+        <section class="ai-auth-card"><div class="ai-auth-mobile-brand">${renderAiBrand()}</div><span class="ai-eyebrow">Idilewa · AI Conversations</span><h1>${title}</h1><p>${signup ? 'Join Idilewa and keep building your language confidence.' : 'Sign in to continue your conversation journey.'}</p>
+          <form data-form="login" class="ai-auth-form">
+            <input type="hidden" name="accountType" value="adult" />
+            ${signup ? '<label>Full Name<input id="authName" name="name" autocomplete="name" maxlength="60" placeholder="Enter your full name" required /></label>' : ''}
+            <label>Email Address<input id="authEmail" name="email" type="email" autocomplete="email" placeholder="Enter your email" required /></label>
+            <label>Password<input id="authPassword" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" placeholder="${signup ? 'Create a password' : 'Enter your password'}" required /></label>
+            ${signup ? '<small class="ai-auth-password-note">Use 12 or more characters, including uppercase and lowercase letters, a number and a symbol.</small>' : '<div class="ai-auth-options"><label class="ai-check-label"><input type="checkbox" name="remember" /> Remember me</label><button type="button" class="ai-inline-button" data-action="request-password-reset">Forgot password?</button></div>'}
+            <p class="ai-auth-error" id="authInlineError" role="alert" hidden></p>
+            <button type="submit" class="ai-button ai-button-green ai-auth-submit">${signup ? 'Sign Up' : 'Login'} ${icon('arrow', 15)}</button>
+          </form>
+          <p class="ai-auth-switch">${signup ? 'Already have an account?' : 'Don’t have an account?'} <a href="#/ai-${signup ? 'login' : 'signup'}?next=ai-dashboard" data-route="ai-${signup ? 'login' : 'signup'}" data-next="ai-dashboard">${signup ? 'Login' : 'Sign up'}</a></p>
+          <small class="ai-auth-safe-note">${icon('lock', 13)} Your account is protected by Idilewa sign-in.</small>
+        </section>
+        <aside class="ai-auth-art"><img src="./assets/${image}" alt="${alt}" /><div class="ai-auth-art-overlay"></div><div class="ai-auth-art-message"><span class="ai-auth-speech">Hi! I’m your<br />language partner!</span><span class="ai-auth-art-icon">${icon('sparkles', 23)}</span><p>${signup ? 'Better conversations.<br /><strong>Brighter future.</strong>' : 'Natural conversations<br /><strong>at your pace.</strong>'}</p></div></aside>
+      </main>
+    </div>`;
+  }
+
+  const AI_WORKSPACE_LINKS = [
+    { route: 'ai-dashboard', label: 'Dashboard', icon: 'home' },
+    { route: 'ai-chat', label: 'AI Conversation', icon: 'sparkles' },
+    { route: 'ai-children', label: 'My Children', icon: 'people' },
+    { route: 'ai-analytics', label: 'Analytics', icon: 'layers' },
+    { route: 'ai-messages', label: 'Messages', icon: 'send' },
+    { route: 'ai-settings', label: 'Settings', icon: 'lock' }
+  ];
+  const AI_WORKSPACE_ACTIVE = {
+    'ai-dashboard': 'ai-dashboard',
+    'ai-chat': 'ai-chat',
+    'ai-everyday': 'ai-chat',
+    'ai-voice': 'ai-chat',
+    'ai-history': 'ai-chat',
+    'ai-analytics': 'ai-analytics',
+    'ai-profile': 'ai-dashboard',
+    'ai-children': 'ai-children',
+    'ai-messages': 'ai-messages',
+    'ai-settings': 'ai-settings'
+  };
+
+  function renderAiWorkspace(page, title, content) {
+    const user = getCurrentUser();
+    const profile = getProfileDetails();
+    const name = profile.name || user?.name || 'Sarah Johnson';
+    const initial = name.trim().charAt(0).toUpperCase() || 'S';
+    const active = AI_WORKSPACE_ACTIVE[page] || 'ai-dashboard';
+    const links = AI_WORKSPACE_LINKS.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="ai-sidebar-link ${item.route === active ? 'is-active' : ''}" ${item.route === active ? 'aria-current="page"' : ''}>${icon(item.icon, 17)}<span>${item.label}</span></a>`).join('');
+    return `<div class="ai-workspace">
+      <aside class="ai-sidebar"><a class="ai-sidebar-brand" href="#/ai-conversations" data-route="ai-conversations" aria-label="AI Conversations home"><span class="ai-brand-globe">${icon('globe', 21)}</span><span><strong>IDILEWA</strong><small>Learn · Speak · Grow</small></span></a>
+        <nav class="ai-sidebar-nav" aria-label="Conversation workspace">${links}<a href="#/ai-history" data-route="ai-history" class="ai-sidebar-link ${page === 'ai-history' ? 'is-active' : ''}">${icon('clock', 17)}<span>History</span></a><a href="#/ai-voice" data-route="ai-voice" class="ai-sidebar-link ${page === 'ai-voice' ? 'is-active' : ''}">${icon('mic', 17)}<span>Voice Practice</span></a></nav>
+        <a href="#/ai-profile" data-route="ai-profile" class="ai-sidebar-user"><span class="ai-user-avatar">${esc(initial)}</span><span><strong>${esc(name)}</strong><small>${user ? 'Learner' : 'Guest learner'}</small></span>${icon('arrow', 14)}</a>
+      </aside>
+      <main class="ai-workspace-main"><header class="ai-workspace-topbar"><div class="ai-topbar-title"><a href="#/ai-conversations" data-route="ai-conversations" aria-label="AI Conversations home">AI Conversations</a><span>/</span><strong>${esc(title)}</strong></div><div class="ai-topbar-actions"><span class="ai-preview-status"><i></i> Practice preview</span><a href="#/ai-profile" data-route="ai-profile" class="ai-topbar-avatar" aria-label="Open profile">${esc(initial)}</a></div></header>
+        <div class="ai-workspace-content">${content}</div>
+      </main>
+    </div>`;
+  }
+
+  function renderAiPageHeading(eyebrow, title, description, actions = '') {
+    return `<header class="ai-page-heading"><div><span class="ai-eyebrow">${esc(eyebrow)}</span><h1>${esc(title)}</h1><p>${esc(description)}</p></div>${actions ? `<div class="ai-page-heading-actions">${actions}</div>` : ''}</header>`;
+  }
+
+  function renderAiDashboard() {
+    const records = getAiConversationRecords();
+    const profile = getProfileDetails();
+    const name = profile.name || getCurrentUser()?.name || 'Sarah';
+    const totalMessages = records.reduce((sum, item) => sum + item.messages.filter((message) => message.role === 'learner').length, 0);
+    const languages = AI_CONVERSATION_LANGUAGES.map((language) => `<button class="ai-language-card" type="button" data-action="ai-select-language" data-language="${language.id}"><span class="ai-language-flag">${language.flag}</span><strong>${esc(language.name)}</strong><small>${esc(language.meaning)}</small><span class="ai-language-card-arrow">${icon('arrow', 15)}</span></button>`).join('');
+    const recent = records.slice().sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 3);
+    const recentMarkup = recent.length
+      ? recent.map((item) => `<article class="ai-recent-card"><span class="ai-recent-avatar">${getAiConversationLanguage(item.language).flag}</span><div><strong>${esc(item.title)}</strong><small>${esc(getAiConversationLanguage(item.language).name)} · ${item.messages.filter((message) => message.role === 'learner').length} messages</small></div><a class="ai-button ai-button-outline ai-button-small" href="#/ai-everyday?lang=${item.language}" data-route="ai-everyday" data-lang="${item.language}">Continue</a></article>`).join('')
+      : '<p class="ai-empty-inline">Your practice sessions will appear here when you begin.</p>';
+    return renderAiWorkspace('ai-dashboard', 'Dashboard', `
+      ${renderAiPageHeading('Your learning space', `Welcome back, ${name.split(' ')[0]}.`, 'Choose a language and start a friendly conversation.', `<a class="ai-button ai-button-green" href="#/ai-chat" data-route="ai-chat">${icon('plus', 16)} New Conversation</a>`)}
+      <section class="ai-stat-grid" aria-label="Conversation overview"><article class="ai-stat-card"><span>${icon('people', 17)} Total Conversations</span><strong>${records.length}</strong><small>Saved on this device</small></article><article class="ai-stat-card"><span>${icon('sparkles', 17)} Practice Prompts</span><strong>${totalMessages}</strong><small>Messages you have tried</small></article><article class="ai-stat-card"><span>${icon('globe', 17)} Languages</span><strong>${new Set(records.map((item) => item.language)).size || 0}</strong><small>Languages explored</small></article><article class="ai-stat-card"><span>${icon('calendar', 17)} Learning streak</span><strong>${records.length ? 'Keep going' : 'Start today'}</strong><small>A little practice adds up</small></article></section>
+      <section class="ai-dashboard-section"><div class="ai-section-title"><div><span class="ai-eyebrow">Pick a language</span><h2>Where shall we begin?</h2></div><a href="#/ai-chat" data-route="ai-chat" class="ai-text-link">All languages ${icon('arrow', 14)}</a></div><div class="ai-language-grid">${languages}</div></section>
+      <section class="ai-dashboard-section ai-dashboard-lower"><div class="ai-recent-panel"><div class="ai-section-title"><div><span class="ai-eyebrow">Keep your momentum</span><h2>Continue your conversation</h2></div><a href="#/ai-history" data-route="ai-history" class="ai-text-link">View history ${icon('arrow', 14)}</a></div>${recentMarkup}</div><aside class="ai-quick-practice"><span class="ai-quick-practice-icon">${icon('mic', 21)}</span><span class="ai-eyebrow">A little speaking practice</span><h2>Try a voice prompt</h2><p>Listen to a greeting, record your voice and review the transcript.</p><a class="ai-button ai-button-green" href="#/ai-voice" data-route="ai-voice">Open Voice Practice ${icon('arrow', 14)}</a></aside></section>
+      <p class="ai-local-note">${icon('lock', 14)} Conversations are saved in this browser only. The guided replies are sample prompts, not live AI.</p>`);
+  }
+
+  function renderAiChatChooser() {
+    const cards = AI_CONVERSATION_LANGUAGES.map((language) => `<button type="button" class="ai-chooser-card" data-action="ai-select-language" data-language="${language.id}"><span class="ai-language-flag">${language.flag}</span><span class="ai-chooser-card-copy"><strong>${esc(language.name)}</strong><small>${esc(language.meaning)} · Everyday conversation</small></span>${icon('arrow', 16)}</button>`).join('');
+    return renderAiWorkspace('ai-chat', 'AI Conversation', `
+      ${renderAiPageHeading('Speak with confidence', 'What would you like to practise?', 'Choose a language to start an everyday conversation.')}
+      <section class="ai-chooser-panel"><div class="ai-section-title"><div><span class="ai-eyebrow">Available languages</span><h2>Choose your conversation</h2></div></div><div class="ai-chooser-list">${cards}</div></section>
+      <section class="ai-scenario-panel"><div class="ai-scenario-icon">${icon('sparkles', 20)}</div><div><strong>Everyday Life</strong><p>Practise greetings, introductions and simple daily conversations.</p></div><span class="ai-scenario-tag">Guided practice</span></section>`);
+  }
+
+  function renderAiEveryday(params = {}) {
+    const languageId = AI_CONVERSATION_LANGUAGES.some((item) => item.id === params.lang) ? params.lang : aiConversationLanguage;
+    aiConversationLanguage = languageId;
+    const language = getAiConversationLanguage();
+    const record = getAiCurrentConversation();
+    const messages = record?.messages?.length ? record.messages : [
+      { role: 'assistant', text: `Welcome! Let's practise a greeting in ${language.name}. You can say “${language.greeting}” to start.`, at: Date.now() }
+    ];
+    const bubbles = messages.map((message) => `<article class="ai-chat-message ai-chat-message-${message.role}"><span class="ai-message-avatar">${message.role === 'assistant' ? icon('sparkles', 15) : esc((getProfileDetails().name || 'S').trim().charAt(0).toUpperCase())}</span><div class="ai-message-body"><small>${message.role === 'assistant' ? 'Idilewa practice partner' : 'You'} · ${new Date(message.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</small><p>${esc(message.text)}</p></div></article>`).join('');
+    const prompts = [
+      `How do I say “good morning” in ${language.name}?`,
+      `Let’s practise a greeting in ${language.name}.`,
+      `What is a polite way to introduce myself?`
+    ].map((prompt) => `<button type="button" class="ai-prompt-chip" data-action="ai-fill-prompt" data-prompt="${esc(prompt)}">${esc(prompt)}</button>`).join('');
+    return renderAiWorkspace('ai-everyday', 'Everyday Life', `
+      ${renderAiPageHeading('Conversation practice', 'Everyday Life', `Practise simple, useful phrases in ${language.name}.`, `<label class="ai-language-select-label"><span class="sr-only">Conversation language</span><select id="ai-language-select" aria-label="Conversation language">${AI_CONVERSATION_LANGUAGES.map((item) => `<option value="${item.id}" ${item.id === language.id ? 'selected' : ''}>${item.flag} ${esc(item.name)}</option>`).join('')}</select></label>`)}
+      <div class="ai-conversation-layout"><section class="ai-conversation-card"><header class="ai-conversation-card-head"><div class="ai-chat-partner"><span class="ai-partner-avatar">${icon('sparkles', 18)}</span><div><strong>Conversation Practice</strong><small><i></i> Guided practice · ${esc(language.name)}</small></div></div><a href="#/ai-history" data-route="ai-history" class="ai-icon-link" aria-label="View conversation history">${icon('clock', 17)}</a></header>
+        <div class="ai-conversation-messages" id="ai-conversation-messages" aria-live="polite">${bubbles}</div>
+        <div class="ai-prompt-row" aria-label="Suggested prompts">${prompts}</div>
+        <form class="ai-message-form" data-form="ai-conversation"><label class="sr-only" for="ai-message-input">Write your practice message</label><input id="ai-message-input" name="message" maxlength="500" autocomplete="off" placeholder="Type a message to practise…" required /><button class="ai-send-button" type="submit" aria-label="Send message">${icon('send', 17)}</button></form>
+        <p class="ai-conversation-disclaimer">${icon('info', 13)} Offline guided sample. Replies are pre-written prompts; do not enter personal information.</p>
+      </section><aside class="ai-conversation-aside"><div class="ai-aside-progress"><span class="ai-eyebrow">Today’s practice</span><strong>${record?.messages.filter((message) => message.role === 'learner').length || 0} <small>messages</small></strong><div><span></span></div><small>Keep going at your own pace</small></div><div class="ai-phrase-card"><span class="ai-eyebrow">Try this phrase</span><strong lang="${language.speech}">${esc(language.greeting)}</strong><p>${esc(language.meaning)}</p><button type="button" class="ai-text-link" data-action="ai-play-phrase">${icon('volume', 15)} Listen</button></div><a href="#/ai-voice?lang=${language.id}" data-route="ai-voice" data-lang="${language.id}" class="ai-voice-shortcut">${icon('mic', 18)} Try voice practice ${icon('arrow', 14)}</a></aside></div>`);
+  }
+
+  function renderAiVoice(params = {}) {
+    if (AI_CONVERSATION_LANGUAGES.some((item) => item.id === params.lang)) aiConversationLanguage = params.lang;
+    const language = getAiConversationLanguage();
+    const phraseOptions = [
+      { text: language.greeting, meaning: language.meaning },
+      { text: language.id === 'yoruba' ? 'Báwo ni?' : language.id === 'igbo' ? 'Kedu?' : language.id === 'hausa' ? 'Yaya dai?' : 'Hujambo?', meaning: 'How are you?' },
+      { text: language.id === 'yoruba' ? 'Ó dàbọ̀' : language.id === 'igbo' ? 'Ka ọ dị' : language.id === 'hausa' ? 'Sai anjima' : 'Kwaheri', meaning: 'Goodbye' }
+    ];
+    const phrase = phraseOptions[aiVoicePhraseIndex % phraseOptions.length];
+    return renderAiWorkspace('ai-voice', 'Voice Practice', `
+      ${renderAiPageHeading('Listen · speak · grow', 'Voice Practice', `Practise a phrase aloud in ${language.name}.`, `<label class="ai-language-select-label"><span class="sr-only">Practice language</span><select id="ai-language-select" aria-label="Practice language">${AI_CONVERSATION_LANGUAGES.map((item) => `<option value="${item.id}" ${item.id === language.id ? 'selected' : ''}>${item.flag} ${esc(item.name)}</option>`).join('')}</select></label>`)}
+      <section class="ai-voice-layout"><article class="ai-voice-card"><span class="ai-voice-step">Your phrase · ${esc(language.name)}</span><div class="ai-voice-mic-orb">${icon('mic', 28)}</div><strong lang="${language.speech}">${esc(phrase.text)}</strong><p>${esc(phrase.meaning)}</p><div class="ai-voice-wave" aria-hidden="true">${Array.from({ length: 25 }, (_, index) => `<i style="--bar:${10 + ((index * 17 + 13) % 32)}px"></i>`).join('')}</div>
+        <button type="button" class="ai-button ai-button-outline" data-action="ai-play-phrase">${icon('volume', 16)} Listen to phrase</button>
+        <div class="ai-record-controls">${aiVoiceRecorder?.state === 'recording' ? `<button type="button" class="ai-button ai-button-stop" data-action="ai-record-stop">${icon('pause', 15)} Stop recording</button>` : `<button type="button" class="ai-button ai-button-green" data-action="ai-record-start" ${aiVoiceTranscriptionPending ? 'disabled' : ''}>${icon('mic', 16)} ${aiVoiceTranscriptionPending ? 'Transcribing…' : 'Record your voice'}</button>`}<button type="button" class="ai-button ai-button-quiet" data-action="ai-next-phrase">Next phrase ${icon('arrow', 14)}</button></div>
+        <label class="ai-record-consent"><input id="ai-voice-consent" type="checkbox" /><span>I understand my recording is sent to Idilewa’s voice service for transcription. It is not saved as a voice score.</span></label>
+        ${aiVoiceTranscript ? `<div class="ai-transcript-result" role="status"><span class="ai-eyebrow">Your transcription</span><p>${esc(aiVoiceTranscript)}</p></div>` : ''}
+        <p class="ai-voice-status" aria-live="polite">${aiVoiceTranscriptionPending ? 'Transcribing your recording…' : 'Your microphone is only used after you choose to record.'}</p>
+      </article><aside class="ai-voice-feedback"><span class="ai-eyebrow">Practice guide</span><h2>Try it at your own pace</h2><ul><li>${icon('check', 15)} Listen to the phrase first</li><li>${icon('check', 15)} Speak clearly into your device</li><li>${icon('check', 15)} Review the transcription</li></ul><p>We show the words the service heard; we do not assign an accuracy score.</p><a href="#/ai-everyday?lang=${language.id}" data-route="ai-everyday" data-lang="${language.id}" class="ai-button ai-button-outline">Back to conversation</a></aside></section>`);
+  }
+
+  function renderAiHistory() {
+    const records = getAiConversationRecords().slice().sort((a, b) => b.updatedAt - a.updatedAt);
+    const content = records.length
+      ? `<div class="ai-history-list">${records.map((item) => `<article class="ai-history-card"><span class="ai-history-flag">${getAiConversationLanguage(item.language).flag}</span><div class="ai-history-copy"><strong>${esc(item.title)}</strong><small>${esc(getAiConversationLanguage(item.language).name)} · ${new Date(item.updatedAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })} · ${item.messages.filter((message) => message.role === 'learner').length} messages</small><p>${esc(item.messages.filter((message) => message.role === 'learner').at(-1)?.text || 'Conversation started')}</p></div><a href="#/ai-everyday?lang=${item.language}" data-route="ai-everyday" data-lang="${item.language}" class="ai-button ai-button-outline ai-button-small">Continue</a><button type="button" class="ai-icon-link ai-delete-item" data-action="ai-delete-conversation" data-id="${esc(item.id)}" aria-label="Delete ${esc(item.title)}">${icon('close', 16)}</button></article>`).join('')}</div>`
+      : `<div class="ai-empty-state"><span>${icon('clock', 24)}</span><h2>No conversations yet</h2><p>Start a short practice session and it will appear here on this device.</p><a class="ai-button ai-button-green" href="#/ai-chat" data-route="ai-chat">Start a conversation ${icon('arrow', 14)}</a></div>`;
+    return renderAiWorkspace('ai-history', 'My Conversation History', `${renderAiPageHeading('Your practice', 'My Conversation History', 'Pick up where you left off. This history stays in this browser.', records.length ? '<button type="button" class="ai-button ai-button-outline" data-action="ai-clear-history">Clear history</button>' : '')}${content}`);
+  }
+
+  function renderAiAnalytics() {
+    const records = getAiConversationRecords();
+    const messages = records.reduce((sum, item) => sum + item.messages.filter((message) => message.role === 'learner').length, 0);
+    const minutes = Math.ceil(messages * 1.5);
+    const languageBars = AI_CONVERSATION_LANGUAGES.map((language, index) => {
+      const count = records.filter((item) => item.language === language.id).reduce((sum, item) => sum + item.messages.filter((message) => message.role === 'learner').length, 0);
+      const width = messages ? Math.max(4, Math.round((count / messages) * 100)) : 4;
+      return `<div class="ai-analytics-language"><span>${language.flag} ${esc(language.name)}</span><div><i style="width:${width}%"></i></div><small>${count}</small></div>`;
+    }).join('');
+    return renderAiWorkspace('ai-analytics', 'Learning Analytics', `
+      ${renderAiPageHeading('Your progress', 'Learning Analytics', 'A simple view of the practice you have done in this browser.')}
+      <section class="ai-analytics-stats"><article class="ai-analytics-stat"><span>${icon('sparkles', 17)} Total Conversations</span><strong>${records.length}</strong><small>Saved practice sessions</small></article><article class="ai-analytics-stat"><span>${icon('clock', 17)} Estimated Practice</span><strong>${minutes} min</strong><small>Approx. 1.5 min per sent prompt</small></article><article class="ai-analytics-stat"><span>${icon('send', 17)} Messages Practised</span><strong>${messages}</strong><small>Your sent practice messages</small></article><article class="ai-analytics-stat"><span>${icon('globe', 17)} Languages</span><strong>${new Set(records.map((item) => item.language)).size}</strong><small>Languages explored</small></article></section>
+      <section class="ai-analytics-grid"><article class="ai-analytics-panel"><div class="ai-section-title"><div><span class="ai-eyebrow">Your activity</span><h2>Practice overview</h2></div><span class="ai-chart-period">All time · this browser</span></div><div class="ai-chart-empty">${messages ? `<div class="ai-chart-bars">${[0, 1, 2, 3, 4, 5, 6].map((index) => `<span style="--bar-height:${Math.min(96, 20 + ((messages * (index + 2)) % 75))}%"><i></i></span>`).join('')}</div><div class="ai-chart-labels"><span>Session 1</span><span>Session 4</span><span>Session 7</span></div>` : `<span class="ai-chart-placeholder">${icon('layers', 22)}</span><p>Your activity chart will grow as you practise.</p>`}</div></article><article class="ai-analytics-panel"><div class="ai-section-title"><div><span class="ai-eyebrow">Your learning trend</span><h2>Languages explored</h2></div></div><div class="ai-language-breakdown">${languageBars}</div></article></section>
+      <p class="ai-local-note">${icon('info', 14)} These totals are calculated from browser history. Estimated time and sample practice prompts are not formal learning scores.</p>`);
+  }
+
+  function renderAiProfile() {
+    const profile = getProfileDetails();
+    const name = profile.name || getCurrentUser()?.name || 'Learner';
+    const initial = name.trim().charAt(0).toUpperCase() || 'L';
+    return renderAiWorkspace('ai-profile', 'My Profile', `
+      ${renderAiPageHeading('Account details', 'My Profile', 'Manage your learning details and conversation preferences.')}
+      <section class="ai-profile-layout"><aside class="ai-profile-card"><span class="ai-profile-avatar">${esc(initial)}</span><span class="ai-eyebrow">Learner profile</span><h2>${esc(name)}</h2><p>${esc(profile.email || 'Learning as a guest')}</p><span class="ai-profile-tag">${esc(getAiConversationLanguage(AI_CONVERSATION_LANGUAGES.some((item) => item.id === profile.language) ? profile.language : 'yoruba').name)}</span><p class="ai-profile-account-state">${getCurrentUser() ? 'Signed in to your Idilewa account' : 'Guest profile · saved on this device'}</p>${getCurrentUser() ? '<button type="button" class="ai-button ai-button-outline" data-action="profile-sign-out">Sign out</button>' : '<a class="ai-button ai-button-outline" href="#/ai-login?next=ai-profile" data-route="ai-login" data-next="ai-profile">Sign in</a>'}</aside>
+      <form class="ai-profile-form" data-form="profile-settings"><span class="ai-eyebrow">Profile information</span><h2>About you</h2><label>Full name<input name="name" maxlength="60" required value="${esc(profile.name)}" placeholder="What should we call you?" /></label><label>Email address<input type="email" value="${esc(profile.email)}" readonly placeholder="Sign in to connect your account" /></label><label>Short bio<textarea name="bio" rows="3" maxlength="500" placeholder="A little about you…">${esc(profile.bio)}</textarea></label><label>Learning goal<textarea name="goal" rows="2" maxlength="240" placeholder="What would you like to practise?">${esc(profile.goal)}</textarea></label><div class="ai-profile-row"><label>Learning language<select name="language">${LANGUAGES.map((item) => `<option value="${item.id}" ${profile.language === item.id ? 'selected' : ''}>${esc(item.name)}</option>`).join('')}</select></label><label>Experience level<select name="level">${[['beginner','Beginning'],['intermediate','Growing'],['advanced','Confident']].map(([value,label]) => `<option value="${value}" ${profile.level === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label></div><button type="submit" class="ai-button ai-button-green">${icon('check', 15)} Save profile</button></form></section>`);
+  }
+
+  function renderAiChildren() {
+    return renderAiWorkspace('ai-children', 'My Children', `
+      ${renderAiPageHeading('Family learning', 'My Children', 'A safe place for families to support language learning.')}
+      <section class="ai-family-notice"><span>${icon('shield', 22)}</span><div><span class="ai-eyebrow">Family privacy comes first</span><h2>Child accounts are not connected to this preview.</h2><p>No child profiles, practice transcripts or personal details are shown here. Parent-managed accounts require a verified guardian approval flow.</p><a href="#/consent" data-route="consent" class="ai-button ai-button-green">Learn about family approval ${icon('arrow', 14)}</a></div></section>`);
+  }
+
+  function renderAiMessages() {
+    return renderAiWorkspace('ai-messages', 'Messages', `
+      ${renderAiPageHeading('Stay connected', 'Messages', 'A place for important updates about your learning.')}
+      <section class="ai-empty-state"><span>${icon('send', 24)}</span><h2>You’re all caught up</h2><p>There are no messages in this browser preview. For help, reach the Idilewa team.</p><a href="#/contact" data-route="contact" class="ai-button ai-button-outline">Contact Idilewa ${icon('arrow', 14)}</a></section>`);
+  }
+
+  function renderAiSettings() {
+    const language = getAiConversationLanguage();
+    return renderAiWorkspace('ai-settings', 'Settings', `
+      ${renderAiPageHeading('Your preferences', 'Settings', 'Choose how your conversation practice works.')}
+      <section class="ai-settings-card"><div class="ai-setting-row"><div><strong>Practice language</strong><p>Choose the language used for your next conversation.</p></div><label><span class="sr-only">Practice language</span><select id="ai-language-select" aria-label="Practice language">${AI_CONVERSATION_LANGUAGES.map((item) => `<option value="${item.id}" ${item.id === language.id ? 'selected' : ''}>${item.flag} ${esc(item.name)}</option>`).join('')}</select></label></div>
+      <div class="ai-setting-row"><div><strong>Read sample replies aloud</strong><p>Use your device speech service when a guided reply appears.</p></div><button type="button" class="ai-toggle ${aiAutoSpeak ? 'is-on' : ''}" role="switch" aria-checked="${aiAutoSpeak}" aria-label="Read sample replies aloud" data-action="ai-toggle-auto-speak"><span></span></button></div>
+      <div class="ai-setting-row"><div><strong>Conversation history</strong><p>Saved locally in this browser. You can remove it whenever you like.</p></div><button type="button" class="ai-button ai-button-outline" data-action="ai-clear-history">Clear history</button></div>
+      <div class="ai-settings-privacy">${icon('lock', 15)} The chat preview does not contact a live AI service. Never add personal or sensitive information.</div></section>`);
+  }
+
+  function renderAiConversationsPage(page, params) {
+    if (page === 'ai-conversations') return renderAiLanding();
+    if (page === 'ai-login') return renderAiAuth('login');
+    if (page === 'ai-signup') return renderAiAuth('signup');
+    if (page === 'ai-dashboard') return renderAiDashboard();
+    if (page === 'ai-chat') return renderAiChatChooser();
+    if (page === 'ai-everyday') return renderAiEveryday(params);
+    if (page === 'ai-voice') return renderAiVoice(params);
+    if (page === 'ai-history') return renderAiHistory();
+    if (page === 'ai-analytics') return renderAiAnalytics();
+    if (page === 'ai-profile') return renderAiProfile();
+    if (page === 'ai-children') return renderAiChildren();
+    if (page === 'ai-messages') return renderAiMessages();
+    return renderAiSettings();
+  }
+
+  function respondToAiPractice(language) {
+    return `Nice work practising in ${language.name}. You can try “${language.greeting}” (${language.meaning}) next. Keep your practice short and say each phrase at your own pace.`;
+  }
+
+  async function startAiVoiceRecording() {
+    if (!document.getElementById('ai-voice-consent')?.checked) {
+      showToast('Please review and accept the transcription notice before recording.', 'error');
+      return;
+    }
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      showToast('Voice recording is not available in this browser.', 'error');
+      return;
+    }
+    try {
+      aiVoiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      aiVoiceChunks = [];
+      aiVoiceTranscriptionRequested = false;
+      aiVoiceRecorder = new MediaRecorder(aiVoiceStream);
+      aiVoiceRecorder.addEventListener('dataavailable', (event) => {
+        if (event.data.size) aiVoiceChunks.push(event.data);
+      });
+      aiVoiceRecorder.addEventListener('stop', () => {
+        const stream = aiVoiceStream;
+        aiVoiceStream = null;
+        stream?.getTracks().forEach((track) => track.stop());
+        const recording = new Blob(aiVoiceChunks, { type: aiVoiceRecorder?.mimeType || 'audio/webm' });
+        aiVoiceChunks = [];
+        aiVoiceRecorder = null;
+        if (!aiVoiceTranscriptionRequested || parseLocation().page !== 'ai-voice' || !recording.size) return;
+        aiVoiceTranscriptionPending = true;
+        render();
+        void transcribeWithPlotweaver(recording, getAiConversationLanguage().speech)
+          .then((result) => {
+            aiVoiceTranscript = result.text;
+            showToast('Your voice transcription is ready.');
+          })
+          .catch((error) => showToast(error instanceof Error ? error.message : 'Your recording could not be transcribed.', 'error'))
+          .finally(() => {
+            aiVoiceTranscriptionPending = false;
+            if (parseLocation().page === 'ai-voice') render();
+          });
+      }, { once: true });
+      aiVoiceRecorder.start();
+      render();
+    } catch (error) {
+      aiVoiceStream?.getTracks().forEach((track) => track.stop());
+      aiVoiceStream = null;
+      aiVoiceRecorder = null;
+      showToast(error instanceof Error ? error.message : 'Microphone access was not available.', 'error');
+    }
+  }
+
   function renderContact() {
     const supportEmail = 'idilewa2026@gmail.com';
     return `<div class="container route-page information-page">
@@ -6479,6 +6865,19 @@ import {
       case 'voice-speech-to-text':
       case 'voice-translation': return renderVoiceFeaturePage(page, params);
       case 'index': return renderHome();
+      case 'ai-conversations':
+      case 'ai-login':
+      case 'ai-signup':
+      case 'ai-dashboard':
+      case 'ai-chat':
+      case 'ai-everyday':
+      case 'ai-voice':
+      case 'ai-history':
+      case 'ai-analytics':
+      case 'ai-profile':
+      case 'ai-children':
+      case 'ai-messages':
+      case 'ai-settings': return renderAiConversationsPage(page, params);
       case 'world': return renderCulturalWorld();
       case 'learn':
       case 'curriculum': return renderCurriculum();
@@ -7048,6 +7447,14 @@ import {
       return;
     }
     const { page, params } = location;
+    if (page === 'ai-login' || page === 'ai-signup') {
+      state.loginMode = page === 'ai-signup' ? 'signup' : 'signin';
+      aiAuthReturnRoute = params.next?.startsWith('ai-') && ROUTES.includes(params.next) ? params.next : 'ai-dashboard';
+    }
+    if (page !== 'ai-voice' && aiVoiceRecorder?.state === 'recording') {
+      aiVoiceTranscriptionRequested = false;
+      aiVoiceRecorder.stop();
+    }
     if (params.lang && LANGUAGES.some((l) => l.id === params.lang)) state.currentLang = params.lang;
     if (params.level && ['beginner', 'intermediate', 'advanced', 'growing', 'fluent'].includes(params.level)) state.level = normalizeCourseLevel(params.level);
     renderHeader(page);
@@ -7062,7 +7469,10 @@ import {
     const pageMarkup = assignUniqueRouteImages(page, renderPage(page, params))
       .replace(/(?:African )?Voice (?:African Language )?Trainer/gi, 'Voice Lessons')
       .replace(/Voice Studio/gi, 'Voice Lessons');
-    if (page === 'coding' || page === 'coding-studio') {
+    if (page.startsWith('ai-')) {
+      document.body.dataset.page = page;
+      document.getElementById('main').innerHTML = pageMarkup;
+    } else if (page === 'coding' || page === 'coding-studio') {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = `${pageMarkup}${renderFooter(page)}`;
     } else if (page === 'login') {
@@ -7354,6 +7764,78 @@ import {
   function handleAction(action, el) {
     const lang = el.dataset.lang;
     switch (action) {
+      case 'ai-scroll': {
+        const target = document.getElementById(el.dataset.target || '');
+        target?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'center' });
+        break;
+      }
+      case 'ai-select-language': {
+        const selected = AI_CONVERSATION_LANGUAGES.find((item) => item.id === el.dataset.language);
+        if (!selected) break;
+        aiConversationLanguage = selected.id;
+        navigate('ai-everyday', { lang: selected.id });
+        break;
+      }
+      case 'ai-fill-prompt': {
+        const input = document.getElementById('ai-message-input');
+        if (input) {
+          input.value = el.dataset.prompt || '';
+          input.focus();
+        }
+        break;
+      }
+      case 'ai-play-phrase': {
+        const language = getAiConversationLanguage();
+        const phrase = document.querySelector('.ai-voice-card > strong')?.textContent
+          || document.querySelector('.ai-phrase-card > strong')?.textContent
+          || language.greeting;
+        void playPlotweaverSpeech(phrase, language.speech)
+          .catch((error) => showToast(error instanceof Error ? error.message : 'The sample phrase could not be played.', 'error'));
+        break;
+      }
+      case 'ai-next-phrase':
+        aiVoicePhraseIndex += 1;
+        aiVoiceTranscript = '';
+        render();
+        break;
+      case 'ai-record-start':
+        void startAiVoiceRecording();
+        break;
+      case 'ai-record-stop':
+        if (aiVoiceRecorder?.state === 'recording') {
+          aiVoiceTranscriptionRequested = true;
+          aiVoiceTranscriptionPending = true;
+          aiVoiceRecorder.stop();
+          render();
+        }
+        break;
+      case 'ai-toggle-auto-speak':
+        aiAutoSpeak = !aiAutoSpeak;
+        render();
+        showToast(aiAutoSpeak ? 'Guided replies will be read aloud on this device.' : 'Read-aloud is turned off.');
+        break;
+      case 'ai-delete-conversation': {
+        const recordId = el.dataset.id;
+        if (!recordId || !window.confirm('Delete this conversation from this browser?')) break;
+        aiConversationRecords = getAiConversationRecords().filter((item) => item.id !== recordId);
+        if (!saveAiConversationRecords()) {
+          showToast('This conversation could not be removed from browser storage.', 'error');
+          break;
+        }
+        render();
+        showToast('Conversation removed from this browser.');
+        break;
+      }
+      case 'ai-clear-history':
+        if (!getAiConversationRecords().length || !window.confirm('Clear all conversation history saved in this browser?')) break;
+        aiConversationRecords = [];
+        if (!saveAiConversationRecords()) {
+          showToast('Conversation history could not be cleared from browser storage.', 'error');
+          break;
+        }
+        render();
+        showToast('Conversation history cleared from this browser.');
+        break;
       case 'toggle-menu': toggleMobileMenu(); break;
       case 'open-search': openSearch(); break;
       case 'close-modal': closeModal(); break;
@@ -8377,7 +8859,7 @@ import {
       if (modalRoot) modalRoot.innerHTML = '';
       const route = routeEl.dataset.route;
       const params = {};
-      ['lang', 'level', 'module', 'lesson', 'grade', 'mode', 'section', 'story'].forEach((key) => { if (routeEl.dataset[key]) params[key] = routeEl.dataset[key]; });
+      ['lang', 'level', 'module', 'lesson', 'grade', 'mode', 'section', 'story', 'next'].forEach((key) => { if (routeEl.dataset[key]) params[key] = routeEl.dataset[key]; });
       if (route.startsWith('voice-')) {
         if (['yoruba', 'igbo', 'hausa', 'swahili', 'zulu', 'twi'].includes(params.lang)) state.trainer.lang = params.lang;
         if (['beginner', 'intermediate', 'advanced'].includes(params.level)) {
@@ -8402,6 +8884,17 @@ import {
 
   document.addEventListener('change', (event) => {
     const el = event.target;
+    if (el.matches('#ai-language-select')) {
+      const selected = AI_CONVERSATION_LANGUAGES.find((item) => item.id === el.value);
+      if (!selected) return;
+      aiConversationLanguage = selected.id;
+      aiVoicePhraseIndex = 0;
+      aiVoiceTranscript = '';
+      if (parseLocation().page === 'ai-everyday') navigate('ai-everyday', { lang: selected.id });
+      else if (parseLocation().page === 'ai-voice') navigate('ai-voice', { lang: selected.id });
+      else render();
+      return;
+    }
     if (el.matches('#code-target-language, #code-landing-language')) {
       if (!CODE_LANGUAGES.some((language) => language.id === el.value)) return;
       state.coding.codeTargetLanguage = el.value;
@@ -8620,7 +9113,39 @@ import {
     if (!type) return;
     event.preventDefault();
     const data = new FormData(form);
-    if (type === 'plotweaver-voice-clone') {
+    if (type === 'ai-conversation') {
+      const message = String(data.get('message') || '').trim().slice(0, 500);
+      if (!message) {
+        showToast('Write a short practice message first.', 'error');
+        return;
+      }
+      const language = getAiConversationLanguage();
+      const records = getAiConversationRecords();
+      const id = `everyday-${language.id}`;
+      const record = records.find((item) => item.id === id) || {
+        id,
+        language: language.id,
+        title: 'Everyday Life',
+        updatedAt: Date.now(),
+        messages: [{ role: 'assistant', text: `Welcome! Let's practise a greeting in ${language.name}. You can say “${language.greeting}” to start.`, at: Date.now() }]
+      };
+      record.messages.push(
+        { role: 'learner', text: message, at: Date.now() },
+        { role: 'assistant', text: respondToAiPractice(language), at: Date.now() }
+      );
+      record.messages = record.messages.slice(-40);
+      record.updatedAt = Date.now();
+      aiConversationRecords = [record, ...records.filter((item) => item.id !== id)].slice(0, 30);
+      form.reset();
+      render();
+      if (!saveAiConversationRecords()) showToast('Your reply is visible, but could not be saved to browser history.', 'error');
+      else showToast('Practice saved in this browser.');
+      if (aiAutoSpeak) {
+        void speakWithDeviceVoice(respondToAiPractice(language), 'en')
+          .catch((error) => showToast(error instanceof Error ? error.message : 'Read-aloud is not available.', 'error'));
+      }
+      return;
+    } else if (type === 'plotweaver-voice-clone') {
       const submitButton = form.querySelector('button[type="submit"]');
       const file = data.get('file');
       if (!(file instanceof File) || !file.size || file.size > 4 * 1024 * 1024) {
@@ -8683,7 +9208,7 @@ import {
         pendingSignin = null;
         passwordResetVerified = false;
         await syncAccountLessonProgress();
-        navigate(roleHomeRoute(getCurrentUser()?.role || state.authRole));
+        navigate(aiAuthReturnRoute || roleHomeRoute(getCurrentUser()?.role || state.authRole));
         try {
           await sendAuthActivityEmail('sign-in');
           showToast('Your password has been updated and you are signed in.', 'success');
@@ -8718,7 +9243,7 @@ import {
         }
         pendingSignin = null;
         await syncAccountLessonProgress();
-        navigate(roleHomeRoute(signedInRole));
+        navigate(aiAuthReturnRoute || roleHomeRoute(signedInRole));
         let activityEmailError = '';
         try {
           await sendAuthActivityEmail('sign-in');
@@ -8946,7 +9471,7 @@ import {
       );
       verifiedGuardianSignup = null;
       try { sessionStorage.removeItem('idilewa-guardian-signup'); } catch (_) {}
-      navigate(roleHomeRoute(signedInRole));
+      navigate(aiAuthReturnRoute || roleHomeRoute(signedInRole));
       if (['adult', 'child'].includes(signedInRole)) {
         const profile = getProfileDetails();
         if (!profile.bio || !profile.goal) window.setTimeout(openProfileCompletionPrompt, 120);
