@@ -3014,6 +3014,9 @@ h3 { font-size: 17px; line-height: 1.25; font-weight: 760; }
    HOW IT WORKS: supplied artwork
    ======================================================================== */
 .how-it-works-journey-section {
+  width: min(1280px, calc(100% - 40px));
+  margin-right: auto;
+  margin-left: auto;
   padding-bottom: clamp(50px, 6vw, 84px);
   margin-top: -36px;
 }
@@ -3023,6 +3026,16 @@ h3 { font-size: 17px; line-height: 1.25; font-weight: 760; }
   width: 100%;
   max-width: 100%;
   height: auto;
+}
+@media (max-width: 620px) {
+  .how-it-works-journey-section {
+    width: calc(100% - 40px);
+  }
+}
+@media (max-width: 359px) {
+  .how-it-works-journey-section {
+    width: calc(100% - 32px);
+  }
 }
 @media (max-width: 480px) {
   .learning-stepper {

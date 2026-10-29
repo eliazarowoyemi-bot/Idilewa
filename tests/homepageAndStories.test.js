@@ -96,4 +96,7 @@ test('homepage How It Works section uses the supplied artwork unchanged', async 
   assert.match(appSource, /<section class="container how-it-works-journey-section"[\s\S]*?<img class="how-it-works-journey-image" src="\$\{imageUrl\('how-it-works-journey-reference\.jpg'\)\}"/);
   assert.doesNotMatch(appSource, /journey-step-card|journey-step-visual/);
   assert.match(styleSource, /\.how-it-works-journey-image\s*\{[^}]*width: 100%;[^}]*height: auto;/s);
+  assert.match(styleSource, /\.how-it-works-journey-section\s*\{[^}]*width: min\(1280px, calc\(100% - 40px\)\);[^}]*margin-right: auto;[^}]*margin-left: auto;/s);
+  assert.match(styleSource, /@media \(max-width: 620px\)[\s\S]*?\.how-it-works-journey-section\s*\{\s*width: calc\(100% - 40px\);/);
+  assert.match(styleSource, /@media \(max-width: 359px\)[\s\S]*?\.how-it-works-journey-section\s*\{\s*width: calc\(100% - 32px\);/);
 });
