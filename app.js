@@ -105,7 +105,7 @@ import {
     'tutor-consent', 'tutor-lesson', 'tutor-messages', 'tutor-profile', 'tutor-availability', 'tutor-settings',
     'curriculum',
     'index', 'about', 'base', 'coding', 'coding-studio', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
-    'ere', 'ere_game', 'game', 'guides', 'human', 'ifa', 'ifa_odu', 'individuals', 'keepers', 'library',
+    'ere', 'ere_game', 'game', 'guides', 'heritage', 'human', 'ifa', 'ifa_odu', 'individuals', 'keepers', 'library',
     'kids', 'languages', 'lesson', 'login', 'method', 'oral', 'oral_genre', 'oriki', 'owe',
     'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'payment', 'pricing', 'profile', 'schools', 'world',
     'voices'
@@ -167,6 +167,9 @@ import {
     calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',
     trophy: '<path d="M8 21h8m-4-4v4M7 4h10v5a5 5 0 0 1-10 0zM7 7H4v2a4 4 0 0 0 4 4m9-6h3v2a4 4 0 0 1-4 4"/>',
     bookmark: '<path d="M6 4h12v17l-6-4-6 4z"/>',
+    settings: '<path d="M12 8.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7Z"/><path d="m19.4 15 .1.1a1.8 1.8 0 1 1-2.5 2.5l-.1-.1a1.8 1.8 0 0 0-3 .9v.2a1.8 1.8 0 1 1-3.6 0v-.2a1.8 1.8 0 0 0-3-.9l-.1.1a1.8 1.8 0 1 1-2.5-2.5l.1-.1a1.8 1.8 0 0 0-.9-3H3.7a1.8 1.8 0 1 1 0-3.6h.2a1.8 1.8 0 0 0 .9-3l-.1-.1a1.8 1.8 0 1 1 2.5-2.5l.1.1a1.8 1.8 0 0 0 3-.9v-.2a1.8 1.8 0 1 1 3.6 0v.2a1.8 1.8 0 0 0 3 .9l.1-.1a1.8 1.8 0 1 1 2.5 2.5l-.1.1a1.8 1.8 0 0 0 .9 3h.2a1.8 1.8 0 1 1 0 3.6h-.2a1.8 1.8 0 0 0-.9 3Z"/>',
+    chart: '<path d="M4 19V5m0 14h17"/><path d="m7 15 4-4 3 2 6-7"/>',
+    circle: '<circle cx="12" cy="12" r="8"/>',
     shield: '<path d="M12 22s8-4 8-11V5l-8-3-8 3v6c0 7 8 11 8 11Z"/><path d="m9 12 2 2 4-4"/>',
     eye: '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12Z"/><circle cx="12" cy="12" r="3"/>',
     eyeOff: '<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61M2 2l20 20"/>',
@@ -387,6 +390,7 @@ import {
   const MENU_NAV = [...NAV,
     { label: 'Read & listen', route: 'oral', group: 'read' },
     { label: 'Stories', route: 'ere', group: 'stories' },
+    { label: 'Heritage Stories', route: 'heritage', group: 'stories' },
     { label: 'About', route: 'about', group: 'about' }
   ];
 
@@ -427,6 +431,7 @@ import {
     connect_students: 'about', connect_teachers: 'about', consent: 'about', contact: 'about', privacy: 'about',
     ere: 'stories', ere_game: 'stories', game: 'stories', library: 'read', payment: 'about', ifa: 'culture', ifa_odu: 'culture',
     about: 'about', method: 'about', schools: 'about',
+    heritage: 'stories',
     guides: 'culture', human: 'culture', keepers: 'culture'
   };
 
@@ -553,6 +558,14 @@ import {
       completed: {},
       xp: 220,
       streak: 5
+    },
+    heritage: {
+      storiesRead: [],
+      riddlesSolved: [],
+      cultureQuizDone: false,
+      streakDays: 0,
+      lastActivityDate: '',
+      showDailyNudge: true
     }
   };
 
@@ -648,6 +661,16 @@ import {
             }))
           : [],
         savedProverbs: Array.isArray(stored.savedProverbs) ? stored.savedProverbs : [],
+        heritage: {
+          ...defaults.heritage,
+          ...(stored.heritage || {}),
+          storiesRead: Array.isArray(stored.heritage?.storiesRead) ? stored.heritage.storiesRead.filter((id) => typeof id === 'string').slice(0, 40) : [],
+          riddlesSolved: Array.isArray(stored.heritage?.riddlesSolved) ? stored.heritage.riddlesSolved.filter((id) => typeof id === 'string').slice(0, 40) : [],
+          cultureQuizDone: stored.heritage?.cultureQuizDone === true,
+          streakDays: Number.isInteger(stored.heritage?.streakDays) ? Math.max(0, stored.heritage.streakDays) : 0,
+          lastActivityDate: typeof stored.heritage?.lastActivityDate === 'string' ? stored.heritage.lastActivityDate.slice(0, 10) : '',
+          showDailyNudge: stored.heritage?.showDailyNudge !== false
+        },
         reflections: Array.isArray(stored.reflections) ? stored.reflections : [],
         teacherRequests: Array.isArray(stored.teacherRequests) ? stored.teacherRequests : [],
         teacherReplies: Array.isArray(stored.teacherReplies) ? stored.teacherReplies : [],
@@ -773,7 +796,7 @@ import {
   }
 
   function renderHeader(page) {
-    if (page === 'login' || page.startsWith('ai-') || page.startsWith('tutor')) {
+    if (page === 'login' || page === 'heritage' || page.startsWith('ai-') || page.startsWith('tutor')) {
       document.getElementById('site-header').innerHTML = '';
       return;
     }
@@ -818,7 +841,7 @@ import {
 
   function renderMobileNav(page) {
     const currentUser = getCurrentUser();
-    if (page.startsWith('ai-') || page.startsWith('tutor') || currentUser?.role === 'parent' || currentUser?.role === 'educator') {
+    if (page === 'heritage' || page.startsWith('ai-') || page.startsWith('tutor') || currentUser?.role === 'parent' || currentUser?.role === 'educator') {
       document.getElementById('mobile-nav').innerHTML = '';
       return;
     }
@@ -875,7 +898,7 @@ import {
     const previews = [
       { title: 'Hear a greeting', label: 'Yorùbá · Language', copy: 'Start with a phrase, then listen for the tones that shape its meaning.', image: 'page-languages-1.jpg', route: 'languages', action: 'Explore languages' },
       { title: 'Make something', label: 'Code · STEM', copy: 'Turn your ideas into small programs in a welcoming code studio.', image: 'code-kids.jpg', route: 'coding', action: 'Open Code Studio' },
-      { title: 'Find a story', label: 'Stories · Culture', copy: 'Read and listen to stories that invite sharing across generations.', image: 'story-grandmother.jpg', route: 'ere', action: 'Read a story' },
+      { title: 'Find a story', label: 'Stories · Culture', copy: 'Read, listen and explore folktales, traditions and riddles.', image: 'story-grandmother.jpg', route: 'heritage', action: 'Explore stories' },
       { title: 'Practice a sound', label: 'Voice Lessons', copy: 'Build confidence with vowels, consonants and guided speaking practice.', image: 'listening-reader.jpg', route: 'voice_lessons', action: 'Start a lesson' }
     ];
     const phonePreviews = [
@@ -4858,6 +4881,248 @@ import {
     return `<div class="container route-page story-game-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span>${routeLink('ere', 'Stories')}<span>/</span><strong>${esc(story.title)}</strong></div><section class="story-game-layout"><div class="story-game-image"><img src="./assets/${story.image}" alt="${esc(story.title)} story illustration" /><span class="story-audio-pill">${icon('volume', 15)} Read aloud together</span></div><div class="story-reading"><span class="section-kicker">Original Idilewa learning story · ${storyIndex + 1} of ${STORY_READINGS.length}</span><h1>${esc(story.title)}</h1><p class="story-subhead">${esc(story.subhead)}</p><button class="listen-inline" data-action="play-audio" data-language="en-US" data-text="${esc(story.paragraphs.map((paragraph) => paragraph[1]).join(' '))}">${icon('play', 14)} Listen to the English translation</button><div class="story-text">${story.paragraphs.map(([yoruba, english]) => `<section class="story-paragraph-pair"><div><span class="story-translation-label" lang="yo">Yorùbá</span><p lang="yo">${esc(yoruba)}</p></div><div><span class="story-translation-label">English translation</span><p lang="en">${esc(english)}</p></div></section>`).join('')}</div><div class="story-credit-note">${icon('heart', 16)} This is an original Idilewa learning story, not a traditional folktale. The English translation is shown beside each Yorùbá passage.</div></div></section>${renderStepper(['Choose a story', 'Read', 'Listen', 'Reflect'], 3)}<nav class="story-navigation" aria-label="Story navigation">${storyNavigationLink(previousStory, 'Previous story', !previousStory)}${routeLink('ere', `${icon('book', 15)} All stories`, 'story-navigation-link')}${storyNavigationLink(nextStory, 'Next story', !nextStory)}</nav><section class="story-quiz"><div><span class="section-kicker">A little reflection</span><h2>${esc(story.question)}</h2><p>Choose the idea that best fits what you read.</p></div><div class="story-answer-list">${story.answers.map(([label, correct], index) => `<button class="story-answer ${result === 'correct' && correct ? 'answer-correct' : ''}" data-action="story-answer" data-key="${story.id}" data-correct="${correct}" ${result === 'correct' ? 'disabled' : ''}><span>${String.fromCharCode(65 + index)}</span>${esc(label)}${result === 'correct' && correct ? icon('check', 17) : icon('arrow', 15)}</button>`).join('')}</div>${result ? `<div class="answer-feedback ${result === 'correct' ? 'feedback-correct' : 'feedback-retry'}">${icon(result === 'correct' ? 'check' : 'refresh', 16)} ${result === 'correct' ? 'Lovely reading. Keep noticing how each story unfolds.' : 'Try again—look for what the characters did in the story.'}</div>` : ''}</section><div class="story-related">${routeLink('oral', 'Explore oral traditions ' + icon('arrow', 14), 'text-link')}${routeLink('ere', 'Back to stories ' + icon('arrow', 14), 'text-link')}${aiHelperButton('story')}</div></div>`;
   }
 
+  const HERITAGE_STORIES = [
+    {
+      id: 'tortoise-hare',
+      title: 'The Tortoise and the Hare',
+      description: 'A steady pace can carry you further than a hurried start.',
+      image: 'story-grandmother.jpg',
+      paragraphs: [
+        'At the edge of a green forest, Hare loved to boast about being the fastest. Tortoise listened quietly and invited Hare to a friendly race along the winding path.',
+        'Hare raced ahead, then stopped to rest beneath a shady tree. Tortoise kept walking, one careful step at a time, and reached the finish while Hare was still asleep.',
+        'Hare congratulated Tortoise. They agreed that practice, patience and kindness mattered more than boasting.'
+      ],
+      lesson: 'Why did Tortoise reach the finish first?',
+      answers: [
+        ['Tortoise kept a steady pace.', true],
+        ['Hare forgot where the path went.', false],
+        ['Tortoise took a shortcut.', false]
+      ]
+    },
+    {
+      id: 'wise-hunter',
+      title: 'The Wise Hunter',
+      description: 'A thoughtful listener finds a safer way through the forest.',
+      image: 'page-oral-1.jpg',
+      paragraphs: [
+        'A young hunter heard a rustle beside the forest path. Instead of rushing forward, she paused and listened to the birds and the wind.',
+        'Their calls helped her notice a safe path around a fallen tree. She followed it home and shared what she had learned with her family.',
+        'The hunter discovered that careful attention can be just as useful as quick action.'
+      ],
+      lesson: 'What helped the hunter choose a safe path?',
+      answers: [
+        ['She paused and listened carefully.', true],
+        ['She ran without looking.', false],
+        ['She ignored the sounds around her.', false]
+      ]
+    },
+    {
+      id: 'sun-moon',
+      title: 'The Sun and the Moon',
+      description: 'A gentle tale about making room for one another.',
+      image: 'hero-reader.jpg',
+      paragraphs: [
+        'Long ago, Sun and Moon wanted to share the same bright sky. They talked and listened, then decided to take turns.',
+        'Sun would warm the day, and Moon would guide the quiet night. Each found a special time to shine.',
+        'Since then, their different gifts have helped the world find a rhythm.'
+      ],
+      lesson: 'How did Sun and Moon solve their problem?',
+      answers: [
+        ['They listened and agreed to take turns.', true],
+        ['They stopped speaking to each other.', false],
+        ['They both disappeared from the sky.', false]
+      ]
+    },
+    {
+      id: 'talking-drum',
+      title: 'The Talking Drum',
+      description: 'A rhythm brings neighbours together to help a friend.',
+      image: 'page-ere-1.jpg',
+      paragraphs: [
+        'When a neighbour needed help carrying a heavy basket, a child played a familiar rhythm on a small drum.',
+        'People heard the call, came together and carried the basket safely. Everyone added a rhythm to celebrate their teamwork.',
+        'The child learned that a message can travel through music when a community listens.'
+      ],
+      lesson: 'What did the drum rhythm help the neighbours do?',
+      answers: [
+        ['Come together and help carry the basket.', true],
+        ['Hide the basket from everyone.', false],
+        ['Make the basket heavier.', false]
+      ]
+    }
+  ];
+
+  const HERITAGE_RIDDLES = [
+    { id: 'piano', title: 'Riddle 1', group: 'All', emoji: '🎹', question: 'What has keys but can’t open any doors?', answer: 'piano', accept: ['piano', 'a piano', 'keyboard', 'a keyboard'], hint: 'Its black and white keys make music.' },
+    { id: 'tortoise', title: 'Riddle 2', group: 'Animals', emoji: '🐢', question: 'I carry my home on my back and move at my own pace. Who am I?', answer: 'tortoise', accept: ['tortoise', 'a tortoise', 'turtle', 'a turtle'], hint: 'I have a shell and four short legs.' },
+    { id: 'shadow', title: 'Riddle 3', group: 'Nature', emoji: '🌤️', question: 'I follow you in the sunshine, but disappear in the dark. What am I?', answer: 'shadow', accept: ['shadow', 'my shadow', 'a shadow'], hint: 'Look down when the sun is shining.' },
+    { id: 'footsteps', title: 'Riddle 4', group: 'People', emoji: '👣', question: 'The more you take, the more you leave behind. What are they?', answer: 'footsteps', accept: ['footsteps', 'footprints', 'steps'], hint: 'You make them when you walk.' },
+    { id: 'echo', title: 'Riddle 5', group: 'Nature', emoji: '🗣️', question: 'I answer when you call, but I never speak first. What am I?', answer: 'echo', accept: ['echo', 'an echo'], hint: 'You may hear me in a valley.' }
+  ];
+
+  function heritageLink(screen, label, cls = '', extra = {}) {
+    const params = { screen, ...Object.fromEntries(Object.entries(extra).filter(([key]) => !key.startsWith('aria-'))) };
+    const query = Object.entries(params).filter(([, value]) => value).map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`).join('&');
+    const data = Object.entries(params).map(([key, value]) => `data-${key}="${esc(value)}"`).join(' ');
+    const accessibility = Object.entries(extra).filter(([key]) => key.startsWith('aria-')).map(([key, value]) => `${key}="${esc(value)}"`).join(' ');
+    return `<a class="${cls}" href="#/heritage?${query}" data-route="heritage" ${data} ${accessibility}>${label}</a>`;
+  }
+
+  function recordHeritageActivity() {
+    const today = new Date().toISOString().slice(0, 10);
+    if (state.heritage.lastActivityDate === today) return;
+    const yesterday = new Date(`${today}T00:00:00Z`);
+    yesterday.setUTCDate(yesterday.getUTCDate() - 1);
+    state.heritage.streakDays = state.heritage.lastActivityDate === yesterday.toISOString().slice(0, 10)
+      ? state.heritage.streakDays + 1
+      : 1;
+    state.heritage.lastActivityDate = today;
+  }
+
+  async function shareHeritageResult() {
+    const message = 'I solved a riddle in Idilewa Stories, Culture & Riddles!';
+    if (typeof navigator.share === 'function') {
+      try {
+        await navigator.share({ title: 'Idilewa Riddle', text: message, url: window.location.href });
+      } catch (error) {
+        if (error?.name !== 'AbortError') showToast(error instanceof Error ? error.message : 'Your result could not be shared.', 'error');
+      }
+      return;
+    }
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(`${message} ${window.location.href}`);
+        showToast('Riddle result copied to your clipboard.', 'success');
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Your result could not be copied.', 'error');
+      }
+      return;
+    }
+    showToast('Sharing is not available in this browser.', 'error');
+  }
+
+  function renderHeritageExperience(params = {}) {
+    const screens = new Set([
+      'home', 'story-list', 'story-reader', 'story-lesson', 'progress', 'culture-list',
+      'festival', 'culture-quiz', 'culture-progress', 'collection', 'riddle-list',
+      'riddle-challenge', 'riddle-answer', 'riddle-streak', 'profile', 'settings'
+    ]);
+    const screen = screens.has(params.screen) ? params.screen : 'home';
+    const story = HERITAGE_STORIES.find((item) => item.id === params.story) || HERITAGE_STORIES[0];
+    const riddle = HERITAGE_RIDDLES.find((item) => item.id === params.riddle) || HERITAGE_RIDDLES[0];
+    const activeStory = ['story-list', 'story-reader', 'story-lesson', 'progress'].includes(screen);
+    const activeCulture = ['culture-list', 'festival', 'culture-quiz', 'culture-progress', 'collection'].includes(screen);
+    const activeRiddles = ['riddle-list', 'riddle-challenge', 'riddle-answer', 'riddle-streak'].includes(screen);
+    const pageTitle = ({
+      home: 'Stories, culture & riddles',
+      'story-list': 'Choose a Story',
+      'story-reader': 'Read & Listen',
+      'story-lesson': 'Key Lesson',
+      progress: 'Your Progress',
+      'culture-list': 'Explore Culture',
+      festival: 'Festivals',
+      'culture-quiz': 'Culture Quiz',
+      'culture-progress': 'Learning Progress',
+      collection: 'Cultural Collection',
+      'riddle-list': 'Riddles',
+      'riddle-challenge': 'Riddle Challenge',
+      'riddle-answer': 'Correct Answer',
+      'riddle-streak': 'Riddle Streak',
+      profile: 'My Profile',
+      settings: 'Settings'
+    })[screen];
+    const search = `<label class="heritage-search">${icon('search', 16)}<input data-input="heritage-search" type="search" placeholder="Search stories, topics or riddles" aria-label="Search stories, topics or riddles" /></label>`;
+    const storyRows = HERITAGE_STORIES.map((item, index) => heritageLink('story-reader', `<span class="heritage-row-art heritage-art-${index + 1}">${['🐢', '🏹', '☀️', '🥁'][index]}</span><span class="heritage-row-copy"><strong>${esc(item.title)}</strong><small>${esc(item.description)}</small><span class="heritage-meta">Yorùbá · English · 4 min</span></span>${icon('arrow', 15)}`, 'heritage-row heritage-search-item', { story: item.id }));
+    const categoryCards = [
+      { title: 'Yorùbá Folktales', copy: 'Timeless stories, lasting values.', image: 'story-grandmother.jpg', screen: 'story-list', className: 'stories' },
+      { title: 'Our Culture, Our Identity', copy: 'Traditions, festivals and everyday life.', image: 'page-oral-1.jpg', screen: 'culture-list', className: 'culture' },
+      { title: 'Think. Solve. Grow.', copy: 'Play with riddles and grow your thinking.', image: 'code-kids.jpg', screen: 'riddle-list', className: 'riddles' }
+    ];
+    let content = '';
+
+    switch (screen) {
+      case 'home':
+        content = `<section class="heritage-greeting"><span class="heritage-kicker">A little learning every day</span><h1>Hello, Ayo!</h1><p>Stories, culture and joyful challenges, all in one place.</p>${search}</section>${state.heritage.showDailyNudge ? `<div class="heritage-daily-nudge">${icon('sparkles', 15)} Your next idea: listen to a folktale.</div>` : ''}<section class="heritage-featured-story"><div><span class="heritage-kicker">Popular today</span><h2>The Tortoise and the Hare</h2><p>A steady pace can carry you further.</p>${heritageLink('story-reader', `Read the story ${icon('arrow', 14)}`, 'heritage-button heritage-button-light', { story: 'tortoise-hare' })}</div><img src="${imageUrl('story-grandmother.jpg')}" alt="A family sharing a story together" /></section><section class="heritage-category-section"><div class="heritage-section-heading"><div><span class="heritage-kicker">Explore</span><h2>Choose your journey</h2></div>${heritageLink('profile', 'Your profile', 'heritage-text-link')}</div><div class="heritage-category-grid">${categoryCards.map((card, index) => heritageLink(card.screen, `<img src="${imageUrl(card.image)}" alt="" /><span class="heritage-category-icon">${['📚', '🎉', '💡'][index]}</span><span class="heritage-category-copy"><strong>${card.title}</strong><small>${card.copy}</small></span>${icon('arrow', 15)}`, `heritage-category-card heritage-category-${card.className} heritage-search-item`)).join('')}</div></section><section class="heritage-quick-links"><h2>Keep going</h2>${heritageLink('progress', `${icon('chart', 18)}<span><strong>Your progress</strong><small>${state.heritage.storiesRead.length} stories read · ${state.heritage.riddlesSolved.length} riddles solved</small></span>${icon('arrow', 14)}`, 'heritage-quick-link')}${heritageLink('collection', `${icon('layers', 18)}<span><strong>Cultural collection</strong><small>Explore festivals, traditions, food and craft</small></span>${icon('arrow', 14)}`, 'heritage-quick-link')}</section>`;
+        break;
+      case 'story-list':
+        content = `<section class="heritage-page-intro"><span class="heritage-kicker">Yorùbá folktales</span><h1>Choose a Story</h1><p>Read together, listen closely and notice the lesson in each tale.</p>${search}</section><div class="heritage-list">${storyRows.join('')}</div>`;
+        break;
+      case 'story-reader': {
+        const storyRead = state.heritage.storiesRead.includes(story.id);
+        content = `<section class="heritage-reader-art"><img src="${imageUrl(story.image)}" alt="Illustration for ${esc(story.title)}" /><span>Yorùbá · English</span></section><section class="heritage-reading"><span class="heritage-kicker">A story to share · ${HERITAGE_STORIES.indexOf(story) + 1} of ${HERITAGE_STORIES.length}</span><h1>${esc(story.title)}</h1><p class="heritage-reader-subtitle">${esc(story.description)}</p><button class="heritage-audio-button" type="button" data-action="play-audio" data-language="en-US" data-text="${esc(story.paragraphs.join(' '))}">${icon('play', 15)} Listen to the story <span>English</span></button><div class="heritage-story-text">${story.paragraphs.map((paragraph, index) => `<p><span>0${index + 1}</span>${esc(paragraph)}</p>`).join('')}</div><div class="heritage-note">${icon('heart', 16)} This learning story is an original retelling. Folktales have many versions; listen to the voices and context shared by each community.</div><div class="heritage-button-row"><button type="button" class="heritage-button heritage-button-outline" data-action="heritage-mark-read" data-story="${story.id}">${storyRead ? 'Story saved as read' : 'Mark as read'}</button>${heritageLink('story-lesson', `Key lesson ${icon('arrow', 14)}`, 'heritage-button heritage-button-primary', { story: story.id })}</div></section>`;
+        break;
+      }
+      case 'story-lesson': {
+        const result = state.quizResults[`heritage:story:${story.id}`] || '';
+        content = `<section class="heritage-page-intro"><span class="heritage-kicker">Think about the story</span><h1>What You Learned</h1><p>${esc(story.lesson)}</p></section><form class="heritage-quiz-card" data-form="heritage-story-quiz" data-story="${story.id}"><fieldset><legend>${esc(story.lesson)}</legend>${story.answers.map(([answer, correct], index) => `<label class="heritage-answer-option"><input type="radio" name="answer" value="${correct ? 'correct' : `option-${index}`}" ${result === 'correct' && correct ? 'checked' : ''} required /><span>${esc(answer)}</span></label>`).join('')}</fieldset>${result === 'retry' ? '<p class="heritage-feedback is-retry" role="status">Not quite. Think about what the characters did.</p>' : ''}${result === 'correct' ? `<p class="heritage-feedback is-correct" role="status">${icon('check', 16)} Lovely thinking! Your progress has been saved.</p>${heritageLink('progress', `See your progress ${icon('arrow', 14)}`, 'heritage-button heritage-button-primary')}` : '<button type="submit" class="heritage-button heritage-button-primary">Check my answer</button>'}</form>`;
+        break;
+      }
+      case 'progress':
+        content = `<section class="heritage-page-intro"><span class="heritage-kicker">Your learning journey</span><h1>Your Progress</h1><p>Every story and thoughtful answer adds to your journey.</p></section><div class="heritage-stats-grid"><article><strong>${state.heritage.storiesRead.length}</strong><span>Stories read</span></article><article><strong>${state.heritage.riddlesSolved.length}</strong><span>Riddles solved</span></article><article><strong>${state.heritage.streakDays}</strong><span>Day streak</span></article></div><section class="heritage-progress-card"><div class="heritage-progress-ring"><strong>${Math.min(5, state.heritage.storiesRead.length + state.heritage.riddlesSolved.length + Number(state.heritage.cultureQuizDone))}/5</strong><span>steps</span></div><div><h2>Learning grows one step at a time</h2><p>Read a folktale, try a riddle or explore a cultural tradition.</p></div></section><div class="heritage-button-row">${heritageLink('story-list', 'Read a story', 'heritage-button heritage-button-primary')}${heritageLink('culture-list', 'Explore culture', 'heritage-button heritage-button-outline')}</div>`;
+        break;
+      case 'culture-list':
+      case 'collection': {
+        const categories = [
+          ['Festivals', 'Gatherings, celebration and community.', '🎉'],
+          ['Traditions', 'Stories and practices shared across generations.', '🧵'],
+          ['Food & Hospitality', 'The flavours and welcomes we share.', '🍲'],
+          ['Arts & Crafts', 'Creative expression in everyday life.', '🎨']
+        ];
+        content = `<section class="heritage-page-intro"><span class="heritage-kicker">Culture keeps us connected</span><h1>${screen === 'collection' ? 'Cultural Collection' : 'Explore Culture'}</h1><p>Discover traditions with curiosity, context and care.</p></section><div class="heritage-list">${categories.map(([title, copy, emoji]) => heritageLink(title === 'Festivals' ? 'festival' : 'collection', `<span class="heritage-category-emoji">${emoji}</span><span class="heritage-row-copy"><strong>${title}</strong><small>${copy}</small></span>${icon('arrow', 15)}`, 'heritage-row')).join('')}</div><section class="heritage-culture-feature"><img src="${imageUrl('page-oral-1.jpg')}" alt="An elder sharing a story with children" /><div><span class="heritage-kicker">Featured learning</span><h2>The New Yam Festival</h2><p>A celebration of gratitude, community and a new harvest.</p>${heritageLink('festival', `Explore the festival ${icon('arrow', 14)}`, 'heritage-button heritage-button-primary')}</div></section>${heritageLink('culture-progress', 'View learning progress ' + icon('arrow', 14), 'heritage-text-link')}`;
+        break;
+      }
+      case 'festival':
+        content = `<section class="heritage-festival-art"><img src="${imageUrl('page-oral-1.jpg')}" alt="A family listening to a cultural story" /><span class="heritage-kicker">Festivals · Community</span></section><section class="heritage-reading"><span class="heritage-kicker">A cultural learning note</span><h1>The New Yam Festival</h1><p class="heritage-reader-subtitle">A time for gratitude, gathering and sharing.</p><button class="heritage-audio-button" type="button" data-action="play-audio" data-language="en-US" data-text="Across some Igbo communities, the New Yam Festival marks a new harvest. Families and neighbours gather, give thanks and share food. Practices and meanings vary by place and community."><span>${icon('play', 15)} Listen to this note</span></button><p class="heritage-culture-copy">Across some Igbo communities, the New Yam Festival marks a new harvest. Families and neighbours gather, give thanks and share food. Practices and meanings vary by place and community.</p><div class="heritage-note">${icon('people', 16)} This is a brief introduction, not a complete account. Learn from community voices and local context.</div>${heritageLink('culture-quiz', `Try a quick quiz ${icon('arrow', 14)}`, 'heritage-button heritage-button-primary')}</section>`;
+        break;
+      case 'culture-quiz': {
+        const result = state.quizResults['heritage:culture'] || '';
+        content = `<section class="heritage-page-intro"><span class="heritage-kicker">Festival reflection</span><h1>Quick Quiz</h1><p>What is one reason people gather for a New Yam Festival?</p></section><form class="heritage-quiz-card" data-form="heritage-culture-quiz"><fieldset><legend>Choose the best answer</legend>${[['To give thanks and share a new harvest', true], ['To compete for a new school', false], ['To travel to a different country', false]].map(([answer, correct], index) => `<label class="heritage-answer-option"><input type="radio" name="answer" value="${correct ? 'correct' : `option-${index}`}" required /><span>${answer}</span></label>`).join('')}</fieldset>${result === 'retry' ? '<p class="heritage-feedback is-retry" role="status">Try again. Think about harvest and community.</p>' : ''}${result === 'correct' ? `<p class="heritage-feedback is-correct" role="status">${icon('check', 16)} That’s right. You completed this culture check-in.</p>${heritageLink('culture-progress', `Learning progress ${icon('arrow', 14)}`, 'heritage-button heritage-button-primary')}` : '<button type="submit" class="heritage-button heritage-button-primary">Check my answer</button>'}</form>`;
+        break;
+      }
+      case 'culture-progress':
+        content = `<section class="heritage-page-intro"><span class="heritage-kicker">Keep exploring</span><h1>Learning Progress</h1><p>Your cultural learning grows through questions, listening and reflection.</p></section><section class="heritage-progress-card"><div class="heritage-progress-ring"><strong>${state.heritage.cultureQuizDone ? '1/1' : '0/1'}</strong><span>quiz</span></div><div><h2>${state.heritage.cultureQuizDone ? 'Culture check-in complete' : 'One small step'}</h2><p>Festivals · Traditions · Food & hospitality · Arts & crafts</p></div></section><ul class="heritage-checklist">${['Festivals', 'Traditions', 'Food & Hospitality', 'Arts & Crafts'].map((topic, index) => `<li>${icon(index === 0 && state.heritage.cultureQuizDone ? 'check' : 'circle', 16)}<span>${topic}</span>${index === 0 && state.heritage.cultureQuizDone ? 'Complete' : 'Explore'}</li>`).join('')}</ul>${heritageLink('collection', 'Explore the collection ' + icon('arrow', 14), 'heritage-button heritage-button-primary')}`;
+        break;
+      case 'riddle-list': {
+        const groups = ['All', 'Animals', 'Nature', 'People'];
+        const selectedGroup = groups.includes(params.category) ? params.category : 'All';
+        const visibleRiddles = HERITAGE_RIDDLES.filter((item) => selectedGroup === 'All' || item.group === selectedGroup);
+        content = `<section class="heritage-page-intro"><span class="heritage-kicker">Think. Solve. Grow.</span><h1>Riddles</h1><p>A little brain teaser is a fun way to practise careful thinking.</p></section><div class="heritage-filter-row">${groups.map((group) => heritageLink('riddle-list', group, `heritage-filter ${selectedGroup === group ? 'is-active' : ''}`, { category: group })).join('')}</div><div class="heritage-list">${visibleRiddles.map((item) => heritageLink('riddle-challenge', `<span class="heritage-row-art">${item.emoji}</span><span class="heritage-row-copy"><strong>${item.title}</strong><small>${esc(item.question)}</small><span class="heritage-meta">${state.heritage.riddlesSolved.includes(item.id) ? 'Solved · ' : ''}Tap to try a hint</span></span>${icon('arrow', 15)}`, 'heritage-row', { riddle: item.id })).join('')}</div>`;
+        break;
+      }
+      case 'riddle-challenge': {
+        const result = state.quizResults[`heritage:riddle:${riddle.id}`] || '';
+        content = `<section class="heritage-page-intro"><span class="heritage-kicker">${riddle.title} · Yorùbá riddles</span><h1>Riddle Challenge</h1></section><section class="heritage-riddle-card"><div class="heritage-riddle-illustration" aria-hidden="true">${riddle.emoji}</div><h2>${esc(riddle.question)}</h2><form data-form="heritage-riddle" data-riddle="${riddle.id}"><label class="heritage-answer-input"><span class="sr-only">Your answer</span><input id="heritage-riddle-answer" name="answer" type="text" maxlength="60" placeholder="Type your answer…" autocomplete="off" required /></label><button type="submit" class="heritage-button heritage-button-primary">Submit answer</button></form>${result === 'retry' ? '<p class="heritage-feedback is-retry" role="status">Not quite—try another answer.</p>' : ''}<details class="heritage-hint"><summary>💡 Hint</summary><p>${esc(riddle.hint)}</p></details></section>`;
+        break;
+      }
+      case 'riddle-answer':
+        content = `<section class="heritage-answer-win"><span class="heritage-confetti" aria-hidden="true">✦　✧　✦</span><div class="heritage-riddle-illustration">${riddle.emoji}</div><span class="heritage-kicker">Correct answer</span><h1>${riddle.answer === 'piano' ? 'A Piano!' : `A ${riddle.answer.charAt(0).toUpperCase()}${riddle.answer.slice(1)}!`}</h1><p>${esc(riddle.hint)}</p><div class="heritage-stats-grid"><article><strong>${state.heritage.riddlesSolved.length}</strong><span>Riddles solved</span></article><article><strong>${state.heritage.streakDays}</strong><span>Day streak</span></article></div>${heritageLink('riddle-streak', `See my streak ${icon('arrow', 14)}`, 'heritage-button heritage-button-primary')}${heritageLink('riddle-list', 'More riddles', 'heritage-button heritage-button-outline')}<button type="button" class="heritage-button heritage-button-outline" data-action="heritage-share">${icon('send', 14)} Share</button></section>`;
+        break;
+      case 'riddle-streak':
+        content = `<section class="heritage-streak-card"><div class="heritage-flame">🔥</div><span class="heritage-kicker">Keep the curiosity going</span><h1>${state.heritage.streakDays} Day${state.heritage.streakDays === 1 ? '' : 's'}!</h1><p>Your thinking streak is ready for its next challenge.</p><div class="heritage-streak-stats"><span><strong>${state.heritage.riddlesSolved.length}</strong> Riddles solved</span><span><strong>${state.heritage.streakDays}</strong> Day streak</span></div></section><section class="heritage-quote-card"><span>“Wisdom grows with every riddle.”</span><small>Keep asking, listening and learning.</small></section><div class="heritage-button-row">${heritageLink('riddle-list', 'Next riddle', 'heritage-button heritage-button-primary')}${heritageLink('profile', 'My profile', 'heritage-button heritage-button-outline')}</div>`;
+        break;
+      case 'profile': {
+        const profileName = getCurrentUser()?.name || 'Ayo';
+        content = `<section class="heritage-profile-head"><div class="heritage-avatar">${esc(profileName.trim().charAt(0).toUpperCase())}</div><div><span class="heritage-kicker">Curious learner</span><h1>${esc(profileName)}</h1><span class="heritage-badge">${icon('star', 13)} Folktale Explorer</span></div></section><div class="heritage-stats-grid"><article><strong>${state.heritage.storiesRead.length}</strong><span>Stories read</span></article><article><strong>${state.heritage.riddlesSolved.length}</strong><span>Riddles solved</span></article><article><strong>${state.heritage.streakDays}</strong><span>Day streak</span></article></div><section class="heritage-profile-menu">${heritageLink('progress', `${icon('star', 17)}<span>My achievements</span>${icon('arrow', 14)}`, 'heritage-quick-link')}${heritageLink('collection', `${icon('layers', 17)}<span>Cultural collection</span>${icon('arrow', 14)}`, 'heritage-quick-link')}${heritageLink('settings', `${icon('settings', 17)}<span>Settings</span>${icon('arrow', 14)}`, 'heritage-quick-link')}${routeLink('contact', `${icon('send', 17)}<span>Help & support</span>${icon('arrow', 14)}`, 'heritage-quick-link')}${routeLink('index', `${icon('home', 17)}<span>Idilewa home</span>${icon('arrow', 14)}`, 'heritage-quick-link')}</section>`;
+        break;
+      }
+      case 'settings':
+        content = `<section class="heritage-page-intro"><span class="heritage-kicker">Make learning yours</span><h1>Settings</h1><p>These preferences are saved on this device.</p></section><section class="heritage-settings-list"><label><span><strong>Daily learning nudge</strong><small>Show a friendly suggestion on your home screen.</small></span><input type="checkbox" data-action="heritage-toggle-setting" data-setting="showDailyNudge" ${state.heritage.showDailyNudge ? 'checked' : ''} aria-label="Show daily learning nudge" /></label><p>Audio uses your device’s available speech support. Motion effects respect your device preference.</p></section>${heritageLink('profile', 'Back to profile', 'heritage-button heritage-button-primary')}`;
+        break;
+      default:
+        content = '';
+    }
+
+    const navItems = [
+      ['home', 'Home', 'home', screen === 'home'],
+      ['story-list', 'Stories', 'book', activeStory],
+      ['culture-list', 'Culture', 'globe', activeCulture],
+      ['riddle-list', 'Riddles', 'sparkles', activeRiddles],
+      ['profile', 'Profile', 'user', screen === 'profile' || screen === 'settings']
+    ];
+    const nav = navItems.map(([route, label, glyph, active]) => heritageLink(route, `${icon(glyph, 18)}<span>${label}</span>`, `heritage-tab ${active ? 'is-active' : ''}`)).join('');
+    return `<div class="heritage-app"><div class="heritage-device"><header class="heritage-topbar">${heritageLink('home', `<span class="heritage-brand-mark">${brandLogo('Idilewa')}</span><span class="heritage-brand-copy"><strong>IDILEWA</strong><small>Language · Culture · Stories</small></span>`, 'heritage-brand')}<div class="heritage-topbar-actions">${heritageLink('progress', icon('trophy', 17), 'heritage-icon-button', { 'aria-label': 'Your progress' })}${heritageLink('profile', '<span class="heritage-avatar-small">A</span>', 'heritage-avatar-link', { 'aria-label': 'Open profile' })}</div></header>${screen !== 'home' ? `<div class="heritage-screen-title">${heritageLink('home', icon('arrow', 18), 'heritage-back', { 'aria-label': 'Back to home' })}<h2>${pageTitle}</h2><span class="heritage-status-mark">●</span></div>` : ''}<main class="heritage-screen ${screen === 'home' ? 'is-home' : ''}" aria-label="${pageTitle}">${content}</main><nav class="heritage-bottom-nav" aria-label="Heritage navigation">${nav}</nav></div><aside class="heritage-desktop-aside"><span class="heritage-kicker">Idilewa · Learn, explore, grow</span><h2>Carry a story.<br />Discover a tradition.<br /><em>Share what you learn.</em></h2><p>Choose a path and move between folktales, culture and playful challenges whenever you like.</p>${heritageLink('story-list', `Explore folktales ${icon('arrow', 14)}`, 'heritage-button heritage-button-primary')}${heritageLink('culture-list', `Discover culture ${icon('arrow', 14)}`, 'heritage-button heritage-button-outline')}</aside></div>`;
+  }
+
   function renderLegacyStoryGame() {
     const result = state.quizResults['story:comprehension'] || '';
     return `<div class="container route-page story-game-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span>${routeLink('ere', 'Stories')}<span>/</span><strong>Story time</strong></div><section class="story-game-layout"><div class="story-game-image"><img src="./assets/story-grandmother.jpg" alt="A grandmother sharing a story with two children" /><span class="story-audio-pill">${icon('volume', 15)} Read aloud together</span></div><div class="story-reading"><span class="section-kicker">A story for the whole family · 4 min</span><h1>The story that<br /><em>travelled.</em></h1><p class="story-subhead">A gentle listening story about how a tale can move from one person to another.</p><button class="listen-inline" data-action="play-audio" data-text="A story travels when someone listens, remembers and shares it with care.">${icon('play', 14)} Listen to this story <span>01:24</span></button><div class="story-text"><p>One evening, a grandmother began a story in the garden. The children leaned closer as the first words settled into the quiet.</p><p>When the story ended, one child asked to hear it again. The next time, they listened for a detail they had missed—and carried that detail into their own retelling.</p><p>By morning, the story had travelled. It was still familiar, and it had room for a new voice.</p></div><div class="story-credit-note">${icon('heart', 16)} Stories belong to the people and communities who share them. Listen with care, and ask before retelling.</div>\n    </section>${renderStepper(['Choose a story', 'Read', 'Listen', 'Reflect'], 3)}<section class="story-quiz"><div><span class="section-kicker">A little reflection</span><h2>What helped the story travel?</h2><p>Choose the idea that best fits what you heard.</p></div><div class="story-answer-list">${[['Someone listened and shared it with care.', true], ['The story was written down by a stranger.', false], ['The children forgot the details.', false]].map(([label, correct], i) => `<button class="story-answer ${result === 'correct' && correct ? 'answer-correct' : ''}" data-action="story-answer" data-key="comprehension" data-correct="${correct}" ${result === 'correct' ? 'disabled' : ''}><span>${String.fromCharCode(65 + i)}</span>${label}${result === 'correct' && correct ? icon('check', 17) : icon('arrow', 15)}</button>`).join('')}</div>${result ? `<div class="answer-feedback ${result === 'correct' ? 'feedback-correct' : 'feedback-retry'}">${icon(result === 'correct' ? 'check' : 'refresh', 16)} ${result === 'correct' ? 'Lovely listening. Stories grow when people share them with care.' : 'Think about what the children did after hearing the story.'}</div>` : ''}</section><div class="story-related">${routeLink('oral', 'Explore oral traditions ' + icon('arrow', 14), 'text-link')}${routeLink('ere', 'Back to stories ' + icon('arrow', 14), 'text-link')}${aiHelperButton('story')}</div></div>`;
@@ -7161,6 +7426,7 @@ import {
       case 'coding-studio': return renderCodingStudio();
       case 'ere': return renderStories();
       case 'ere_game': return renderStoryGame(params);
+      case 'heritage': return renderHeritageExperience(params);
       case 'oral': return renderOral();
       case 'oral_genre': return renderOralGenre();
       case 'oriki': return renderOriki();
@@ -7737,12 +8003,14 @@ import {
       ? 'Preserving African culture. Promoting technology.'
       : gradeTitle
         ? `${gradeTitle} voice lessons`
-        : (PAGE_META[page]?.eyebrow || LABELS[page] || 'Explore Idilewa');
+        : page === 'heritage'
+          ? 'Heritage Stories & Learning'
+          : (PAGE_META[page]?.eyebrow || LABELS[page] || 'Explore Idilewa');
     document.title = `${title} · Idilewa`;
     const pageMarkup = assignUniqueRouteImages(page, renderPage(page, params))
       .replace(/(?:African )?Voice (?:African Language )?Trainer/gi, 'Voice Lessons')
       .replace(/Voice Studio/gi, 'Voice Lessons');
-    if (page.startsWith('ai-') || page.startsWith('tutor')) {
+    if (page === 'heritage' || page.startsWith('ai-') || page.startsWith('tutor')) {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = pageMarkup;
     } else if (page === 'coding' || page === 'coding-studio') {
@@ -8038,6 +8306,24 @@ import {
   function handleAction(action, el) {
     const lang = el.dataset.lang;
     switch (action) {
+      case 'heritage-share':
+        void shareHeritageResult();
+        break;
+      case 'heritage-toggle-setting':
+        if (el.dataset.setting !== 'showDailyNudge') break;
+        state.heritage.showDailyNudge = el.checked;
+        saveState();
+        render();
+        break;
+      case 'heritage-mark-read': {
+        const storyId = el.dataset.story;
+        if (!HERITAGE_STORIES.some((story) => story.id === storyId)) break;
+        if (!state.heritage.storiesRead.includes(storyId)) state.heritage.storiesRead.push(storyId);
+        recordHeritageActivity();
+        saveState();
+        render();
+        break;
+      }
       case 'tutor-toggle-password': {
         const input = document.getElementById(el.dataset.target || '');
         if (!input) break;
@@ -9155,7 +9441,7 @@ import {
       if (modalRoot) modalRoot.innerHTML = '';
       const route = routeEl.dataset.route;
       const params = {};
-      ['lang', 'level', 'module', 'lesson', 'grade', 'mode', 'section', 'story', 'next'].forEach((key) => { if (routeEl.dataset[key]) params[key] = routeEl.dataset[key]; });
+      ['lang', 'level', 'module', 'lesson', 'grade', 'mode', 'section', 'story', 'screen', 'riddle', 'category', 'next'].forEach((key) => { if (routeEl.dataset[key]) params[key] = routeEl.dataset[key]; });
       if (route.startsWith('voice-')) {
         if (['yoruba', 'igbo', 'hausa', 'swahili', 'zulu', 'twi'].includes(params.lang)) state.trainer.lang = params.lang;
         if (['beginner', 'intermediate', 'advanced'].includes(params.level)) {
@@ -9298,6 +9584,13 @@ import {
 
   document.addEventListener('input', (event) => {
     const target = event.target;
+    if (target.matches('[data-input="heritage-search"]')) {
+      const query = target.value.trim().toLocaleLowerCase();
+      document.querySelectorAll('.heritage-search-item').forEach((item) => {
+        item.hidden = !item.textContent.toLocaleLowerCase().includes(query);
+      });
+      return;
+    }
     if (target.matches('[data-input="code-message"]')) {
       state.coding.codeMessage = target.value.slice(0, 120);
       const speechBubble = document.querySelector('.code-result-speech');
@@ -9409,6 +9702,40 @@ import {
     if (!type) return;
     event.preventDefault();
     const data = new FormData(form);
+    if (type === 'heritage-riddle') {
+      if (!form.reportValidity()) return;
+      const riddle = HERITAGE_RIDDLES.find((item) => item.id === form.dataset.riddle);
+      const answer = String(data.get('answer') || '').normalize('NFD').replace(/\p{Diacritic}/gu, '').toLocaleLowerCase().replace(/[^a-z0-9 ]/g, ' ').trim().replace(/\s+/g, ' ');
+      if (!riddle) {
+        showToast('This riddle is not available. Choose another one.', 'error');
+        return;
+      }
+      const accepted = riddle.accept.some((item) => answer === item);
+      state.quizResults[`heritage:riddle:${riddle.id}`] = accepted ? 'correct' : 'retry';
+      if (accepted) {
+        if (!state.heritage.riddlesSolved.includes(riddle.id)) state.heritage.riddlesSolved.push(riddle.id);
+        recordHeritageActivity();
+      }
+      saveState();
+      if (accepted) navigate('heritage', { screen: 'riddle-answer', riddle: riddle.id });
+      else render();
+      return;
+    }
+    if (type === 'heritage-story-quiz' || type === 'heritage-culture-quiz') {
+      if (!form.reportValidity()) return;
+      const correct = data.get('answer') === 'correct';
+      const key = type === 'heritage-story-quiz'
+        ? `heritage:story:${form.dataset.story}`
+        : 'heritage:culture';
+      state.quizResults[key] = correct ? 'correct' : 'retry';
+      if (correct) {
+        recordHeritageActivity();
+        if (type === 'heritage-culture-quiz') state.heritage.cultureQuizDone = true;
+      }
+      saveState();
+      render();
+      return;
+    }
     if (type === 'tutor-login' || type === 'tutor-signup') {
       if (!form.reportValidity()) return;
       const errorElement = form.querySelector('.tutor-auth-error');

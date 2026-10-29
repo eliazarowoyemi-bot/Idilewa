@@ -158,6 +158,7 @@ All 37 HTML entries declared in the active `vite.config.js` are supported:
 | | `#/voices` (`voices.html`) | Sample greeting library for Yorùbá, Igbo, Hausa, and Swahili with Plotweaver speech audio where supported. |
 | **Culture & Stories** | `#/ere` (`ere.html`) | Living story shelf featuring shared family tales and save controls. |
 | | `#/ere_game` (`ere_game.html`) | “The story that travelled” interactive reading and comprehension reflection. |
+| | `#/heritage` (hash route) | Responsive Stories, Culture & Riddles experience with story listening, lesson quizzes, festival learning, riddles, saved progress, streaks, and profile screens. |
 | | `#/oral` (`oral.html`) | Oral traditions gateway (Oríkì, Òwe, spoken word, and song). |
 | | `#/oral_genre` (`oral_genre.html`) | Guided genre index linking attribution, speaker context, and consent. |
 | | `#/oriki` (`oriki.html`) | Yorùbá praise poetry & remembrance, exploring rhythm, speaker, and permission. |
