@@ -24,26 +24,18 @@ The visual identity is warm, calm, editorial, and rooted in nature. It strictly 
 
 | Token Name | Hex Code | Role & Usage |
 | :--- | :--- | :--- |
-| **Ink** | `#18231d` | Primary headings, prominent copy, high-contrast marks |
-| **Soft Ink** | `#334139` | Secondary text, subheadings, labels |
-| **Muted Text** | `#6b776f` | Body descriptions, helper text |
-| **Low-Emphasis Text** | `#89938c` | Metadata, timestamps, captions |
-| **Primary Green** | `#15764a` | Primary brand color, key buttons, links |
-| **Dark Green** | `#0c5737` | Hover states, brand wordmark, contrast focus |
-| **Bright Green** | `#17864e` | Action badges, energy accents |
-| **Border Line** | `#e7ebe5` | Subtle separators, card outlines |
-| **Main Paper** | `#fffefa` | Primary application canvas |
-| **Warm Cream** | `#faf9f2` | Alternate canvas, section containers |
-| **Mint** | `#eaf6ec` | Language and foundational learning surfaces |
-| **Blue** | `#e7f5fb` | Voice and audio accent surfaces |
-| **Yellow** | `#fff5d9` | Tone highlights, code and attention tags |
-| **Peach** | `#fff0e8` | Story, proverbs, and oral tradition surfaces |
-| **Pink** | `#fff0f2` | Secondary soft highlights and cultural tags |
-| **Lilac** | `#f2effb` | Categorical badge highlights |
+| **Deep Forest Green** | `#0E4D34` | Main headings, major containers, navigation, and high-contrast actions |
+| **Vibrant Leaf Green** | `#029A5B` | Brand accent for links, icons, active states, and action highlights |
+| **Mint Tint** | `#E8F6F0` | Soft category cards and spacing surfaces |
+| **Warm Ochre Gold** | `#EAA822` | Cultural highlights and interactive accents |
+| **Terracotta Red** | `#D34836` | Cultural badges and warm secondary accents |
+| **Off-White** | `#F9FBF9` | Shared page canvas and browser theme color |
+| **Charcoal / Dark Olive** | `#2C3E35` | Body text and secondary copy |
 
 - **Typography:** Inter-first sans-serif stack (`Inter, system-ui, -apple-system, sans-serif`).
 - **Layout:** Maximum container width around `1200px`, soft green-tinted shadows, `22px` / `30px` rounded cards and buttons.
 - **Header:** Light translucent sticky navigation with active link indicators and instant search overlay.
+- **Responsive layouts:** Shared and standalone pages adapt to phone, tablet, and desktop widths without horizontal page overflow.
 
 ---
 

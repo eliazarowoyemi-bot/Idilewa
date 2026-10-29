@@ -138,33 +138,27 @@ The shared CSS tokens are defined near the top of `styles.css`. The visual direc
 
 | Token | Hex | Intended role |
 |---|---|---|
-| `--ink` | `#18231d` | Main headings and high-emphasis text. |
-| `--ink-soft` | `#334139` | Secondary dark text and controls. |
-| `--muted` | `#6b776f` | Supporting copy and descriptions. |
-| `--muted-2` | `#89938c` | Lower-emphasis labels and helper text. |
-| `--green` | `#15764a` | Primary brand accent, links, active states, and primary actions. |
-| `--green-dark` | `#0c5737` | Stronger green for hover, brand wordmark, and contrast emphasis. |
-| `--green-bright` | `#17864e` | Brighter green variant for energetic/action accents. |
-| `--line` | `#e7ebe5` | Fine borders and separators. |
-| `--paper` | `#fffefa` | Main page canvas and light surfaces. |
-| `--cream` | `#faf9f2` | Warm alternate canvas and section tone. |
-| `--mint` | `#eaf6ec` | Positive, learning, and language-related pastel surfaces. |
-| `--blue` | `#e7f5fb` | Cool supporting surface, often used for listening/learning distinctions. |
-| `--yellow` | `#fff5d9` | Warm highlight, voice/tone, and attention accent. |
-| `--peach` | `#fff0e8` | Story and culture accent surface. |
-| `--pink` | `#fff0f2` | Secondary soft highlight. |
-| `--lilac` | `#f2effb` | Occasional category accent, not the primary brand color. |
+| `--ink` | `#2C3E35` | Charcoal/dark-olive body text and supporting copy. |
+| `--green-dark` | `#0E4D34` | Deep-forest headings, major containers, navigation, and high-contrast actions. |
+| `--green` / `--green-bright` | `#029A5B` | Vibrant-leaf links, icons, active states, and action highlights. |
+| `--mint` / `--blue` / `--lilac` | `#E8F6F0` | Shared mint tint for category cards and clean surfaces. |
+| `--ochre` | `#EAA822` | Warm cultural highlights and interactive accents. |
+| `--terracotta` | `#D34836` | Cultural badges and warm secondary accents. |
+| `--paper` / `--cream` | `#F9FBF9` | Shared off-white canvas and section surfaces. |
+| `--muted` | `#58675F` | Supporting copy and descriptions. |
+| `--line` | `#DDE9E2` | Fine borders and separators. |
 
 Other recurring design choices:
 
-- Green is the most consistent identity color; page sections and content cards use the pastel tokens as secondary differentiation.
+- Deep forest and vibrant leaf greens establish a shared identity across the core site, AI Conversations, family/tutor portals, coding, and heritage experiences.
+- White text on primary action buttons uses the deep-forest shade for legible contrast; vibrant leaf green remains the supporting interactive accent.
 - The CSS defines soft green-tinted shadows, a 1200px content width, 22px and 30px radius tokens, and shared button, card, pill, section, and navigation styles.
 - A light translucent sticky header, breadcrumbs, clear active navigation, compact uppercase section labels, rounded buttons, stepper flows, and repeated card patterns establish a common interaction language.
 - Page backgrounds occasionally use gentle radial/linear effects and illustrations/photography; the core visual system remains light and green rather than dark mode.
 - The font stack begins with Inter and falls back to system sans-serif families; no web-font package is declared in `package.json`.
 - Responsive breakpoints and a mobile quick-navigation mount exist in the shared layout/CSS. Pages share the same base shell and design tokens.
 
-The HTML shells use `#fbfcf8` as their theme-color metadata. This is close to, but not identical with, the stylesheet's main `--paper` value `#fffefa`.
+HTML shells use the shared off-white `#F9FBF9` as their browser theme color to match the stylesheet canvas.
 
 ## 6. Interaction and Feature Inventory
 

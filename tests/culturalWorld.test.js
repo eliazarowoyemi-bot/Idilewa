@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
-import { readFile } from 'node:fs/promises';
+import { readFile, readdir } from 'node:fs/promises';
 import test from 'node:test';
 import { CULTURAL_BIOMES } from '../src/culturalWorld.js';
 
@@ -96,11 +96,34 @@ test('the map provides accessible non-WebGL navigation and reduced-motion suppor
   assert.match(stylesSource, /backdrop-filter: blur\(24px\)/);
 });
 
-test('the existing Idilewa green palette is preserved', () => {
-  assert.match(stylesSource, /--green: #15764a;/);
-  assert.match(stylesSource, /--green-dark: #0c5737;/);
-  assert.match(stylesSource, /--paper: #fffefa;/);
+test('the Idilewa brand palette is consistent across core and standalone experiences', () => {
+  assert.match(stylesSource, /--green: #029A5B;/);
+  assert.match(stylesSource, /--green-dark: #0E4D34;/);
+  assert.match(stylesSource, /--mint: #E8F6F0;/);
+  assert.match(stylesSource, /--ochre: #EAA822;/);
+  assert.match(stylesSource, /--terracotta: #D34836;/);
+  assert.match(stylesSource, /--paper: #F9FBF9;/);
+  assert.match(stylesSource, /--ink: #2C3E35;/);
+  assert.match(stylesSource, /--ai-green: #029A5B;/);
+  assert.match(stylesSource, /--family-green: #029A5B;/);
+  assert.match(stylesSource, /--tutor-green: #029A5B;/);
+  assert.match(stylesSource, /--heritage-green: #029A5B;/);
+  assert.match(stylesSource, /\.button-primary \{ background: var\(--green-dark\); color: #fff;/);
+  assert.match(stylesSource, /h1, h2, h3 \{ color: var\(--green-dark\);/);
+  assert.match(stylesSource, /@media \(min-width: 801px\) and \(max-width: 900px\)[\s\S]*?\.desktop-nav \{ display: none; \}[\s\S]*?\.menu-toggle \{ display: inline-flex; \}/);
+  assert.match(stylesSource, /@media \(max-width: 800px\)[\s\S]*?\.container, \.route-page, \.main-content, #main \{ min-width: 0; \}/);
+  assert.match(stylesSource, /@media \(max-width: 520px\)[\s\S]*?\.code-studio-editor-head \{ flex-wrap: wrap; \}/);
   assert.doesNotMatch(stylesSource, /--green: #a9543e|--clay:|--royal-indigo:|--sahara-gold:|--savannah-green:/);
+});
+
+test('all HTML entry pages use the shared off-white browser theme color', async () => {
+  const htmlPages = (await readdir(new URL('../', import.meta.url))).filter((filename) => filename.endsWith('.html'));
+  assert.ok(htmlPages.length > 0);
+
+  for (const filename of htmlPages) {
+    const source = await readFile(new URL(`../${filename}`, import.meta.url), 'utf8');
+    assert.match(source, /<meta name="theme-color" content="#F9FBF9"\s*\/>/, `${filename} should use the brand off-white`);
+  }
 });
 
 test('lesson and route images use the site-root assets path', () => {
