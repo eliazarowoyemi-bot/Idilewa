@@ -20,6 +20,15 @@ test('AI Conversations registers every supplied interface as a navigable Idilewa
   assert.match(appSource, /data-route="ai-voice"/);
 });
 
+test('AI Conversations starts a guest directly in practice without requiring account creation', () => {
+  const landingSource = appSource.slice(appSource.indexOf('function renderAiLanding()'), appSource.indexOf('function renderAiAuth('));
+  assert.match(landingSource, /href="#\/ai-everyday\?lang=\$\{getAiConversationLanguage\(\)\.id\}" data-route="ai-everyday"/);
+  assert.match(landingSource, /No account needed · start practising right away/);
+  assert.match(landingSource, /Optional sign in/);
+  assert.doesNotMatch(landingSource, /Create account|data-route="ai-signup"/);
+  assert.match(appSource, /<form class="ai-message-form" data-form="ai-conversation">/);
+});
+
 test('conversation practice, local history, account forms and voice tools are wired', () => {
   assert.match(appSource, /data-form="ai-conversation"/);
   assert.match(appSource, /data-action="ai-delete-conversation"/);
@@ -28,7 +37,7 @@ test('conversation practice, local history, account forms and voice tools are wi
   assert.match(appSource, /transcribeWithPlotweaver\(recording/);
   assert.match(appSource, /data-form="login"/);
   assert.match(appSource, /data-form="profile-settings"/);
-  assert.match(appSource, /Guided practice preview · sample replies are offline, not live AI/);
+  assert.match(appSource, /No account needed · start practising right away/);
   assert.match(appSource, /The chat preview does not contact a live AI service/);
 });
 

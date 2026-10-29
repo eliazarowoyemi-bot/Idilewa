@@ -5961,13 +5961,13 @@ import {
   function renderAiLanding() {
     const languagePills = AI_CONVERSATION_LANGUAGES.map((language) => `<span class="ai-language-pill"><span aria-hidden="true">${language.flag}</span>${language.name}</span>`).join('');
     return `<div class="ai-landing">
-      <header class="ai-landing-header">${renderAiBrand()}<nav aria-label="AI Conversations navigation"><button type="button" data-action="ai-scroll" data-target="ai-how-it-works">How it works</button><button type="button" data-action="ai-scroll" data-target="ai-languages">Languages</button><a href="#/ai-login?next=ai-dashboard" data-route="ai-login" data-next="ai-dashboard">Log in</a><a class="ai-button ai-button-green ai-button-small" href="#/ai-signup?next=ai-dashboard" data-route="ai-signup" data-next="ai-dashboard">Create account</a></nav></header>
+      <header class="ai-landing-header">${renderAiBrand()}<nav aria-label="AI Conversations navigation"><button type="button" data-action="ai-scroll" data-target="ai-how-it-works">How it works</button><button type="button" data-action="ai-scroll" data-target="ai-languages">Languages</button><a href="#/ai-login?next=ai-dashboard" data-route="ai-login" data-next="ai-dashboard">Optional sign in</a></nav></header>
       <main class="ai-landing-main">
         <section class="ai-hero">
           <div class="ai-hero-copy"><span class="ai-eyebrow"><span></span> Speak a little more every day</span><h1>AI Conversations</h1><h2>Practice. Improve. Speak<br />with confidence.</h2><p>Build your language skills through natural, interactive conversation practice at your own pace.</p>
-            <div class="ai-hero-actions"><a class="ai-button ai-button-green" href="#/ai-chat" data-route="ai-chat">Start Conversation ${icon('arrow', 16)}</a><a class="ai-button ai-button-quiet" href="#/ai-dashboard" data-route="ai-dashboard">Open dashboard</a></div>
+            <div class="ai-hero-actions"><a class="ai-button ai-button-green" href="#/ai-everyday?lang=${getAiConversationLanguage().id}" data-route="ai-everyday" data-lang="${getAiConversationLanguage().id}">Start Conversation ${icon('arrow', 16)}</a><a class="ai-button ai-button-quiet" href="#/ai-dashboard" data-route="ai-dashboard">Open dashboard</a></div>
             <div class="ai-hero-language-list" id="ai-languages" aria-label="Available conversation languages">${languagePills}</div>
-            <p class="ai-preview-note">Guided practice preview · sample replies are offline, not live AI.</p>
+            <p class="ai-preview-note">No account needed · start practising right away. Guided sample replies are available offline.</p>
           </div>
           <div class="ai-hero-art"><img src="./assets/voice-lessons-welcome.jpg" alt="Young learners smiling as they practise speaking together" /><div class="ai-chat-bubble">Let’s<br />Chat! <span>✦</span></div><div class="ai-art-caption"><span class="ai-art-pulse"></span> Your voice, your pace</div></div>
         </section>
