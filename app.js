@@ -99,7 +99,7 @@ import {
     'voice-language', 'voice-grade', 'voice-audio', 'voice-practice',
     'voice-text-to-speech', 'voice-cloning', 'voice-speech-to-text', 'voice-translation',
     'ai-conversations', 'ai-login', 'ai-signup', 'ai-dashboard', 'ai-chat', 'ai-everyday',
-    'ai-voice', 'ai-history', 'ai-analytics', 'ai-profile', 'ai-children', 'ai-messages', 'ai-settings',
+    'ai-voice', 'ai-history', 'ai-analytics', 'ai-profile', 'ai-messages', 'ai-settings',
     'families', 'parent-login', 'parent-signup', 'parent-dashboard', 'parent-children',
     'parent-progress', 'parent-messages', 'parent-settings', 'parent-welcome',
     'tutor', 'tutor-login', 'tutor-signup', 'tutor-dashboard', 'tutor-find-child', 'tutor-students',
@@ -415,7 +415,6 @@ import {
     'ai-history': 'ai-conversations',
     'ai-analytics': 'ai-conversations',
     'ai-profile': 'ai-conversations',
-    'ai-children': 'ai-conversations',
     'ai-messages': 'ai-conversations',
     'ai-settings': 'ai-conversations',
     tutor: 'tutor',
@@ -480,7 +479,6 @@ import {
   LABELS['ai-history'] = 'Conversation History';
   LABELS['ai-analytics'] = 'Learning Analytics';
   LABELS['ai-profile'] = 'My Profile';
-  LABELS['ai-children'] = 'My Children';
   LABELS['ai-messages'] = 'Messages';
   LABELS['ai-settings'] = 'Settings';
   Object.assign(LABELS, {
@@ -763,6 +761,10 @@ import {
     let page = path.split('/')[0] || 'index';
     if (page === 'learn') page = 'curriculum';
     const params = Object.fromEntries(new URLSearchParams(query));
+    if (page === 'ai-children') {
+      page = 'ai-dashboard';
+      history.replaceState(null, '', `${window.location.pathname}${window.location.search}#/ai-dashboard`);
+    }
     if (OWE_ROUTE_SECTIONS[page]) {
       params.section = params.section || OWE_ROUTE_SECTIONS[page];
       page = 'owe';
@@ -5942,7 +5944,6 @@ import {
   const AI_WORKSPACE_LINKS = [
     { route: 'ai-dashboard', label: 'Dashboard', icon: 'home' },
     { route: 'ai-chat', label: 'AI Conversation', icon: 'sparkles' },
-    { route: 'ai-children', label: 'My Children', icon: 'people' },
     { route: 'ai-analytics', label: 'Analytics', icon: 'layers' },
     { route: 'ai-messages', label: 'Messages', icon: 'send' },
     { route: 'ai-settings', label: 'Settings', icon: 'lock' }
@@ -5955,7 +5956,6 @@ import {
     'ai-history': 'ai-chat',
     'ai-analytics': 'ai-analytics',
     'ai-profile': 'ai-dashboard',
-    'ai-children': 'ai-children',
     'ai-messages': 'ai-messages',
     'ai-settings': 'ai-settings'
   };
@@ -6084,12 +6084,6 @@ import {
       ${renderAiPageHeading('Account details', 'My Profile', 'Manage your learning details and conversation preferences.')}
       <section class="ai-profile-layout"><aside class="ai-profile-card"><span class="ai-profile-avatar">${esc(initial)}</span><span class="ai-eyebrow">Learner profile</span><h2>${esc(name)}</h2><p>${esc(profile.email || 'Learning as a guest')}</p><span class="ai-profile-tag">${esc(getAiConversationLanguage(AI_CONVERSATION_LANGUAGES.some((item) => item.id === profile.language) ? profile.language : 'yoruba').name)}</span><p class="ai-profile-account-state">${getCurrentUser() ? 'Signed in to your Idilewa account' : 'Guest profile · saved on this device'}</p>${getCurrentUser() ? '<button type="button" class="ai-button ai-button-outline" data-action="profile-sign-out">Sign out</button>' : '<a class="ai-button ai-button-outline" href="#/ai-login?next=ai-profile" data-route="ai-login" data-next="ai-profile">Sign in</a>'}</aside>
       <form class="ai-profile-form" data-form="profile-settings"><span class="ai-eyebrow">Profile information</span><h2>About you</h2><label>Full name<input name="name" maxlength="60" required value="${esc(profile.name)}" placeholder="What should we call you?" /></label><label>Email address<input type="email" value="${esc(profile.email)}" readonly placeholder="Sign in to connect your account" /></label><label>Short bio<textarea name="bio" rows="3" maxlength="500" placeholder="A little about you…">${esc(profile.bio)}</textarea></label><label>Learning goal<textarea name="goal" rows="2" maxlength="240" placeholder="What would you like to practise?">${esc(profile.goal)}</textarea></label><div class="ai-profile-row"><label>Learning language<select name="language">${LANGUAGES.map((item) => `<option value="${item.id}" ${profile.language === item.id ? 'selected' : ''}>${esc(item.name)}</option>`).join('')}</select></label><label>Experience level<select name="level">${[['beginner','Beginning'],['intermediate','Growing'],['advanced','Confident']].map(([value,label]) => `<option value="${value}" ${profile.level === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label></div><button type="submit" class="ai-button ai-button-green">${icon('check', 15)} Save profile</button></form></section>`);
-  }
-
-  function renderAiChildren() {
-    return renderAiWorkspace('ai-children', 'My Children', `
-      ${renderAiPageHeading('Family learning', 'My Children', 'A safe place for families to support language learning.')}
-      <section class="ai-family-notice"><span>${icon('shield', 22)}</span><div><span class="ai-eyebrow">Family privacy comes first</span><h2>Child accounts are not connected to this preview.</h2><p>No child profiles, practice transcripts or personal details are shown here. Parent-managed accounts require a verified guardian approval flow.</p><a href="#/consent" data-route="consent" class="ai-button ai-button-green">Learn about family approval ${icon('arrow', 14)}</a></div></section>`);
   }
 
   function renderAiMessages() {
@@ -6394,7 +6388,6 @@ import {
     if (page === 'ai-history') return renderAiHistory();
     if (page === 'ai-analytics') return renderAiAnalytics();
     if (page === 'ai-profile') return renderAiProfile();
-    if (page === 'ai-children') return renderAiChildren();
     if (page === 'ai-messages') return renderAiMessages();
     return renderAiSettings();
   }
@@ -7644,7 +7637,6 @@ import {
       case 'ai-history':
       case 'ai-analytics':
       case 'ai-profile':
-      case 'ai-children':
       case 'ai-messages':
       case 'ai-settings': return renderAiConversationsPage(page, params);
       case 'families':

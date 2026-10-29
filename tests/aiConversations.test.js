@@ -9,7 +9,7 @@ test('AI Conversations registers every supplied interface as a navigable Idilewa
   for (const route of [
     'ai-conversations', 'ai-login', 'ai-signup', 'ai-dashboard', 'ai-chat',
     'ai-everyday', 'ai-voice', 'ai-history', 'ai-analytics', 'ai-profile',
-    'ai-children', 'ai-messages', 'ai-settings'
+    'ai-messages', 'ai-settings'
   ]) {
     assert.match(appSource, new RegExp(`'${route}'`));
     assert.match(appSource, new RegExp(`case '${route}':`));
@@ -18,6 +18,18 @@ test('AI Conversations registers every supplied interface as a navigable Idilewa
   assert.match(appSource, /data-route="ai-dashboard"/);
   assert.match(appSource, /data-route="ai-chat"/);
   assert.match(appSource, /data-route="ai-voice"/);
+});
+
+test('AI Conversations removes My Children and redirects its old route to the dashboard', () => {
+  const workspaceLinks = appSource.slice(appSource.indexOf('const AI_WORKSPACE_LINKS'), appSource.indexOf('const AI_WORKSPACE_ACTIVE'));
+  const parentLinks = appSource.slice(appSource.indexOf('const PARENT_PORTAL_LINKS'), appSource.indexOf('const PARENT_PREFERENCES_KEY'));
+  const routes = appSource.slice(appSource.indexOf('const ROUTES = ['), appSource.indexOf('const REMOVED_ROUTES'));
+
+  assert.doesNotMatch(routes, /ai-children/);
+  assert.doesNotMatch(workspaceLinks, /ai-children|My Children/);
+  assert.doesNotMatch(appSource, /renderAiChildren|case 'ai-children'/);
+  assert.match(appSource, /if \(page === 'ai-children'\) \{\s*page = 'ai-dashboard';\s*history\.replaceState\(null, '', `\$\{window\.location\.pathname\}\$\{window\.location\.search\}#\/ai-dashboard`\);/);
+  assert.match(parentLinks, /route: 'parent-children', label: 'My Children'/);
 });
 
 test('AI Conversations starts a guest directly in practice without requiring account creation', () => {
