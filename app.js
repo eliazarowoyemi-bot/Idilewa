@@ -101,6 +101,8 @@ import {
     'voice-text-to-speech', 'voice-cloning', 'voice-speech-to-text', 'voice-translation',
     'ai-conversations', 'ai-login', 'ai-signup', 'ai-dashboard', 'ai-chat', 'ai-everyday',
     'ai-voice', 'ai-history', 'ai-analytics', 'ai-profile', 'ai-children', 'ai-messages', 'ai-settings',
+    'families', 'parent-login', 'parent-signup', 'parent-dashboard', 'parent-children',
+    'parent-progress', 'parent-messages', 'parent-settings', 'parent-welcome',
     'tutor', 'tutor-login', 'tutor-signup', 'tutor-dashboard', 'tutor-find-child', 'tutor-students',
     'tutor-consent', 'tutor-lesson', 'tutor-messages', 'tutor-profile', 'tutor-availability', 'tutor-settings',
     'curriculum',
@@ -388,6 +390,7 @@ import {
     { label: 'Curriculum', route: 'curriculum', group: 'curriculum' }
   ];
   const MENU_NAV = [...NAV,
+    { label: 'For Parents', route: 'families', group: 'families' },
     { label: 'Read & listen', route: 'oral', group: 'read' },
     { label: 'Stories', route: 'ere', group: 'stories' },
     { label: 'Heritage Stories', route: 'heritage', group: 'stories' },
@@ -395,6 +398,15 @@ import {
   ];
 
   const NAV_GROUPS = {
+    families: 'families',
+    'parent-login': 'families',
+    'parent-signup': 'families',
+    'parent-dashboard': 'families',
+    'parent-children': 'families',
+    'parent-progress': 'families',
+    'parent-messages': 'families',
+    'parent-settings': 'families',
+    'parent-welcome': 'families',
     world: 'world',
     profile: 'world',
     'ai-conversations': 'ai-conversations',
@@ -477,6 +489,15 @@ import {
   LABELS['ai-messages'] = 'Messages';
   LABELS['ai-settings'] = 'Settings';
   Object.assign(LABELS, {
+    families: 'For Parents',
+    'parent-login': 'Parent Login',
+    'parent-signup': 'Create Parent Account',
+    'parent-dashboard': 'Family Dashboard',
+    'parent-children': 'My Children',
+    'parent-progress': 'Learning Progress',
+    'parent-messages': 'Messages',
+    'parent-settings': 'Settings',
+    'parent-welcome': 'You’re all set',
     tutor: 'Tutor Portal',
     'tutor-login': 'Tutor sign in',
     'tutor-signup': 'Create tutor account',
@@ -779,7 +800,9 @@ import {
     if (typeof window.scrollTo === 'function') window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
-  function roleHomeRoute() {
+  function roleHomeRoute(role) {
+    if (role === 'parent') return 'parent-dashboard';
+    if (role === 'educator') return 'tutor-dashboard';
     return 'index';
   }
 
@@ -796,7 +819,7 @@ import {
   }
 
   function renderHeader(page) {
-    if (page === 'login' || page === 'heritage' || page.startsWith('ai-') || page.startsWith('tutor')) {
+    if (page === 'login' || page === 'heritage' || page.startsWith('ai-') || page.startsWith('tutor') || page.startsWith('parent') || page === 'families') {
       document.getElementById('site-header').innerHTML = '';
       return;
     }
@@ -841,7 +864,7 @@ import {
 
   function renderMobileNav(page) {
     const currentUser = getCurrentUser();
-    if (page === 'heritage' || page.startsWith('ai-') || page.startsWith('tutor') || currentUser?.role === 'parent' || currentUser?.role === 'educator') {
+    if (page === 'heritage' || page.startsWith('ai-') || page.startsWith('tutor') || page.startsWith('parent') || page === 'families' || currentUser?.role === 'parent' || currentUser?.role === 'educator') {
       document.getElementById('mobile-nav').innerHTML = '';
       return;
     }
@@ -871,7 +894,7 @@ import {
         </section>
         <nav class="footer-directory" aria-label="Footer navigation">
           <section class="footer-links"><h2>Quick links</h2>${routeLink('index', 'Home')}${routeLink('curriculum', 'Curriculum')}${routeLink('library', 'Learning library')}${routeLink('trainer', 'Voice lessons')}${routeLink('ere', 'Stories')}</section>
-          <section class="footer-links"><h2>Information</h2>${routeLink('about', 'About Idilewa')}${routeLink('individuals', 'For families')}${routeLink('schools', 'For schools')}${routeLink('privacy', 'Privacy policy')}${routeLink('base', 'Explore all pages')}</section>
+          <section class="footer-links"><h2>Information</h2>${routeLink('about', 'About Idilewa')}${routeLink('families', 'Parent portal')}${routeLink('individuals', 'For families')}${routeLink('schools', 'For schools')}${routeLink('privacy', 'Privacy policy')}${routeLink('base', 'Explore all pages')}</section>
         </nav>
       </div>
       <div class="footer-bottom"><div class="container footer-bottom-inner">
@@ -6153,6 +6176,281 @@ import {
       <div class="ai-settings-privacy">${icon('lock', 15)} The chat preview does not contact a live AI service. Never add personal or sensitive information.</div></section>`);
   }
 
+  const PARENT_PORTAL_LINKS = [
+    { route: 'parent-dashboard', label: 'Dashboard', icon: 'home' },
+    { route: 'parent-children', label: 'My Children', icon: 'people' },
+    { route: 'parent-progress', label: 'Analytics', icon: 'layers' },
+    { route: 'parent-messages', label: 'Messages', icon: 'send' },
+    { route: 'parent-settings', label: 'Settings', icon: 'lock' }
+  ];
+  const PARENT_PREFERENCES_KEY = 'idilewa-parent-preferences';
+  let parentDashboardData = null;
+  let parentDashboardError = '';
+  let parentDashboardLoading = false;
+  let parentDashboardRequest = 0;
+
+  function getParentPreferences() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(PARENT_PREFERENCES_KEY) || '{}');
+      return {
+        emailUpdates: saved.emailUpdates !== false,
+        learningReminders: saved.learningReminders !== false,
+        weeklySummary: saved.weeklySummary !== false
+      };
+    } catch (error) {
+      console.error('Could not read family portal preferences.', error);
+      return { emailUpdates: true, learningReminders: true, weeklySummary: true };
+    }
+  }
+
+  function renderParentBrand(className = '') {
+    return `<a class="family-brand ${className}" href="#/families" data-route="families"><img src="${brandLogoUrl}" alt="Idilewa" /><span>Learn · Explore · Grow</span></a>`;
+  }
+
+  function renderFamiliesLanding() {
+    return `<div class="family-public-page">
+      <header class="family-public-header">${renderParentBrand()}<nav aria-label="Family portal navigation">
+        <a href="#/index" data-route="index">Home</a><a href="#/families" data-route="families" aria-current="page">For Parents</a><a href="#/tutor" data-route="tutor">For Teachers</a><a href="#/about" data-route="about">About</a>
+        <a class="family-login-link" href="#/parent-login" data-route="parent-login">Log in</a><a class="family-button family-button-primary family-button-small" href="#/parent-signup" data-route="parent-signup">Get Started</a>
+      </nav></header>
+      <main class="family-public-main">
+        <section class="family-hero">
+          <div class="family-hero-copy"><span class="family-eyebrow"><i></i> Language · culture · future</span><h1>Every child deserves a <em>global voice.</em></h1>
+            <p>Idilewa helps children learn languages, explore cultures, and build confidence for a brighter future.</p>
+            <div class="family-hero-actions"><a class="family-button family-button-primary" href="#/parent-signup" data-route="parent-signup">Get Started ${icon('arrow', 15)}</a><a class="family-button family-button-light" href="#/about" data-route="about">Learn More</a></div>
+            <div class="family-hero-points"><span>${icon('book', 15)} Language learning</span><span>${icon('globe', 15)} Cultural exploration</span><span>${icon('sparkles', 15)} Confidence building</span></div>
+          </div>
+          <div class="family-hero-image"><img src="./assets/home-family-learning.jpg" alt="A parent and children learning together at home" /><span class="family-image-note">Small steps. Big dreams. <span aria-hidden="true">♡</span></span></div>
+        </section>
+        <section class="family-public-benefits" id="family-how-it-works" aria-label="Family learning benefits">
+          <article><span>${icon('book', 17)}</span><div><strong>Language learning</strong><small>Learn words, sounds and everyday phrases.</small></div></article>
+          <article><span>${icon('globe', 17)}</span><div><strong>Cultural exploration</strong><small>Discover stories and living traditions.</small></div></article>
+          <article><span>${icon('heart', 17)}</span><div><strong>Confidence building</strong><small>Grow with a safe, family-first learning space.</small></div></article>
+        </section>
+      </main>
+      <footer class="family-public-footer">${renderParentBrand()}<span>Language · Culture · Future</span><a href="#/privacy" data-route="privacy">Privacy</a></footer>
+    </div>`;
+  }
+
+  function renderParentAuth(signup) {
+    const imageAlt = signup
+      ? 'A family sharing a language-learning activity'
+      : 'A parent and children learning together';
+    return `<div class="family-auth-page">
+      <header class="family-auth-header">${renderParentBrand()}<a href="#/families" data-route="families">Back to For Parents</a></header>
+      <main class="family-auth-layout">
+        <section class="family-auth-card"><div class="family-auth-mobile-brand">${renderParentBrand()}</div>
+          <span class="family-eyebrow">${signup ? 'Join the Idilewa family' : 'Welcome back'}</span>
+          <h1>${signup ? 'Create Parent Account' : 'Parent Login'}</h1>
+          <p>${signup ? 'Create your account and give your child the gift of a global voice.' : 'Welcome back. Please log in to your account to continue.'}</p>
+          <form class="family-auth-form" data-form="parent-auth" data-mode="${signup ? 'signup' : 'login'}">
+            ${signup ? `<label>Full Name<input name="name" autocomplete="name" maxlength="60" placeholder="Enter your full name" required /></label>` : ''}
+            <label>Email Address<input id="authEmail" name="email" type="email" autocomplete="email" maxlength="254" placeholder="Enter your email" required /></label>
+            ${signup ? `<label>Phone Number<input name="phone" type="tel" autocomplete="tel" maxlength="24" placeholder="Enter your phone number" required /></label>` : ''}
+            <label>Password<input id="authPassword" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="${signup ? '12' : '1'}" maxlength="128" placeholder="${signup ? 'Create a password' : 'Enter your password'}" required /></label>
+            ${signup
+              ? '<small class="family-password-note">Use 12 or more characters, including uppercase and lowercase letters, a number and a symbol.</small>'
+              : `<div class="family-auth-options"><label class="family-remember"><input type="checkbox" name="remember" /> Remember me</label><a href="#/login?mode=signin" data-route="login" data-mode="signin">Forgot password?</a></div>`}
+            <p class="family-auth-error" role="alert" hidden></p>
+            <button type="submit" class="family-button family-button-primary family-auth-submit">${signup ? 'Create Account' : 'Login'} ${icon('arrow', 15)}</button>
+          </form>
+          <p class="family-auth-switch">${signup ? 'Already have an account?' : 'Don’t have an account?'} <a href="#/parent-${signup ? 'login' : 'signup'}" data-route="parent-${signup ? 'login' : 'signup'}">${signup ? 'Log in' : 'Sign up'}</a></p>
+          <small class="family-auth-safe-note">${icon('lock', 13)} Your account is protected by Idilewa sign-in.</small>
+        </section>
+        <aside class="family-auth-art"><img src="./assets/home-family-learning.jpg" alt="${imageAlt}" /><div class="family-auth-art-caption"><span>${signup ? 'Their future' : 'Learn. Grow.'}</span><strong>${signup ? 'matters.' : 'Achieve.'}</strong><i aria-hidden="true">♡</i></div></aside>
+      </main>
+    </div>`;
+  }
+
+  function renderParentWelcome() {
+    const signedIn = getCurrentUser()?.role === 'parent';
+    return `<div class="family-welcome-page"><main class="family-welcome-card">
+      ${renderParentBrand()}<span class="family-welcome-check">${icon('check', 30)}</span>
+      <h1>You’re all set!</h1>
+      <p>${signedIn
+        ? 'Your account is ready. You can now explore your family learning dashboard.'
+        : 'Your account has been created. Check your email and confirm your address before logging in.'}</p>
+      <a class="family-button family-button-primary" href="#/${signedIn ? 'parent-dashboard' : 'parent-login'}" data-route="${signedIn ? 'parent-dashboard' : 'parent-login'}">${signedIn ? 'Go to Dashboard' : 'Go to Login'} ${icon('arrow', 15)}</a>
+      <a class="family-welcome-home" href="#/families" data-route="families">Back to Home</a>
+    </main></div>`;
+  }
+
+  function renderParentAccess() {
+    return `<div class="family-access-page"><section class="family-access-card"><span class="family-access-icon">${icon('lock', 22)}</span><span class="family-eyebrow">Family portal</span><h1>Sign in to continue</h1><p>Your child’s learning information is only available to their verified parent or guardian.</p><div><a class="family-button family-button-primary" href="#/parent-login" data-route="parent-login">Parent Login</a><a class="family-access-link" href="#/parent-signup" data-route="parent-signup">Create a parent account</a></div></section></div>`;
+  }
+
+  function renderParentWorkspace(page, content) {
+    const user = getCurrentUser();
+    const name = user?.name || 'Parent';
+    const initial = name.trim().charAt(0).toUpperCase() || 'P';
+    const active = page === 'parent-progress' ? 'parent-progress' : page;
+    const links = PARENT_PORTAL_LINKS.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="family-sidebar-link ${item.route === active ? 'is-active' : ''}" ${item.route === active ? 'aria-current="page"' : ''}>${icon(item.icon, 17)}<span>${item.label}</span></a>`).join('');
+    return `<div class="family-workspace">
+      <aside class="family-sidebar"><a class="family-sidebar-brand" href="#/parent-dashboard" data-route="parent-dashboard"><img src="./assets/favicon.svg" alt="" /><span><strong>IDILEWA</strong><small>Learn · Explore · Grow</small></span></a>
+        <nav class="family-sidebar-nav" aria-label="Family portal">${links}</nav>
+        <button type="button" class="family-sidebar-user" data-action="profile-sign-out"><span class="family-avatar">${esc(initial)}</span><span><strong>${esc(name)}</strong><small>Parent</small></span>${icon('arrow', 14)}</button>
+      </aside>
+      <main class="family-workspace-main"><header class="family-topbar"><div><a href="#/parent-dashboard" data-route="parent-dashboard">Family Portal</a><span>/</span><strong>${esc(LABELS[page] || 'Dashboard')}</strong></div><div class="family-topbar-actions"><span class="family-secure-status"><i></i> Family space</span><a href="#/parent-settings" data-route="parent-settings" class="family-topbar-avatar" aria-label="Open settings">${esc(initial)}</a></div></header>
+        <div class="family-workspace-content">${content}</div>
+      </main>
+    </div>`;
+  }
+
+  function renderParentHeading(kicker, title, description, actions = '') {
+    return `<header class="family-page-heading"><div><span class="family-eyebrow">${esc(kicker)}</span><h1>${esc(title)}</h1><p>${esc(description)}</p></div>${actions ? `<div class="family-heading-actions">${actions}</div>` : ''}</header>`;
+  }
+
+  function familyChildren() {
+    return Array.isArray(parentDashboardData?.children) ? parentDashboardData.children : [];
+  }
+
+  function renderParentChildCard(child) {
+    const name = typeof child.name === 'string' && child.name.trim() ? child.name.trim() : 'Learner';
+    const initials = name.trim().split(/\s+/).slice(0, 2).map((part) => part.charAt(0)).join('').toUpperCase();
+    const childId = encodeURIComponent(String(child.id || ''));
+    return `<article class="family-child-card"><div class="family-child-card-head"><span class="family-child-avatar">${esc(initials || 'L')}</span><div><span class="family-child-label">Approved learner</span><h3>${esc(name)}</h3><small>${Number(child.streak) || 0} day learning streak</small></div></div>
+      <div class="family-child-stats"><span><strong>${Number(child.completedLessons) || 0}</strong><small>Lessons</small></span><span><strong>${Number(child.codingSessions) || 0}</strong><small>Code sessions</small></span><span><strong>${Number(child.voicePractices) || 0}</strong><small>Voice practices</small></span></div>
+      <div class="family-child-card-footer"><span>${Number(child.points) || 0} learning points</span><a class="family-text-link" href="#/parent-progress?child=${childId}" data-route="parent-progress" data-child="${childId}">View Analytics ${icon('arrow', 13)}</a></div></article>`;
+  }
+
+  function renderParentDashboard() {
+    const children = familyChildren();
+    const totalLessons = children.reduce((sum, child) => sum + (Number(child.completedLessons) || 0), 0);
+    const totalCoding = children.reduce((sum, child) => sum + (Number(child.codingSessions) || 0), 0);
+    const voiceScores = children.map((child) => child.averageVoiceScore).filter(Number.isFinite);
+    const averageVoice = voiceScores.length
+      ? `${Math.round(voiceScores.reduce((sum, score) => sum + score, 0) / voiceScores.length)}%`
+      : '—';
+    const name = getCurrentUser()?.name?.trim().split(/\s+/)[0] || 'Parent';
+    const stat = (label, value, note, tone = '') => `<article class="family-stat-card ${tone}"><span>${icon('sparkles', 16)} ${label}</span><strong>${value}</strong><small>${note}</small></article>`;
+    const childSection = children.length
+      ? `<div class="family-child-grid">${children.slice(0, 4).map(renderParentChildCard).join('')}</div>`
+      : parentDashboardLoading || parentDashboardError
+        ? ''
+        : `<div class="family-empty-card"><span>${icon('heart', 23)}</span><h3>Your family space is ready</h3><p>When a child finishes guardian-approved sign-up, their learning progress will appear here.</p><a class="family-button family-button-outline" href="#/consent" data-route="consent">Learn about family approval ${icon('arrow', 14)}</a></div>`;
+    const loading = parentDashboardLoading
+      ? '<div class="family-data-state" role="status">Loading your family dashboard…</div>'
+      : parentDashboardError
+        ? `<div class="family-data-state is-error" role="alert">${esc(parentDashboardError)} <button type="button" data-action="parent-refresh">Try again</button></div>`
+        : '';
+    return renderParentWorkspace('parent-dashboard', `${renderParentHeading('Your family learning space', `Welcome back, ${name}.`, 'Here’s how your children are growing with Idilewa.', `<a class="family-button family-button-outline" href="#/parent-progress" data-route="parent-progress">View Analytics ${icon('arrow', 14)}</a>`)}
+      <section class="family-stat-grid" aria-label="Family learning overview">${stat('My Children', children.length, 'Guardian-approved learners')}${stat('Lessons Completed', totalLessons, 'Across your family', 'is-mint')}${stat('Coding Sessions', totalCoding, 'Saved practice attempts', 'is-blue')}${stat('Average Voice Score', averageVoice, 'When available', 'is-peach')}</section>
+      <section class="family-dashboard-section"><div class="family-section-heading"><div><span class="family-eyebrow">Your learners</span><h2>My Children</h2></div><a class="family-text-link" href="#/parent-children" data-route="parent-children">View all ${icon('arrow', 13)}</a></div>${loading}${childSection}</section>
+      <section class="family-dashboard-lower"><article class="family-insight-card"><span class="family-insight-icon">${icon('globe', 20)}</span><div><span class="family-eyebrow">A little every day</span><h2>Building a global voice, one child at a time.</h2><p>Celebrate each lesson, story and new word along the way.</p></div><a href="#/parent-progress" data-route="parent-progress" aria-label="Open learning analytics">${icon('arrow', 15)}</a></article><aside class="family-activity-panel"><div class="family-section-heading"><div><span class="family-eyebrow">Family updates</span><h2>Connection requests</h2></div><a class="family-text-link" href="#/parent-messages" data-route="parent-messages">View all ${icon('arrow', 13)}</a></div>${renderParentRequestSummary()}</aside></section>`);
+  }
+
+  function renderParentRequestSummary() {
+    const requests = Array.isArray(parentDashboardData?.connectionRequests) ? parentDashboardData.connectionRequests : [];
+    if (parentDashboardLoading && !parentDashboardData) return '<p class="family-empty-inline">Loading your family updates…</p>';
+    if (!requests.length) return '<p class="family-empty-inline">No educator connection requests yet.</p>';
+    return `<div class="family-request-list">${requests.slice(0, 3).map((request) => `<article><span class="family-request-icon">${icon('school', 15)}</span><div><strong>${esc(request.educator || 'Educator')}</strong><small>${esc(request.learner || 'Learner')} · ${formatDashboardDate(request.requestedAt)}</small></div><span class="family-status">${esc(consentStatusLabel(request.status))}</span></article>`).join('')}</div>`;
+  }
+
+  function renderParentChildren() {
+    const children = familyChildren();
+    const loading = parentDashboardLoading
+      ? '<div class="family-data-state" role="status">Loading your approved learners…</div>'
+      : parentDashboardError
+        ? `<div class="family-data-state is-error" role="alert">${esc(parentDashboardError)} <button type="button" data-action="parent-refresh">Try again</button></div>`
+        : '';
+    return renderParentWorkspace('parent-children', `${renderParentHeading('Family learning', 'My Children', 'See the learning activity shared with you by your guardian-approved learners.', `<a class="family-button family-button-outline" href="#/consent" data-route="consent">Family approval ${icon('arrow', 14)}</a>`)}
+      ${loading}${children.length ? `<div class="family-child-grid family-child-grid-full">${children.map(renderParentChildCard).join('')}</div>` : parentDashboardLoading || parentDashboardError ? '' : `<div class="family-empty-card"><span>${icon('people', 23)}</span><h2>No approved learner accounts yet</h2><p>Child profiles and learning activity are shown only after a guardian-approved account is connected.</p><a class="family-button family-button-primary" href="#/consent" data-route="consent">Explore family approval ${icon('arrow', 14)}</a></div>`}`);
+  }
+
+  function renderParentProgress(params = {}) {
+    const children = familyChildren();
+    const selected = children.find((child) => String(child.id) === String(params.child || ''));
+    const loading = parentDashboardLoading
+      ? '<div class="family-data-state" role="status">Loading learning progress…</div>'
+      : parentDashboardError
+        ? `<div class="family-data-state is-error" role="alert">${esc(parentDashboardError)} <button type="button" data-action="parent-refresh">Try again</button></div>`
+        : '';
+    if (!selected) {
+      return renderParentWorkspace('parent-progress', `${renderParentHeading('Celebrate every step', 'Learning Progress', 'Review the learning activity shared by your approved learners.', `<button type="button" class="family-button family-button-outline" data-action="parent-export-report">${icon('download', 14)} Print Report</button>`)}
+        ${loading}${children.length ? `<div class="family-progress-list">${children.map((child) => `<a class="family-progress-card" href="#/parent-progress?child=${encodeURIComponent(String(child.id || ''))}" data-route="parent-progress" data-child="${encodeURIComponent(String(child.id || ''))}"><span class="family-child-avatar">${esc((child.name || 'L').trim().charAt(0).toUpperCase())}</span><span><strong>${esc(child.name || 'Learner')}</strong><small>${Number(child.completedLessons) || 0} lessons · ${Number(child.codingSessions) || 0} coding sessions · ${Number(child.voicePractices) || 0} voice practices</small></span>${icon('arrow', 15)}</a>`).join('')}</div>` : parentDashboardLoading || parentDashboardError ? '' : '<div class="family-empty-card"><span>' + icon('layers', 23) + '</span><h2>Progress appears here as children learn</h2><p>Learning activity is only shared after a parent or guardian approves a child account.</p><a class="family-button family-button-outline" href="#/consent" data-route="consent">How family approval works</a></div>'}`);
+    }
+    const metrics = [
+      ['Lessons completed', Number(selected.completedLessons) || 0],
+      ['Coding sessions', Number(selected.codingSessions) || 0],
+      ['Voice practices', Number(selected.voicePractices) || 0],
+    ];
+    const maxMetric = Math.max(1, ...metrics.map(([, value]) => value));
+    const activity = Array.isArray(selected.recentActivity) ? selected.recentActivity : [];
+    return renderParentWorkspace('parent-progress', `${renderParentHeading('Learner overview', `${selected.name || 'Learner'}’s Progress`, 'A closer look at the learning activity saved to this family account.', `<button type="button" class="family-button family-button-outline" data-action="parent-export-report">${icon('download', 14)} Print Report</button>`)}
+      ${loading}<div class="family-progress-detail"><section class="family-panel"><div class="family-section-heading"><div><span class="family-eyebrow">Learning activity</span><h2>Practice at a glance</h2></div><a class="family-text-link" href="#/parent-children" data-route="parent-children">All children ${icon('arrow', 13)}</a></div>${metrics.map(([label, value]) => `<div class="family-progress-meter"><div><span>${label}</span><strong>${value}</strong></div><span class="family-progress-track"><i style="width:${Math.round(value / maxMetric * 100)}%"></i></span></div>`).join('')}</section>
+      <section class="family-panel"><div class="family-section-heading"><div><span class="family-eyebrow">Latest updates</span><h2>Recent activity</h2></div></div>${activity.length ? `<ol class="family-activity-list">${activity.map((item) => `<li><span class="family-activity-dot">${icon('check', 12)}</span><div><strong>${esc(item.lessonType || 'Learning activity')}</strong><small>${esc(item.lessonId || 'Practice')} · ${formatDashboardDate(item.completedAt)}</small></div></li>`).join('')}</ol>` : '<p class="family-empty-inline">No saved lesson activity yet.</p>'}</section></div>
+      <p class="family-privacy-note">${icon('lock', 14)} Progress is shared only after family approval. Report data reflects activity currently saved to this account.</p>`);
+  }
+
+  function renderParentMessages() {
+    const requests = Array.isArray(parentDashboardData?.connectionRequests) ? parentDashboardData.connectionRequests : [];
+    const requestList = parentDashboardLoading && !parentDashboardData
+      ? '<p class="family-empty-inline">Loading your family updates…</p>'
+      : requests.length
+      ? `<div class="family-message-requests">${requests.map((request) => `<article><span class="family-message-icon">${icon('school', 17)}</span><div><strong>${esc(request.educator || 'Educator')} · ${esc(request.learner || 'Learner')}</strong><small>Requested ${formatDashboardDate(request.requestedAt)}</small></div><span class="family-status">${esc(consentStatusLabel(request.status))}</span>${request.status === 'approved' ? `<button type="button" class="family-text-link" data-action="parent-withdraw-consent" data-id="${esc(request.id)}">Withdraw consent</button>` : ''}</article>`).join('')}</div>`
+      : '<p class="family-empty-inline">No teacher connection requests yet. You’ll see requests here if a tutor asks to connect with an approved learner.</p>';
+    const loading = parentDashboardLoading
+      ? '<div class="family-data-state" role="status">Loading your messages…</div>'
+      : parentDashboardError
+        ? `<div class="family-data-state is-error" role="alert">${esc(parentDashboardError)} <button type="button" data-action="parent-refresh">Try again</button></div>`
+        : '';
+    return renderParentWorkspace('parent-messages', `${renderParentHeading('Stay connected', 'Messages', 'Review family connection updates and reach the Idilewa team.', `<a class="family-button family-button-primary" href="mailto:idilewa2026@gmail.com?subject=Idilewa%20family%20support">${icon('send', 14)} Contact Idilewa</a>`)}
+      ${loading}<section class="family-message-layout"><div class="family-panel"><div class="family-section-heading"><div><span class="family-eyebrow">Family inbox</span><h2>Teacher connection requests</h2></div></div>${requestList}</div>
+      <aside class="family-message-note"><span class="family-insight-icon">${icon('lock', 19)}</span><span class="family-eyebrow">Your family’s privacy</span><h2>Direct messages aren’t enabled yet.</h2><p>Teacher requests are managed here. Contact Idilewa if you need help with your family account.</p><a class="family-text-link" href="mailto:idilewa2026@gmail.com?subject=Idilewa%20family%20support">Email our team ${icon('arrow', 13)}</a></aside></section>`);
+  }
+
+  function renderParentSettings() {
+    const user = getCurrentUser() || {};
+    const preferences = getParentPreferences();
+    const requests = Array.isArray(parentDashboardData?.connectionRequests) ? parentDashboardData.connectionRequests : [];
+    const toggler = (key, title, description) => `<div class="family-setting-row"><div><strong>${title}</strong><p>${description}</p></div><button type="button" class="family-toggle ${preferences[key] ? 'is-on' : ''}" role="switch" aria-checked="${preferences[key]}" aria-label="${title}" data-action="parent-toggle-preference" data-setting="${key}"><span></span></button></div>`;
+    const connectionRows = parentDashboardLoading && !parentDashboardData
+      ? '<p class="family-empty-inline">Loading your connections…</p>'
+      : requests.length
+      ? requests.map((request) => `<article class="family-consent-row"><span class="family-request-icon">${icon('school', 15)}</span><div><strong>${esc(request.educator || 'Educator')}</strong><small>${esc(request.learner || 'Learner')} · ${esc(consentStatusLabel(request.status))}</small></div>${request.status === 'approved' ? `<button type="button" class="family-text-link" data-action="parent-withdraw-consent" data-id="${esc(request.id)}">Withdraw consent</button>` : ''}</article>`).join('')
+      : '<p class="family-empty-inline">No active educator connections.</p>';
+    return renderParentWorkspace('parent-settings', `${renderParentHeading('Manage your account and preferences', 'Settings', 'Keep your family account details up to date.')}
+      <div class="family-settings-layout"><section class="family-panel"><div class="family-section-heading"><div><span class="family-eyebrow">Profile information</span><h2>Account details</h2></div></div>
+        <form class="family-profile-form" data-form="parent-profile"><label>Full Name<input name="name" value="${esc(user.name || '')}" maxlength="60" autocomplete="name" required /></label><label>Email Address<input type="email" value="${esc(user.email || '')}" readonly /></label><label>Phone Number<input name="phone" type="tel" value="${esc(user.phone || '')}" maxlength="24" autocomplete="tel" /></label><p class="family-auth-error" role="alert" hidden></p><button type="submit" class="family-button family-button-primary">${icon('check', 14)} Save Changes</button></form>
+      </section><section class="family-panel family-settings-card"><div class="family-section-heading"><div><span class="family-eyebrow">Personal preferences</span><h2>Notifications</h2></div></div>
+        ${toggler('emailUpdates', 'Email updates', 'Receive important account and family connection updates.')}${toggler('learningReminders', 'Learning reminders', 'Keep a local preference for family learning reminders.')}${toggler('weeklySummary', 'Weekly summary', 'Choose whether you would like a weekly learning summary.')}
+        <div class="family-settings-subsection"><span class="family-eyebrow">Consent and privacy</span>${connectionRows}<a class="family-text-link" href="#/consent" data-route="consent">Review family approval ${icon('arrow', 13)}</a></div>
+        <div class="family-settings-subsection family-account-security"><div><strong>Account security</strong><p>Sign out of your family account on this device.</p></div><button type="button" class="family-button family-button-outline family-button-small" data-action="profile-sign-out">Sign out</button></div>
+        <p class="family-privacy-note">${icon('lock', 14)} Preferences are saved in this browser. Notification switches do not subscribe you to emails.</p>
+      </section></div>`);
+  }
+
+  function renderParentPortal(page, params = {}) {
+    if (page === 'families') return renderFamiliesLanding();
+    if (page === 'parent-login') return renderParentAuth(false);
+    if (page === 'parent-signup') return renderParentAuth(true);
+    if (page === 'parent-welcome') return renderParentWelcome();
+    if (getCurrentUser()?.role !== 'parent') return renderParentAccess();
+    if (page === 'parent-dashboard') return renderParentDashboard();
+    if (page === 'parent-children') return renderParentChildren();
+    if (page === 'parent-progress') return renderParentProgress(params);
+    if (page === 'parent-messages') return renderParentMessages();
+    return renderParentSettings();
+  }
+
+  async function loadParentPortalData() {
+    if (parentDashboardLoading || parentDashboardData || getCurrentUser()?.role !== 'parent') return;
+    parentDashboardLoading = true;
+    parentDashboardError = '';
+    const sequence = ++parentDashboardRequest;
+    render();
+    try {
+      parentDashboardData = await getRoleDashboard('/api/dashboard/parent');
+    } catch (error) {
+      parentDashboardError = error instanceof Error ? error.message : 'Your family dashboard could not be loaded.';
+    } finally {
+      if (sequence !== parentDashboardRequest) return;
+      parentDashboardLoading = false;
+      const page = parseLocation().page;
+      if (page.startsWith('parent-') && page !== 'parent-login' && page !== 'parent-signup' && page !== 'parent-welcome') render();
+    }
+  }
+
   function renderAiConversationsPage(page, params) {
     if (page === 'ai-conversations') return renderAiLanding();
     if (page === 'ai-login') return renderAiAuth('login');
@@ -7416,6 +7714,15 @@ import {
       case 'ai-children':
       case 'ai-messages':
       case 'ai-settings': return renderAiConversationsPage(page, params);
+      case 'families':
+      case 'parent-login':
+      case 'parent-signup':
+      case 'parent-dashboard':
+      case 'parent-children':
+      case 'parent-progress':
+      case 'parent-messages':
+      case 'parent-settings':
+      case 'parent-welcome': return renderParentPortal(page, params);
       case 'world': return renderCulturalWorld();
       case 'learn':
       case 'curriculum': return renderCurriculum();
@@ -8010,7 +8317,7 @@ import {
     const pageMarkup = assignUniqueRouteImages(page, renderPage(page, params))
       .replace(/(?:African )?Voice (?:African Language )?Trainer/gi, 'Voice Lessons')
       .replace(/Voice Studio/gi, 'Voice Lessons');
-    if (page === 'heritage' || page.startsWith('ai-') || page.startsWith('tutor')) {
+    if (page === 'heritage' || page.startsWith('ai-') || page.startsWith('tutor') || page.startsWith('parent') || page === 'families') {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = pageMarkup;
     } else if (page === 'coding' || page === 'coding-studio') {
@@ -8037,6 +8344,10 @@ import {
     }
     if (page === 'coding') initializeIdeOutputResize();
     if (page.startsWith('tutor')) loadTutorPortalData();
+    if (page.startsWith('parent-') && !['parent-login', 'parent-signup', 'parent-welcome'].includes(page)
+      && getCurrentUser()?.role === 'parent' && !parentDashboardData && !parentDashboardError) {
+      void loadParentPortalData();
+    }
     startHomePreviewMotion();
     if (page === 'coding') {
       const codeRobotGlyphs = document.getElementById('codeRobotGlyphCanvas');
@@ -8396,6 +8707,48 @@ import {
         render();
         showToast(aiAutoSpeak ? 'Guided replies will be read aloud on this device.' : 'Read-aloud is turned off.');
         break;
+      case 'parent-refresh':
+        parentDashboardData = null;
+        parentDashboardError = '';
+        parentDashboardLoading = false;
+        parentDashboardRequest += 1;
+        void loadParentPortalData();
+        break;
+      case 'parent-toggle-preference': {
+        const key = el.dataset.setting;
+        if (!['emailUpdates', 'learningReminders', 'weeklySummary'].includes(key)) break;
+        const preferences = getParentPreferences();
+        preferences[key] = !preferences[key];
+        try {
+          localStorage.setItem(PARENT_PREFERENCES_KEY, JSON.stringify(preferences));
+        } catch (error) {
+          showToast(error instanceof Error ? error.message : 'Your family preferences could not be saved.', 'error');
+          break;
+        }
+        render();
+        showToast('Your preferences were saved in this browser.');
+        break;
+      }
+      case 'parent-export-report':
+        window.print();
+        break;
+      case 'parent-withdraw-consent': {
+        const requestId = el.dataset.id;
+        if (!requestId || !window.confirm('Withdraw this educator’s access to the learner’s dashboard?')) break;
+        el.disabled = true;
+        void withdrawEducatorConnection(requestId).then((result) => {
+          parentDashboardData = null;
+          parentDashboardError = '';
+          parentDashboardLoading = false;
+          parentDashboardRequest += 1;
+          showToast(result.message || 'Educator access was withdrawn.', 'success');
+          void loadParentPortalData();
+        }).catch((error) => {
+          showToast(error instanceof Error ? error.message : 'Consent could not be withdrawn.', 'error');
+          if (el.isConnected) el.disabled = false;
+        });
+        break;
+      }
       case 'ai-delete-conversation': {
         const recordId = el.dataset.id;
         if (!recordId || !window.confirm('Delete this conversation from this browser?')) break;
@@ -9219,6 +9572,11 @@ import {
           state.loginMode = 'signin';
           state.authRole = 'adult';
           navigate(parseLocation().page.startsWith('tutor') ? 'tutor-login' : 'login', parseLocation().page.startsWith('tutor') ? {} : { mode: 'signin' }, true);
+          if (returnToParentPortal) navigate('parent-login', {}, true);
+          parentDashboardData = null;
+          parentDashboardError = '';
+          parentDashboardLoading = false;
+          parentDashboardRequest += 1;
           const notice = result.activityEmailError
             ? `You have signed out. ${result.activityEmailError}`
             : authStorageError
@@ -9229,9 +9587,15 @@ import {
           state.loginMode = 'signin';
           state.authRole = 'adult';
           navigate(parseLocation().page.startsWith('tutor') ? 'tutor-login' : 'login', parseLocation().page.startsWith('tutor') ? {} : { mode: 'signin' }, true);
+          if (returnToParentPortal) navigate('parent-login', {}, true);
+          parentDashboardData = null;
+          parentDashboardError = '';
+          parentDashboardLoading = false;
+          parentDashboardRequest += 1;
           const message = error instanceof Error ? error.message : 'Signed out on this device, but Supabase could not confirm the session revocation.';
           showToast(authStorageError ? `${message} Pending sign-in state could not be fully cleared.` : message, 'error');
         });
+        const returnToParentPortal = parseLocation().page.startsWith('parent');
         break;
       case 'close-search': document.getElementById('modal-root').innerHTML = ''; break;
       case 'trainer-set-lang': {
@@ -9441,7 +9805,7 @@ import {
       if (modalRoot) modalRoot.innerHTML = '';
       const route = routeEl.dataset.route;
       const params = {};
-      ['lang', 'level', 'module', 'lesson', 'grade', 'mode', 'section', 'story', 'screen', 'riddle', 'category', 'next'].forEach((key) => { if (routeEl.dataset[key]) params[key] = routeEl.dataset[key]; });
+      ['lang', 'level', 'module', 'lesson', 'grade', 'mode', 'section', 'story', 'screen', 'riddle', 'category', 'next', 'child'].forEach((key) => { if (routeEl.dataset[key]) params[key] = routeEl.dataset[key]; });
       if (route.startsWith('voice-')) {
         if (['yoruba', 'igbo', 'hausa', 'swahili', 'zulu', 'twi'].includes(params.lang)) state.trainer.lang = params.lang;
         if (['beginner', 'intermediate', 'advanced'].includes(params.level)) {
@@ -9702,6 +10066,104 @@ import {
     if (!type) return;
     event.preventDefault();
     const data = new FormData(form);
+    if (type === 'parent-auth') {
+      if (!form.reportValidity()) return;
+      const errorElement = form.querySelector('.family-auth-error');
+      const submitButton = form.querySelector('button[type="submit"]');
+      const fail = (message) => {
+        if (errorElement) {
+          errorElement.textContent = message;
+          errorElement.hidden = false;
+        } else showToast(message, 'error');
+      };
+      if (!isSupabaseConfigured || !supabase) {
+        fail('Family accounts are not configured on this deployment. Please try again later.');
+        return;
+      }
+      if (errorElement) {
+        errorElement.textContent = '';
+        errorElement.hidden = true;
+      }
+      if (submitButton) submitButton.disabled = true;
+      try {
+        const mode = form.dataset.mode;
+        const email = String(data.get('email') || '').trim();
+        const password = String(data.get('password') || '');
+        if (mode === 'signup') {
+          const name = String(data.get('name') || '').trim();
+          const phone = String(data.get('phone') || '').trim();
+          if (!/^\+?[0-9\s()-]{7,24}$/.test(phone)) throw new Error('Enter a valid phone number.');
+          if (!isSignupPasswordValid(password)) throw new Error('Use 12–128 characters with uppercase and lowercase letters, a number, and a symbol.');
+          const { session, welcomeEmailError } = await signUpAccount({
+            email,
+            password,
+            name,
+            phone,
+            role: 'parent',
+            redirectRoute: 'parent-dashboard'
+          });
+          parentDashboardData = null;
+          parentDashboardError = '';
+          parentDashboardLoading = false;
+          parentDashboardRequest += 1;
+          navigate('parent-welcome');
+          if (!session) {
+            showToast('Account created. Confirm your email to finish setting up your parent account.', 'success');
+          } else if (welcomeEmailError) {
+            showToast(`Your parent account is ready. ${welcomeEmailError}`, 'error');
+          } else {
+            showToast('Your parent account is ready.', 'success');
+          }
+          return;
+        }
+        await signInAccount({ email, password, expectedRole: 'parent' });
+        parentDashboardData = null;
+        parentDashboardError = '';
+        parentDashboardLoading = false;
+        parentDashboardRequest += 1;
+        let activityEmailError = '';
+        try {
+          await sendAuthActivityEmail('sign-in');
+        } catch (error) {
+          activityEmailError = error instanceof Error ? error.message : 'The sign-in notification could not be sent.';
+        }
+        navigate('parent-dashboard');
+        showToast(activityEmailError ? `Signed in successfully. ${activityEmailError}` : 'Welcome to your family portal.', activityEmailError ? 'error' : 'success');
+      } catch (error) {
+        fail(error instanceof Error ? error.message : 'Your parent account could not be verified.');
+      } finally {
+        if (submitButton?.isConnected) submitButton.disabled = false;
+      }
+      return;
+    }
+    if (type === 'parent-profile') {
+      if (!form.reportValidity()) return;
+      const errorElement = form.querySelector('.family-auth-error');
+      const submitButton = form.querySelector('button[type="submit"]');
+      if (submitButton) submitButton.disabled = true;
+      try {
+        const name = String(data.get('name') || '').trim();
+        const phone = String(data.get('phone') || '').trim();
+        if (!name) throw new Error('Enter your name before saving.');
+        if (phone && !/^\+?[0-9\s()-]{7,24}$/.test(phone)) throw new Error('Enter a valid phone number.');
+        await updateUserProfile({ name, phone });
+        if (errorElement) {
+          errorElement.textContent = '';
+          errorElement.hidden = true;
+        }
+        render();
+        showToast('Your account details were saved.');
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Your account details could not be saved.';
+        if (errorElement) {
+          errorElement.textContent = message;
+          errorElement.hidden = false;
+        } else showToast(message, 'error');
+      } finally {
+        if (submitButton?.isConnected) submitButton.disabled = false;
+      }
+      return;
+    }
     if (type === 'heritage-riddle') {
       if (!form.reportValidity()) return;
       const riddle = HERITAGE_RIDDLES.find((item) => item.id === form.dataset.riddle);

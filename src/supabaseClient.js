@@ -160,6 +160,7 @@ function mapAuthUser(authUser, metadata = authUser.user_metadata || {}) {
     id: authUser.id,
     email: authUser.email,
     name: metadata.name || authUser.email?.split('@')[0] || '',
+    phone: metadata.phone || '',
     role: metadata.role || 'adult',
     avatar: metadata.avatar_url || '',
     bio: metadata.bio || '',
@@ -217,7 +218,7 @@ async function requestAuthEmailCode(email, purpose) {
   }
 }
 
-export async function signUp({ email, password, name, role = 'child', guardianAccessRequestId, educatorInviteId, redirectRoute = 'index' }) {
+export async function signUp({ email, password, name, phone = '', role = 'child', guardianAccessRequestId, educatorInviteId, redirectRoute = 'index' }) {
   const client = requireSupabase();
   if (!['child', 'adult', 'parent', 'educator'].includes(role)) {
     throw new Error('Choose a supported account type before creating an account.');
@@ -231,7 +232,7 @@ export async function signUp({ email, password, name, role = 'child', guardianAc
   if (role === 'educator' && !/^[0-9a-f-]{36}$/i.test(educatorInviteId || '')) {
     throw new Error('A verified one-time educator invitation code is required before creating a teacher account.');
   }
-  if (!['index', 'tutor-login'].includes(redirectRoute)) {
+  if (!['index', 'tutor-login', 'parent-dashboard'].includes(redirectRoute)) {
     throw new Error('Choose a supported destination for the account confirmation link.');
   }
   const normalizedEmail = email.toLowerCase().trim();
@@ -244,6 +245,7 @@ export async function signUp({ email, password, name, role = 'child', guardianAc
       data: {
         name: userName,
         role,
+        ...(role === 'parent' && phone ? { phone: phone.trim().slice(0, 24) } : {}),
         ...(role === 'child' ? { guardian_access_request_id: guardianAccessRequestId } : {}),
         ...(role === 'educator' ? { educator_invite_id: educatorInviteId } : {}),
       },

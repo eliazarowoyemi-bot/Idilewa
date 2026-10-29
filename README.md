@@ -87,6 +87,10 @@ The application is bundled with Vite as an ES module web application:
 - **`src/supabaseClient.js`:** Supabase authentication and database persistence layer with local browser storage offline-first fallback.
 - **`styles.css`:** Curated design tokens, responsive breakpoints, typography, 3D scroll animations, and accessibility styles.
 
+### Family portal
+
+The parent experience is available at `parents.html` (`#/families`) and includes dedicated parent sign-up and sign-in, a guardian-approved family dashboard, learner progress, connection updates, and account settings. Parent account confirmation returns to the protected `parent-dashboard` route. Learner data is loaded from the authenticated `/api/dashboard/parent` endpoint; direct teacher messaging is not enabled.
+
 ## 5. Cultural World Application Blueprint
 
 The Cultural World (`#/world`) is the learner-facing hub for Idilewa's existing language, oral-heritage and K–8 STEM experiences. It adds an interactive map without replacing the working single-page application or making existing lessons inaccessible.

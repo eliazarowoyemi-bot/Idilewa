@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 const routes = [
-  'auth-callback', 'index', 'about', 'base', 'coding', 'connect_students', 'connect_teachers', 'consent', 'course',
+  'auth-callback', 'index', 'parents', 'about', 'base', 'coding', 'connect_students', 'connect_teachers', 'consent', 'course',
   'curriculum', 'ere', 'ere_game', 'guides', 'human', 'ifa', 'ifa_odu', 'individuals', 'keepers',
   'kids', 'languages', 'lesson', 'login', 'method', 'oral', 'oral_genre', 'oriki', 'owe',
   'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'pricing', 'profile', 'schools',
