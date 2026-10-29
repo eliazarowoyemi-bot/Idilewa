@@ -6523,6 +6523,7 @@ import {
     const supportEmail = 'idilewa2026@gmail.com';
     return `<div class="container route-page information-page">
       <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>Contact</strong></div>
+      <figure class="contact-team-image"><img src="${imageUrl('contact-idilewa-team.png')}" alt="Contact the Idilewa team. We’re here to listen, help and support your learning journey." /></figure>
       <section class="page-intro-card">
         <span class="section-kicker">Talk with the Idilewa team</span>
         <h1>We’d love to <em>hear from you.</em></h1>
