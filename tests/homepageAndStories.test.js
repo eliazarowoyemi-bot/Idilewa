@@ -40,10 +40,15 @@ test('homepage uses the approved bilingual font families and removes the video C
   const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderLanguageCard'));
   assert.match(indexSource, /<body data-default-route="index">/);
   assert.match(indexSource, /family=Inter:wght@400;500;600;700&family=Plus\+Jakarta\+Sans:wght@600;700;800/);
-  assert.match(homeSource, /Preserving African Culture\.<br \/><span>Promoting Technology\.<\/span>/);
-  assert.match(homeSource, /Explore Stories/);
+  assert.match(homeSource, /Carry a story\.<br \/>Discover a tradition\.<br \/><span>Share what you<br \/>learn\.<\/span>/);
+  assert.match(homeSource, /landing-phone-screen/);
+  assert.match(homeSource, /routeLink\('languages', `Explore Idilewa/);
+  assert.match(homeSource, /routeLink\('heritage', `Discover culture/);
   assert.doesNotMatch(homeSource, /visual-journey-3d-section|Talking Drum|Living Glyphs/);
   assert.match(appSource, /case 'index': return renderHome\(\);/);
+  assert.doesNotMatch(homeSource, /routeLink\('world'/);
+  assert.match(styleSource, /\.landing-phone\s*\{/);
+  assert.match(styleSource, /@media \(max-width: 760px\)[\s\S]*?\.landing-home \.landing-hero-grid\s*\{\s*grid-template-columns: minmax\(0, 1fr\)/);
   assert.doesNotMatch(homeSource, /Watch Video/);
   assert.doesNotMatch(homeSource, /landing-language-flag|flag: '🇳🇬'|flag: '🇹🇿'/);
   assert.match(styleSource, /landing-hero-copy h1[\s\S]*?font-size: 28px;[\s\S]*?line-height: 33px/);
@@ -51,12 +56,15 @@ test('homepage uses the approved bilingual font families and removes the video C
   assert.match(styleSource, /landing-hero-actions \.button[\s\S]*?min-height: 48px;[\s\S]*?font-size: 14px/);
 });
 
-test('main and expanded mobile navigation order lessons between Explore and Code', () => {
+test('main and expanded mobile navigation omit the removed Explore page', () => {
   const navSource = appSource.match(/const NAV = \[([\s\S]*?)\n  \];/)?.[1];
   assert.ok(navSource, 'main navigation list should exist');
   const navLabels = [...navSource.matchAll(/label: '([^']+)'/g)].map((match) => match[1]);
 
-  assert.deepEqual(navLabels, ['Home', 'Explore', 'Voice Lessons', 'AI Conversations', 'For Tutors', 'Code', 'Curriculum']);
+  assert.deepEqual(navLabels, ['Home', 'Voice Lessons', 'AI Conversations', 'For Tutors', 'Code', 'Curriculum']);
+  assert.match(appSource, /const REMOVED_ROUTES = new Set\(\[[^\]]*'world'/);
+  assert.match(appSource, /\{ route: 'ere', label: 'Stories', ico: 'quote' \}/);
+  assert.doesNotMatch(appSource, /route: 'world'|label: 'Explore'|function renderCulturalWorld|initCulturalWorld|cultural-zone|cultural-world-replacement/);
   assert.match(appSource, /const MENU_NAV = \[\.\.\.NAV,/);
 });
 

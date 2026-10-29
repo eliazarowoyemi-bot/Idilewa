@@ -1,7 +1,6 @@
 import * as THREE from 'three';
 import brandLogoUrl from './assets/idilewa-brand.svg';
 import './src/convexClient.js';
-import { CULTURAL_BIOMES, initCulturalWorld } from './src/culturalWorld.js';
 import {
   init3DCodeRobotGlyphs,
   init3DAuthCanvas,
@@ -109,10 +108,10 @@ import {
     'index', 'about', 'base', 'coding', 'coding-studio', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
     'ere', 'ere_game', 'game', 'guides', 'heritage', 'human', 'ifa', 'ifa_odu', 'individuals', 'keepers', 'library',
     'kids', 'languages', 'lesson', 'login', 'method', 'oral', 'oral_genre', 'oriki', 'owe',
-    'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'payment', 'pricing', 'profile', 'schools', 'world',
+    'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'payment', 'pricing', 'profile', 'schools',
     'voices'
   ];
-  const REMOVED_ROUTES = new Set(['adult', 'parent_dashboard', 'educator_dashboard']);
+  const REMOVED_ROUTES = new Set(['adult', 'parent_dashboard', 'educator_dashboard', 'world']);
   const OWE_ROUTE_SECTIONS = {
     owe_detail: 'meaning',
     owe_story: 'story',
@@ -382,7 +381,6 @@ import {
 
   const NAV = [
     { label: 'Home', route: 'index', group: 'home' },
-    { label: 'Explore', route: 'world', group: 'world' },
     { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' },
     { label: 'AI Conversations', route: 'ai-conversations', group: 'ai-conversations' },
     { label: 'For Tutors', route: 'tutor', group: 'tutor' },
@@ -407,8 +405,6 @@ import {
     'parent-messages': 'families',
     'parent-settings': 'families',
     'parent-welcome': 'families',
-    world: 'world',
-    profile: 'world',
     'ai-conversations': 'ai-conversations',
     'ai-login': 'ai-conversations',
     'ai-signup': 'ai-conversations',
@@ -451,7 +447,6 @@ import {
   LABELS.curriculum = 'Curriculum';
   LABELS.coding = 'Code';
   LABELS['coding-studio'] = 'Start Coding';
-  LABELS.world = 'Cultural World';
   Object.assign(LABELS, {
     'voice-language': 'Choose a voice lesson language',
     'voice-grade': 'Choose a voice lesson grade',
@@ -870,7 +865,7 @@ import {
     }
     const items = [
       { route: 'index', label: 'Home', ico: 'home' },
-      { route: 'world', label: 'Explore', ico: 'globe' },
+      { route: 'ere', label: 'Stories', ico: 'quote' },
       { route: 'library', label: 'Library', ico: 'book' },
       { route: 'coding', label: 'Code', ico: 'code' },
       { route: 'profile', label: 'Profile', ico: 'user' }
@@ -1245,22 +1240,49 @@ import {
       { icon: 'people', title: 'Join', copy: 'A global community', route: 'connect_students' }
     ];
     return `<div class="landing-home">
-      <section class="landing-hero">
+      <section class="landing-hero" aria-label="Welcome to Idilewa">
         <div class="container landing-hero-grid">
-          <div class="landing-hero-copy">
-            <span class="landing-eyebrow">African Roots <i>•</i> Brighter Futures</span>
-            <h1>Preserving African Culture.<br /><span>Promoting Technology.</span></h1>
-            <p>Learn African languages, hear our stories, build real skills and belong to a global community.</p>
-            <div class="landing-hero-actions">
-              ${routeLink('voice-language', `Start Learning ${icon('arrow', 16)}`, 'button button-primary')}
-              ${routeLink('ere', `Explore Stories ${icon('arrow', 16)}`, 'button button-outline')}
-              ${routeLink('world', `Explore the World ${icon('compass', 16)}`, 'button button-soft')}
+          <div class="landing-hero-device" aria-hidden="true">
+            <div class="landing-phone">
+              <div class="landing-phone-notch"></div>
+              <div class="landing-phone-screen">
+                <div class="landing-phone-status"><span>9:41</span><span>● ▰</span></div>
+                <div class="landing-phone-brand">
+                  <span class="landing-phone-mark">${icon('leaf', 19)}</span>
+                  <span><strong>idilewa</strong><small>Language · Culture · Stories</small></span>
+                  <span class="landing-phone-tools">${icon('search', 15)}${icon('user', 15)}</span>
+                </div>
+                <div class="landing-phone-welcome">
+                  <small>A LITTLE LEARNING EVERY DAY</small>
+                  <strong>Hello, Aya!</strong>
+                  <span>Stories, culture and joyful challenges, all in one place.</span>
+                </div>
+                <div class="landing-phone-search">${icon('search', 14)}<span>Search stories, topics or children</span></div>
+                <div class="landing-phone-story">
+                  <img src="/assets/story-grandmother.jpg" alt="" />
+                  <span class="landing-phone-popular">POPULAR TODAY</span>
+                  <strong>A steady pace can carry you further.</strong>
+                  <span class="landing-phone-read">Read the story ${icon('arrow', 12)}</span>
+                </div>
+                <div class="landing-phone-section-heading"><span><strong>EXPLORE</strong><small>Choose your journey</small></span><strong>Your profile ${icon('arrow', 11)}</strong></div>
+                <div class="landing-phone-tiles">
+                  <div><img src="/assets/child-language-yoruba.jpg" alt="" /><strong>Values<br />&amp; Habits</strong><small>Timeless lessons for everyday life.</small></div>
+                  <div><img src="/assets/home-family-learning.jpg" alt="" /><strong>Our<br />Identity</strong><small>Explore who we are and where we come from.</small></div>
+                  <div><img src="/assets/african-kids-friends.jpg" alt="" /><strong>Think<br />&amp; Grow</strong><small>Solve problems. Make better choices.</small></div>
+                </div>
+                <div class="landing-phone-nav"><span>${icon('home', 13)}Home</span><span>${icon('book', 13)}Stories</span><span>${icon('globe', 13)}Culture</span><span>${icon('sparkles', 13)}Riddles</span><span>${icon('user', 13)}Profile</span></div>
+              </div>
             </div>
-            <div class="landing-hero-proof"><span>${icon('globe', 17)}</span><span>Culture, creativity and learning<br />for every generation.</span></div>
           </div>
-          <figure class="landing-hero-image">
-            <img src="/assets/home-family-learning.jpg" alt="A family sharing African stories and learning together around an Idilewa tablet" fetchpriority="high" />
-          </figure>
+          <div class="landing-hero-copy">
+            <span class="landing-eyebrow">IDILEWA <i>•</i> LEARN, EXPLORE, GROW</span>
+            <h1>Carry a story.<br />Discover a tradition.<br /><span>Share what you<br />learn.</span></h1>
+            <p>Choose a path and move between folktales, culture and playful challenges wherever you are.</p>
+            <div class="landing-hero-actions">
+              ${routeLink('languages', `Explore Idilewa ${icon('arrow', 16)}`, 'button button-primary')}
+              ${routeLink('heritage', `Discover culture ${icon('arrow', 16)}`, 'button button-outline')}
+            </div>
+          </div>
         </div>
       </section>
 
@@ -5562,98 +5584,8 @@ import {
     </div>`;
   }
 
-  function renderCulturalWorld() {
-    const zones = CULTURAL_BIOMES.map((biome) => `
-      <button class="world-artwork-hotspot world-artwork-zone world-artwork-zone-${biome.id}" type="button" data-action="cultural-zone" data-zone="${biome.id}" aria-label="Explore ${esc(biome.title)}"></button>`).join('');
-    const languageMarkers = [
-      ['english', 'English'],
-      ['french', 'French'],
-      ['mandarin', 'Mandarin'],
-      ['spanish', 'Spanish'],
-      ['swahili', 'Swahili']
-    ].map(([id, name]) => routeLink(
-      'languages',
-      `<span class="sr-only">Browse available language courses from the ${name} map marker</span>`,
-      `world-artwork-hotspot world-artwork-language-marker world-artwork-language-marker-${id}`,
-      `aria-label="Browse available language courses from the ${name} map marker"`
-    )).join('');
-
-    return `<div class="world-artwork-page">
-      <h1 class="world-artwork-title">A Bigger World Awaits</h1>
-      <div class="world-artwork-frame" role="group" aria-label="Explore languages and cultures">
-        <img src="./assets/cultural-world-replacement.png" srcset="./assets/cultural-world-replacement.png 877w, ./assets/cultural-world-replacement-5k.jpg 5000w" sizes="(min-width: 1232px) 1200px, calc(100vw - 32px)" width="877" height="768" alt="Idilewa's bigger world of language, voice, stories, wisdom and coding." />
-        <button class="world-artwork-hotspot world-artwork-start" type="button" data-action="cultural-zone" data-zone="language" aria-label="Start exploring"></button>
-        ${routeLink('languages', '<span class="sr-only">Browse available Idilewa language courses</span>', 'world-artwork-hotspot world-artwork-top-languages', 'aria-label="Browse available Idilewa language courses"')}
-        ${zones}
-        ${languageMarkers}
-        ${routeLink('profile', '<span class="sr-only">Start your learning journey: open your profile</span>', 'world-artwork-hotspot world-artwork-profile')}
-      </div>
-    </div>`;
-  }
-
-  function openCulturalZone(zoneId) {
-    const biome = CULTURAL_BIOMES.find((item) => item.id === zoneId);
-    if (!biome) return;
-    const currentFocus = document.activeElement;
-    worldSheetReturnFocus = currentFocus instanceof HTMLElement && currentFocus !== document.body
-      ? currentFocus
-      : null;
-    const root = document.getElementById('modal-root');
-    root.innerHTML = `<div class="world-sheet-backdrop" data-action="close-modal">
-      <section class="world-lesson-sheet" role="dialog" aria-modal="true" aria-labelledby="world-sheet-title" data-sheet-route="${esc(biome.route)}">
-        <div class="world-sheet-grabber" aria-hidden="true"></div>
-        <button class="world-sheet-close" type="button" data-action="close-modal" aria-label="Close learning place">×</button>
-        <span class="world-sheet-glyph world-zone-${esc(biome.id)}" aria-hidden="true">${esc(biome.icon)}</span>
-        <span class="world-section-kicker">${esc(biome.title)}</span>
-        <h2 id="world-sheet-title">${esc(biome.chapter)}</h2>
-        <p>${esc(biome.description)}</p>
-        <div class="world-lesson-note">
-          <small>${biome.translation ? 'Yorùbá · English meaning' : 'A learning path'}</small>
-          <strong>${esc(biome.phrase)}</strong>
-          ${biome.translation ? `<span>${esc(biome.translation)}</span>` : ''}
-        </div>
-        <div class="world-sheet-footer"><span>${icon('shield', 15)} ${esc(biome.ageNote)}</span>
-          <button class="button button-primary" type="button" data-action="launch-cultural-zone" data-zone="${esc(biome.id)}">Explore this place ${icon('arrow', 15)}</button>
-        </div>
-      </section>
-    </div>`;
-    const sheet = root.querySelector('.world-lesson-sheet');
-    const closeButton = root.querySelector('.world-sheet-close');
-    closeButton?.focus();
-    const grabber = root.querySelector('.world-sheet-grabber');
-    let dragStartY = 0;
-    let dragStartTime = 0;
-    grabber?.addEventListener('pointerdown', (event) => {
-      dragStartY = event.clientY;
-      dragStartTime = performance.now();
-      if (sheet) sheet.style.transition = 'none';
-      grabber.setPointerCapture(event.pointerId);
-    });
-    grabber?.addEventListener('pointermove', (event) => {
-      if (!grabber.hasPointerCapture(event.pointerId) || !sheet) return;
-      sheet.style.transform = `translateY(${Math.max(0, event.clientY - dragStartY)}px)`;
-    });
-    const finishSheetDrag = (event) => {
-      if (!grabber?.hasPointerCapture(event.pointerId) || !sheet) return;
-      const distance = Math.max(0, event.clientY - dragStartY);
-      const elapsed = Math.max(1, performance.now() - dragStartTime);
-      if (distance > 100 || distance / elapsed > 0.75) {
-        closeModal();
-      } else {
-        sheet.style.transition = '';
-        sheet.style.transform = '';
-      }
-    };
-    grabber?.addEventListener('pointerup', finishSheetDrag);
-    grabber?.addEventListener('pointercancel', finishSheetDrag);
-  }
-
-  let worldSheetReturnFocus = null;
   function closeModal() {
-    const isWorldSheet = document.querySelector('.world-lesson-sheet');
     document.getElementById('modal-root').innerHTML = '';
-    if (isWorldSheet && worldSheetReturnFocus?.isConnected) worldSheetReturnFocus.focus();
-    worldSheetReturnFocus = null;
   }
 
   const TUTOR_PORTAL_LINKS = [
@@ -7724,7 +7656,6 @@ import {
       case 'parent-messages':
       case 'parent-settings':
       case 'parent-welcome': return renderParentPortal(page, params);
-      case 'world': return renderCulturalWorld();
       case 'learn':
       case 'curriculum': return renderCurriculum();
       case 'languages': return renderLanguages();
@@ -8223,7 +8154,6 @@ import {
   }
 
   let activeCodeRobotScene = null;
-  let activeWorldScene = null;
   let homePreviewTimers = [];
 
   function startHomePreviewMotion() {
@@ -8283,10 +8213,6 @@ import {
     if (activeCodeRobotScene) {
       activeCodeRobotScene.destroy();
       activeCodeRobotScene = null;
-    }
-    if (activeWorldScene) {
-      activeWorldScene.destroy();
-      activeWorldScene = null;
     }
     const location = parseLocation();
     if (location.removedRoute) {
@@ -8353,11 +8279,6 @@ import {
     if (page === 'coding') {
       const codeRobotGlyphs = document.getElementById('codeRobotGlyphCanvas');
       if (codeRobotGlyphs) activeCodeRobotScene = init3DCodeRobotGlyphs(codeRobotGlyphs);
-    } else if (page === 'world') {
-      const worldCanvas = document.getElementById('cultural-world-canvas');
-      if (worldCanvas) {
-        activeWorldScene = initCulturalWorld(worldCanvas, (zoneId) => openCulturalZone(zoneId));
-      }
     } else if (page === 'trainer' || page === 'voice_lessons') {
       const audioCanvas = document.getElementById('waveformCanvas');
       if (audioCanvas) init3DAudioVisualizer(audioCanvas);
@@ -8775,20 +8696,6 @@ import {
       case 'toggle-menu': toggleMobileMenu(); break;
       case 'open-search': openSearch(); break;
       case 'close-modal': closeModal(); break;
-      case 'cultural-zone':
-        openCulturalZone(el.dataset.zone || '');
-        break;
-      case 'launch-cultural-zone': {
-        const biome = CULTURAL_BIOMES.find((item) => item.id === el.dataset.zone);
-        if (!biome) break;
-        document.getElementById('modal-root').innerHTML = '';
-        if (biome.language) {
-          state.currentLang = biome.language;
-          saveState();
-        }
-        navigate(biome.route, biome.language ? { lang: biome.language } : {});
-        break;
-      }
       case 'open-ai-helper': openAiHelper(el.dataset.topic || 'general'); break;
       case 'ai-suggestion': {
         const input = document.getElementById('aiHelperQuestion');
