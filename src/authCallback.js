@@ -27,7 +27,7 @@ async function initializeAuthCallback() {
     recoveryForm.hidden = false;
   } else if (callback) {
     const next = new URLSearchParams(window.location.search).get('next');
-    const destination = ['index', 'login', 'profile'].includes(next || '') ? next : 'index';
+    const destination = ['index', 'login', 'profile', 'tutor-login'].includes(next || '') ? next : 'index';
     window.location.replace(destination === 'login' ? '/#/login?mode=signin' : `/#/${destination}`);
   }
 }

@@ -88,7 +88,7 @@ test('sign-in and sign-out activity emails are sent without blocking local logou
 test('sign-out clears pending verification and recovery steps before returning to sign-in', () => {
   assert.match(appSource, /function clearPendingAuthFlow\(\) \{[\s\S]*?pendingSignupEmail = '';[\s\S]*?pendingSignin = null;[\s\S]*?passwordResetVerified = false;[\s\S]*?idilewa-pending-signup-email[\s\S]*?idilewa-pending-signin-otp[\s\S]*?idilewa-password-reset-verified/);
   assert.match(appSource, /case 'account-sign-out':\s*case 'profile-sign-out':\s*const authStorageError = clearPendingAuthFlow\(\);\s*void signOutAccount\(\)\.then/);
-  assert.match(appSource, /catch\(\(error\) => \{\s*state\.loginMode = 'signin';\s*state\.authRole = 'adult';\s*navigate\('login', \{ mode: 'signin' \}, true\);/);
+  assert.match(appSource, /catch\(\(error\) => \{\s*state\.loginMode = 'signin';\s*state\.authRole = 'adult';\s*navigate\(parseLocation\(\)\.page\.startsWith\('tutor'\) \? 'tutor-login' : 'login', parseLocation\(\)\.page\.startsWith\('tutor'\) \? \{\} : \{ mode: 'signin' \}, true\);/);
 });
 
 test('sign-out clears the current device session without relying on global logout', () => {

@@ -149,7 +149,7 @@ All 37 HTML entries declared in the active `vite.config.js` are supported:
 | | `#/kids` (`kids.html`) | Child-centered learning portal with playful stories and coding. |
 | | `#/individuals` (`individuals.html`) | Independent learner & heritage reconnection pathways. |
 | | `#/schools` (`schools.html`) | Classroom educator guide with preview-only school interest inquiry. |
-| | `#/tutor` (`tutor.html`) | Informational introduction to tutor-led conversational learning. |
+| | `#/tutor` (`tutor.html`) | Tutor Portal with public introduction, educator sign-in/invitation signup, dashboard, learner connection requests, consent, lesson, messages, profile, availability, and settings interfaces. |
 | | `#/profile` (`profile.html`) | Learner progress dashboard, points, streaks, badges (stored in local browser state). |
 | | `#/login` (`login.html`) | Persona-based authentication (child, adult, parent, educator) with 3D shield and Supabase notice. |
 | | `#/pricing` (`pricing.html`) | Preview family/explorer plans; explicitly non-billing demonstration. |

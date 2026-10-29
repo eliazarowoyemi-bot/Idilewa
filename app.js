@@ -54,6 +54,7 @@ import {
   signOut as signOutAccount,
   signIn as signInAccount,
   signUp as signUpAccount,
+  verifyEducatorInvite,
   resendSignupConfirmation,
   restoreAuthSession,
   requestSigninOtp,
@@ -100,6 +101,8 @@ import {
     'voice-text-to-speech', 'voice-cloning', 'voice-speech-to-text', 'voice-translation',
     'ai-conversations', 'ai-login', 'ai-signup', 'ai-dashboard', 'ai-chat', 'ai-everyday',
     'ai-voice', 'ai-history', 'ai-analytics', 'ai-profile', 'ai-children', 'ai-messages', 'ai-settings',
+    'tutor', 'tutor-login', 'tutor-signup', 'tutor-dashboard', 'tutor-find-child', 'tutor-students',
+    'tutor-consent', 'tutor-lesson', 'tutor-messages', 'tutor-profile', 'tutor-availability', 'tutor-settings',
     'curriculum',
     'index', 'about', 'base', 'coding', 'coding-studio', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
     'ere', 'ere_game', 'game', 'guides', 'human', 'ifa', 'ifa_odu', 'individuals', 'keepers', 'library',
@@ -107,7 +110,7 @@ import {
     'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'payment', 'pricing', 'profile', 'schools', 'world',
     'voices'
   ];
-  const REMOVED_ROUTES = new Set(['adult', 'parent_dashboard', 'educator_dashboard', 'tutor']);
+  const REMOVED_ROUTES = new Set(['adult', 'parent_dashboard', 'educator_dashboard']);
   const OWE_ROUTE_SECTIONS = {
     owe_detail: 'meaning',
     owe_story: 'story',
@@ -377,6 +380,7 @@ import {
     { label: 'Explore', route: 'world', group: 'world' },
     { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' },
     { label: 'AI Conversations', route: 'ai-conversations', group: 'ai-conversations' },
+    { label: 'For Tutors', route: 'tutor', group: 'tutor' },
     { label: 'Code', route: 'coding', group: 'code' },
     { label: 'Curriculum', route: 'curriculum', group: 'curriculum' }
   ];
@@ -402,6 +406,18 @@ import {
     'ai-children': 'ai-conversations',
     'ai-messages': 'ai-conversations',
     'ai-settings': 'ai-conversations',
+    tutor: 'tutor',
+    'tutor-login': 'tutor',
+    'tutor-signup': 'tutor',
+    'tutor-dashboard': 'tutor',
+    'tutor-find-child': 'tutor',
+    'tutor-students': 'tutor',
+    'tutor-consent': 'tutor',
+    'tutor-lesson': 'tutor',
+    'tutor-messages': 'tutor',
+    'tutor-profile': 'tutor',
+    'tutor-availability': 'tutor',
+    'tutor-settings': 'tutor',
     curriculum: 'curriculum',
     coding: 'code', 'coding-studio': 'code',
     trainer: 'trainer', voice_lessons: 'trainer',
@@ -410,7 +426,7 @@ import {
     owe_detail: 'read', owe_story: 'read', owe_reflection: 'read', voices: 'read',
     connect_students: 'about', connect_teachers: 'about', consent: 'about', contact: 'about', privacy: 'about',
     ere: 'stories', ere_game: 'stories', game: 'stories', library: 'read', payment: 'about', ifa: 'culture', ifa_odu: 'culture',
-    about: 'about', method: 'about', schools: 'about', tutor: 'about',
+    about: 'about', method: 'about', schools: 'about',
     guides: 'culture', human: 'culture', keepers: 'culture'
   };
 
@@ -455,6 +471,20 @@ import {
   LABELS['ai-children'] = 'My Children';
   LABELS['ai-messages'] = 'Messages';
   LABELS['ai-settings'] = 'Settings';
+  Object.assign(LABELS, {
+    tutor: 'Tutor Portal',
+    'tutor-login': 'Tutor sign in',
+    'tutor-signup': 'Create tutor account',
+    'tutor-dashboard': 'Tutor dashboard',
+    'tutor-find-child': 'Find a child',
+    'tutor-students': 'My students',
+    'tutor-consent': 'Parent consent',
+    'tutor-lesson': 'Today’s lesson',
+    'tutor-messages': 'Tutor messages',
+    'tutor-profile': 'Tutor profile',
+    'tutor-availability': 'Tutor availability',
+    'tutor-settings': 'Tutor settings'
+  });
 
   const defaults = {
     currentLang: 'yoruba',
@@ -743,7 +773,7 @@ import {
   }
 
   function renderHeader(page) {
-    if (page === 'login' || page.startsWith('ai-')) {
+    if (page === 'login' || page.startsWith('ai-') || page.startsWith('tutor')) {
       document.getElementById('site-header').innerHTML = '';
       return;
     }
@@ -788,7 +818,7 @@ import {
 
   function renderMobileNav(page) {
     const currentUser = getCurrentUser();
-    if (page.startsWith('ai-') || currentUser?.role === 'parent' || currentUser?.role === 'educator') {
+    if (page.startsWith('ai-') || page.startsWith('tutor') || currentUser?.role === 'parent' || currentUser?.role === 'educator') {
       document.getElementById('mobile-nav').innerHTML = '';
       return;
     }
@@ -5338,6 +5368,237 @@ import {
     worldSheetReturnFocus = null;
   }
 
+  const TUTOR_PORTAL_LINKS = [
+    { route: 'tutor-dashboard', label: 'Dashboard', icon: 'home' },
+    { route: 'tutor-find-child', label: 'Find a Child', icon: 'search' },
+    { route: 'tutor-students', label: 'My Students', icon: 'people' },
+    { route: 'tutor-messages', label: 'Messages', icon: 'send' },
+    { route: 'tutor-profile', label: 'My Profile', icon: 'user' },
+    { route: 'tutor-settings', label: 'Settings', icon: 'lock' }
+  ];
+  const TUTOR_ACTIVE_LINK = {
+    'tutor-dashboard': 'tutor-dashboard',
+    'tutor-find-child': 'tutor-find-child',
+    'tutor-consent': 'tutor-find-child',
+    'tutor-students': 'tutor-students',
+    'tutor-lesson': 'tutor-students',
+    'tutor-messages': 'tutor-messages',
+    'tutor-profile': 'tutor-profile',
+    'tutor-availability': 'tutor-profile',
+    'tutor-settings': 'tutor-settings'
+  };
+  const TUTOR_AVAILABILITY_KEY = 'idilewa-tutor-availability';
+  const TUTOR_PREFERENCES_KEY = 'idilewa-tutor-preferences';
+  let tutorDashboardData = null;
+  let tutorDashboardLoadSequence = 0;
+  let tutorDashboardDataPage = '';
+  let tutorDashboardLoadPending = false;
+
+  function isTutorAccount() {
+    return getCurrentUser()?.role === 'educator';
+  }
+
+  function renderTutorBrand() {
+    return `<a class="tutor-brand" href="#/tutor" data-route="tutor" aria-label="Idilewa tutor portal home">${brandLogo('Idilewa')}</a>`;
+  }
+
+  function renderTutorLanding() {
+    return `<div class="tutor-public-page">
+      <header class="tutor-public-header">${renderTutorBrand()}<nav aria-label="Tutor portal navigation"><a href="#/tutor-login" data-route="tutor-login">Sign in</a><a class="tutor-button tutor-button-primary tutor-button-small" href="#/tutor-signup" data-route="tutor-signup">Create tutor account</a></nav></header>
+      <main class="tutor-public-main">
+        <section class="tutor-public-hero"><div class="tutor-public-copy"><span class="tutor-eyebrow"><i></i> For language educators</span><h1>Make a difference.<br />Teach the world.</h1><p>Connect with children from around the world, help them learn new languages, and be part of their global journey.</p><div class="tutor-public-actions"><a class="tutor-button tutor-button-primary" href="#/tutor-signup" data-route="tutor-signup">Create Tutor Account ${icon('arrow', 15)}</a><a class="tutor-button tutor-button-outline" href="#/tutor-login" data-route="tutor-login">Sign in</a></div><div class="tutor-public-values"><span>${icon('check', 15)} Trusted connections</span><span>${icon('shield', 15)} Safe & secure</span><span>${icon('people', 15)} Global impact</span></div></div><div class="tutor-public-art"><img src="/assets/yoruba-educator-woman.jpg" alt="Language tutor preparing a lesson at her laptop" /><span class="tutor-art-message">Teach<br />Inspire<br />Empower</span></div></section>
+        <section class="tutor-public-steps" aria-label="How the tutor portal works"><article><span>01</span><strong>Create your account</strong><p>Use your one-time educator invitation to sign up securely.</p></article><article><span>02</span><strong>Connect with care</strong><p>Families approve each learner connection before any details are shared.</p></article><article><span>03</span><strong>Help learners grow</strong><p>See approved learning progress and prepare thoughtful lessons.</p></article></section>
+        <p class="tutor-public-note">${icon('lock', 14)} Learner information is only available after a parent or guardian approves your specific connection request.</p>
+      </main>
+      <footer class="tutor-public-footer">${renderTutorBrand()}<span>Language · Culture · Future</span><a href="#/privacy" data-route="privacy">Privacy</a></footer>
+    </div>`;
+  }
+
+  function renderTutorAuth(signup) {
+    const title = signup ? 'Create Tutor Account' : 'Welcome Back, Tutor';
+    const image = signup ? 'yoruba-educator-man.jpg' : 'yoruba-educator-woman.jpg';
+    const action = signup ? 'tutor-signup' : 'tutor-login';
+    return `<div class="tutor-auth-page">
+      <header class="tutor-auth-header">${renderTutorBrand()}<a href="#/tutor" data-route="tutor">Back to tutor portal</a></header>
+      <main class="tutor-auth-layout"><section class="tutor-auth-card"><div class="tutor-auth-mobile-brand">${renderTutorBrand()}</div><span class="tutor-eyebrow">IDILEWA · EDUCATOR PORTAL</span><h1>${title}</h1><p>${signup ? 'Join our community of dedicated language tutors.' : 'Log in to continue your teaching journey.'}</p>
+        <form class="tutor-auth-form" data-form="${action}" novalidate>
+          ${signup ? '<label>Full Name<input name="name" autocomplete="name" maxlength="80" placeholder="Enter your full name" required /></label>' : ''}
+          <label>Email Address<input name="email" type="email" autocomplete="email" placeholder="Enter your email" required /></label>
+          ${signup ? '<label>Educator Invitation Code<input name="inviteCode" autocomplete="one-time-code" maxlength="80" placeholder="Enter your invitation code" required /><small>A valid, unused invitation is required to create an educator account.</small></label>' : ''}
+          <label>Password<span class="tutor-password-field"><input id="tutor-password" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="12" maxlength="128" placeholder="${signup ? 'Create a password' : 'Enter your password'}" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-password" aria-label="Show password">${icon('eye', 15)}</button></span></label>
+          ${signup ? `<label>Confirm Password<span class="tutor-password-field"><input id="tutor-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Confirm your password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-confirm-password" aria-label="Show password">${icon('eye', 15)}</button></span></label><small class="tutor-password-guidance">Use 12 or more characters, including uppercase and lowercase letters, a number, and a symbol.</small><label class="tutor-check-label"><input type="checkbox" name="agreement" required /> I agree to follow Idilewa’s child-safeguarding and privacy requirements.</label>` : '<div class="tutor-auth-options"><label class="tutor-check-label"><input type="checkbox" name="remember" /> Remember me</label><a href="#/login?mode=signin" data-route="login" data-mode="signin">Forgot password?</a></div>'}
+          <p class="tutor-auth-error" role="alert" hidden></p>
+          <button type="submit" class="tutor-button tutor-button-primary tutor-auth-submit">${signup ? 'Create Account' : 'Login'} ${icon('arrow', 15)}</button>
+        </form>
+        <p class="tutor-auth-switch">${signup ? 'Already have an account?' : 'Don’t have an account?'} <a href="#/${signup ? 'tutor-login' : 'tutor-signup'}" data-route="${signup ? 'tutor-login' : 'tutor-signup'}">${signup ? 'Sign in' : 'Sign up'}</a></p>
+        <small class="tutor-auth-security">${icon('lock', 13)} Secure educator access · family consent is always required</small>
+      </section><aside class="tutor-auth-art"><img src="/assets/${image}" alt="Idilewa language tutor working at a laptop" /><div class="tutor-auth-art-caption">Better Language Skills<br /><strong>Brighter Futures</strong></div></aside></main>
+    </div>`;
+  }
+
+  function renderTutorWorkspace(page, title, content) {
+    if (!isTutorAccount()) {
+      return `<div class="tutor-access-page"><section class="tutor-access-card"><span class="tutor-access-icon">${icon('lock', 22)}</span><span class="tutor-eyebrow">Educator access</span><h1>Sign in to your tutor portal.</h1><p>Only verified educator accounts can view their dashboard and parent-approved student connections.</p><a class="tutor-button tutor-button-primary" href="#/tutor-login?next=${page}" data-route="tutor-login">Tutor sign in ${icon('arrow', 15)}</a></section></div>`;
+    }
+    const user = getCurrentUser();
+    const name = user.name || 'Tutor';
+    const initial = name.trim().charAt(0).toUpperCase() || 'T';
+    const active = TUTOR_ACTIVE_LINK[page] || 'tutor-dashboard';
+    const links = TUTOR_PORTAL_LINKS.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="tutor-sidebar-link ${item.route === active ? 'is-active' : ''}" ${item.route === active ? 'aria-current="page"' : ''}>${icon(item.icon, 17)}<span>${item.label}</span></a>`).join('');
+    return `<div class="tutor-workspace"><aside class="tutor-sidebar"><a class="tutor-sidebar-brand" href="#/tutor-dashboard" data-route="tutor-dashboard">${brandLogo('Idilewa')}<span><strong>IDILEWA</strong><small>Learn · Inspire · Grow</small></span></a><nav class="tutor-sidebar-nav" aria-label="Tutor workspace">${links}<a href="#/tutor-availability" data-route="tutor-availability" class="tutor-sidebar-link ${page === 'tutor-availability' ? 'is-active' : ''}">${icon('calendar', 17)}<span>Availability</span></a></nav><a href="#/tutor-profile" data-route="tutor-profile" class="tutor-sidebar-user"><span class="tutor-avatar">${esc(initial)}</span><span><strong>${esc(name)}</strong><small>Educator</small></span></a></aside><main class="tutor-workspace-main"><header class="tutor-topbar"><div><a href="#/tutor-dashboard" data-route="tutor-dashboard">Tutor Portal</a><span>/</span><strong>${esc(title)}</strong></div><div><span class="tutor-secure-status"><i></i> Secure workspace</span><a class="tutor-topbar-avatar" href="#/tutor-profile" data-route="tutor-profile" aria-label="Open tutor profile">${esc(initial)}</a></div></header><div class="tutor-workspace-content">${content}</div></main></div>`;
+  }
+
+  function renderTutorHeading(eyebrow, title, description, actions = '') {
+    return `<header class="tutor-page-heading"><div><span class="tutor-eyebrow">${esc(eyebrow)}</span><h1>${esc(title)}</h1><p>${esc(description)}</p></div>${actions ? `<div class="tutor-heading-actions">${actions}</div>` : ''}</header>`;
+  }
+
+  function renderTutorDashboard() {
+    const data = tutorDashboardData || {};
+    const educator = data.educator || {};
+    const firstName = (getCurrentUser()?.name || educator.name || 'Tutor').trim().split(/\s+/)[0];
+    const requests = Array.isArray(data.requests) ? data.requests : [];
+    const learners = Array.isArray(data.learners) ? data.learners : [];
+    const approvedCount = learners.length;
+    const lessons = learners.reduce((sum, learner) => sum + (Number(learner.completedLessons) || 0), 0);
+    const pending = requests.filter((request) => request.status === 'pending').length;
+    const recent = requests.slice(0, 4);
+    return renderTutorWorkspace('tutor-dashboard', 'Dashboard', `${renderTutorHeading('Your teaching space', `Good Morning, ${firstName}!`, 'Here’s what’s happening with your learners today.', `<a class="tutor-button tutor-button-primary" href="#/tutor-find-child" data-route="tutor-find-child">${icon('plus', 15)} Find a Child</a>`)}
+      <section class="tutor-stat-grid" aria-label="Teaching overview"><article><span>${icon('people', 17)} Approved Students</span><strong>${approvedCount}</strong><small>Parent-approved connections</small></article><article><span>${icon('book', 17)} Lessons Completed</span><strong>${lessons}</strong><small>Across approved learners</small></article><article><span>${icon('calendar', 17)} Pending Consent</span><strong>${pending}</strong><small>Awaiting family approval</small></article><article><span>${icon('sparkles', 17)} Learners Practising</span><strong>${learners.filter((learner) => learner.streak > 0).length}</strong><small>Recent learning activity</small></article></section>
+      <section class="tutor-dashboard-lower"><div class="tutor-panel tutor-recent-panel"><div class="tutor-section-heading"><div><span class="tutor-eyebrow">Your learners</span><h2>Recent connections</h2></div><a class="tutor-text-link" href="#/tutor-students" data-route="tutor-students">View all ${icon('arrow', 14)}</a></div><div id="tutor-recent-connections">${recent.length ? recent.map((request) => `<article class="tutor-recent-row"><span class="tutor-student-avatar">${icon(request.status === 'approved' ? 'user' : 'lock', 16)}</span><div><strong>${esc(request.learner)}</strong><small>${request.status === 'approved' ? `${Number(request.completedLessons) || 0} lessons completed` : 'No learner information is shared before consent'}</small></div><span class="tutor-status tutor-status-${esc(request.status)}">${esc(consentStatusLabel(request.status))}</span></article>`).join('') : '<p class="tutor-empty-inline">Your approved connections and consent requests will appear here.</p>'}</div></div>
+      <aside class="tutor-panel tutor-today-panel"><span class="tutor-today-icon">${icon('book', 20)}</span><span class="tutor-eyebrow">Teaching resource</span><h2>Today’s Lesson</h2><p>Explore a short Yorùbá greeting lesson and prepare a welcoming first activity.</p><div class="tutor-lesson-progress"><span>Language practice</span><strong>Beginner</strong></div><a class="tutor-button tutor-button-primary" href="#/tutor-lesson" data-route="tutor-lesson">Read Lesson ${icon('arrow', 14)}</a></aside></section>
+      <p class="tutor-privacy-note">${icon('shield', 14)} Student names and progress appear only after a parent or guardian approves your request.</p>`);
+  }
+
+  function renderTutorFindChild() {
+    return renderTutorWorkspace('tutor-find-child', 'Find a Child', `${renderTutorHeading('Build a safe connection', 'Find a Child', 'Request a connection using the email address on a learner’s Idilewa account. A parent or guardian must approve before any learner details are shared.')}
+      <div class="tutor-two-column"><section class="tutor-panel tutor-search-panel"><div class="tutor-panel-icon">${icon('search', 20)}</div><span class="tutor-eyebrow">Request a connection</span><h2>Search by learner email</h2><p>For privacy, Idilewa does not reveal whether an email belongs to a learner. If an eligible learner is found, the family will be invited to decide.</p><form data-form="tutor-find-child" class="tutor-find-form"><label for="tutor-child-email">Learner email address<input id="tutor-child-email" type="email" name="childEmail" autocomplete="off" maxlength="254" placeholder="Enter the email used for Idilewa" required /></label><p class="tutor-form-feedback" data-tutor-connection-feedback role="status" aria-live="polite"></p><button class="tutor-button tutor-button-primary" type="submit">${icon('send', 15)} Send parent consent request</button></form></section><aside class="tutor-panel tutor-safeguarding-panel"><span class="tutor-eyebrow">Family-first safeguarding</span><h2>Consent comes first.</h2><ul><li>${icon('check', 15)} Families receive the request directly.</li><li>${icon('lock', 15)} No student details are exposed before approval.</li><li>${icon('check', 15)} Each tutor connection needs separate approval.</li><li>${icon('clock', 15)} Requests expire automatically if unanswered.</li></ul><a href="#/tutor-consent" data-route="tutor-consent" class="tutor-text-link">Review the consent process ${icon('arrow', 14)}</a></aside></div>`);
+  }
+
+  function renderTutorStudents() {
+    const data = tutorDashboardData || {};
+    const learners = Array.isArray(data.learners) ? data.learners : [];
+    const requests = Array.isArray(data.requests) ? data.requests : [];
+    const cards = learners.map((learner) => `<article class="tutor-student-card"><div class="tutor-student-card-head"><span class="tutor-student-avatar">${esc((learner.name || 'L').trim().charAt(0).toUpperCase())}</span><div><span class="tutor-eyebrow">Parent-approved learner</span><h2>${esc(learner.name || 'Learner')}</h2></div><span class="tutor-status tutor-status-approved">Approved</span></div><div class="tutor-student-metrics"><span><strong>${Number(learner.completedLessons) || 0}</strong><small>Lessons</small></span><span><strong>${Number(learner.codingSessions) || 0}</strong><small>Coding</small></span><span><strong>${Number(learner.voicePractices) || 0}</strong><small>Voice practice</small></span></div><p>${Number(learner.streak) > 0 ? `${Number(learner.streak)}-day learning streak` : 'Learning at their own pace'}</p><a class="tutor-text-link" href="#/tutor-lesson" data-route="tutor-lesson">Prepare a lesson ${icon('arrow', 14)}</a></article>`).join('');
+    const pending = requests.filter((request) => request.status !== 'approved').map((request) => `<article class="tutor-request-row"><span class="tutor-student-avatar">${icon('lock', 16)}</span><div><strong>${esc(request.learner || 'Learner')}</strong><small>Requested ${formatDashboardDate(request.requestedAt)} · learner details are not available</small></div><span class="tutor-status tutor-status-${esc(request.status)}">${esc(consentStatusLabel(request.status))}</span></article>`).join('');
+    return renderTutorWorkspace('tutor-students', 'My Students', `${renderTutorHeading('Manage your connections', 'My Students', 'See learning progress only for children whose families approved your connection.', `<a class="tutor-button tutor-button-primary" href="#/tutor-find-child" data-route="tutor-find-child">${icon('plus', 15)} Find a Child</a>`)}
+      <section class="tutor-student-toolbar"><span>${learners.length} approved ${learners.length === 1 ? 'student' : 'students'}</span><a href="#/tutor-availability" data-route="tutor-availability" class="tutor-text-link">${icon('calendar', 14)} Manage availability</a></section>
+      <div class="tutor-student-grid">${cards || '<section class="tutor-empty-state"><span class="tutor-empty-icon">' + icon('people', 23) + '</span><h2>No approved students yet</h2><p>When a family approves a connection request, that learner will appear here.</p><a class="tutor-button tutor-button-primary" href="#/tutor-find-child" data-route="tutor-find-child">Find a Child</a></section>'}</div>
+      ${pending ? `<section class="tutor-panel tutor-pending-panel"><div class="tutor-section-heading"><div><span class="tutor-eyebrow">Waiting on family approval</span><h2>Consent requests</h2></div><a href="#/tutor-consent" data-route="tutor-consent" class="tutor-text-link">Consent details ${icon('arrow', 14)}</a></div>${pending}</section>` : ''}`);
+  }
+
+  function renderTutorConsent() {
+    const requests = Array.isArray(tutorDashboardData?.requests) ? tutorDashboardData.requests : [];
+    return renderTutorWorkspace('tutor-consent', 'Consent Form', `${renderTutorHeading('Family approval', 'Consent Form', 'A child’s parent or guardian reviews and approves each tutor connection directly by email. Tutors cannot sign consent on a family’s behalf.')}
+      <section class="tutor-consent-layout"><article class="tutor-panel tutor-consent-card"><span class="tutor-consent-mark">${icon('shield', 22)}</span><span class="tutor-eyebrow">How approval works</span><h2>Every connection is specific.</h2><p>When you request a connection, Idilewa emails the learner’s guardian. Nothing is shared until the guardian approves that educator request. The approval is limited to that tutor and learner and can be withdrawn by the family.</p><div class="tutor-consent-steps"><div><span>1</span><p><strong>You request</strong><small>Submit the learner’s account email.</small></p></div><div><span>2</span><p><strong>Guardian reviews</strong><small>The family receives a private approval link.</small></p></div><div><span>3</span><p><strong>Approved learning</strong><small>Only then can the approved learner’s progress appear.</small></p></div></div><a class="tutor-button tutor-button-primary" href="#/tutor-find-child" data-route="tutor-find-child">Request family consent ${icon('arrow', 14)}</a></article><aside class="tutor-panel tutor-consent-aside"><span class="tutor-eyebrow">Your consent requests</span><h2>Connection status</h2>${requests.length ? requests.map((request) => `<article class="tutor-request-row"><span class="tutor-student-avatar">${icon(request.status === 'approved' ? 'check' : 'lock', 15)}</span><div><strong>${esc(request.learner || 'Learner')}</strong><small>${formatDashboardDate(request.requestedAt)}</small></div><span class="tutor-status tutor-status-${esc(request.status)}">${esc(consentStatusLabel(request.status))}</span></article>`).join('') : '<p class="tutor-empty-inline">You have no connection requests yet.</p>'}</aside></section>
+      <p class="tutor-privacy-note">${icon('lock', 14)} Consent is recorded and enforced by Idilewa’s secure family approval service, not by this page.</p>`);
+  }
+
+  function renderTutorLesson() {
+    return renderTutorWorkspace('tutor-lesson', 'Today’s Lesson', `${renderTutorHeading('Prepare a learning activity', 'Today’s Lesson', 'A short, beginner-friendly Yorùbá greeting lesson you can use to plan a supportive session.')}
+      <div class="tutor-lesson-layout"><article class="tutor-panel tutor-lesson-card"><div class="tutor-lesson-banner"><img src="/assets/yoruba-educator-woman.jpg" alt="Language educator preparing a learning activity" /><span class="tutor-lesson-label">${icon('book', 14)} BEGINNER · YORÙBÁ</span></div><span class="tutor-eyebrow">Everyday Life · Greetings</span><h2>Start with a warm greeting.</h2><p>Help learners listen to a phrase, notice its meaning and practise it at a pace that feels comfortable.</p><div class="tutor-phrase-card"><small>Phrase to practise</small><strong lang="yo">Ẹ káàárọ̀</strong><span>Good morning</span></div><ol class="tutor-lesson-steps"><li><span>1</span><div><strong>Listen together</strong><p>Say the greeting clearly and invite the learner to listen first.</p></div></li><li><span>2</span><div><strong>Practise gently</strong><p>Give the learner time to repeat or ask a question without pressure.</p></div></li><li><span>3</span><div><strong>Connect the meaning</strong><p>Talk about when this greeting might be used in everyday life.</p></div></li></ol><div class="tutor-lesson-actions"><a class="tutor-button tutor-button-primary" href="#/course?lang=yoruba" data-route="course" data-lang="yoruba">Open Yorùbá course ${icon('arrow', 14)}</a><a class="tutor-button tutor-button-outline" href="#/voice_lessons" data-route="voice_lessons">Explore voice lessons</a></div><p class="tutor-lesson-note">${icon('info', 14)} This is a sample preparation resource, not a scheduled live lesson or a message to a child.</p></article><aside class="tutor-panel tutor-lesson-aside"><span class="tutor-eyebrow">Lesson outline</span><h2>Today’s flow</h2><div class="tutor-outline-item is-complete"><span>${icon('check', 14)}</span><div><strong>Warm welcome</strong><small>Begin with a friendly hello</small></div></div><div class="tutor-outline-item"><span>2</span><div><strong>Learn the phrase</strong><small>Listen, repeat and explore meaning</small></div></div><div class="tutor-outline-item"><span>3</span><div><strong>Reflect together</strong><small>Connect words to daily life</small></div></div><a href="#/tutor-students" data-route="tutor-students" class="tutor-text-link">Back to my students ${icon('arrow', 14)}</a></aside></div>`);
+  }
+
+  function renderTutorMessages() {
+    return renderTutorWorkspace('tutor-messages', 'Messages', `${renderTutorHeading('Stay connected', 'Messages', 'Family and learner privacy is protected throughout every Idilewa interaction.')}
+      <section class="tutor-empty-state tutor-messages-empty"><span class="tutor-empty-icon">${icon('send', 23)}</span><span class="tutor-eyebrow">No messages</span><h2>Messages aren’t enabled in this portal yet.</h2><p>There is no tutor-to-child messaging service here. Connection requests go through the parent or guardian, who can review each request privately.</p><a class="tutor-button tutor-button-outline" href="#/tutor-consent" data-route="tutor-consent">Review family consent ${icon('arrow', 14)}</a></section>`);
+  }
+
+  function renderTutorProfile() {
+    const user = getCurrentUser() || {};
+    const details = getProfileDetails();
+    const name = details.name || user.name || '';
+    const initial = name.trim().charAt(0).toUpperCase() || 'T';
+    return renderTutorWorkspace('tutor-profile', 'My Profile', `${renderTutorHeading('Your educator profile', 'My Profile', 'Manage your name and teaching details. Your sign-in email is managed by your Idilewa account.')}
+      <section class="tutor-profile-layout"><aside class="tutor-panel tutor-profile-summary"><span class="tutor-profile-avatar">${esc(initial)}</span><span class="tutor-eyebrow">Verified educator account</span><h2>${esc(name || 'Tutor')}</h2><p>${esc(user.email || '')}</p><span class="tutor-profile-tag">${icon('check', 13)} Educator</span><a class="tutor-button tutor-button-outline" href="#/tutor-availability" data-route="tutor-availability">Manage availability</a></aside><form class="tutor-panel tutor-profile-form" data-form="profile-settings"><span class="tutor-eyebrow">Profile information</span><h2>About you</h2><label>Full Name<input name="name" maxlength="60" required value="${esc(details.name || user.name || '')}" placeholder="Enter your name" /></label><label>Email Address<input type="email" value="${esc(user.email || '')}" readonly /></label><label>Teaching introduction<textarea name="bio" rows="4" maxlength="500" placeholder="Share your teaching approach">${esc(details.bio || '')}</textarea></label><label>Teaching focus<textarea name="goal" rows="3" maxlength="240" placeholder="Languages or skills you teach">${esc(details.goal || '')}</textarea></label><div class="tutor-profile-language"><label>Primary language<select name="language">${LANGUAGES.map((language) => `<option value="${language.id}" ${details.language === language.id ? 'selected' : ''}>${esc(language.name)}</option>`).join('')}</select></label></div><button type="submit" class="tutor-button tutor-button-primary">${icon('check', 14)} Save Profile</button><small>Your profile details are saved to your Idilewa account when signed in.</small></form></section>`);
+  }
+
+  function getTutorAvailability() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(TUTOR_AVAILABILITY_KEY) || '{}');
+      return {
+        days: Array.isArray(saved.days) ? saved.days.filter((day) => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].includes(day)) : [],
+        start: typeof saved.start === 'string' ? saved.start : '16:00',
+        end: typeof saved.end === 'string' ? saved.end : '18:00',
+        timezone: typeof saved.timezone === 'string' ? saved.timezone.slice(0, 60) : 'Africa/Lagos'
+      };
+    } catch (error) {
+      console.error('Could not read saved tutor availability.', error);
+      return { days: [], start: '16:00', end: '18:00', timezone: 'Africa/Lagos' };
+    }
+  }
+
+  function renderTutorAvailability() {
+    const saved = getTutorAvailability();
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    return renderTutorWorkspace('tutor-availability', 'Availability', `${renderTutorHeading('Plan your teaching time', 'Availability', 'Set the days and hours you are available. These preferences stay in this browser in this version.')}
+      <form class="tutor-panel tutor-availability-form" data-form="tutor-availability"><div class="tutor-section-heading"><div><span class="tutor-eyebrow">Weekly schedule</span><h2>Choose your available days</h2></div></div><div class="tutor-day-grid">${days.map((day) => `<label class="tutor-day-option"><input type="checkbox" name="days" value="${day}" ${saved.days.includes(day) ? 'checked' : ''} /><span>${day}</span></label>`).join('')}</div><div class="tutor-availability-fields"><label>Available from<input type="time" name="start" value="${esc(saved.start)}" required /></label><label>Available until<input type="time" name="end" value="${esc(saved.end)}" required /></label><label>Time zone<select name="timezone">${[['Africa/Lagos','WAT · Lagos'],['Africa/Accra','GMT · Accra'],['Africa/Nairobi','EAT · Nairobi'],['Europe/London','UK time · London'],['America/New_York','Eastern · New York']].map(([value,label]) => `<option value="${value}" ${saved.timezone === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label></div><p class="tutor-form-feedback" data-tutor-availability-feedback role="status"></p><button type="submit" class="tutor-button tutor-button-primary">${icon('check', 14)} Save Changes</button><p class="tutor-lesson-note">${icon('info', 14)} Availability is only a local preference; it does not create appointments or share time slots with families.</p></form>`);
+  }
+
+  function getTutorPreferences() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(TUTOR_PREFERENCES_KEY) || '{}');
+      return { emailUpdates: saved.emailUpdates !== false, lessonReminders: saved.lessonReminders !== false };
+    } catch (error) {
+      console.error('Could not read saved tutor preferences.', error);
+      return { emailUpdates: true, lessonReminders: true };
+    }
+  }
+
+  function renderTutorSettings() {
+    const preferences = getTutorPreferences();
+    return renderTutorWorkspace('tutor-settings', 'Settings', `${renderTutorHeading('Account preferences', 'Settings', 'Manage your tutor portal preferences and account security.')}
+      <section class="tutor-panel tutor-settings-card"><div class="tutor-section-heading"><div><span class="tutor-eyebrow">Personal preferences</span><h2>Notifications</h2></div></div><div class="tutor-setting-row"><div><strong>Email updates</strong><p>Receive account and connection-request updates through your Idilewa account.</p></div><button type="button" class="tutor-toggle ${preferences.emailUpdates ? 'is-on' : ''}" role="switch" aria-checked="${preferences.emailUpdates}" aria-label="Email updates" data-action="tutor-toggle-preference" data-setting="emailUpdates"><span></span></button></div><div class="tutor-setting-row"><div><strong>Lesson reminders</strong><p>Keep a local preference for reminders about your teaching preparation.</p></div><button type="button" class="tutor-toggle ${preferences.lessonReminders ? 'is-on' : ''}" role="switch" aria-checked="${preferences.lessonReminders}" aria-label="Lesson reminders" data-action="tutor-toggle-preference" data-setting="lessonReminders"><span></span></button></div><div class="tutor-setting-row"><div><strong>Weekly availability</strong><p>Update your teaching availability saved on this browser.</p></div><a class="tutor-button tutor-button-outline tutor-button-small" href="#/tutor-availability" data-route="tutor-availability">Manage</a></div><div class="tutor-setting-row"><div><strong>Account security</strong><p>Sign out of your educator account on this device.</p></div><button type="button" class="tutor-button tutor-button-outline tutor-button-small" data-action="profile-sign-out">Sign out</button></div><p class="tutor-lesson-note">${icon('lock', 14)} Notification switches are saved in this browser; they do not subscribe you to emails or create reminder messages.</p></section>`);
+  }
+
+  async function loadTutorPortalData() {
+    const page = parseLocation().page;
+    if (!['tutor-dashboard', 'tutor-students', 'tutor-find-child', 'tutor-consent'].includes(page) || !isTutorAccount()) return;
+    if (tutorDashboardDataPage === page || tutorDashboardLoadPending) return;
+    const sequence = ++tutorDashboardLoadSequence;
+    tutorDashboardLoadPending = true;
+    try {
+      const data = await getRoleDashboard('/api/dashboard/educator');
+      if (sequence !== tutorDashboardLoadSequence) return;
+      tutorDashboardData = data;
+      const currentPage = parseLocation().page;
+      tutorDashboardDataPage = currentPage;
+      if (['tutor-dashboard', 'tutor-students', 'tutor-consent'].includes(currentPage)) render();
+    } catch (error) {
+      if (sequence !== tutorDashboardLoadSequence) return;
+      const currentPage = parseLocation().page;
+      tutorDashboardDataPage = currentPage;
+      const feedback = currentPage === 'tutor-find-child' ? document.querySelector('[data-tutor-connection-feedback]') : null;
+      const message = error instanceof Error ? error.message : 'Your educator data could not be loaded.';
+      if (feedback) feedback.textContent = message;
+      else showToast(message, 'error');
+    } finally {
+      if (sequence === tutorDashboardLoadSequence) {
+        tutorDashboardLoadPending = false;
+        const currentPage = parseLocation().page;
+        if (isTutorAccount()
+          && ['tutor-dashboard', 'tutor-students', 'tutor-find-child', 'tutor-consent'].includes(currentPage)
+          && tutorDashboardDataPage !== currentPage) {
+          void loadTutorPortalData();
+        }
+      }
+    }
+  }
+
+  function renderTutorPortal(page) {
+    if (page === 'tutor') return renderTutorLanding();
+    if (page === 'tutor-login') return renderTutorAuth(false);
+    if (page === 'tutor-signup') return renderTutorAuth(true);
+    if (page === 'tutor-dashboard') return renderTutorDashboard();
+    if (page === 'tutor-find-child') return renderTutorFindChild();
+    if (page === 'tutor-students') return renderTutorStudents();
+    if (page === 'tutor-consent') return renderTutorConsent();
+    if (page === 'tutor-lesson') return renderTutorLesson();
+    if (page === 'tutor-messages') return renderTutorMessages();
+    if (page === 'tutor-profile') return renderTutorProfile();
+    if (page === 'tutor-availability') return renderTutorAvailability();
+    return renderTutorSettings();
+  }
+
   const AI_CONVERSATION_LANGUAGES = [
     { id: 'yoruba', name: 'Yorùbá', greeting: 'Ẹ káàárọ̀', meaning: 'Good morning', flag: '🇳🇬', speech: 'yo' },
     { id: 'igbo', name: 'Igbo', greeting: 'Ndewo', meaning: 'Hello', flag: '🇳🇬', speech: 'ig' },
@@ -6854,6 +7115,18 @@ import {
 
   function renderPage(page, params) {
     switch (page) {
+      case 'tutor':
+      case 'tutor-login':
+      case 'tutor-signup':
+      case 'tutor-dashboard':
+      case 'tutor-find-child':
+      case 'tutor-students':
+      case 'tutor-consent':
+      case 'tutor-lesson':
+      case 'tutor-messages':
+      case 'tutor-profile':
+      case 'tutor-availability':
+      case 'tutor-settings': return renderTutorPortal(page);
       case 'voice_lessons': return renderVoiceLessonsHome();
       case 'trainer': return renderTrainer(params);
       case 'voice-language':
@@ -7469,7 +7742,7 @@ import {
     const pageMarkup = assignUniqueRouteImages(page, renderPage(page, params))
       .replace(/(?:African )?Voice (?:African Language )?Trainer/gi, 'Voice Lessons')
       .replace(/Voice Studio/gi, 'Voice Lessons');
-    if (page.startsWith('ai-')) {
+    if (page.startsWith('ai-') || page.startsWith('tutor')) {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = pageMarkup;
     } else if (page === 'coding' || page === 'coding-studio') {
@@ -7495,6 +7768,7 @@ import {
       });
     }
     if (page === 'coding') initializeIdeOutputResize();
+    if (page.startsWith('tutor')) loadTutorPortalData();
     startHomePreviewMotion();
     if (page === 'coding') {
       const codeRobotGlyphs = document.getElementById('codeRobotGlyphCanvas');
@@ -7764,6 +8038,28 @@ import {
   function handleAction(action, el) {
     const lang = el.dataset.lang;
     switch (action) {
+      case 'tutor-toggle-password': {
+        const input = document.getElementById(el.dataset.target || '');
+        if (!input) break;
+        const reveal = input.type === 'password';
+        input.type = reveal ? 'text' : 'password';
+        el.setAttribute('aria-label', reveal ? 'Hide password' : 'Show password');
+        el.innerHTML = icon(reveal ? 'eyeOff' : 'eye', 15);
+        break;
+      }
+      case 'tutor-toggle-preference': {
+        const key = el.dataset.setting;
+        if (!['emailUpdates', 'lessonReminders'].includes(key)) break;
+        try {
+          const preferences = getTutorPreferences();
+          preferences[key] = !preferences[key];
+          localStorage.setItem(TUTOR_PREFERENCES_KEY, JSON.stringify(preferences));
+          render();
+        } catch (error) {
+          showToast(error instanceof Error ? error.message : 'Your preference could not be saved.', 'error');
+        }
+        break;
+      }
       case 'ai-scroll': {
         const target = document.getElementById(el.dataset.target || '');
         target?.scrollIntoView({ behavior: prefersReducedMotion() ? 'auto' : 'smooth', block: 'center' });
@@ -8636,7 +8932,7 @@ import {
         void signOutAccount().then((result) => {
           state.loginMode = 'signin';
           state.authRole = 'adult';
-          navigate('login', { mode: 'signin' }, true);
+          navigate(parseLocation().page.startsWith('tutor') ? 'tutor-login' : 'login', parseLocation().page.startsWith('tutor') ? {} : { mode: 'signin' }, true);
           const notice = result.activityEmailError
             ? `You have signed out. ${result.activityEmailError}`
             : authStorageError
@@ -8646,7 +8942,7 @@ import {
         }).catch((error) => {
           state.loginMode = 'signin';
           state.authRole = 'adult';
-          navigate('login', { mode: 'signin' }, true);
+          navigate(parseLocation().page.startsWith('tutor') ? 'tutor-login' : 'login', parseLocation().page.startsWith('tutor') ? {} : { mode: 'signin' }, true);
           const message = error instanceof Error ? error.message : 'Signed out on this device, but Supabase could not confirm the session revocation.';
           showToast(authStorageError ? `${message} Pending sign-in state could not be fully cleared.` : message, 'error');
         });
@@ -9113,7 +9409,120 @@ import {
     if (!type) return;
     event.preventDefault();
     const data = new FormData(form);
-    if (type === 'ai-conversation') {
+    if (type === 'tutor-login' || type === 'tutor-signup') {
+      if (!form.reportValidity()) return;
+      const errorElement = form.querySelector('.tutor-auth-error');
+      const submitButton = form.querySelector('button[type="submit"]');
+      const fail = (message) => {
+        if (errorElement) {
+          errorElement.textContent = message;
+          errorElement.hidden = false;
+        } else showToast(message, 'error');
+      };
+      if (!isSupabaseConfigured || !supabase) {
+        fail('Educator accounts are not configured on this deployment. Please try again later.');
+        return;
+      }
+      if (errorElement) {
+        errorElement.textContent = '';
+        errorElement.hidden = true;
+      }
+      if (submitButton) submitButton.disabled = true;
+      try {
+        const email = String(data.get('email') || '').trim();
+        const password = String(data.get('password') || '');
+        if (type === 'tutor-signup') {
+          const name = String(data.get('name') || '').trim();
+          const inviteCode = String(data.get('inviteCode') || '').trim();
+          if (!data.get('agreement')) throw new Error('Please agree to follow Idilewa’s safeguarding and privacy requirements.');
+          if (password !== String(data.get('confirmPassword') || '')) throw new Error('The passwords do not match.');
+          if (!isSignupPasswordValid(password)) throw new Error('Use 12–128 characters with uppercase and lowercase letters, a number, and a symbol.');
+          const educatorInviteId = await verifyEducatorInvite(inviteCode);
+          const { session, welcomeEmailError } = await signUpAccount({
+            email,
+            password,
+            name,
+            role: 'educator',
+            educatorInviteId,
+            redirectRoute: 'tutor-login'
+          });
+          if (!session) {
+            navigate('tutor-login');
+            showToast('Account created. Confirm your email to finish setting up your tutor account.', 'success');
+            return;
+          }
+          navigate('tutor-dashboard');
+          showToast(welcomeEmailError ? `Your tutor account is ready. ${welcomeEmailError}` : 'Your tutor account is ready.', welcomeEmailError ? 'error' : 'success');
+          return;
+        }
+        await signInAccount({ email, password, expectedRole: 'educator' });
+        tutorDashboardData = null;
+        tutorDashboardDataPage = '';
+        let activityEmailError = '';
+        try {
+          await sendAuthActivityEmail('sign-in');
+        } catch (error) {
+          activityEmailError = error instanceof Error ? error.message : 'The sign-in notification could not be sent.';
+        }
+        navigate('tutor-dashboard');
+        showToast(activityEmailError ? `Signed in successfully. ${activityEmailError}` : 'Welcome to your tutor portal.', activityEmailError ? 'error' : 'success');
+      } catch (error) {
+        fail(error instanceof Error ? error.message : 'Your tutor account could not be verified.');
+      } finally {
+        if (submitButton?.isConnected) submitButton.disabled = false;
+      }
+    } else if (type === 'tutor-find-child') {
+      const childEmail = String(data.get('childEmail') || '').trim();
+      const submitButton = form.querySelector('button[type="submit"]');
+      const feedback = form.querySelector('[data-tutor-connection-feedback]');
+      if (!isTutorAccount()) {
+        if (feedback) feedback.textContent = 'Sign in with a verified educator account to request a connection.';
+        return;
+      }
+      if (!childEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(childEmail)) {
+        if (feedback) feedback.textContent = 'Enter a valid learner account email address.';
+        return;
+      }
+      if (submitButton) submitButton.disabled = true;
+      if (feedback) feedback.textContent = 'Sending a private consent request to the family…';
+      try {
+        const result = await submitEducatorConnectionRequest(childEmail);
+        tutorDashboardDataPage = '';
+        await loadTutorPortalData();
+        if (feedback) feedback.textContent = result.message;
+        form.reset();
+        showToast(result.message, 'success');
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'The family consent request could not be sent.';
+        if (feedback) feedback.textContent = message;
+        showToast(message, 'error');
+      } finally {
+        if (submitButton?.isConnected) submitButton.disabled = false;
+      }
+    } else if (type === 'tutor-availability') {
+      const days = data.getAll('days').map(String).filter((day) => ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].includes(day));
+      const start = String(data.get('start') || '');
+      const end = String(data.get('end') || '');
+      if (!days.length) {
+        showToast('Choose at least one available day.', 'error');
+        return;
+      }
+      if (!start || !end || start >= end) {
+        showToast('Choose an end time later than your start time.', 'error');
+        return;
+      }
+      try {
+        localStorage.setItem(TUTOR_AVAILABILITY_KEY, JSON.stringify({
+          days,
+          start,
+          end,
+          timezone: String(data.get('timezone') || 'Africa/Lagos')
+        }));
+        showToast('Your availability was saved in this browser.');
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Your availability could not be saved.', 'error');
+      }
+    } else if (type === 'ai-conversation') {
       const message = String(data.get('message') || '').trim().slice(0, 500);
       if (!message) {
         showToast('Write a short practice message first.', 'error');

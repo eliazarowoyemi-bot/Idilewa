@@ -217,7 +217,7 @@ async function requestAuthEmailCode(email, purpose) {
   }
 }
 
-export async function signUp({ email, password, name, role = 'child', guardianAccessRequestId, educatorInviteId }) {
+export async function signUp({ email, password, name, role = 'child', guardianAccessRequestId, educatorInviteId, redirectRoute = 'index' }) {
   const client = requireSupabase();
   if (!['child', 'adult', 'parent', 'educator'].includes(role)) {
     throw new Error('Choose a supported account type before creating an account.');
@@ -230,6 +230,9 @@ export async function signUp({ email, password, name, role = 'child', guardianAc
   }
   if (role === 'educator' && !/^[0-9a-f-]{36}$/i.test(educatorInviteId || '')) {
     throw new Error('A verified one-time educator invitation code is required before creating a teacher account.');
+  }
+  if (!['index', 'tutor-login'].includes(redirectRoute)) {
+    throw new Error('Choose a supported destination for the account confirmation link.');
   }
   const normalizedEmail = email.toLowerCase().trim();
   const userName = (typeof name === 'string' ? name.trim().slice(0, 80) : '')
@@ -244,7 +247,7 @@ export async function signUp({ email, password, name, role = 'child', guardianAc
         ...(role === 'child' ? { guardian_access_request_id: guardianAccessRequestId } : {}),
         ...(role === 'educator' ? { educator_invite_id: educatorInviteId } : {}),
       },
-      emailRedirectTo: new URL('/auth-callback.html?next=index', window.location.origin).toString(),
+      emailRedirectTo: new URL(`/auth-callback.html?next=${encodeURIComponent(redirectRoute)}`, window.location.origin).toString(),
     },
   });
   if (error) throw new Error(normalizeAuthError(error, 'signup'), { cause: error });
@@ -292,6 +295,27 @@ export async function signUp({ email, password, name, role = 'child', guardianAc
     error: null,
     welcomeEmailError,
   };
+}
+
+export async function verifyEducatorInvite(code) {
+  const response = await fetch('/api/educator/verify-invite', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ code }),
+  });
+  let result;
+  try {
+    result = await response.json();
+  } catch (error) {
+    throw new Error('The invitation service returned an invalid response.', { cause: error });
+  }
+  if (!response.ok) {
+    throw new Error(typeof result?.error === 'string' ? result.error : 'The educator invitation could not be verified.');
+  }
+  if (typeof result?.inviteId !== 'string' || !/^[0-9a-f-]{36}$/i.test(result.inviteId)) {
+    throw new Error('The invitation service did not return a valid invitation.');
+  }
+  return result.inviteId;
 }
 
 export async function resendSignupConfirmation(email) {
