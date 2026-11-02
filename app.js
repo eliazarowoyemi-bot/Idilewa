@@ -553,6 +553,9 @@ import {
       codeUndo: [], codeRedo: [],
       codeOutput: 'Ẹ n lẹ́ o, ẹ̀yin ọ̀rẹ́ mi!',
       codeStatus: 'Your message is ready to run.',
+      playScreen: 'home', playGame: 'platformer', playMode: 'blocks',
+      playCharacter: 'boy', playBlocks: ['start', 'move', 'jump', 'collect'],
+      playSaved: [], playScore: 0, playStepCount: 0, playBilingual: true,
       ideLang: 'yoruba', idePresetId: 'hello_world',
       ideCode: '# Kí Ilé Ayé ní Èdè Yorùbá\njẹ́ orúkọ = "Ọmọ Yorùbá"\ntẹ_jade("Ẹ n lẹ́ o, " + orúkọ + "! Ẹ káàbọ̀ sí Idíléwà.")\ntẹ_jade("A n kọ́ koodu ní èdè abínibí wa lónìí! ✨")',
       ideOutput: '> [Idilewa Engine v2.4 Online]\n> Ẹ n lẹ́ o, Ọmọ Yorùbá! Ẹ káàbọ̀ sí Idíléwà.\n> A n kọ́ koodu ní èdè abínibí wa lónìí! ✨\n✓ Àṣeyọrí: Execution completed in 0.02ms (+10 Maker XP)',
@@ -633,6 +636,15 @@ import {
           codeRedo: Array.isArray(stored.coding?.codeRedo) ? stored.coding.codeRedo.filter(Array.isArray).slice(-20) : [],
           codeOutput: typeof stored.coding?.codeOutput === 'string' ? stored.coding.codeOutput.slice(0, 500) : defaults.coding.codeOutput,
           codeStatus: typeof stored.coding?.codeStatus === 'string' ? stored.coding.codeStatus.slice(0, 160) : defaults.coding.codeStatus,
+          playScreen: ['home', 'build', 'game', 'win', 'library'].includes(stored.coding?.playScreen) ? stored.coding.playScreen : defaults.coding.playScreen,
+          playGame: ['platformer', 'space', 'fruit', 'racing'].includes(stored.coding?.playGame) ? stored.coding.playGame : defaults.coding.playGame,
+          playMode: ['blocks', 'sprites'].includes(stored.coding?.playMode) ? stored.coding.playMode : defaults.coding.playMode,
+          playCharacter: ['boy', 'girl', 'cat', 'dog'].includes(stored.coding?.playCharacter) ? stored.coding.playCharacter : defaults.coding.playCharacter,
+          playBlocks: Array.isArray(stored.coding?.playBlocks) ? stored.coding.playBlocks.filter((block) => ['start', 'move', 'jump', 'collect', 'repeat', 'sound'].includes(block)).slice(0, 10) : defaults.coding.playBlocks,
+          playSaved: Array.isArray(stored.coding?.playSaved) ? [...new Set(stored.coding.playSaved.filter((game) => ['platformer', 'space', 'fruit', 'racing'].includes(game)))].slice(0, 4) : [],
+          playScore: Number.isInteger(stored.coding?.playScore) ? Math.min(99, Math.max(0, stored.coding.playScore)) : 0,
+          playStepCount: Number.isInteger(stored.coding?.playStepCount) ? Math.min(8, Math.max(0, stored.coding.playStepCount)) : 0,
+          playBilingual: stored.coding?.playBilingual !== false,
           ideSidebar: ['explorer', 'extensions'].includes(stored.coding?.ideSidebar) ? stored.coding.ideSidebar : 'explorer',
           ideOutputHeight: Number.isInteger(stored.coding?.ideOutputHeight)
             ? Math.min(900, Math.max(170, stored.coding.ideOutputHeight))
@@ -4234,10 +4246,106 @@ import {
     return CODE_LANGUAGES.map((language) => `<button class="code-language-tile ${selectedLanguage === language.id ? 'is-selected' : ''}" type="button" data-action="${action}" data-language="${language.id}" aria-pressed="${selectedLanguage === language.id}"><span aria-hidden="true">${language.flag}</span><strong>${language.name}</strong></button>`).join('');
   }
 
+  const CODE_PLAY_GAMES = [
+    { id: 'platformer', title: 'Platformer', subtitle: 'Run & Jump', icon: '🏃🏾', theme: 'sky' },
+    { id: 'space', title: 'Space Adventure', subtitle: 'Blast off!', icon: '🚀', theme: 'space' },
+    { id: 'fruit', title: 'Fruit Collector', subtitle: 'Fruit fun', icon: '🍎', theme: 'fruit' },
+    { id: 'racing', title: 'Racing Game', subtitle: 'Ready, set, go!', icon: '🏎️', theme: 'racing' },
+  ];
+  const CODE_PLAY_BLOCKS = [
+    { id: 'start', label: 'When I start', color: 'purple', icon: '▶' },
+    { id: 'move', label: 'Move forward', color: 'blue', icon: '↗' },
+    { id: 'jump', label: 'Jump over it', color: 'orange', icon: '⬆' },
+    { id: 'collect', label: 'Collect a star', color: 'green', icon: '★' },
+    { id: 'repeat', label: 'Do it again', color: 'pink', icon: '↻' },
+    { id: 'sound', label: 'Play a sound', color: 'yellow', icon: '♫' },
+  ];
+
+  function renderCodePlay() {
+    const flow = state.coding;
+    const game = CODE_PLAY_GAMES.find((item) => item.id === flow.playGame) || CODE_PLAY_GAMES[0];
+    const bilingual = flow.playBilingual;
+    const screen = flow.playScreen;
+    const characters = { boy: '🧒🏾', girl: '👧🏾', cat: '🐱', dog: '🐶' };
+    const navItems = [
+      { id: 'home', icon: '⌂', label: 'Home', sublabel: 'Ile' },
+      { id: 'build', icon: '🎮', label: 'Create', sublabel: 'Ṣẹda' },
+      { id: 'library', icon: '♥', label: 'My Games', sublabel: 'Ere Mi' },
+    ];
+    const bottomNav = `<nav class="code-play-nav" aria-label="Code & Play navigation">${navItems.map((item) => `<button type="button" data-action="code-play-screen" data-screen="${item.id}" class="${screen === item.id || (item.id === 'build' && screen === 'game') ? 'is-active' : ''}" ${screen === item.id ? 'aria-current="page"' : ''}><span aria-hidden="true">${item.icon}</span><strong>${item.label}</strong><small>${item.sublabel}</small></button>`).join('')}</nav>`;
+    const gameCards = (savedOnly = false) => CODE_PLAY_GAMES
+      .filter((item) => !savedOnly || flow.playSaved.includes(item.id))
+      .map((item) => `<button type="button" class="code-play-game-card code-play-art-${item.theme} ${flow.playGame === item.id ? 'is-selected' : ''}" data-action="${savedOnly ? 'code-play-open-game' : 'code-play-select'}" data-game="${item.id}" aria-pressed="${flow.playGame === item.id}">
+        <span class="code-play-card-art"><span aria-hidden="true">${item.icon}</span></span>
+        <span class="code-play-card-copy"><strong>${item.title}</strong><small>${item.subtitle}</small></span><span class="code-play-card-mark" aria-hidden="true">${flow.playGame === item.id ? '✓' : '▶'}</span>
+      </button>`).join('');
+    let activeScreen = '';
+
+    if (screen === 'home') {
+      activeScreen = `<section class="code-play-screen code-play-home" aria-labelledby="code-play-title">
+        <div class="code-play-screen-heading"><span class="code-play-eyebrow">Pick a game to customize!</span><h2 id="code-play-title">${bilingual ? 'Choose a Game' : 'Yan ere kan'}</h2><p>Choose your world, then bring it to life with code.</p></div>
+        <div class="code-play-games-grid">${gameCards()}</div>
+        <button type="button" class="code-play-primary" data-action="code-play-screen" data-screen="build"><span>Build your game</span><strong>Let’s play <span aria-hidden="true">›</span></strong></button>
+      </section>`;
+    } else if (screen === 'build') {
+      activeScreen = `<section class="code-play-screen code-play-build" aria-labelledby="code-play-title">
+        <div class="code-play-screen-heading code-play-heading-row"><div><span class="code-play-eyebrow">Your game · ${game.title}</span><h2 id="code-play-title">${bilingual ? 'Build Your Game' : 'Bọ́ọ̀dù Ere Rẹ'}</h2><p>Choose blocks, put them in order, and see what happens.</p></div><button type="button" class="code-play-light-button" data-action="code-play-screen" data-screen="home">‹ Change game</button></div>
+        <div class="code-play-builder">
+          <aside class="code-play-toolbox">
+            <div class="code-play-mode-switch" aria-label="Choose what to create"><button type="button" data-action="code-play-mode" data-mode="blocks" class="${flow.playMode === 'blocks' ? 'is-active' : ''}" aria-pressed="${flow.playMode === 'blocks'}">🎮 Code Blocks</button><button type="button" data-action="code-play-mode" data-mode="sprites" class="${flow.playMode === 'sprites' ? 'is-active' : ''}" aria-pressed="${flow.playMode === 'sprites'}">◉ Sprites</button></div>
+            ${flow.playMode === 'blocks'
+              ? `<h3>Pick a block</h3><div class="code-play-block-options">${CODE_PLAY_BLOCKS.map((block) => `<button type="button" class="code-play-block-option is-${block.color}" data-action="code-play-add-block" data-block="${block.id}"><span aria-hidden="true">${block.icon}</span>${block.label}<b aria-hidden="true">+</b></button>`).join('')}</div>`
+              : `<h3>Choose a friend</h3><div class="code-play-sprites">${Object.entries(characters).map(([id, emoji]) => `<button type="button" data-action="code-play-character" data-character="${id}" class="${flow.playCharacter === id ? 'is-selected' : ''}" aria-label="${id}" aria-pressed="${flow.playCharacter === id}">${emoji}</button>`).join('')}</div>`}
+          </aside>
+          <div class="code-play-workspace">
+            <div class="code-play-workspace-head"><div><span>MY CODE</span><strong>${flow.playBlocks.length} blocks</strong></div><button type="button" data-action="code-play-clear" aria-label="Clear blocks">↺</button></div>
+            <div class="code-play-block-stack">${flow.playBlocks.length ? flow.playBlocks.map((id, index) => {
+              const block = CODE_PLAY_BLOCKS.find((item) => item.id === id);
+              return `<div class="code-play-block is-${block.color}"><span>${block.icon}</span><strong>${block.label}</strong><button type="button" data-action="code-play-remove-block" data-index="${index}" aria-label="Remove ${block.label}">×</button></div>`;
+            }).join('') : '<p class="code-play-empty">Tap a block to start building your game.</p>'}</div>
+            <button type="button" class="code-play-primary code-play-preview-button" data-action="code-play-preview">▶ <span>Preview Game</span></button>
+          </div>
+          <aside class="code-play-mini-preview"><span class="code-play-eyebrow">YOUR CHARACTER</span><div class="code-play-avatar">${characters[flow.playCharacter]}</div><strong>${game.title}</strong><p>Ready to play?</p><button type="button" class="code-play-light-button" data-action="code-play-preview">Try it <span aria-hidden="true">→</span></button></aside>
+        </div>
+      </section>`;
+    } else if (screen === 'game') {
+      const characterPosition = Math.min(78, 18 + flow.playStepCount * 8);
+      activeScreen = `<section class="code-play-screen code-play-game" aria-labelledby="code-play-title">
+        <div class="code-play-screen-heading code-play-heading-row"><div><span class="code-play-eyebrow">Preview Game</span><h2 id="code-play-title">${game.title}</h2></div><span class="code-play-score">⭐ ${flow.playScore}</span></div>
+        <div class="code-play-world code-play-art-${game.theme}" role="img" aria-label="${game.title} game scene. Use the controls below to move your character and collect stars.">
+          <span class="code-play-cloud code-play-cloud-one"></span><span class="code-play-cloud code-play-cloud-two"></span><span class="code-play-world-star" aria-hidden="true">⭐</span>
+          <span class="code-play-world-character" style="left:${characterPosition}%">${characters[flow.playCharacter]}</span><span class="code-play-world-platform code-play-platform-one"></span><span class="code-play-world-platform code-play-platform-two"></span>
+          <span class="code-play-world-hint">Gba ìràwọ̀! <small>Collect the star</small></span>
+        </div>
+        <div class="code-play-game-controls"><button type="button" data-action="code-play-move" data-move="left" aria-label="Move left">←</button><button type="button" data-action="code-play-move" data-move="right" aria-label="Move right">→</button><button type="button" class="code-play-jump" data-action="code-play-move" data-move="jump" aria-label="Jump">↑</button></div>
+        <div class="code-play-game-footer"><button type="button" class="code-play-light-button" data-action="code-play-screen" data-screen="build">‹ Edit blocks</button><button type="button" class="code-play-primary" data-action="code-play-finish">Finish game <span aria-hidden="true">→</span></button></div>
+      </section>`;
+    } else if (screen === 'win') {
+      activeScreen = `<section class="code-play-screen code-play-win" aria-labelledby="code-play-title">
+        <div class="code-play-confetti" aria-hidden="true">✦ · ⭐ · ✧ · ✨ · ★</div><div class="code-play-trophy" aria-hidden="true">🏆</div>
+        <span class="code-play-eyebrow">Àṣeyọrí! · Great job!</span><h2 id="code-play-title">O ṣeun gan-an!</h2><p>Your game is ready! You collected <strong>${flow.playScore} stars</strong>.</p>
+        <button type="button" class="code-play-primary" data-action="code-play-save">▣ <span>Save to My Games</span></button><button type="button" class="code-play-light-button" data-action="code-play-again">↻ Play again</button>
+      </section>`;
+    } else {
+      const savedGames = gameCards(true);
+      activeScreen = `<section class="code-play-screen code-play-library" aria-labelledby="code-play-title">
+        <div class="code-play-screen-heading code-play-heading-row"><div><span class="code-play-eyebrow">Your creations</span><h2 id="code-play-title">Ere Mi <small>My Games</small></h2></div><span class="code-play-library-count">♥ ${flow.playSaved.length} saved</span></div>
+        <div class="code-play-library-tabs"><button type="button" class="is-active" aria-pressed="true">🎮 Ere Mi <small>My Games</small></button><button type="button" disabled title="Shared games are coming soon">✦ Pinpin <small>Shared</small></button><button type="button" disabled title="Favorites are coming soon">♥ Ayanfẹ <small>Favorites</small></button></div>
+        <div class="code-play-library-grid">${savedGames || `<div class="code-play-empty-library"><span aria-hidden="true">🌟</span><strong>Your first game is waiting!</strong><p>Choose a game and make it your own.</p><button type="button" class="code-play-primary" data-action="code-play-screen" data-screen="home">Choose a game</button></div>`}</div>
+      </section>`;
+    }
+
+    return `<section class="code-play-section" aria-label="Code and Play games"><div class="code-play-shell">
+      <header class="code-play-topbar"><div class="code-play-brand"><span class="code-play-brand-icon" aria-hidden="true">🎮</span><div><strong>Idilewa</strong><small>Code &amp; Play</small></div></div><button type="button" class="code-play-language" data-action="code-play-toggle-language" aria-pressed="${bilingual}"><span aria-hidden="true">🇳🇬</span> Yorùbá <span aria-hidden="true">${bilingual ? '⌄' : '›'}</span></button></header>
+      ${activeScreen}
+      ${bottomNav}
+    </div></section>`;
+  }
+
   function renderCoding() {
     const languages = CODE_LANGUAGES;
     const preview = getCodeSampleTranslation(state.coding.codeMessage, state.coding.codeTargetLanguage) || state.coding.codeOutput;
-    return `<div class="code-design-page code-landing-page">
+    return `${renderCodePlay()}<div class="code-design-page code-landing-page">
       <section class="code-design-landing-hero">
         <div class="code-landing-copy">
           <span class="code-design-kicker">${icon('code', 16)} Code &amp; Translate</span>
@@ -8779,6 +8887,116 @@ import {
         }
         void playPlotweaverSpeech(state.coding.codeOutput, state.coding.codeTargetLanguage || 'yo')
           .catch((error) => showToast(error instanceof Error ? error.message : 'Idilewa could not play the translation.', 'error'));
+        break;
+      case 'code-play-screen': {
+        const screen = el.dataset.screen;
+        if (!['home', 'build', 'library'].includes(screen)) break;
+        state.coding.playScreen = screen;
+        saveState();
+        render();
+        break;
+      }
+      case 'code-play-select':
+      case 'code-play-open-game': {
+        const game = el.dataset.game;
+        if (!CODE_PLAY_GAMES.some((item) => item.id === game)) break;
+        state.coding.playGame = game;
+        state.coding.playScreen = 'build';
+        state.coding.playScore = 0;
+        state.coding.playStepCount = 0;
+        saveState();
+        render();
+        break;
+      }
+      case 'code-play-mode': {
+        const mode = el.dataset.mode;
+        if (!['blocks', 'sprites'].includes(mode)) break;
+        state.coding.playMode = mode;
+        saveState();
+        render();
+        break;
+      }
+      case 'code-play-character': {
+        const character = el.dataset.character;
+        if (!['boy', 'girl', 'cat', 'dog'].includes(character)) break;
+        state.coding.playCharacter = character;
+        saveState();
+        render();
+        break;
+      }
+      case 'code-play-add-block': {
+        const block = el.dataset.block;
+        if (!CODE_PLAY_BLOCKS.some((item) => item.id === block)) break;
+        if (state.coding.playBlocks.length >= 10) {
+          showToast('Your game has room for 10 blocks. Remove one to add another.');
+          break;
+        }
+        state.coding.playBlocks = [...state.coding.playBlocks, block];
+        saveState();
+        render();
+        break;
+      }
+      case 'code-play-remove-block': {
+        const index = Number(el.dataset.index);
+        if (!Number.isInteger(index) || index < 0 || index >= state.coding.playBlocks.length) break;
+        state.coding.playBlocks = state.coding.playBlocks.filter((_, blockIndex) => blockIndex !== index);
+        saveState();
+        render();
+        break;
+      }
+      case 'code-play-clear':
+        state.coding.playBlocks = [];
+        saveState();
+        render();
+        break;
+      case 'code-play-toggle-language':
+        state.coding.playBilingual = !state.coding.playBilingual;
+        saveState();
+        render();
+        break;
+      case 'code-play-preview':
+        if (!state.coding.playBlocks.length) {
+          showToast('Add a code block before previewing your game.');
+          break;
+        }
+        state.coding.playScreen = 'game';
+        state.coding.playStepCount = 0;
+        state.coding.playScore = 0;
+        saveState();
+        render();
+        break;
+      case 'code-play-move': {
+        const move = el.dataset.move;
+        if (!['left', 'right', 'jump'].includes(move)) break;
+        const nextPosition = Math.min(8, Math.max(0, state.coding.playStepCount + (move === 'left' ? -1 : 1)));
+        state.coding.playStepCount = nextPosition;
+        if (move === 'jump' || (move === 'right' && nextPosition > 0 && nextPosition % 2 === 0)) {
+          state.coding.playScore = Math.min(99, state.coding.playScore + 1);
+        }
+        saveState();
+        render();
+        break;
+      }
+      case 'code-play-finish':
+        state.coding.playScreen = 'win';
+        saveState();
+        render();
+        break;
+      case 'code-play-save':
+        if (!state.coding.playSaved.includes(state.coding.playGame)) {
+          state.coding.playSaved = [...state.coding.playSaved, state.coding.playGame].slice(0, 4);
+        }
+        state.coding.playScreen = 'library';
+        saveState();
+        render();
+        showToast('Your game was saved to My Games.');
+        break;
+      case 'code-play-again':
+        state.coding.playScreen = 'game';
+        state.coding.playScore = 0;
+        state.coding.playStepCount = 0;
+        saveState();
+        render();
         break;
       case 'ide-set-lang': {
         const lang = el.dataset.lang || 'yoruba';

@@ -47,9 +47,28 @@ test('Coding studio supports block editing, undo, run, translation, and audio co
   assert.match(appSource, /document\.addEventListener\('drop'/);
 });
 
+test('Code & Play adds the referenced game journey without replacing the existing Code page', () => {
+  const gameFlow = appSource.slice(appSource.indexOf('function renderCodePlay()'), appSource.indexOf('function renderCoding()'));
+  const gameCatalog = appSource.slice(appSource.indexOf('const CODE_PLAY_GAMES'), appSource.indexOf('const CODE_PLAY_BLOCKS'));
+  const landing = appSource.slice(appSource.indexOf('function renderCoding()'), appSource.indexOf('function renderCodingStudio()'));
+  for (const screen of ['Choose a Game', 'Build Your Game', 'Preview Game', 'Great job!', 'My Games']) {
+    assert.ok(gameFlow.includes(screen), `Expected the Code & Play flow to include "${screen}".`);
+  }
+  for (const game of ['platformer', 'space', 'fruit', 'racing']) assert.ok(gameCatalog.includes(`id: '${game}'`));
+  assert.match(landing, /\$\{renderCodePlay\(\)\}/);
+  assert.match(landing, /Build Your Code/);
+  assert.match(landing, /See Your Result in<br>Different Languages/);
+  assert.match(landing, /code-reference-children\.png/);
+  assert.match(appSource, /case 'code-play-save':/);
+  assert.match(appSource, /case 'code-play-move':/);
+  assert.match(appSource, /playSaved: Array\.isArray\(stored\.coding\?\.playSaved\)/);
+});
+
 test('the new coding layouts adapt for tablets and mobile screens', () => {
   assert.match(styleSource, /\.code-design-page \{/);
   assert.match(styleSource, /@media\(max-width:900px\)[\s\S]*?\.code-studio-workbench/);
   assert.match(styleSource, /@media\(max-width:650px\)[\s\S]*?\.code-landing-preview/);
   assert.match(styleSource, /@media\(max-width:650px\)[\s\S]*?\.code-studio-workbench \{ grid-template-columns: 1fr;/);
+  assert.match(styleSource, /\.code-play-games-grid/);
+  assert.match(styleSource, /@media \(max-width: 650px\) \{[\s\S]*?\.code-play-builder \{ grid-template-columns: 1fr;/);
 });
