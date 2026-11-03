@@ -2,7 +2,7 @@ import { defineConfig } from 'vite';
 import { resolve } from 'path';
 
 const routes = [
-  'index', 'about', 'base', 'coding', 'connect_students', 'connect_teachers', 'consent', 'course',
+  'index', 'about', 'base', 'connect_students', 'connect_teachers', 'consent', 'course',
   'curriculum',
   'ere', 'ere_game', 'guides', 'human', 'ifa', 'ifa_odu', 'individuals', 'keepers',
   'kids', 'languages', 'lesson', 'login', 'method', 'oral', 'oral_genre', 'oriki', 'owe',

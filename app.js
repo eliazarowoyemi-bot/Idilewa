@@ -105,13 +105,13 @@ import {
     'tutor', 'tutor-login', 'tutor-signup', 'tutor-dashboard', 'tutor-find-child', 'tutor-students',
     'tutor-consent', 'tutor-lesson', 'tutor-messages', 'tutor-profile', 'tutor-availability', 'tutor-settings',
     'curriculum',
-    'index', 'about', 'base', 'coding', 'coding-studio', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
+    'index', 'about', 'base', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
     'ere', 'ere_game', 'game', 'guides', 'heritage', 'human', 'ifa', 'ifa_odu', 'individuals', 'keepers', 'library',
     'kids', 'languages', 'lesson', 'login', 'method', 'oral', 'oral_genre', 'oriki', 'owe',
     'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'payment', 'pricing', 'profile', 'schools',
     'voices'
   ];
-  const REMOVED_ROUTES = new Set(['adult', 'parent_dashboard', 'educator_dashboard', 'world']);
+  const REMOVED_ROUTES = new Set(['adult', 'parent_dashboard', 'educator_dashboard', 'world', 'coding', 'coding-studio']);
   const OWE_ROUTE_SECTIONS = {
     owe_detail: 'meaning',
     owe_story: 'story',
@@ -214,11 +214,11 @@ import {
       desc: 'Standards-aligned STEM lessons infused with Yoruba, Igbo, Hausa and African cultural concepts from Kindergarten to Grade 8.',
       icon: 'layers', image: 'code-kids.jpg', imageAlt: 'African students exploring STEM and coding curriculum',
       active: 0, flow: ['Choose Grade Band', 'Explore Concepts', 'Teach Lesson', 'Code Live'],
-      cta: 'Open Code Studio', ctaRoute: 'coding',
+      cta: 'Explore STEM curriculum', ctaRoute: 'curriculum',
       cards: [
         { title: 'Lower Elementary', text: 'Visual Block Patterns & African Cultural Storytelling (K–2).', icon: 'sparkles', route: 'curriculum', tone: 'mint' },
         { title: 'Upper Elementary', text: 'Algorithmic Decision Trees & Yoruba Logic Syntax (3–5).', icon: 'layers', route: 'curriculum', tone: 'peach' },
-        { title: 'Middle School', text: 'Full Indigenous Syntax, Physical Computing & Web (6–8+).', icon: 'code', route: 'coding', tone: 'blue' }
+        { title: 'Middle School', text: 'Full Indigenous Syntax, Physical Computing & Web (6–8+).', icon: 'code', route: 'curriculum', tone: 'blue' }
       ]
     },
     adult: {
@@ -227,11 +227,11 @@ import {
       desc: 'Build practical confidence in African languages, coding, robotics and creative technology at your own pace.',
       icon: 'compass', image: 'code-kids.jpg', imageAlt: 'Learners exploring creative technology',
       active: 1, flow: ['Choose a goal', 'Learn a concept', 'Build a project', 'Reflect and grow'],
-      cta: 'Open Code Studio', ctaRoute: 'coding',
+      cta: 'Explore STEM curriculum', ctaRoute: 'curriculum',
       cards: [
         { title: 'Learn a language', text: 'Practice real-world listening and speaking in supported African language paths.', icon: 'volume', route: 'languages', tone: 'mint' },
-        { title: 'Build with code', text: 'Strengthen programming foundations with HTML, JavaScript, Python and project-based practice.', icon: 'code', route: 'coding', tone: 'blue' },
-        { title: 'Explore robotics', text: 'Move into sensors, microcontrollers, automation, CAD and responsible AI projects.', icon: 'compass', route: 'coding', tone: 'peach' }
+        { title: 'Build with code', text: 'Strengthen programming foundations with HTML, JavaScript, Python and project-based practice.', icon: 'code', route: 'curriculum', tone: 'blue' },
+        { title: 'Explore robotics', text: 'Move into sensors, microcontrollers, automation, CAD and responsible AI projects.', icon: 'compass', route: 'curriculum', tone: 'peach' }
       ]
     },
     coding: {
@@ -242,9 +242,9 @@ import {
       active: 1, flow: ['Select Language', 'Load Preset', 'Write Code', 'Execute Live'],
       cta: 'View Curriculum', ctaRoute: 'curriculum',
       cards: [
-        { title: 'Yorùbá Syntax', text: 'Code with tẹ_jade, jẹ́, bí, and kò_bá_jẹ́.', icon: 'code', route: 'coding', tone: 'mint' },
-        { title: 'Multi-Lingual', text: 'Supports Yorùbá, Igbo, Hausa, Swahili, and Python.', icon: 'globe', route: 'coding', tone: 'yellow' },
-        { title: 'Canvas Turtle', text: 'Interactive Adire geometric graphics and shapes.', icon: 'sparkles', route: 'coding', tone: 'blue' }
+        { title: 'Yorùbá Syntax', text: 'Code with tẹ_jade, jẹ́, bí, and kò_bá_jẹ́.', icon: 'code', route: 'curriculum', tone: 'mint' },
+        { title: 'Multi-Lingual', text: 'Supports Yorùbá, Igbo, Hausa, Swahili, and Python.', icon: 'globe', route: 'curriculum', tone: 'yellow' },
+        { title: 'Canvas Turtle', text: 'Interactive Adire geometric graphics and shapes.', icon: 'sparkles', route: 'curriculum', tone: 'blue' }
       ]
     },
     about: {
@@ -257,7 +257,7 @@ import {
       cards: [
         { title: 'Language lives in community', text: 'Learning grows through everyday words, family stories and the voices of people who carry them.', icon: 'people', route: 'individuals', tone: 'mint' },
         { title: 'Culture belongs in the classroom', text: 'Proverbs, oral traditions and cultural context sit beside language practice—not on the sidelines.', icon: 'book', route: 'oral', tone: 'peach' },
-        { title: 'Technology can carry us forward', text: 'Young learners can explore coding while staying rooted in the languages they know.', icon: 'code', route: 'coding', tone: 'blue' }
+        { title: 'Technology can carry us forward', text: 'Young learners can explore coding while staying rooted in the languages they know.', icon: 'code', route: 'curriculum', tone: 'blue' }
       ]
     },
     individuals: {
@@ -283,7 +283,7 @@ import {
       cards: [
         { title: 'Words you can use today', text: 'Learn friendly greetings and everyday phrases with clear audio prompts.', icon: 'volume', route: 'course', tone: 'mint' },
         { title: 'Stories made to share', text: 'Read or listen together, then answer a short question about what happened.', icon: 'book', route: 'ere', tone: 'peach' },
-        { title: 'Create with code', text: 'See beginner coding ideas explained in English and an African language side by side.', icon: 'code', route: 'coding', tone: 'yellow' }
+        { title: 'Create with code', text: 'See beginner coding ideas explained in English and an African language side by side.', icon: 'code', route: 'curriculum', tone: 'yellow' }
       ]
     },
     schools: {
@@ -384,7 +384,6 @@ import {
     { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' },
     { label: 'AI Conversations', route: 'ai-conversations', group: 'ai-conversations' },
     { label: 'For Tutors', route: 'tutor', group: 'tutor' },
-    { label: 'Code', route: 'coding', group: 'code' },
     { label: 'Curriculum', route: 'curriculum', group: 'curriculum' }
   ];
   const MENU_NAV = [...NAV,
@@ -430,7 +429,6 @@ import {
     'tutor-availability': 'tutor',
     'tutor-settings': 'tutor',
     curriculum: 'curriculum',
-    coding: 'code', 'coding-studio': 'code',
     trainer: 'trainer', voice_lessons: 'trainer',
     languages: 'curriculum', course: 'curriculum', lesson: 'curriculum', kids: 'curriculum', individuals: 'curriculum',
     oral: 'read', oral_genre: 'read', oriki: 'read', owe: 'read', owe_add: 'read',
@@ -444,8 +442,6 @@ import {
 
   const LABELS = Object.fromEntries(ROUTES.map((r) => [r, r === 'index' ? 'Home' : r.replaceAll('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())]));
   LABELS.curriculum = 'Curriculum';
-  LABELS.coding = 'Code';
-  LABELS['coding-studio'] = 'Start Coding';
   Object.assign(LABELS, {
     'voice-language': 'Choose a voice lesson language',
     'voice-grade': 'Choose a voice lesson grade',
@@ -881,10 +877,9 @@ import {
       { route: 'index', label: 'Home', ico: 'home' },
       { route: 'ere', label: 'Stories', ico: 'quote' },
       { route: 'library', label: 'Library', ico: 'book' },
-      { route: 'coding', label: 'Code', ico: 'code' },
       { route: 'profile', label: 'Profile', ico: 'user' }
     ];
-    document.getElementById('mobile-nav').innerHTML = items.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="mobile-tab ${page === item.route || (item.route === 'coding' && page === 'coding-studio') ? 'active' : ''}">${icon(item.ico, 19)}<span>${item.label}</span></a>`).join('');
+    document.getElementById('mobile-nav').innerHTML = items.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="mobile-tab ${page === item.route ? 'active' : ''}">${icon(item.ico, 19)}<span>${item.label}</span></a>`).join('');
   }
 
   function renderFooter(page) {
@@ -929,7 +924,7 @@ import {
   function renderHomeAppPreview() {
     const previews = [
       { title: 'Hear a greeting', label: 'Yorùbá · Language', copy: 'Start with a phrase, then listen for the tones that shape its meaning.', image: 'page-languages-1.jpg', route: 'languages', action: 'Explore languages' },
-      { title: 'Make something', label: 'Code · STEM', copy: 'Turn your ideas into small programs in a welcoming code studio.', image: 'code-kids.jpg', route: 'coding', action: 'Open Code Studio' },
+      { title: 'Explore technology', label: 'STEM curriculum', copy: 'Discover hands-on technology and problem-solving lessons.', image: 'code-kids.jpg', route: 'curriculum', action: 'Explore curriculum' },
       { title: 'Find a story', label: 'Stories · Culture', copy: 'Read, listen and explore folktales, traditions and riddles.', image: 'story-grandmother.jpg', route: 'heritage', action: 'Explore stories' },
       { title: 'Practice a sound', label: 'Voice Lessons', copy: 'Build confidence with vowels, consonants and guided speaking practice.', image: 'listening-reader.jpg', route: 'voice_lessons', action: 'Start a lesson' }
     ];
@@ -954,7 +949,7 @@ import {
   function renderLegacyHome() {
     const featureCards = [
       { title: 'K–8 STEM Curriculum', desc: 'Standards-aligned lessons infused with African culture.', icon: 'layers', route: 'curriculum', tone: 'blue', tag: 'Curriculum', image: 'page-languages-1.jpg' },
-      { title: 'Code in your language', desc: 'Interactive bilingual coding studio for kids.', icon: 'code', route: 'coding', tone: 'yellow', tag: 'Interactive IDE', image: 'code-kids.jpg' },
+      { title: 'Technology and STEM', desc: 'Explore hands-on learning across technology and problem-solving.', icon: 'code', route: 'curriculum', tone: 'yellow', tag: 'Curriculum', image: 'code-kids.jpg' },
       { title: 'Voice Lessons', desc: 'Start with Yorùbá sounds, then practice pitch and pronunciation across African languages.', icon: 'mic', route: 'voice_lessons', tone: 'mint', tag: 'Interactive Audio Lessons', image: 'listening-reader.jpg' },
       { title: 'Read & listen', desc: 'Hear words, voices and ideas.', icon: 'headphones', route: 'voices', tone: 'mint', tag: 'Audio & text', image: 'listening-reader.jpg' },
       { title: 'Stories & culture', desc: 'Discover stories, people and traditions.', icon: 'book', route: 'ere', tone: 'pink', tag: 'Explore', image: 'story-grandmother.jpg' },
@@ -964,7 +959,7 @@ import {
     const books = [
       { title: 'A Morning Greeting', label: 'Yorùbá · Beginner', bg: 'cover-green', shape: 'È', route: 'course' },
       { title: 'Stories We Share', label: 'Story · Read & listen', bg: 'cover-blue', shape: '♫', route: 'ere' },
-      { title: 'Little Code Garden', label: 'English + Yorùbá', bg: 'cover-yellow', shape: '</>', route: 'coding' },
+      { title: 'Little Code Garden', label: 'English + Yorùbá', bg: 'cover-yellow', shape: '</>', route: 'curriculum' },
       { title: 'Wisdom We Carry', label: 'Culture · Short read', bg: 'cover-pink', shape: '“', route: 'oral' }
     ];
     return `
@@ -977,7 +972,7 @@ import {
             <p class="hero-lede">A joyful place to learn a language, hear the stories behind it and imagine what you can create next.</p>
             <div class="hero-actions">
               ${routeLink('curriculum', `Explore Curriculum ${icon('arrow', 17)}`, 'button button-primary')}
-              ${routeLink('coding', `${icon('code', 16)} Code Studio`, 'button button-accent')}
+              ${routeLink('curriculum', `${icon('layers', 16)} Explore STEM curriculum`, 'button button-accent')}
               ${routeLink('about', `${icon('play', 15)} Our story`, 'button button-outline')}
             </div>
             <div class="hero-social-proof"><div class="mini-avatars"><span>A</span><span>Ẹ</span><span>Ụ</span><span>✳</span></div><span>For curious learners, families<br class="desktop-only" /> and the next generation</span></div>
@@ -1126,7 +1121,7 @@ import {
               </ul>
             </div>
             <div class="journey-card-action">
-              ${routeLink('coding', `Code for Kids ${icon('arrow', 15)}`, 'button button-primary')}
+              ${routeLink('curriculum', `Explore the curriculum ${icon('arrow', 15)}`, 'button button-primary')}
             </div>
           </div>
         </div>
@@ -1250,7 +1245,7 @@ import {
     const pathways = [
       { icon: 'book', title: 'Learn', copy: 'African languages', route: 'voice-language' },
       { icon: 'volume', title: 'Listen', copy: 'Stories & audiobooks', route: 'voices' },
-      { icon: 'code', title: 'Code', copy: 'Build skills in your language', route: 'coding' },
+      { icon: 'code', title: 'STEM', copy: 'Build technology skills', route: 'curriculum' },
       { icon: 'people', title: 'Join', copy: 'A global community', route: 'connect_students' }
     ];
     return `<div class="landing-home">
@@ -3847,7 +3842,7 @@ import {
     }
     return `<nav class="ide-learning-nav" aria-label="Learning navigation">
       <a class="ide-nav-item" href="#/index">${icon('home', 18)}<span>Home</span></a>
-      <a class="ide-nav-item is-active" href="#/coding" aria-current="page">${icon('code', 18)}<span>Code</span></a>
+      <a class="ide-nav-item is-active" href="#/curriculum" data-route="curriculum" aria-current="page">${icon('layers', 18)}<span>Curriculum</span></a>
       <a class="ide-nav-item" href="#/oral">${icon('book', 18)}<span>Library</span></a>
       <a class="ide-nav-item" href="#/ere_game">${icon('gamepad', 18)}<span>Games</span></a>
       <a class="ide-nav-item" href="#/profile">${icon('user', 18)}<span>Profile</span></a>
@@ -4392,7 +4387,7 @@ import {
     const characters = { boy: '🧒🏾', girl: '👧🏾', cat: '🐱', dog: '🐶' };
     return `<div class="code-design-page code-studio-page">
       <section class="code-studio-hero">
-        <div class="code-studio-hero-copy"><a class="code-back-link" href="#/coding" data-route="coding">${icon('arrow', 15)} Back to Home</a><h1>Start <em>Coding</em></h1><p>Drag the blocks, build your code,<br>and bring your ideas to life!</p></div>
+        <div class="code-studio-hero-copy"><a class="code-back-link" href="#/curriculum" data-route="curriculum">${icon('arrow', 15)} Back to Curriculum</a><h1>Start <em>Coding</em></h1><p>Drag the blocks, build your code,<br>and bring your ideas to life!</p></div>
         <div class="code-studio-hero-art"><img class="code-studio-kids" src="./assets/code-reference-children.png" alt="Young coders creating a project together" /><img class="code-studio-buddy" src="./assets/code-reference-buddy.png" alt="Idilewa robot cheering on young coders" /><span class="code-speech-bubble code-speech-bubble-purple">Small Steps...<br>Big Dreams!</span><span class="code-studio-spark" aria-hidden="true">✦ ✨ ✧</span></div>
       </section>
       <section class="code-studio-workbench" aria-label="Block coding workspace">
@@ -4540,7 +4535,7 @@ import {
           '<div class="c4k-quick-pills-row">' +
             '<button type="button" class="c4k-nav-pill active" data-action="coding-jump-band" data-band="curriculum-bands">' + icon('layers', 14) + ' K-8 Curriculum</button>' +
             '<button type="button" class="c4k-nav-pill" data-action="coding-jump-band" data-band="free-lessons">' + icon('book', 14) + ' Free STEM Lessons (' + C4K_FREE_LESSONS.length + ')</button>' +
-            routeLink('coding', icon('code', 14) + ' Code IDE', 'c4k-nav-pill') +
+            routeLink('curriculum', icon('layers', 14) + ' Curriculum', 'c4k-nav-pill') +
           '</div>' +
 
           '<!-- 3 Interactive Grade Band 3D Hub Cards -->' +
@@ -4696,7 +4691,7 @@ import {
           '<h3>Ready to code in your language?</h3>' +
           '<p>Experience live compilation in Yorùbá, Igbo, Hausa, Swahili, and Python in our interactive bilingual studio.</p>' +
         '</div>' +
-        routeLink('coding', 'Launch Code Studio ' + icon('arrow', 15), 'curriculum-ide-cta-btn') +
+        routeLink('curriculum', 'Explore STEM curriculum ' + icon('arrow', 15), 'curriculum-ide-cta-btn') +
       '</div>' +
 
       '<!-- Section: Subscription / Stay in the Loop -->' +
@@ -5464,7 +5459,7 @@ import {
     { title: 'Grandmother’s garden', kind: 'Stories', text: 'A gentle story about patience, care and a seed taking its time.', image: 'story-grandmother.jpg', route: 'owe_story', alt: 'A grandmother sharing a garden story with a child' },
     { title: 'Words that welcome', kind: 'Language', text: 'Practice greetings and useful first phrases in four African languages.', image: 'yoruba-kids-culture.jpg', route: 'languages', alt: 'Children learning African-language greetings together' },
     { title: 'Listen together', kind: 'Audio', text: 'Hear a phrase, notice its rhythm and try saying it at your own pace.', image: 'listening-reader.jpg', route: 'trainer', alt: 'A learner listening closely while following a book' },
-    { title: 'Make your first project', kind: 'Code', text: 'Explore beginner-friendly coding paths with familiar-language hints.', image: 'code-kids.jpg', route: 'coding', alt: 'Young learners collaborating on a coding project' },
+    { title: 'Make your first project', kind: 'STEM', text: 'Explore hands-on technology and problem-solving lessons.', image: 'code-kids.jpg', route: 'curriculum', alt: 'Young learners collaborating on a coding project' },
     { title: 'Proverbs with context', kind: 'Culture', text: 'Read a proverb, explore its meaning and reflect with care.', image: 'yoruba-educator-woman.jpg', route: 'owe', alt: 'A language educator introducing a proverb' },
     { title: 'Match the words', kind: 'Games', text: 'Pair African-language words with their English meanings in a quick game.', image: 'african-kids-friends.jpg', route: 'game', alt: 'Children enjoying a language-learning game together' }
   ];
@@ -7761,8 +7756,6 @@ import {
       case 'languages': return renderLanguages();
       case 'course': return renderCourse(params);
       case 'lesson': return renderLesson(params);
-      case 'coding': return renderCoding();
-      case 'coding-studio': return renderCodingStudio();
       case 'ere': return renderStories();
       case 'ere_game': return renderStoryGame(params);
       case 'heritage': return renderHeritageExperience(params);
@@ -8347,9 +8340,6 @@ import {
     if (page === 'heritage' || page.startsWith('ai-') || page.startsWith('tutor') || page.startsWith('parent') || page === 'families') {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = pageMarkup;
-    } else if (page === 'coding' || page === 'coding-studio') {
-      document.body.dataset.page = page;
-      document.getElementById('main').innerHTML = `${pageMarkup}${renderFooter(page)}`;
     } else if (page === 'login') {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = `${pageMarkup}${renderFooter(page)}`;
@@ -8369,17 +8359,13 @@ import {
         document.getElementById(`owe-${params.section}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     }
-    if (page === 'coding') initializeIdeOutputResize();
     if (page.startsWith('tutor')) loadTutorPortalData();
     if (page.startsWith('parent-') && !['parent-login', 'parent-signup', 'parent-welcome'].includes(page)
       && getCurrentUser()?.role === 'parent' && !parentDashboardData && !parentDashboardError) {
       void loadParentPortalData();
     }
     startHomePreviewMotion();
-    if (page === 'coding') {
-      const codeRobotGlyphs = document.getElementById('codeRobotGlyphCanvas');
-      if (codeRobotGlyphs) activeCodeRobotScene = init3DCodeRobotGlyphs(codeRobotGlyphs);
-    } else if (page === 'trainer' || page === 'voice_lessons') {
+    if (page === 'trainer' || page === 'voice_lessons') {
       const audioCanvas = document.getElementById('waveformCanvas');
       if (audioCanvas) init3DAudioVisualizer(audioCanvas);
       initializePlotweaverVoiceTools();
@@ -10805,11 +10791,6 @@ import {
     }
     if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
       event.preventDefault(); openSearch();
-    }
-    if ((event.metaKey || event.ctrlKey) && event.key === 'Enter' && ['coding', 'coding-studio'].includes(parseLocation().page)) {
-      event.preventDefault();
-      const runButton = document.querySelector('[data-action="code-run"]');
-      if (runButton) handleAction('code-run', runButton);
     }
   });
 

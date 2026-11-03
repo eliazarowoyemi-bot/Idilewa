@@ -56,13 +56,13 @@ test('homepage uses the approved bilingual font families and removes the video C
   assert.match(styleSource, /landing-hero-actions \.button[\s\S]*?min-height: 48px;[\s\S]*?font-size: 14px/);
 });
 
-test('main and expanded mobile navigation omit the removed Explore page', () => {
+test('main and expanded mobile navigation omit retired pages', () => {
   const navSource = appSource.match(/const NAV = \[([\s\S]*?)\n  \];/)?.[1];
   assert.ok(navSource, 'main navigation list should exist');
   const navLabels = [...navSource.matchAll(/label: '([^']+)'/g)].map((match) => match[1]);
 
-  assert.deepEqual(navLabels, ['Home', 'Voice Lessons', 'AI Conversations', 'For Tutors', 'Code', 'Curriculum']);
-  assert.match(appSource, /const REMOVED_ROUTES = new Set\(\[[^\]]*'world'/);
+  assert.deepEqual(navLabels, ['Home', 'Voice Lessons', 'AI Conversations', 'For Tutors', 'Curriculum']);
+  assert.match(appSource, /const REMOVED_ROUTES = new Set\(\[[^\]]*'world', 'coding', 'coding-studio'/);
   assert.match(appSource, /\{ route: 'ere', label: 'Stories', ico: 'quote' \}/);
   assert.doesNotMatch(appSource, /route: 'world'|label: 'Explore'|function renderCulturalWorld|initCulturalWorld|cultural-zone|cultural-world-replacement/);
   assert.match(appSource, /const MENU_NAV = \[\.\.\.NAV,/);
