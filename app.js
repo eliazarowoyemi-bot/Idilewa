@@ -861,7 +861,7 @@ import {
             <p class="hero-lede">Learn African languages, hear our stories, build real skills and belong to a global community.</p>
             <div class="hero-actions home-reference-actions">
               ${routeLink('voice-language', `Start Learning ${icon('arrow', 17)}`, 'button button-primary')}
-              ${routeLink('curriculum', `${icon('code', 17)} Code for Kids`, 'button button-outline')}
+              ${routeLink('curriculum', `Code for Kids ${icon('code', 17)}`, 'button button-outline')}
               ${routeLink('ai-conversations', `AI Conversation ${icon('sparkles', 17)}`, 'button button-primary')}
             </div>
             <div class="hero-social-proof home-reference-proof"><span class="home-reference-proof-mark">${icon('globe', 19)}</span><span>Culture, creativity and learning<br />for every generation.</span></div>
