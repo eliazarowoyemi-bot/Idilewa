@@ -774,8 +774,9 @@ import {
     }
     const items = [
       { route: 'index', label: 'Home', ico: 'home' },
-      { route: 'ere', label: 'Stories', ico: 'quote' },
-      { route: 'languages', label: 'Learn', ico: 'book' },
+      { route: 'voice_lessons', label: 'Voice Lessons', ico: 'mic' },
+      { route: 'ai-conversations', label: 'AI Conversation', ico: 'sparkles' },
+      { route: 'curriculum', label: 'Code', ico: 'code' },
       { route: 'profile', label: 'Profile', ico: 'user' }
     ];
     document.getElementById('mobile-nav').innerHTML = items.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="mobile-tab ${page === item.route ? 'active' : ''}">${icon(item.ico, 19)}<span>${item.label}</span></a>`).join('');
@@ -783,7 +784,6 @@ import {
 
   function renderFooter(page) {
     return `<footer class="site-footer">
-      ${page === 'index' ? renderHomeBenefits() : ''}
       <div class="container footer-main">
         <section class="footer-contact">
           <span class="footer-kicker">Contact us</span>
@@ -846,6 +846,39 @@ import {
   }
 
   function renderHome() {
+    const pathways = [
+      { icon: 'book', title: 'Learn', copy: 'African languages', route: 'voice-language' },
+      { icon: 'volume', title: 'Listen', copy: 'Stories & audiobooks', route: 'voices' },
+      { icon: 'code', title: 'Code', copy: 'Build skills in your language', route: 'curriculum' },
+      { icon: 'people', title: 'Join', copy: 'A global community', route: 'connect_students' }
+    ];
+    return `<div class="home-reference-page">
+      <section class="hero-section home-ribbon-section" aria-label="Welcome to Idilewa">
+        <div class="container hero-grid">
+          <div class="hero-copy">
+            <div class="home-reference-eyebrow">AFRICAN ROOTS <span aria-hidden="true">·</span> BRIGHTER FUTURES</div>
+            <h1>Preserving African Culture.<br /><span>Promoting Technology.</span></h1>
+            <p class="hero-lede">Learn African languages, hear our stories, build real skills and belong to a global community.</p>
+            <div class="hero-actions home-reference-actions">
+              ${routeLink('voice-language', `Start Learning ${icon('arrow', 17)}`, 'button button-primary')}
+              ${routeLink('curriculum', `${icon('code', 17)} Code for Kids`, 'button button-outline')}
+              ${routeLink('ai-conversations', `AI Conversation ${icon('sparkles', 17)}`, 'button button-primary')}
+            </div>
+            <div class="hero-social-proof home-reference-proof"><span class="home-reference-proof-mark">${icon('globe', 19)}</span><span>Culture, creativity and learning<br />for every generation.</span></div>
+          </div>
+          <div class="hero-visual home-hero-art">
+            <img src="./assets/idilewa-family-view.png" alt="Idilewa Living Family View showing a family learning together" />
+          </div>
+        </div>
+      </section>
+      ${renderHomeAppPreview()}
+      <section class="container landing-pathways" aria-label="Explore Idilewa">
+        ${pathways.map((item) => `<a class="landing-pathway" href="#/${item.route}" data-route="${item.route}"><span>${icon(item.icon, 23)}</span><strong>${item.title}</strong><small>${item.copy}</small></a>`).join('')}
+      </section>
+    </div>`;
+  }
+
+  function renderFullHome() {
     const featureCards = [
       { title: 'K–8 STEM Curriculum', desc: 'Standards-aligned lessons infused with African culture.', icon: 'layers', route: 'curriculum', tone: 'blue', tag: 'Curriculum', image: 'page-languages-1.jpg' },
       { title: 'Technology and STEM', desc: 'Explore hands-on learning across technology and problem-solving.', icon: 'code', route: 'curriculum', tone: 'yellow', tag: 'Curriculum', image: 'code-kids.jpg' },
@@ -8124,6 +8157,9 @@ import {
     if (page === 'heritage' || page.startsWith('ai-') || page.startsWith('tutor') || page.startsWith('parent') || page === 'families') {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = pageMarkup;
+    } else if (page === 'index') {
+      document.body.dataset.page = page;
+      document.getElementById('main').innerHTML = `${pageMarkup}${renderFooter(page)}`;
     } else if (page === 'login') {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = `${pageMarkup}${renderFooter(page)}`;

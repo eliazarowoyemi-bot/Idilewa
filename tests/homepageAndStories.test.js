@@ -1,5 +1,4 @@
 import assert from 'node:assert/strict';
-import { createHash } from 'node:crypto';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
@@ -7,66 +6,38 @@ const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const styleSource = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 const indexSource = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 
-function jpegDimensions(buffer) {
-  let offset = 2;
-  const startOfFrameMarkers = new Set([0xc0, 0xc1, 0xc2, 0xc3, 0xc5, 0xc6, 0xc7, 0xc9, 0xca, 0xcb, 0xcd, 0xce, 0xcf]);
-
-  while (offset < buffer.length) {
-    if (buffer[offset] !== 0xff) {
-      offset += 1;
-      continue;
-    }
-    while (buffer[offset] === 0xff) offset += 1;
-
-    const marker = buffer[offset];
-    offset += 1;
-    if (marker === 0xd9 || marker === 0xda) break;
-    if (marker === 0xd8 || (marker >= 0xd0 && marker <= 0xd7) || marker === 0x01) continue;
-
-    const segmentLength = buffer.readUInt16BE(offset);
-    if (startOfFrameMarkers.has(marker)) {
-      return {
-        height: buffer.readUInt16BE(offset + 3),
-        width: buffer.readUInt16BE(offset + 5)
-      };
-    }
-    offset += segmentLength;
-  }
-
-  throw new Error('JPEG image has no supported start-of-frame marker');
-}
-
-test('homepage permanently uses Family Living View and the animated 3D phone preview', () => {
-  const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderPhoneFirstHome()'));
+test('homepage follows the Family Living View mobile reference', () => {
+  const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderFullHome()'));
   assert.match(indexSource, /<body data-default-route="index">/);
   assert.match(homeSource, /src="\.\/assets\/idilewa-family-view\.png"/);
   assert.match(homeSource, /Idilewa Living Family View showing a family learning together/);
+  assert.match(homeSource, /Learn African languages, hear our stories, build real skills and belong to a global community/);
+  assert.match(homeSource, /Start Learning/);
+  assert.match(homeSource, /Code for Kids/);
+  assert.match(homeSource, /AI Conversation/);
   assert.match(homeSource, /\$\{renderHomeAppPreview\(\)\}/);
-  assert.match(homeSource, /visual-journey-3d-section/);
+  assert.match(homeSource, /class="container landing-pathways"/);
+  assert.doesNotMatch(homeSource, /visual-journey-3d-section|home-voice-promo|home-trainer-feature-section|explore-section|story-feature|audience-section|home-cta-section/);
   assert.match(appSource, /case 'index': return renderHome\(\);/);
+  assert.match(appSource, /else if \(page === 'index'\) \{\s*document\.body\.dataset\.page = page;\s*document\.getElementById\('main'\)\.innerHTML = `\$\{pageMarkup\}\$\{renderFooter\(page\)\}`;/);
+  assert.doesNotMatch(appSource, /page === 'index' \? renderHomeBenefits\(\)/);
   assert.match(styleSource, /\.android-device \{[^}]*transform-style: preserve-3d; animation: android-device-orbit/);
+  assert.match(styleSource, /\.android-device \{ width: min\(42vw, 220px\); height: auto; aspect-ratio: \.46;/);
   assert.match(styleSource, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.android-device \{ animation: none;/);
 });
 
 test('main and expanded mobile navigation omit retired pages', () => {
   const navSource = appSource.match(/const NAV = \[([\s\S]*?)\n  \];/)?.[1];
+  const mobileNavSource = appSource.slice(appSource.indexOf('function renderMobileNav('), appSource.indexOf('function renderFooter('));
   assert.ok(navSource, 'main navigation list should exist');
   const navLabels = [...navSource.matchAll(/label: '([^']+)'/g)].map((match) => match[1]);
 
   assert.deepEqual(navLabels, ['Home', 'Voice Lessons', 'AI Conversations', 'For Tutors', 'Curriculum']);
+  const mobileItems = [...mobileNavSource.matchAll(/\{ route: '([^']+)', label: '([^']+)'/g)].map((match) => [match[1], match[2]]);
+  assert.deepEqual(mobileItems, [['index', 'Home'], ['voice_lessons', 'Voice Lessons'], ['ai-conversations', 'AI Conversation'], ['curriculum', 'Code'], ['profile', 'Profile']]);
   assert.match(appSource, /const REMOVED_ROUTES = new Set\(\[[\s\S]*?'world'[\s\S]*?'coding', 'coding-studio'/);
-  assert.match(appSource, /\{ route: 'ere', label: 'Stories', ico: 'quote' \}/);
   assert.doesNotMatch(appSource, /route: 'world'|label: 'Explore'|function renderCulturalWorld|initCulturalWorld|cultural-zone|cultural-world-replacement/);
   assert.match(appSource, /const MENU_NAV = \[\.\.\.NAV,/);
-});
-
-test('homepage language photos do not have country-symbol overlays', () => {
-  const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderLanguageCard'));
-
-  assert.equal((homeSource.match(/class="landing-language-card"/g) || []).length, 1);
-  assert.match(homeSource, /class="landing-language-name">\$\{language\.name\}/);
-  assert.doesNotMatch(homeSource, /landing-language-flag|language\.flag/);
-  assert.doesNotMatch(styleSource, /\.landing-language-flag/);
 });
 
 test('every story card opens its own bilingual reader with previous and next navigation', () => {
@@ -80,23 +51,14 @@ test('every story card opens its own bilingual reader with previous and next nav
   assert.match(appSource, /data-key="\$\{story\.id\}"/);
 });
 
-test('mobile landing layouts and story navigation have responsive no-overflow rules', () => {
-  assert.match(styleSource, /@media \(max-width: 620px\)[\s\S]*?landing-home \.container \{ width: calc\(100% - 40px\)/);
-  assert.match(styleSource, /@media \(max-width: 359px\)[\s\S]*?landing-home \.container \{ width: calc\(100% - 32px\)/);
-  assert.match(styleSource, /\.landing-future-card \{[^}]*color: var\(--ink\);[^}]*background: var\(--mint\)/);
-  assert.match(styleSource, /\.landing-future-card \.text-link \{ color: var\(--green-dark\);/);
+test('reference homepage and story navigation have responsive layouts', () => {
+  assert.match(styleSource, /@media \(max-width: 620px\)[\s\S]*?\.home-reference-page \.hero-grid \{/);
+  assert.match(styleSource, /\.home-reference-actions\s*\{/);
+  assert.match(styleSource, /\.home-app-layout\s*\{/);
   assert.match(styleSource, /\.story-navigation-link \{[\s\S]*?min-height: 44px/);
 });
 
-test('homepage How It Works section uses the supplied artwork unchanged', async () => {
-  const image = await readFile(new URL('../public/assets/how-it-works-journey-reference.jpg', import.meta.url));
-
-  assert.equal(createHash('sha256').update(image).digest('hex'), 'fb715733b68f5d740cf11f5b52f3618de53644cb2ebe56071e2e0e07ab482005');
-  assert.deepEqual(jpegDimensions(image), { width: 1080, height: 720 });
-  assert.match(appSource, /<section class="container how-it-works-journey-section"[\s\S]*?<img class="how-it-works-journey-image" src="\$\{imageUrl\('how-it-works-journey-reference\.jpg'\)\}"/);
-  assert.doesNotMatch(appSource, /journey-step-card|journey-step-visual/);
-  assert.match(styleSource, /\.how-it-works-journey-image\s*\{[^}]*width: 100%;[^}]*height: auto;/s);
-  assert.match(styleSource, /\.how-it-works-journey-section\s*\{[^}]*width: min\(1280px, calc\(100% - 40px\)\);[^}]*margin-right: auto;[^}]*margin-left: auto;/s);
-  assert.match(styleSource, /@media \(max-width: 620px\)[\s\S]*?\.how-it-works-journey-section\s*\{\s*width: calc\(100% - 40px\);/);
-  assert.match(styleSource, /@media \(max-width: 359px\)[\s\S]*?\.how-it-works-journey-section\s*\{\s*width: calc\(100% - 32px\);/);
+test('homepage omits the extra promotional sections outside the supplied reference', () => {
+  const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderFullHome()'));
+  assert.doesNotMatch(homeSource, /visual-journey-3d-section|how-it-works-journey-section|home-trainer-feature-section|story-feature|audience-section|home-cta-section/);
 });
