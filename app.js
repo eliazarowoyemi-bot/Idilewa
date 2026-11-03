@@ -946,7 +946,7 @@ import {
     </div></section><section class="home-principles-strip" aria-label="Idilewa learning principles"><div class="container"><span>${icon('globe', 17)} African languages</span><span>${icon('people', 17)} Family learning</span><span>${icon('leaf', 17)} Culture with context</span><span>${icon('code', 17)} STEM for young makers</span></div></section>`;
   }
 
-  function renderLegacyHome() {
+  function renderHome() {
     const featureCards = [
       { title: 'K–8 STEM Curriculum', desc: 'Standards-aligned lessons infused with African culture.', icon: 'layers', route: 'curriculum', tone: 'blue', tag: 'Curriculum', image: 'page-languages-1.jpg' },
       { title: 'Technology and STEM', desc: 'Explore hands-on learning across technology and problem-solving.', icon: 'code', route: 'curriculum', tone: 'yellow', tag: 'Curriculum', image: 'code-kids.jpg' },
@@ -978,7 +978,7 @@ import {
             <div class="hero-social-proof"><div class="mini-avatars"><span>A</span><span>Ẹ</span><span>Ụ</span><span>✳</span></div><span>For curious learners, families<br class="desktop-only" /> and the next generation</span></div>
           </div>
           <div class="hero-visual home-hero-art">
-            <img src="./assets/home-family-learning.jpg" alt="A family sharing African stories and learning together around an Idilewa tablet" />
+            <img src="./assets/idilewa-family-view.png" alt="Idilewa Living Family View showing a family learning together" />
             <section class="home-voice-promo" aria-labelledby="home-voice-promo-title">
               <div class="home-voice-promo-copy">
                 <span class="home-voice-promo-kicker">${icon('headphones', 14)} Voice lessons · sound &amp; tonal practice</span>
@@ -1235,7 +1235,7 @@ import {
       <section class="container home-cta-section home-ribbon-section"><div class="home-cta"><div><span class="section-kicker">Your next word is waiting</span><h2>Let’s keep the good things growing.</h2><p>Choose a language and take your first small step today.</p></div>${routeLink('languages', `Find your language ${icon('arrow', 17)}`, 'button button-white')}</div></section>`;
   }
 
-  function renderHome() {
+  function renderPhoneFirstHome() {
     const languages = [
       { id: 'yoruba', name: 'Yorùbá', image: 'child-language-yoruba.jpg', alt: 'Yorùbá child wearing blue traditional clothing and a headwrap' },
       { id: 'igbo', name: 'Igbo', image: 'child-language-igbo.jpg', alt: 'Igbo child wearing patterned traditional clothing and a red cap' },

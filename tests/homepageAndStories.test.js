@@ -36,24 +36,16 @@ function jpegDimensions(buffer) {
   throw new Error('JPEG image has no supported start-of-frame marker');
 }
 
-test('homepage uses the approved bilingual font families and removes the video CTA', () => {
-  const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderLanguageCard'));
+test('homepage permanently uses Family Living View and the animated 3D phone preview', () => {
+  const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderPhoneFirstHome()'));
   assert.match(indexSource, /<body data-default-route="index">/);
-  assert.match(indexSource, /family=Inter:wght@400;500;600;700&family=Plus\+Jakarta\+Sans:wght@600;700;800/);
-  assert.match(homeSource, /Carry a story\.<br \/>Discover a tradition\.<br \/><span>Share what you<br \/>learn\.<\/span>/);
-  assert.match(homeSource, /landing-phone-screen/);
-  assert.match(homeSource, /routeLink\('languages', `Explore Idilewa/);
-  assert.match(homeSource, /routeLink\('heritage', `Discover culture/);
-  assert.doesNotMatch(homeSource, /visual-journey-3d-section|Talking Drum|Living Glyphs/);
+  assert.match(homeSource, /src="\.\/assets\/idilewa-family-view\.png"/);
+  assert.match(homeSource, /Idilewa Living Family View showing a family learning together/);
+  assert.match(homeSource, /\$\{renderHomeAppPreview\(\)\}/);
+  assert.match(homeSource, /visual-journey-3d-section/);
   assert.match(appSource, /case 'index': return renderHome\(\);/);
-  assert.doesNotMatch(homeSource, /routeLink\('world'/);
-  assert.match(styleSource, /\.landing-phone\s*\{/);
-  assert.match(styleSource, /@media \(max-width: 760px\)[\s\S]*?\.landing-home \.landing-hero-grid\s*\{\s*grid-template-columns: minmax\(0, 1fr\)/);
-  assert.doesNotMatch(homeSource, /Watch Video/);
-  assert.doesNotMatch(homeSource, /landing-language-flag|flag: '🇳🇬'|flag: '🇹🇿'/);
-  assert.match(styleSource, /landing-hero-copy h1[\s\S]*?font-size: 28px;[\s\S]*?line-height: 33px/);
-  assert.match(styleSource, /landing-hero-copy > p[\s\S]*?font-size: 14px;[\s\S]*?line-height: 22px/);
-  assert.match(styleSource, /landing-hero-actions \.button[\s\S]*?min-height: 48px;[\s\S]*?font-size: 14px/);
+  assert.match(styleSource, /\.android-device \{[^}]*transform-style: preserve-3d; animation: android-device-orbit/);
+  assert.match(styleSource, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.android-device \{ animation: none;/);
 });
 
 test('main and expanded mobile navigation omit retired pages', () => {
