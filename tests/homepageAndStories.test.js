@@ -54,7 +54,7 @@ test('main and expanded mobile navigation omit retired pages', () => {
   const navLabels = [...navSource.matchAll(/label: '([^']+)'/g)].map((match) => match[1]);
 
   assert.deepEqual(navLabels, ['Home', 'Voice Lessons', 'AI Conversations', 'For Tutors', 'Curriculum']);
-  assert.match(appSource, /const REMOVED_ROUTES = new Set\(\[[^\]]*'world', 'coding', 'coding-studio'/);
+  assert.match(appSource, /const REMOVED_ROUTES = new Set\(\[[\s\S]*?'world'[\s\S]*?'coding', 'coding-studio'/);
   assert.match(appSource, /\{ route: 'ere', label: 'Stories', ico: 'quote' \}/);
   assert.doesNotMatch(appSource, /route: 'world'|label: 'Explore'|function renderCulturalWorld|initCulturalWorld|cultural-zone|cultural-world-replacement/);
   assert.match(appSource, /const MENU_NAV = \[\.\.\.NAV,/);

@@ -83,20 +83,17 @@ The application is bundled with Vite as an ES module web application:
 
 The parent experience is available at `parents.html` (`#/families`) and includes dedicated parent sign-up and sign-in, a guardian-approved family dashboard, learner progress, connection updates, and account settings. Parent account confirmation returns to the protected `parent-dashboard` route. Learner data is loaded from the authenticated `/api/dashboard/parent` endpoint; direct teacher messaging is not enabled.
 
-## 5. Page & Route Inventory (37 HTML Entries)
+## 5. Page & Route Inventory
 
-All 37 HTML entries declared in the active `vite.config.js` are supported:
+The HTML entries declared in the active `vite.config.js` are supported:
 
 | Group | Route | Purpose & Key Features |
 | :--- | :--- | :--- |
 | **Home & Discovery** | `#/index` (`index.html`) | Story-led landing page with an app preview and direct links to language and culture learning. |
-| | `#/base` (`base.html`) | Complete platform directory classified by learning, culture, and technology. |
 | | `#/languages` (`languages.html`) | Primary paths (Yorùbá, Igbo, Hausa, Swahili) + growing paths + interactive soundboard. |
 | | `#/course` (`course.html`) | Language course tracks (3 levels, 4 modules per level, 5 lessons per module). |
 | | `#/lesson` (`lesson.html`) | Focused lesson practice, prompts, answer validation, and progress rewards. |
 | | `#/kids` (`kids.html`) | Child-centered learning portal with playful stories and coding. |
-| | `#/individuals` (`individuals.html`) | Independent learner & heritage reconnection pathways. |
-| | `#/schools` (`schools.html`) | Classroom educator guide with preview-only school interest inquiry. |
 | | `#/tutor` (`tutor.html`) | Tutor Portal with public introduction, educator sign-in/invitation signup, dashboard, learner connection requests, consent, lesson, messages, profile, availability, and settings interfaces. |
 | | `#/profile` (`profile.html`) | Learner progress dashboard, points, streaks, badges (stored in local browser state). |
 | | `#/login` (`login.html`) | Persona-based authentication (child, adult, parent, educator) with 3D shield and Supabase notice. |
@@ -115,14 +112,8 @@ All 37 HTML entries declared in the active `vite.config.js` are supported:
 | | `#/owe_detail` (`owe_detail.html`) | Proverb breakdown for *“Sùúrù ni baba ìwà”* (noted as one common rendering). |
 | | `#/owe_story` (`owe_story.html`) | Educational classroom story about Dami & the okra seed (explicitly not a traditional folktale). |
 | | `#/owe_reflection` (`owe_reflection.html`) | Personal reflection step with explicit privacy notice. |
-| | `#/ifa` (`ifa.html`) | Educational context for Ifá and Yorùbá knowledge systems (not spiritual advice). |
-| | `#/ifa_odu` (`ifa_odu.html`) | Cultural note on Odu poetry with community attribution guidance. |
-| | `#/guides` (`guides.html`) | Living culture guides: greetings, naming traditions, customs, and festivals. |
-| | `#/human` (`human.html`) | People and community portal highlighting educators and culture bearers. |
 | | `#/keepers` (`keepers.html`) | Culture keepers page foregrounding attribution, privacy, and community agency. |
-| **Coding & STEM** | `#/coding` (`coding.html`) | Code for Kids (K–8): grade bands, African-language coding lessons, browser HTML/CSS/JavaScript previews, and additional compiler runtimes when the private runner is configured. |
 | **Community & Safety**| `#/about` (`about.html`) | Origin story and philosophy of Idilewa. |
-| | `#/method` (`method.html`) | Pedagogical progression connecting listening, cultural context, and practice. |
 | | `#/connect_teachers` (`connect_teachers.html`)| Sample tutor directory requiring parent-approved code (demo-only, no live bookings). |
 | | `#/connect_students` (`connect_students.html`)| Tutor-facing view for sample student assignments with guardian verification. |
 | | `#/consent` (`consent.html`) | Guardian consent demonstration issuing local verification codes with safety disclosures. |

@@ -105,13 +105,17 @@ import {
     'tutor', 'tutor-login', 'tutor-signup', 'tutor-dashboard', 'tutor-find-child', 'tutor-students',
     'tutor-consent', 'tutor-lesson', 'tutor-messages', 'tutor-profile', 'tutor-availability', 'tutor-settings',
     'curriculum',
-    'index', 'about', 'base', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
-    'ere', 'ere_game', 'game', 'guides', 'heritage', 'human', 'ifa', 'ifa_odu', 'individuals', 'keepers', 'library',
-    'kids', 'languages', 'lesson', 'login', 'method', 'oral', 'oral_genre', 'oriki', 'owe',
-    'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'payment', 'pricing', 'profile', 'schools',
+    'index', 'about', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
+    'ere', 'ere_game', 'heritage', 'keepers',
+    'kids', 'languages', 'lesson', 'login', 'oral', 'oral_genre', 'oriki', 'owe',
+    'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'payment', 'pricing', 'profile',
     'voices'
   ];
-  const REMOVED_ROUTES = new Set(['adult', 'parent_dashboard', 'educator_dashboard', 'world', 'coding', 'coding-studio']);
+  const REMOVED_ROUTES = new Set([
+    'adult', 'parent_dashboard', 'educator_dashboard', 'world', 'explore', 'undefined',
+    'coding', 'coding-studio', 'method', 'base', 'human', 'guides', 'game', 'library',
+    'individuals', 'schools', 'ifa', 'ifa_odu'
+  ]);
   const OWE_ROUTE_SECTIONS = {
     owe_detail: 'meaning',
     owe_story: 'story',
@@ -253,24 +257,11 @@ import {
       desc: 'A welcoming digital home where African languages, living heritage and future-facing skills grow together.',
       icon: 'leaf', image: 'story', imageAlt: 'A grandmother sharing a story with children',
       active: 2, flow: ['Belong', 'Discover', 'Learn', 'Pass it on'],
-      cta: 'Explore our approach', ctaRoute: 'method',
+      cta: 'Explore our approach', ctaRoute: 'curriculum',
       cards: [
-        { title: 'Language lives in community', text: 'Learning grows through everyday words, family stories and the voices of people who carry them.', icon: 'people', route: 'individuals', tone: 'mint' },
+        { title: 'Language lives in community', text: 'Learning grows through everyday words, family stories and the voices of people who carry them.', icon: 'people', route: 'families', tone: 'mint' },
         { title: 'Culture belongs in the classroom', text: 'Proverbs, oral traditions and cultural context sit beside language practice—not on the sidelines.', icon: 'book', route: 'oral', tone: 'peach' },
         { title: 'Technology can carry us forward', text: 'Young learners can explore coding while staying rooted in the languages they know.', icon: 'code', route: 'curriculum', tone: 'blue' }
-      ]
-    },
-    individuals: {
-      title: 'Your roots. Your pace. Your next chapter.',
-      eyebrow: 'For independent learners',
-      desc: 'Reconnect with a language you grew up hearing—or begin a new one with a clear, welcoming path.',
-      icon: 'compass', image: 'hero', imageAlt: 'A young learner exploring a book',
-      active: 1, flow: ['Find your why', 'Choose a level', 'Practice a little', 'Grow confidently'],
-      cta: 'Choose a language', ctaRoute: 'languages',
-      cards: [
-        { title: 'Start where you are', text: 'Begin with greetings and practical phrases, or choose a level that fits your experience.', icon: 'globe', route: 'languages', tone: 'mint' },
-        { title: 'Listen, repeat, remember', text: 'Hear a phrase, see its meaning and build confidence through short practice.', icon: 'headphones', route: 'voices', tone: 'blue' },
-        { title: 'Follow your curiosity', text: 'Move from language into stories, proverbs, culture and code whenever you are ready.', icon: 'sparkles', route: 'base', tone: 'peach' }
       ]
     },
     kids: {
@@ -286,97 +277,19 @@ import {
         { title: 'Create with code', text: 'See beginner coding ideas explained in English and an African language side by side.', icon: 'code', route: 'curriculum', tone: 'yellow' }
       ]
     },
-    schools: {
-      title: 'Bring language, culture and code into class.',
-      eyebrow: 'For schools & educators',
-      desc: 'A flexible learning space for teachers who want culturally grounded language practice and technology education.',
-      icon: 'school', image: 'code', imageAlt: 'Children learning coding together',
-      active: 1, flow: ['Explore the platform', 'Choose a language', 'Plan a lesson', 'Learn together'],
-      cta: 'Explore learning paths', ctaRoute: 'languages', form: 'school',
-      cards: [
-        { title: 'A clear lesson structure', text: 'Move from language and level to a module, an activity and a short assessment.', icon: 'layers', route: 'course', tone: 'mint' },
-        { title: 'Culture with context', text: 'Use stories, oral traditions and guided cultural notes to bring a lesson to life.', icon: 'quote', route: 'guides', tone: 'peach' },
-        { title: 'Designed with care', text: 'A calm, age-aware experience supports teachers and keeps children’s privacy in view.', icon: 'shield', route: 'method', tone: 'blue' }
-      ]
-    },
-    method: {
-      title: 'Learn through listening, doing and belonging.',
-      eyebrow: 'The Idilewa method',
-      desc: 'A six-layer information guide makes each route understandable, while a separate progress sequence shows the next action and culture gives the words a place to live.',
-      icon: 'layers', image: 'hero', imageAlt: 'A learner reading as part of a language lesson',
-      active: 2, flow: ['Language', 'Level', 'Module', 'Lesson'],
-      cta: 'See the learning path', ctaRoute: 'course',
-      cards: [
-        { title: 'Hear it in context', text: 'Start with useful phrases, pronunciation and examples that connect to daily life.', icon: 'headphones', route: 'voices', tone: 'blue' },
-        { title: 'Practice in small steps', text: 'Short exercises and friendly feedback help learners try, revise and remember.', icon: 'check', route: 'lesson', tone: 'mint' },
-        { title: 'Connect language to culture', text: 'Stories, oral traditions and people keep language learning human and rooted.', icon: 'leaf', route: 'oral', tone: 'peach' }
-      ]
-    },
-    guides: {
-      title: 'A little context makes every word richer.',
-      eyebrow: 'Cultural guides',
-      desc: 'Explore thoughtful, learner-friendly introductions to greetings, names, customs, food, festivals and heritage.',
-      icon: 'book', image: 'story', imageAlt: 'A family sharing an oral story',
-      active: 1, flow: ['Choose a theme', 'Read a guide', 'Meet a voice', 'Reflect together'],
-      cta: 'Explore oral traditions', ctaRoute: 'oral',
-      cards: [
-        { title: 'Everyday expressions', text: 'Discover how greetings, respect and familiar phrases change with context.', icon: 'volume', route: 'languages', tone: 'mint' },
-        { title: 'Stories & memory', text: 'Meet oral storytelling as a living way to share history, humour and belonging.', icon: 'quote', route: 'ere', tone: 'peach' },
-        { title: 'Culture keepers', text: 'Learn why community voices and careful attribution matter.', icon: 'people', route: 'keepers', tone: 'blue' }
-      ]
-    },
-    human: {
-      title: 'Language lives in the people who carry it.',
-      eyebrow: 'People & community',
-      desc: 'Meet the roles, voices and shared knowledge that help language and culture travel between generations.',
-      icon: 'people', image: 'story', imageAlt: 'A grandmother telling a story to children',
-      active: 2, flow: ['Listen', 'Learn the context', 'Share respectfully', 'Keep it growing'],
-      cta: 'Meet culture keepers', ctaRoute: 'keepers',
-      cards: [
-        { title: 'Language educators', text: 'Teachers help learners turn curiosity into a steady practice.', icon: 'school', route: 'schools', tone: 'mint' },
-        { title: 'Story keepers', text: 'Elders and storytellers carry expressions, memories and local knowledge.', icon: 'quote', route: 'oral', tone: 'peach' },
-        { title: 'Creative learners', text: 'Children and adults bring their own questions, ideas and futures.', icon: 'sparkles', route: 'individuals', tone: 'yellow' }
-      ]
-    },
     keepers: {
       title: 'Listen first. Credit the people behind the knowledge.',
       eyebrow: 'Language & culture keepers',
       desc: 'Idilewa is designed to centre the people who teach, record and care for language and cultural knowledge.',
       icon: 'heart', image: 'story', imageAlt: 'A cultural elder sharing a story',
       active: 2, flow: ['Listen well', 'Understand context', 'Give credit', 'Share with care'],
-      cta: 'Explore our approach', ctaRoute: 'method',
+      cta: 'Explore our approach', ctaRoute: 'about',
       cards: [
         { title: 'Oral historians', text: 'Help place stories and expressions in their local and historical context.', icon: 'quote', route: 'oral', tone: 'peach' },
-        { title: 'Language teachers', text: 'Support accurate, welcoming learning experiences for every level.', icon: 'school', route: 'schools', tone: 'mint' },
+        { title: 'Language teachers', text: 'Support accurate, welcoming learning experiences for every level.', icon: 'school', route: 'families', tone: 'mint' },
         { title: 'Community voices', text: 'Shape what is shared, how it is attributed and what should remain private.', icon: 'shield', route: 'about', tone: 'blue' }
       ]
     },
-    ifa: {
-      title: 'Explore a living tradition with care and context.',
-      eyebrow: 'Ifá & Yoruba knowledge',
-      desc: 'A respectful learning space for cultural context, vocabulary and stories—guided by knowledgeable community voices.',
-      icon: 'leaf', image: 'story', imageAlt: 'A family learning from a cultural elder',
-      active: 1, flow: ['Begin with context', 'Explore a theme', 'Listen to keepers', 'Reflect respectfully'],
-      cta: 'Explore a cultural guide', ctaRoute: 'ifa_odu',
-      cards: [
-        { title: 'Context before conclusions', text: 'Start with language and history; cultural traditions deserve more than a quick summary.', icon: 'eye', route: 'ifa_odu', tone: 'mint' },
-        { title: 'Listen to community voices', text: 'Explore how oral knowledge is shared and why attribution and consent matter.', icon: 'headphones', route: 'keepers', tone: 'peach' },
-        { title: 'Keep learning open-ended', text: 'Use guided questions to notice, reflect and learn without reducing a living tradition.', icon: 'sparkles', route: 'guides', tone: 'blue' }
-      ]
-    },
-    ifa_odu: {
-      title: 'Odu: a doorway into a much wider body of knowledge.',
-      eyebrow: 'Culture note · Ifá',
-      desc: 'An introductory, non-prescriptive cultural overview. Meaning and practice vary; this space makes room for context, community and deeper learning.',
-      icon: 'book', image: 'story', imageAlt: 'A cultural guide sharing knowledge with young learners',
-      active: 2, flow: ['Context', 'Vocabulary', 'Community voices', 'Reflection'],
-      cta: 'Back to the culture collection', ctaRoute: 'ifa',
-      cards: [
-        { title: 'Words and context', text: 'Notice how language, story and interpretation are connected.', icon: 'globe', route: 'languages', tone: 'mint' },
-        { title: 'A living knowledge system', text: 'Learn with respect for the people and communities who hold and transmit this knowledge.', icon: 'people', route: 'keepers', tone: 'peach' },
-        { title: 'Reflect, do not prescribe', text: 'This learning view is educational and cultural—not spiritual advice or a substitute for a qualified guide.', icon: 'shield', route: 'method', tone: 'blue' }
-      ]
-    }
   };
 
   const NAV = [
@@ -430,14 +343,14 @@ import {
     'tutor-settings': 'tutor',
     curriculum: 'curriculum',
     trainer: 'trainer', voice_lessons: 'trainer',
-    languages: 'curriculum', course: 'curriculum', lesson: 'curriculum', kids: 'curriculum', individuals: 'curriculum',
+    languages: 'curriculum', course: 'curriculum', lesson: 'curriculum', kids: 'curriculum',
     oral: 'read', oral_genre: 'read', oriki: 'read', owe: 'read', owe_add: 'read',
     owe_detail: 'read', owe_story: 'read', owe_reflection: 'read', voices: 'read',
     connect_students: 'about', connect_teachers: 'about', consent: 'about', contact: 'about', privacy: 'about',
-    ere: 'stories', ere_game: 'stories', game: 'stories', library: 'read', payment: 'about', ifa: 'culture', ifa_odu: 'culture',
-    about: 'about', method: 'about', schools: 'about',
+    ere: 'stories', ere_game: 'stories', payment: 'about',
+    about: 'about',
     heritage: 'stories',
-    guides: 'culture', human: 'culture', keepers: 'culture'
+    keepers: 'culture'
   };
 
   const LABELS = Object.fromEntries(ROUTES.map((r) => [r, r === 'index' ? 'Home' : r.replaceAll('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())]));
@@ -519,9 +432,6 @@ import {
     teacherRequests: [],
     teacherReplies: [],
     teacherFilter: 'all',
-    tileGame: { language: 'yoruba', deck: [], selected: [], matched: [], moves: 0 },
-    libraryFilter: 'all',
-    librarySearch: '',
     interested: [],
     available: { yoruba: true, igbo: true, hausa: true, swahili: true, twi: false, wolof: false, zulu: false, fulfulde: false },
     loginMode: 'signin',
@@ -590,13 +500,6 @@ import {
         ...stored,
         available: { ...defaults.available, ...(stored.available || {}) },
         consent: { ...defaults.consent, ...(stored.consent || {}) },
-        tileGame: {
-          ...defaults.tileGame,
-          ...(stored.tileGame || {}),
-          deck: Array.isArray(stored.tileGame?.deck) ? stored.tileGame.deck : [],
-          selected: Array.isArray(stored.tileGame?.selected) ? stored.tileGame.selected.slice(0, 2) : [],
-          matched: Array.isArray(stored.tileGame?.matched) ? stored.tileGame.matched : []
-        },
         trainer: {
           ...defaults.trainer,
           ...(stored.trainer || {}),
@@ -697,8 +600,6 @@ import {
         teacherRequests: Array.isArray(stored.teacherRequests) ? stored.teacherRequests : [],
         teacherReplies: Array.isArray(stored.teacherReplies) ? stored.teacherReplies : [],
         teacherFilter: typeof stored.teacherFilter === 'string' ? stored.teacherFilter : 'all',
-        libraryFilter: typeof stored.libraryFilter === 'string' ? stored.libraryFilter : 'all',
-        librarySearch: typeof stored.librarySearch === 'string' ? stored.librarySearch : '',
         reflectionFeeling: typeof stored.reflectionFeeling === 'string' ? stored.reflectionFeeling : '',
         authRole: stored.authRole === 'child' ? 'child' : 'adult',
         completed: Array.isArray(stored.completed) ? stored.completed : defaults.completed.slice(),
@@ -783,9 +684,9 @@ import {
       state.authRole = 'adult';
     }
     return {
-      page: REMOVED_ROUTES.has(page) ? 'index' : ROUTES.includes(page) ? page : 'base',
+      page: REMOVED_ROUTES.has(page) || !ROUTES.includes(page) ? 'index' : page,
       params,
-      removedRoute: REMOVED_ROUTES.has(page)
+      removedRoute: REMOVED_ROUTES.has(page) || !ROUTES.includes(page)
     };
   }
 
@@ -839,12 +740,10 @@ import {
       ? `<a class="header-profile" href="#/profile" data-route="profile" aria-label="Open profile"><span class="header-avatar">${profileAvatar}</span><span class="header-profile-label">${esc(currentUser.name || 'Profile')}</span></a><button class="header-signout" type="button" data-action="account-sign-out">Sign out</button>`
       : `${routeLink('login', 'Log in', 'header-signin', 'data-mode="signin"')}${routeLink('login', 'Get started', 'button button-primary header-cta', 'data-mode="signup"')}`;
     const mobileShortcuts = [
-      { route: 'library', label: 'Library', ico: 'book' },
-      { route: 'game', label: 'Tile game', ico: 'sparkles' },
       { route: 'profile', label: 'Profile', ico: 'user' },
       { route: 'payment', label: 'Payment', ico: 'shield' }
     ].map((item) => `<a class="mobile-menu-link ${page === item.route ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.ico, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('');
-    const menu = MENU_NAV.map((item) => `<a class="mobile-menu-link ${currentGroup === item.group ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.group === 'home' ? 'home' : item.group === 'trainer' ? 'mic' : item.group === 'learn' ? 'book' : item.group === 'read' ? 'headphones' : item.group === 'code' ? 'code' : item.group === 'stories' ? 'quote' : item.group === 'community' ? 'people' : 'sparkles', 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('') + mobileShortcuts + routeLink('base', `${icon('layers', 19)}<span>All pages</span>${icon('arrow', 16)}`, 'mobile-menu-link');
+    const menu = MENU_NAV.map((item) => `<a class="mobile-menu-link ${currentGroup === item.group ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.group === 'home' ? 'home' : item.group === 'trainer' ? 'mic' : item.group === 'learn' ? 'book' : item.group === 'read' ? 'headphones' : item.group === 'code' ? 'code' : item.group === 'stories' ? 'quote' : item.group === 'community' ? 'people' : 'sparkles', 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('') + mobileShortcuts;
     document.getElementById('site-header').innerHTML = `
       ${page === 'index' ? `<div class="home-promo-strip"><span>A little every day brings you closer to your language.</span></div>` : ''}
       <div class="header-inner">
@@ -876,7 +775,7 @@ import {
     const items = [
       { route: 'index', label: 'Home', ico: 'home' },
       { route: 'ere', label: 'Stories', ico: 'quote' },
-      { route: 'library', label: 'Library', ico: 'book' },
+      { route: 'languages', label: 'Learn', ico: 'book' },
       { route: 'profile', label: 'Profile', ico: 'user' }
     ];
     document.getElementById('mobile-nav').innerHTML = items.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="mobile-tab ${page === item.route ? 'active' : ''}">${icon(item.ico, 19)}<span>${item.label}</span></a>`).join('');
@@ -897,8 +796,8 @@ import {
           </div>
         </section>
         <nav class="footer-directory" aria-label="Footer navigation">
-          <section class="footer-links"><h2>Quick links</h2>${routeLink('index', 'Home')}${routeLink('curriculum', 'Curriculum')}${routeLink('library', 'Learning library')}${routeLink('trainer', 'Voice lessons')}${routeLink('ere', 'Stories')}</section>
-          <section class="footer-links"><h2>Information</h2>${routeLink('about', 'About Idilewa')}${routeLink('families', 'Parent portal')}${routeLink('individuals', 'For families')}${routeLink('schools', 'For schools')}${routeLink('privacy', 'Privacy policy')}${routeLink('base', 'Explore all pages')}</section>
+          <section class="footer-links"><h2>Quick links</h2>${routeLink('index', 'Home')}${routeLink('curriculum', 'Curriculum')}${routeLink('languages', 'Languages')}${routeLink('trainer', 'Voice lessons')}${routeLink('ere', 'Stories')}</section>
+          <section class="footer-links"><h2>Information</h2>${routeLink('about', 'About Idilewa')}${routeLink('families', 'Parent portal')}${routeLink('privacy', 'Privacy policy')}</section>
         </nav>
       </div>
       <div class="footer-bottom"><div class="container footer-bottom-inner">
@@ -1128,7 +1027,7 @@ import {
       </section>
 
       <section class="container section section-start home-ribbon-section">
-        <div class="section-heading"><div><span class="section-kicker">A world of ways to learn</span><h2>Learn a little. Carry a lot.</h2><p>Choose a path that feels like you. There is always room to explore.</p></div><a class="text-link desktop-only" href="#/base" data-route="base">Explore the platform ${icon('arrow', 15)}</a></div>
+        <div class="section-heading"><div><span class="section-kicker">A world of ways to learn</span><h2>Learn a little. Carry a lot.</h2><p>Choose a path that feels like you. There is always room to explore.</p></div>${routeLink('curriculum', 'Explore the curriculum ' + icon('arrow', 15), 'text-link desktop-only')}</div>
         <div class="feature-grid">${featureCards.map((card) => `<a class="feature-card tone-${card.tone}" href="#/${card.route}" data-route="${card.route}"><span class="feature-card-portrait"><img src="./assets/${card.image}" alt="${card.imageAlt ? esc(card.imageAlt) : ''}" ${card.imageAlt ? '' : 'aria-hidden="true"'} loading="lazy" /></span><div class="feature-card-top"><span class="feature-icon">${icon(card.icon, 23)}</span><span class="feature-tag">${card.tag}</span></div><h3>${card.title}</h3><p>${card.desc}</p><span class="card-arrow">${icon('arrow', 17)}</span></a>`).join('')}</div>
       </section>
 
@@ -1228,7 +1127,7 @@ import {
         <div class="section-heading"><div><span class="section-kicker">One home, many journeys</span><h2>Made for the way you learn.</h2><p>Welcoming for young learners, with families and communities learning together.</p></div></div>
         <div class="audience-grid">
           <a class="audience-card audience-kids" href="#/kids" data-route="kids"><span class="audience-icon">${icon('sparkles', 21)}</span><span class="audience-kicker">For young learners</span><strong>Curiosity comes first.</strong><small>Playful lessons, stories and gentle challenges.</small>${icon('arrow', 16)}</a>
-          <a class="audience-card audience-school" href="#/schools" data-route="schools"><span class="audience-icon">${icon('school', 21)}</span><span class="audience-kicker">For schools</span><strong>Bring culture into class.</strong><small>Clear learning paths for educators.</small>${icon('arrow', 16)}</a>
+          <a class="audience-card audience-school" href="#/families" data-route="families"><span class="audience-icon">${icon('people', 21)}</span><span class="audience-kicker">For families</span><strong>Learn together at home.</strong><small>Share language, stories and progress.</small>${icon('arrow', 16)}</a>
         </div>
       </section>
 
@@ -5431,107 +5330,19 @@ import {
 
   function renderGeneric(key) {
     const meta = PAGE_META[key];
-    if (!meta) return renderDirectory();
+    if (!meta) return renderHome();
     const imageSrc = meta.image === 'story' ? './assets/story-grandmother.jpg' : meta.image === 'code' ? './assets/code-kids.jpg' : meta.image === 'kids' ? './assets/yoruba-kids-culture.jpg' : meta.image === 'hero' ? './assets/hero-reader.jpg' : '';
     const cards = meta.cards.map((card) => `<a class="editorial-card tone-${card.tone || 'mint'}" href="#/${card.route}" data-route="${card.route}"><span class="editorial-card-icon">${icon(card.icon, 20)}</span><span class="editorial-card-overline">Explore</span><h3>${card.title}</h3><p>${card.text}</p><span class="editorial-card-go">Learn more ${icon('arrow', 14)}</span></a>`).join('');
     const interestForm = meta.form ? `<form class="interest-form" data-form="interest"><label for="interestEmail">${meta.form === 'school' ? 'Get school updates' : 'Ask about guided learning'}</label><div><input id="interestEmail" name="email" type="email" placeholder="Your email address" required /><button type="submit">${icon('send', 16)} <span>Send interest</span></button></div><small>Prototype only—your details are not sent.</small></form>` : '';
     return `<div class="container route-page editorial-page page-${key}">
       <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>${meta.eyebrow}</strong></div>
       <section class="editorial-hero"><div class="editorial-copy"><span class="section-kicker">${meta.eyebrow}</span><h1>${meta.title}</h1><p>${meta.desc}</p><div class="editorial-actions">${routeLink(meta.ctaRoute, `${meta.cta} ${icon('arrow', 15)}`, 'button button-primary')}${key !== 'about' ? routeLink('about', 'About Idilewa', 'text-link') : ''}</div><div class="editorial-proof">${icon('shield', 16)} Warm, accessible and built to grow with learners.</div></div><div class="editorial-visual ${meta.image ? 'has-photo' : ''}">${imageSrc ? `<img src="${imageSrc}" alt="${meta.imageAlt}" />` : `<div class="editorial-illustration tone-mint">${icon(meta.icon || 'sparkles', 50)}<span class="editorial-spark">✦</span><span class="editorial-orbit">${meta.eyebrow}</span></div>`}<div class="visual-note">${icon(meta.icon || 'sparkles', 16)} <span>Rooted in language<br />open to the future</span></div>\n    </section>
-      <div class="editorial-body"><div class="editorial-main"><section class="editorial-cards-section"><div class="section-heading"><div><span class="section-kicker">A thoughtful way to begin</span><h2>Explore what matters to you.</h2><p>Choose a next step or follow your curiosity.</p></div></div><div class="editorial-card-grid">${cards}</div></section>${interestForm}<section class="editorial-footer-note"><span>${icon('heart', 18)}</span><p>Idilewa is designed to be welcoming for children and useful for adults—with privacy, consent and cultural context in mind.</p></section></div><aside class="editorial-aside"><div class="aside-path-card"><span class="section-kicker">A clear journey</span><h3>See your next step.</h3>${renderStepper(meta.flow || ['Discover', 'Choose', 'Practice', 'Grow'], meta.active || 0)}<p>Each path keeps the next layer easy to find.</p><a class="text-link" href="#/base" data-route="base">Explore all spaces ${icon('arrow', 14)}</a></div><div class="aside-quote-card"><span>${icon(meta.icon || 'leaf', 19)}</span><p>“Language is a bridge between who we are and what we can imagine.”</p><small>Idilewa learning principle</small></div></aside></div>
+      <div class="editorial-body"><div class="editorial-main"><section class="editorial-cards-section"><div class="section-heading"><div><span class="section-kicker">A thoughtful way to begin</span><h2>Explore what matters to you.</h2><p>Choose a next step or follow your curiosity.</p></div></div><div class="editorial-card-grid">${cards}</div></section>${interestForm}<section class="editorial-footer-note"><span>${icon('heart', 18)}</span><p>Idilewa is designed to be welcoming for children and useful for adults—with privacy, consent and cultural context in mind.</p></section></div><aside class="editorial-aside"><div class="aside-path-card"><span class="section-kicker">A clear journey</span><h3>See your next step.</h3>${renderStepper(meta.flow || ['Discover', 'Choose', 'Practice', 'Grow'], meta.active || 0)}<p>Each path keeps the next layer easy to find.</p>${routeLink('index', 'Back to Home ' + icon('arrow', 14), 'text-link')}</div><div class="aside-quote-card"><span>${icon(meta.icon || 'leaf', 19)}</span><p>“Language is a bridge between who we are and what we can imagine.”</p><small>Idilewa learning principle</small></div></aside></div>
     </div>`;
-  }
-
-  function renderDirectory() {
-    const groups = [
-      { title: 'Learn & practice', text: 'Language learning from the first choice to the next small win.', pages: ['index', 'trainer', 'languages', 'course', 'lesson', 'library', 'game', 'kids', 'individuals', 'schools', 'profile', 'connect_teachers', 'connect_students'] },
-      { title: 'Stories & living culture', text: 'Explore oral traditions, voices, guides and cultural context.', pages: ['ere', 'ere_game', 'oral', 'oral_genre', 'oriki', 'owe', 'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'voices', 'ifa', 'ifa_odu', 'guides', 'human', 'keepers'] },
-      { title: 'Technology & Idilewa', text: 'Discover bilingual coding, the learning approach and platform spaces.', pages: ['coding', 'about', 'method', 'pricing', 'payment', 'login', 'consent', 'base'] }
-    ];
-    return `<div class="container route-page directory-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>Explore all spaces</strong></div><section class="directory-hero"><span class="section-kicker">The Idilewa map</span><h1>One home.<br /><em>Many ways to belong.</em></h1><p>Start with a language, follow a story, explore culture or build something new.</p>${renderStepper(['Language', 'Level', 'Module', 'Lesson'], 0)}</section>${groups.map((g) => `<section class="directory-group"><div class="directory-heading"><div><span class="section-kicker">A learning layer</span><h2>${g.title}</h2><p>${g.text}</p></div><span class="directory-count">${g.pages.length} spaces</span></div><div class="directory-links">${g.pages.map((page) => `<a href="#/${page}" data-route="${page}" class="directory-link"><span>${icon(page === 'coding' ? 'code' : page.includes('oral') || page.includes('ere') || page === 'voices' ? 'book' : page === 'schools' || page === 'tutor' || page === 'connect_students' || page === 'connect_teachers' ? 'people' : 'sparkles', 17)}</span><strong>${LABELS[page]}</strong>${icon('arrow', 15)}</a>`).join('')}</div></section>`).join('')}<div class="directory-note">${icon('info', 17)} Every named prototype route is connected through this route map and the main navigation.</div></div>`;
   }
 
   function renderPricing() {
-    return `<div class="container route-page pricing-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>Plans</strong></div><section class="pricing-hero page-depth-reveal"><span class="section-kicker">Free to start · no checkout</span><h1>More language.<br /><em>More belonging.</em></h1><p>All current learning plans are free. No payment details are collected and no subscription is started.</p><div class="pricing-free-note">${icon('check', 16)} Family: $0 USD/month <span aria-hidden="true">·</span> School: $0 USD/month</div></section>${renderStepper(['Explore plans', 'Choose learning paths', 'Review as a family', 'Begin together'], 0)}<div class="pricing-grid"><article class="pricing-card"><span class="pricing-label">Begin here</span><h2>Explorer</h2><p>For learners ready to try a first path.</p><div class="pricing-cost"><strong>Free</strong><small>to get started</small></div><ul><li>${icon('check', 15)} Explore available languages</li><li>${icon('check', 15)} Try sample lessons & stories</li><li>${icon('check', 15)} Follow a personal learning path</li></ul>${routeLink('languages', 'Start exploring ' + icon('arrow', 15), 'button button-outline')}</article><article class="pricing-card pricing-featured"><span class="popular-pill">Made for together</span><span class="pricing-label">For home</span><h2>Family</h2><p>Free access to the current language, culture and story learning previews.</p><div class="pricing-cost"><strong>$0</strong><small>USD · per month</small></div><ul><li>${icon('check', 15)} Explore available family learning paths</li><li>${icon('check', 15)} Try sample stories and activities</li><li>${icon('check', 15)} Keep progress in this browser preview</li></ul>${routeLink('login', `Create a free account ${icon('arrow', 15)}`, 'button button-primary', 'data-mode="signup"')}</article><article class="pricing-card"><span class="pricing-label">For educators</span><h2>School</h2><p>Free preview of classroom learning paths; no school service or student roster is active.</p><div class="pricing-cost"><strong>$0</strong><small>USD · per month</small></div><ul><li>${icon('check', 15)} Explore sample language modules</li><li>${icon('check', 15)} Preview culture and coding activities</li><li>${icon('lock', 15)} Student connections are not available</li></ul>${routeLink('schools', 'Explore schools ' + icon('arrow', 15), 'button button-outline')}</article></div><p class="pricing-footnote">Current plan prices are $0. No Paystack checkout is started for free plans. ${routeLink('payment', 'View payment information ' + icon('arrow', 14), 'text-link')}. If prices change, confirm the new amount and billing terms before enabling payments.</p></div>`;
-  }
-
-  const LIBRARY_ITEMS = [
-    { title: 'Grandmother’s garden', kind: 'Stories', text: 'A gentle story about patience, care and a seed taking its time.', image: 'story-grandmother.jpg', route: 'owe_story', alt: 'A grandmother sharing a garden story with a child' },
-    { title: 'Words that welcome', kind: 'Language', text: 'Practice greetings and useful first phrases in four African languages.', image: 'yoruba-kids-culture.jpg', route: 'languages', alt: 'Children learning African-language greetings together' },
-    { title: 'Listen together', kind: 'Audio', text: 'Hear a phrase, notice its rhythm and try saying it at your own pace.', image: 'listening-reader.jpg', route: 'trainer', alt: 'A learner listening closely while following a book' },
-    { title: 'Make your first project', kind: 'STEM', text: 'Explore hands-on technology and problem-solving lessons.', image: 'code-kids.jpg', route: 'curriculum', alt: 'Young learners collaborating on a coding project' },
-    { title: 'Proverbs with context', kind: 'Culture', text: 'Read a proverb, explore its meaning and reflect with care.', image: 'yoruba-educator-woman.jpg', route: 'owe', alt: 'A language educator introducing a proverb' },
-    { title: 'Match the words', kind: 'Games', text: 'Pair African-language words with their English meanings in a quick game.', image: 'african-kids-friends.jpg', route: 'game', alt: 'Children enjoying a language-learning game together' }
-  ];
-
-  function renderLibrary() {
-    const kinds = ['All', ...new Set(LIBRARY_ITEMS.map((item) => item.kind))];
-    const selectedFilter = state.libraryFilter || 'all';
-    const query = state.librarySearch || '';
-    const cards = LIBRARY_ITEMS.filter((item) => (selectedFilter === 'all' || item.kind.toLowerCase() === selectedFilter) && `${item.title} ${item.kind} ${item.text}`.toLowerCase().includes(query.toLowerCase()));
-    return `<div class="container route-page library-page">
-      <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>Library</strong></div>
-      <section class="library-hero page-depth-reveal">
-        <div class="library-hero-copy"><span class="section-kicker">A welcoming place to explore</span><h1>Find a story.<br /><em>Follow your curiosity.</em></h1><p>Browse language practice, stories, listening, culture and creative technology. Choose a small next step that feels right for you.</p><div class="library-hero-actions">${routeLink('game', `Play the word match ${icon('arrow', 15)}`, 'button button-primary')}${routeLink('curriculum', 'Browse curriculum', 'button button-outline')}</div></div>
-        <div class="library-hero-art" aria-label="A family sharing a book"><img src="${imageUrl('story-grandmother.jpg')}" alt="A grandmother and child sharing a story in a garden" loading="eager" /><span class="library-art-caption">${icon('book', 16)} Stories travel between generations</span></div>
-      </section>
-      <section class="library-browse" aria-labelledby="library-browse-title">
-        <div class="section-heading library-heading"><div><span class="section-kicker">The learning shelf</span><h2 id="library-browse-title">Choose what to explore.</h2><p>Every card opens a real learning space in Idilewa.</p></div><label class="library-search">${icon('search', 17)}<span>Search the library</span><input type="search" data-library-search value="${esc(query)}" placeholder="Stories, language, code…" /></label></div>
-        <div class="library-filters" role="group" aria-label="Filter library by type">${kinds.map((kind) => { const value = kind.toLowerCase(); const active = selectedFilter === value; return `<button type="button" class="library-filter ${active ? 'is-active' : ''}" data-action="library-filter" data-filter="${value}" aria-pressed="${active}">${kind}</button>`; }).join('')}</div>
-        <div class="library-card-grid" aria-live="polite">${LIBRARY_ITEMS.map((item) => { const visible = (selectedFilter === 'all' || item.kind.toLowerCase() === selectedFilter) && `${item.title} ${item.kind} ${item.text}`.toLowerCase().includes(query.toLowerCase()); return `<a class="library-card" href="#/${item.route}" data-route="${item.route}" data-library-item data-library-kind="${item.kind.toLowerCase()}" ${visible ? '' : 'hidden'}><div class="library-card-image"><img src="${imageUrl(item.image)}" alt="${esc(item.alt)}" loading="lazy" /><span>${esc(item.kind)}</span></div><div class="library-card-copy"><h3>${esc(item.title)}</h3><p>${esc(item.text)}</p><span class="library-card-link">Explore ${icon('arrow', 14)}</span></div></a>`; }).join('')}<p class="library-empty" data-library-empty ${cards.length ? 'hidden' : ''}>No matching shelf items. Try another word or choose “All”.</p></div>
-      </section>
-      ${state.savedTranslations.length ? `<section class="translation-library-saved" aria-labelledby="translation-library-saved-title"><span class="section-kicker">Saved on this device</span><h2 id="translation-library-saved-title">Your saved translations</h2><div>${state.savedTranslations.map((item) => `<article><div><small>${esc(translationLanguageName(item.sourceLanguage))} → ${esc(translationLanguageName(item.targetLanguage))}</small><strong>${esc(item.translated)}</strong><p>${esc(item.source)}</p></div><button type="button" data-action="open-saved-translation" data-id="${esc(item.id)}">Open translation</button></article>`).join('')}</div></section>` : ''}
-      <section class="library-next-step"><div><span class="section-kicker">Ready to try something?</span><h2>Learning can start with play.</h2><p>Match a few words in Yorùbá, Igbo, Hausa or Kiswahili—then explore the phrases in the curriculum.</p></div>${routeLink('game', `Open the tile game ${icon('arrow', 15)}`, 'button button-primary')}</section>
-    </div>`;
-  }
-
-  const TILE_WORDS = {
-    yoruba: { hello: ['Ẹ káàárọ̀', 'Good morning'], thanks: ['Ẹ ṣé', 'Thank you'], water: ['Omi', 'Water'], family: ['Ìdílé', 'Family'] },
-    igbo: { hello: ['Ndewo', 'Hello'], thanks: ['Daalụ', 'Thank you'], water: ['Mmiri', 'Water'], family: ['Ezinụlọ', 'Family'] },
-    hausa: { hello: ['Sannu', 'Hello'], thanks: ['Na gode', 'Thank you'], water: ['Ruwa', 'Water'], family: ['Iyali', 'Family'] },
-    swahili: { hello: ['Habari', 'Hello'], thanks: ['Asante', 'Thank you'], water: ['Maji', 'Water'], family: ['Familia', 'Family'] }
-  };
-
-  function makeTileDeck() {
-    const pairs = Object.keys(TILE_WORDS[state.tileGame.language] || TILE_WORDS.yoruba);
-    const deck = pairs.flatMap((pair) => [{ id: `${pair}-native`, pair, side: 0 }, { id: `${pair}-meaning`, pair, side: 1 }]);
-    for (let i = deck.length - 1; i > 0; i -= 1) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [deck[i], deck[j]] = [deck[j], deck[i]];
-    }
-    return deck;
-  }
-
-  function renderTileGame() {
-    const game = state.tileGame;
-    if (!TILE_WORDS[game.language]) game.language = 'yoruba';
-    const expectedIds = Object.keys(TILE_WORDS[game.language]).flatMap((pair) => [`${pair}-native`, `${pair}-meaning`]);
-    if (game.deck.length !== expectedIds.length || !expectedIds.every((id) => game.deck.some((card) => card?.id === id))) {
-      game.deck = makeTileDeck();
-      game.selected = [];
-      game.matched = [];
-      game.moves = 0;
-      saveState();
-    }
-    const language = getLanguage(game.language);
-    const isComplete = game.matched.length === Object.keys(TILE_WORDS[game.language]).length;
-    const tiles = game.deck.map((card, index) => {
-      const word = TILE_WORDS[game.language][card.pair];
-      const isOpen = game.selected.includes(card.id) || game.matched.includes(card.pair);
-      const text = isOpen ? word[card.side] : '✦';
-      const label = isOpen ? `${word[card.side]}${game.matched.includes(card.pair) ? ', matched' : ''}` : `Hidden tile ${index + 1}`;
-      return `<button type="button" class="tile-match-card ${isOpen ? 'is-open' : ''} ${game.matched.includes(card.pair) ? 'is-matched' : ''}" data-action="tile-card" data-card="${card.id}" data-pair="${card.pair}" aria-label="${esc(label)}" aria-pressed="${isOpen}" ${game.matched.includes(card.pair) ? 'disabled' : ''}><span class="tile-card-side">${card.side === 0 ? esc(language.name) : 'English'}</span><strong>${esc(text)}</strong><span class="tile-card-mark">${isOpen ? icon(game.matched.includes(card.pair) ? 'check' : 'sparkles', 17) : '＋'}</span></button>`;
-    }).join('');
-    return `<div class="container route-page tile-game-page">
-      <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span>${routeLink('library', 'Library')}<span>/</span><strong>Tile game</strong></div>
-      <section class="tile-game-hero page-depth-reveal"><div><span class="section-kicker">A little language-play</span><h1>Find the word<br /><em>that belongs.</em></h1><p>Turn over two tiles and match each African-language phrase to its English meaning. A small game for curious learners of every age.</p><div class="tile-game-controls"><label for="tile-language-select">Practice language</label><select id="tile-language-select">${LANGUAGES.map((item) => `<option value="${item.id}" ${game.language === item.id ? 'selected' : ''}>${item.name}</option>`).join('')}</select><button type="button" class="button button-outline" data-action="tile-game-reset">${icon('refresh', 16)} Start again</button></div></div><div class="tile-game-hero-art"><img src="${imageUrl('african-kids-friends.jpg')}" alt="Friends smiling as they learn together" loading="eager" /><span>${icon('sparkles', 16)} Play · notice · remember</span></div></section>
-      <section class="tile-game-board-section" aria-labelledby="tile-game-title">
-        <div class="tile-game-board-heading"><div><span class="section-kicker">${isComplete ? 'Beautifully matched' : `${language.name} · English`}</span><h2 id="tile-game-title">${isComplete ? 'All pairs found!' : 'Match the pairs'}</h2><p>${isComplete ? `You found all four pairs in ${game.moves} ${game.moves === 1 ? 'move' : 'moves'}. Try another language or play again.` : 'Choose any two tiles. Matched pairs stay face up.'}</p></div><div class="tile-game-score"><span><strong>${game.moves}</strong> moves</span><span><strong>${game.matched.length}/4</strong> pairs</span></div></div>
-        <div class="tile-match-grid" aria-label="Word matching tiles">${tiles}</div>
-        <p class="tile-game-status" role="status">${isComplete ? `Great work! ${game.moves} moves to complete this round.` : game.selected.length === 2 ? 'Not a match this time. Take a look, then try again.' : game.selected.length === 1 ? 'One tile turned over. Choose its meaning or matching phrase.' : 'Turn over two tiles to find a matching pair.'}</p>
-      </section>
-      <section class="tile-game-tip"><span>${icon('heart', 20)}</span><div><strong>Learning tip</strong><p>Say each phrase aloud if you know it, and ask a family member or language speaker about pronunciation and context.</p></div>${routeLink('curriculum', 'Explore lessons ' + icon('arrow', 14), 'text-link')}</section>
-    </div>`;
+    return `<div class="container route-page pricing-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>Plans</strong></div><section class="pricing-hero page-depth-reveal"><span class="section-kicker">Free to start · no checkout</span><h1>More language.<br /><em>More belonging.</em></h1><p>All current learning plans are free. No payment details are collected and no subscription is started.</p><div class="pricing-free-note">${icon('check', 16)} Family: $0 USD/month <span aria-hidden="true">·</span> School: $0 USD/month</div></section>${renderStepper(['Explore plans', 'Choose learning paths', 'Review as a family', 'Begin together'], 0)}<div class="pricing-grid"><article class="pricing-card"><span class="pricing-label">Begin here</span><h2>Explorer</h2><p>For learners ready to try a first path.</p><div class="pricing-cost"><strong>Free</strong><small>to get started</small></div><ul><li>${icon('check', 15)} Explore available languages</li><li>${icon('check', 15)} Try sample lessons & stories</li><li>${icon('check', 15)} Follow a personal learning path</li></ul>${routeLink('languages', 'Start exploring ' + icon('arrow', 15), 'button button-outline')}</article><article class="pricing-card pricing-featured"><span class="popular-pill">Made for together</span><span class="pricing-label">For home</span><h2>Family</h2><p>Free access to the current language, culture and story learning previews.</p><div class="pricing-cost"><strong>$0</strong><small>USD · per month</small></div><ul><li>${icon('check', 15)} Explore available family learning paths</li><li>${icon('check', 15)} Try sample stories and activities</li><li>${icon('check', 15)} Keep progress in this browser preview</li></ul>${routeLink('login', `Create a free account ${icon('arrow', 15)}`, 'button button-primary', 'data-mode="signup"')}</article><article class="pricing-card"><span class="pricing-label">For educators</span><h2>School</h2><p>Free preview of classroom learning paths; no school service or student roster is active.</p><div class="pricing-cost"><strong>$0</strong><small>USD · per month</small></div><ul><li>${icon('check', 15)} Explore sample language modules</li><li>${icon('check', 15)} Preview culture and coding activities</li><li>${icon('lock', 15)} Student connections are not available</li></ul>${routeLink('curriculum', 'Explore curriculum ' + icon('arrow', 15), 'button button-outline')}</article></div><p class="pricing-footnote">Current plan prices are $0. No Paystack checkout is started for free plans. ${routeLink('payment', 'View payment information ' + icon('arrow', 14), 'text-link')}. If prices change, confirm the new amount and billing terms before enabling payments.</p></div>`;
   }
 
   function renderPayment() {
@@ -6998,8 +6809,6 @@ import {
   }
 
 
-  function renderBase() { return renderDirectory(); }
-
   
     /* ==========================================================================
        VOICE AFRICAN LANGUAGE TRAINER MODEL DATA & ENGINE (60 LESSONS / 3 TIERS)
@@ -7767,8 +7576,6 @@ import {
       case 'owe_detail': return renderOweDetail();
       case 'owe_story': return renderOweStory();
       case 'owe_reflection': return renderOweReflection();
-      case 'library': return renderLibrary();
-      case 'game': return renderTileGame();
       case 'payment': return renderPayment();
       case 'connect_teachers': return renderConnectTeachers();
       case 'connect_students': return renderConnectStudents();
@@ -7779,7 +7586,6 @@ import {
       case 'privacy': return renderPrivacy();
       case 'login': return renderLogin();
       case 'consent': return renderConsent();
-      case 'base': return renderBase();
       default: return renderGeneric(page);
     }
   }
@@ -7805,14 +7611,14 @@ import {
     'stories-culture.jpg',
     'page-index-1.jpg', 'page-index-2.jpg', 'page-index-3.jpg', 'page-index-4.jpg',
     'page-index-5.jpg', 'page-index-6.jpg', 'page-index-7.jpg',
-    'page-about-1.jpg', 'page-base-1.jpg', 'page-coding-1.jpg',
+    'page-about-1.jpg', 'page-coding-1.jpg',
     'page-languages-1.jpg', 'page-course-1.jpg', 'page-lesson-1.jpg', 'page-kids-1.jpg',
     'page-schools-1.jpg', 'page-connect_teachers-1.jpg',
     'page-connect_students-1.jpg', 'page-consent-1.jpg', 'page-oral-1.jpg',
     'page-owe-1.jpg', 'page-owe_detail-1.jpg', 'page-owe_story-1.jpg',
     'page-owe_reflection-1.jpg', 'page-owe_add-1.jpg', 'page-oral_genre-1.jpg',
     'page-oriki-1.jpg', 'page-ere-1.jpg', 'page-ere_game-1.jpg', 'page-profile-1.jpg',
-    'page-ifa-1.jpg', 'page-ifa_odu-1.jpg', 'page-pricing-1.jpg',
+    'page-pricing-1.jpg',
     'african-kids-friends.jpg', 'code-kids.jpg', 'hero-reader.jpg', 'listening-reader.jpg',
     'story-grandmother.jpg', 'yoruba-educator-man.jpg', 'yoruba-educator-woman.jpg', 'yoruba-kids-culture.jpg'
   ]);
@@ -7828,12 +7634,10 @@ import {
     profile: 'A learner celebrating a small learning milestone at home',
     pricing: 'A family planning a shared language-learning routine around a tablet',
     voices: 'A language speaker recording a short phrase in a quiet studio',
-    base: 'An overhead view of language-learning materials, books and cultural objects',
     languages: 'Nigerian siblings practicing greetings with their language teacher in a library',
     course: 'A young learner following an illustrated language course with a tutor',
     lesson: 'A grandmother gently guiding a child through a language lesson in a notebook',
     kids: 'Children in beautiful traditional attire sharing a picture book outdoors',
-    schools: 'Students collaborating on a coding activity in a welcoming classroom',
     connect_teachers: 'A Nigerian woman language educator holding a picture book in a community classroom',
     connect_students: 'African children in varied traditional attire warmly connecting around a picture book',
     oral: 'An elder storyteller sharing an oral tradition with children in a courtyard',
@@ -7844,14 +7648,8 @@ import {
     ere: 'A Nigerian parent and children sharing a storybook in an elegant family home',
     ere_game: 'A parent and child enjoying an interactive story together on a tablet',
     tutor: 'A Nigerian language tutor in traditional agbada in a refined library',
-    guides: 'A Nigerian woman educator in elegant aso-oke sharing a learning book',
-    human: 'Children in varied African traditional clothing sharing a book in a garden courtyard',
-    ifa: 'A Yoruba educator introducing cultural learning with respect in an elegant study',
-    ifa_odu: 'An elder guiding a young learner through cultural knowledge with care',
-    individuals: 'African children exploring a language book in a polished family home',
     keepers: 'A Nigerian elder sharing knowledge with children in a beautiful courtyard',
     login: 'A child reading in a calm, sunlit family home',
-    method: 'Two children exploring a creative coding activity in a modern home',
     voices: 'A child listening to a language recording in a comfortable reading nook'
   };
   const ROUTE_IMAGE_SLOT_ALTS = {
@@ -7863,13 +7661,11 @@ import {
     'index-6': 'A welcoming Nigerian language tutor in a sunlit community classroom',
     'index-7': 'A grandmother in elegant aso-oke sharing a picture book with children in a refined Lagos home',
     'about-1': 'A Nigerian grandfather and teenage granddaughter sharing an illustrated language book',
-    'base-1': 'An overhead arrangement of African language-learning materials and cultural objects',
     'coding-1': 'Nigerian children in traditional attire solving a coding puzzle beside a small robot',
     'languages-1': 'Nigerian siblings in traditional clothing practicing language greetings with a teacher in a sunlit library',
     'course-1': 'A child and grandmother following an illustrated language course together at home',
     'lesson-1': 'A grandmother helping a child write a language exercise in a notebook',
     'kids-1': 'Three children in colorful traditional clothing sharing a picture book in a leafy courtyard',
-    'schools-1': 'Two schoolchildren collaborating on a colorful beginner coding activity in class',
     'connect_teachers-1': 'A Nigerian woman language educator in indigo aso-oke holding an open picture book',
     'connect_students-1': 'Children in Yoruba, Igbo, Hausa and East African attire warmly sharing a storybook',
     'consent-1': 'A Nigerian mother and child calmly reviewing a permission form on a tablet',
@@ -7886,12 +7682,8 @@ import {
     'profile-1': 'A Nigerian girl celebrating a learning milestone in her home study'
   };
   const ROUTE_IMAGE_OVERRIDES = {
-    'guides-1': 'yoruba-educator-woman.jpg',
-    'human-1': 'african-kids-friends.jpg',
-    'individuals-1': 'yoruba-kids-culture.jpg',
     'keepers-1': 'story-grandmother.jpg',
     'login-1': 'hero-reader.jpg',
-    'method-1': 'code-kids.jpg',
     'tutor-1': 'yoruba-educator-man.jpg',
     'voices-1': 'listening-reader.jpg'
   };
@@ -7953,14 +7745,6 @@ import {
       ['Culture in context', 'Explore oral stories, proverbs and heritage with attribution and community context—not as decoration.', 'Story · proverb · source'],
       ['Make with code', 'Try a playful mission or browse 50+ coding paths with multilingual hints, feedback and maker progression.', 'Code Garden · XP · streak'],
       ['Learn safely together', 'Directory previews are samples; child sign-up and tutor pairing require guardian approval and scoped checks.', 'Family consent · educator preview']
-    ],
-    base: [
-      ['Explore the platform map', 'This directory connects language learning, cultural knowledge, creative technology and community spaces.', 'Idilewa route map'],
-      ['Learn and practice', 'Choose a language, a level and a short lesson; keep progress visible one step at a time.', 'Language · level · lesson'],
-      ['Stories and living culture', 'Move among oral traditions, voices, proverbs, stories and careful introductions to heritage.', 'Story · voice · tradition'],
-      ['Technology and creation', 'Find the Code Garden, bilingual helpers, coding paths and projects for curious makers.', 'Coding path · mission · project'],
-      ['People and learning roles', 'Explore family, school, tutor and educator spaces; directory profiles are clearly labeled as samples.', 'Learner · guardian · educator'],
-      ['Choose a safe next route', 'Use the route map to continue. Child accounts and tutor connections remain behind parent approval.', 'Direct page · consent gate']
     ],
     coding: [
       ['Choose a guide language', 'Code itself stays in its programming language while explanations and hints can use a familiar African language.', 'Yorùbá · Igbo · Hausa · Kiswahili'],
@@ -9521,56 +9305,10 @@ import {
         showToast('The sample learner cards are read-only; accept only the assigned learner displayed after code validation.', 'error'); break;
       }
       case 'select-feeling': state.reflectionFeeling = el.dataset.feeling || ''; saveState(); render(); break;
-      case 'search-result': document.getElementById('modal-root').innerHTML = ''; navigate(el.dataset.route || 'base'); break;
+      case 'search-result': document.getElementById('modal-root').innerHTML = ''; navigate(el.dataset.route || 'index'); break;
       case 'select-language':
         if (state.available[lang]) { state.currentLang = lang; saveState(); navigate('course', { lang }); }
         break;
-      case 'library-filter':
-        state.libraryFilter = el.dataset.filter || 'all';
-        saveState();
-        render();
-        break;
-      case 'tile-game-reset':
-        state.tileGame.deck = makeTileDeck();
-        state.tileGame.selected = [];
-        state.tileGame.matched = [];
-        state.tileGame.moves = 0;
-        saveState();
-        render();
-        break;
-      case 'tile-card': {
-        const game = state.tileGame;
-        const cardId = el.dataset.card;
-        const pairId = el.dataset.pair;
-        if (!cardId || !pairId || game.selected.length >= 2 || game.matched.includes(pairId) || game.selected.includes(cardId)) break;
-        game.selected.push(cardId);
-        if (game.selected.length === 2) {
-          game.moves += 1;
-          const picked = game.deck.filter((card) => game.selected.includes(card.id));
-          if (picked.length === 2 && picked[0].pair === picked[1].pair) {
-            game.matched.push(pairId);
-            game.selected = [];
-            saveState();
-            render();
-            if (game.matched.length === Object.keys(TILE_WORDS[game.language]).length) showToast(`All pairs matched in ${game.moves} ${game.moves === 1 ? 'move' : 'moves'}!`);
-            else showToast('Match found! Keep going.');
-            break;
-          }
-          const pendingSelection = game.selected.join('|');
-          saveState();
-          render();
-          window.setTimeout(() => {
-            if (parseLocation().page !== 'game' || state.tileGame.selected.join('|') !== pendingSelection) return;
-            state.tileGame.selected = [];
-            saveState();
-            render();
-          }, 900);
-          break;
-        }
-        saveState();
-        render();
-        break;
-      }
       case 'notify-language':
         if (!state.interested.includes(lang)) state.interested.push(lang);
         saveState(); render(); showToast(`${SOON_LANGUAGES.find((l) => l.id === lang)?.name || LANGUAGES.find((l) => l.id === lang)?.name || 'Language'} saved to your interest list on this device.`); break;
@@ -10004,17 +9742,6 @@ import {
       if (file) void saveProfilePhoto(file);
       return;
     }
-    if (el.matches('#tile-language-select')) {
-      if (!TILE_WORDS[el.value]) return;
-      state.tileGame.language = el.value;
-      state.tileGame.deck = makeTileDeck();
-      state.tileGame.selected = [];
-      state.tileGame.matched = [];
-      state.tileGame.moves = 0;
-      saveState();
-      render();
-      return;
-    }
     if (el.matches('[data-action="ide-select-preset"]')) { handleAction('ide-select-preset', el); return; }
     if (el.matches('#ide-language-select')) {
       handleAction('ide-set-lang', { dataset: { lang: el.value } });
@@ -10050,6 +9777,39 @@ import {
     }
   });
 
+  document.addEventListener('dragstart', (event) => {
+    const block = event.target.closest('[data-action="code-add-block"], [data-action="code-set-character"]');
+    if (!block || !event.dataTransfer) return;
+    event.dataTransfer.setData('application/x-idilewa-block', JSON.stringify({
+      action: block.dataset.action,
+      block: block.dataset.block,
+      character: block.dataset.character,
+    }));
+    event.dataTransfer.effectAllowed = 'copy';
+  });
+
+  document.addEventListener('dragover', (event) => {
+    if (!event.target.closest('[data-code-drop-zone]')) return;
+    event.preventDefault();
+    if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
+  });
+
+  document.addEventListener('drop', (event) => {
+    const dropZone = event.target.closest('[data-code-drop-zone]');
+    if (!dropZone || !event.dataTransfer) return;
+    event.preventDefault();
+    try {
+      const dropped = JSON.parse(event.dataTransfer.getData('application/x-idilewa-block'));
+      if (dropped.action === 'code-set-character') {
+        handleAction('code-set-character', { dataset: { character: dropped.character } });
+      } else if (dropped.action === 'code-add-block') {
+        handleAction('code-add-block', { dataset: { block: dropped.block } });
+      }
+    } catch {
+      showToast('That block could not be added. Please try again.', 'error');
+    }
+  });
+
   document.addEventListener('input', (event) => {
     const target = event.target;
     if (target.matches('[data-input="heritage-search"]')) {
@@ -10077,54 +9837,6 @@ import {
         const transliteration = document.getElementById('voice-translation-transliteration');
         if (transliteration) transliteration.textContent = '';
       }
-    }
-    if (target.matches('[data-library-search]')) {
-      state.librarySearch = target.value;
-      const query = target.value.trim().toLowerCase();
-      const cards = document.querySelectorAll('[data-library-item]');
-      let visibleCount = 0;
-      cards.forEach((card) => {
-        const visible = (state.libraryFilter === 'all' || card.dataset.libraryKind === state.libraryFilter) && card.textContent.toLowerCase().includes(query);
-        card.hidden = !visible;
-        if (visible) visibleCount += 1;
-      });
-
-      document.addEventListener('dragstart', (event) => {
-        const block = event.target.closest('[data-action="code-add-block"], [data-action="code-set-character"]');
-        if (!block || !event.dataTransfer) return;
-        event.dataTransfer.setData('application/x-idilewa-block', JSON.stringify({
-          action: block.dataset.action,
-          block: block.dataset.block,
-          character: block.dataset.character,
-        }));
-        event.dataTransfer.effectAllowed = 'copy';
-      });
-
-      document.addEventListener('dragover', (event) => {
-        if (!event.target.closest('[data-code-drop-zone]')) return;
-        event.preventDefault();
-        if (event.dataTransfer) event.dataTransfer.dropEffect = 'copy';
-      });
-
-      document.addEventListener('drop', (event) => {
-        const dropZone = event.target.closest('[data-code-drop-zone]');
-        if (!dropZone || !event.dataTransfer) return;
-        event.preventDefault();
-        try {
-          const dropped = JSON.parse(event.dataTransfer.getData('application/x-idilewa-block'));
-          if (dropped.action === 'code-set-character') {
-            handleAction('code-set-character', { dataset: { character: dropped.character } });
-          } else if (dropped.action === 'code-add-block') {
-            handleAction('code-add-block', { dataset: { block: dropped.block } });
-          }
-        } catch {
-          showToast('That block could not be added. Please try again.', 'error');
-        }
-      });
-      const empty = document.querySelector('[data-library-empty]');
-      if (empty) empty.hidden = visibleCount > 0;
-      saveState();
-      return;
     }
     if (target.id === 'ide-code-input') {
       state.coding.ideCode = target.value;

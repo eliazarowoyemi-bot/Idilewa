@@ -66,20 +66,17 @@ The primary navigation exposes Home, Learn, Voice Trainer, Read & listen, Code, 
 
 ## 4. Complete Page Inventory
 
-The Vite configuration includes **36 HTML entry files**. Most files are small shells that load the same stylesheet and `app.js`; actual page content is rendered by the shared application based on the URL hash. Page descriptions below reflect the code in the route renderer, not a claim that every proposed production service is live.
+The Vite configuration includes **30 HTML entry files**. Most files are small shells that load the same stylesheet and `app.js`; actual page content is rendered by the shared application based on the URL hash. Retired routes redirect to the Family homepage, and unknown hashes also resolve to Home. Page descriptions below reflect the code in the route renderer, not a claim that every proposed production service is live.
 
 ### A. Home, discovery, and learning
 
 | Entry / route | Purpose and current experience |
 |---|---|
 | `index.html` / `index` | Main landing page. Introduces the platform promise, the learning journey, language choices, tonal practice, featured books/stories, audience paths, and calls to explore. It links the language, story, coding, and educator areas. |
-| `base.html` / `base` | Platform map/directory. Groups links into Learn & practice, Stories & living culture, and Technology & Idilewa. It is an index of routes rather than a separate curriculum. |
 | `languages.html` / `languages` | Language chooser. Four primary paths are listed (Yorùbá, Igbo, Hausa, and Swahili); additional language interests are shown as growing/planned paths, including Twi, Wolof, isiZulu, and Fulfulde. Language-course copy should not be read as proof that all reviewed lesson content exists. |
 | `course.html` / `course` | Course selection for a chosen language and level. The intended course shape is three levels, four modules per level, five lessons per module (20 lessons per level). Some language paths deliberately show a pending-content state where reviewed text/audio are not available. |
 | `lesson.html` / `lesson` | Individual practice view inside the language curriculum. Provides a focused lesson, response/activity controls, and completion/progress behavior. Route parameters select the language, level, module, and lesson. |
 | `kids.html` / `kids` | Audience page for children. Emphasizes short phrases, shared stories, playful practice, and coding, with links into the learning paths. |
-| `individuals.html` / `individuals` | Audience page for independent learners and heritage-language reconnection. Suggests choosing a level, listening/practicing, and following interests into culture and code. |
-| `schools.html` / `schools` | Audience page for schools and educators. Describes use in classroom learning, curriculum structure, cultural context, and an interest form. The form is preview-only and does not send details. |
 | `tutor.html` / `tutor` | General editorial page introducing tutor-led learning, guided conversation, cultural context, and learning-path continuity. It is informational; the actual sample directory is `connect_teachers`. |
 | `profile.html` / `profile` | Learner progress dashboard concept. Shows current language/level, completion progress, a learning streak, points, and a timeline. The page explicitly describes progress as saved in the current browser for the prototype. |
 | `login.html` / `login` | Simplified sign-in/create-account interface with persona selection (child, adult, parent, educator) and consent-oriented child flow. Auth uses Supabase Auth only when its public URL and anon key are configured; otherwise account submission is disabled and guest exploration remains available. |
@@ -109,19 +106,13 @@ The trainer UI includes six language choices (Yorùbá, Igbo, Hausa, Kiswahili, 
 | `owe_detail.html` / `owe_detail` | Translation and meaning lesson for “Sùúrù ni baba ìwà.” Explains that the displayed translation is one common rendering, includes a meaning check, and gates the following story step. |
 | `owe_story.html` / `owe_story` | Original classroom story about Dami and an okra seed. It is explicitly not presented as a traditional folktale. Contains a comprehension check and is gated by completion of the meaning step. |
 | `owe_reflection.html` / `owe_reflection` | Final step in the proverb activity. After the story check, learners choose a feeling and save a thought/action locally. It warns users not to enter private details and notes that browser users can see saved content. |
-| `ifa.html` / `ifa` | General educational introduction to Ifá and Yorùbá knowledge. Stresses community voices, context, and not reducing a living tradition to a quick summary. |
-| `ifa_odu.html` / `ifa_odu` | Introductory Odu cultural note. Explicitly non-prescriptive and educational, not spiritual advice; routes learners toward language, community context, and respectful reflection. |
-| `guides.html` / `guides` | General cultural-guides page for themes such as greetings, names, customs, food, festivals, and heritage. Uses the shared editorial template and links to language/culture areas. |
-| `human.html` / `human` | People-and-community page presenting educators, storytellers, and learners as carriers of language across generations. Uses the shared editorial template. |
 | `keepers.html` / `keepers` | Culture-keeper page emphasizing listening, context, attribution, and community agency over what is shared or kept private. Uses the shared editorial template. |
 
 ### D. Coding, community, and safeguarding
 
 | Entry / route | Purpose and current experience |
 |---|---|
-| `coding.html` / `coding` | K-8 Code for Kids/STEM experience. Shows K-2, grades 3-5, and grades 6-8 curriculum bands; code-in-your-language lessons; browser-based HTML/CSS/JavaScript previews; and an IDE that can discover and run installed runtimes through the Vercel API and private Judge0 CE. Compiler availability depends on the deployed runner configuration. |
 | `about.html` / `about` | Product story: culture, community language, oral tradition, and technology belong together. Shared editorial layout with cards to related areas. |
-| `method.html` / `method` | Learning-method overview that connects listening, practice, and cultural context. Describes a clear progression from language through lesson; links to voice, practice, and oral culture. |
 | `connect_teachers.html` / `connect_teachers` | Family/learner-facing sample tutor directory. Filters illustrative educator profiles and teaching focus; requires a guardian-approved code before a demo introduction request. The page expressly says profiles/schedules are sample data and no booking or message is sent. |
 | `connect_students.html` / `connect_students` | Tutor-facing safeguarding flow. Requires validation of the guardian-approved code for the named tutor before an anonymous sample learner assignment can open. Example learner cards are fictional/read-only; accepting an assignment does not create a real lesson or message. |
 | `consent.html` / `consent` | Guardian-consent demonstration: generate a request reference, guardian form and typed signature, issue a local code, verify a child, and optionally approve a specific tutor. The UI warns that local browser state cannot prove identity or securely authorize a child. |
