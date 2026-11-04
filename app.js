@@ -731,7 +731,8 @@ import {
     }
     const currentUser = getCurrentUser();
     const currentGroup = NAV_GROUPS[page] || (page === 'index' ? 'home' : '');
-    const nav = NAV.map((item) => `<a class="nav-link ${currentGroup === item.group ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${item.label}</a>`).join('');
+    const nav = NAV.map((item) => `<a class="nav-link ${currentGroup === item.group ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${item.label}</a>`).join('') +
+      '<a class="nav-link" href="/starter-projects">Create</a>';
     const avatarLabel = currentUser?.name?.trim()?.charAt(0)?.toUpperCase() || 'S';
     const profileAvatar = profilePhoto
       ? `<img src="${esc(profilePhoto)}" alt="" />`
@@ -743,7 +744,8 @@ import {
       { route: 'profile', label: 'Profile', ico: 'user' },
       { route: 'payment', label: 'Payment', ico: 'shield' }
     ].map((item) => `<a class="mobile-menu-link ${page === item.route ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.ico, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('');
-    const menu = MENU_NAV.map((item) => `<a class="mobile-menu-link ${currentGroup === item.group ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.group === 'home' ? 'home' : item.group === 'trainer' ? 'mic' : item.group === 'learn' ? 'book' : item.group === 'read' ? 'headphones' : item.group === 'code' ? 'code' : item.group === 'stories' ? 'quote' : item.group === 'community' ? 'people' : 'sparkles', 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('') + mobileShortcuts;
+    const menu = MENU_NAV.map((item) => `<a class="mobile-menu-link ${currentGroup === item.group ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.group === 'home' ? 'home' : item.group === 'trainer' ? 'mic' : item.group === 'learn' ? 'book' : item.group === 'read' ? 'headphones' : item.group === 'code' ? 'code' : item.group === 'stories' ? 'quote' : item.group === 'community' ? 'people' : 'sparkles', 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('') +
+      '<a class="mobile-menu-link" href="/starter-projects"><span class="icon" aria-hidden="true">⌘</span><span>Creative studio</span></a>' + mobileShortcuts;
     document.getElementById('site-header').innerHTML = `
       ${page === 'index' ? `<div class="home-promo-strip"><span>A little every day brings you closer to your language.</span></div>` : ''}
       <div class="header-inner">

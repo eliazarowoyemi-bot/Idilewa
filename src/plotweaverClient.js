@@ -69,7 +69,7 @@ export async function getRecommendedPlotweaverVoice(language) {
   return voice;
 }
 
-export async function synthesizePlotweaverSpeech({ text, language, voiceId }) {
+export async function synthesizePlotweaverSpeech({ text, language, voiceId, signal }) {
   const response = await fetch(endpoint('speech'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'audio/wav' },
@@ -78,6 +78,7 @@ export async function synthesizePlotweaverSpeech({ text, language, voiceId }) {
       language,
       ...(voiceId ? { voice_id: voiceId } : {}),
     }),
+    signal,
   });
   if (!response.ok) throw await responseError(response);
   return response.blob();
@@ -106,7 +107,7 @@ export function speakWithDeviceVoice(text, language) {
   });
 }
 
-export async function translateWithPlotweaver({ text, sourceLanguage, targetLanguage }) {
+export async function translateWithPlotweaver({ text, sourceLanguage, targetLanguage, signal }) {
   const response = await fetch(endpoint('translations'), {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -115,6 +116,7 @@ export async function translateWithPlotweaver({ text, sourceLanguage, targetLang
       source_language: sourceLanguage,
       target_language: targetLanguage,
     }),
+    signal,
   });
   if (!response.ok) throw await responseError(response);
   const result = await response.json();

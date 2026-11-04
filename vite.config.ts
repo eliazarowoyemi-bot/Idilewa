@@ -7,6 +7,7 @@ const routes = [
   'ere', 'ere_game', 'keepers',
   'kids', 'languages', 'lesson', 'login', 'oral', 'oral_genre', 'oriki', 'owe',
   'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'pricing', 'profile',
+  'starter-projects', 'coding-studio',
   'trainer', 'tutor', 'voices', 'voice_lessons'
 ];
 
