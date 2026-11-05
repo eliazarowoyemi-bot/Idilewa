@@ -14,9 +14,14 @@ test('homepage follows the Family Living View mobile reference', () => {
   assert.match(homeSource, /Learn African languages, hear our stories, build real skills and belong to a global community/);
   assert.match(homeSource, /Start Learning/);
   assert.match(homeSource, /Code for Kids/);
+  assert.match(homeSource, /routeLink\('kids', `Code for Kids/);
   assert.match(homeSource, /AI Conversation/);
   assert.match(homeSource, /\$\{renderHomeAppPreview\(\)\}/);
   assert.match(homeSource, /class="container landing-pathways"/);
+  for (const route of ['voice-translation', 'voice-text-to-speech', 'voice-speech-to-text', 'voice-cloning']) {
+    assert.match(homeSource, new RegExp(`route: '${route}'`));
+  }
+  assert.doesNotMatch(homeSource, /route: 'heritage'/);
   assert.doesNotMatch(homeSource, /visual-journey-3d-section|home-voice-promo|home-trainer-feature-section|explore-section|story-feature|audience-section|home-cta-section/);
   assert.match(appSource, /case 'index': return renderHome\(\);/);
   assert.match(appSource, /else if \(page === 'index'\) \{\s*document\.body\.dataset\.page = page;\s*document\.getElementById\('main'\)\.innerHTML = `\$\{pageMarkup\}\$\{renderFooter\(page\)\}`;/);

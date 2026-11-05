@@ -1,5 +1,3 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
-  <circle cx="32" cy="32" r="30" fill="#159D91"/>
-  <circle cx="32" cy="32" r="19" stroke="#fff" stroke-width="3"/>
-  <path d="M13 32h38M32 13a30 30 0 0 1 0 38M32 13a30 30 0 0 0 0 38" stroke="#fff" stroke-linecap="round" stroke-width="3"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <image href="/assets/idilewa-mark.png" width="64" height="64" />
 </svg>

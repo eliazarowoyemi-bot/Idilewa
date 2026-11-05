@@ -16,7 +16,7 @@ The product brings several learning modes into one web experience:
 - A K-8 coding and STEM space that connects programming ideas to African languages and cultural examples.
 - Learner progress and family/tutor discovery concepts, with parent consent as a prerequisite for child-tutor connections.
 
-The repository is best understood as a rich interactive prototype with a growing server-backed boundary, not a fully deployed learning service. The shared client application integrates Supabase Auth and separate translation, Yoruba-code, phoneme-data, and Three.js modules. Sign-up/sign-in require configured Supabase Auth. The Code page supports local African-language lessons and browser-based web previews; additional compiler runtimes require the Vercel API routes and a configured private Judge0 CE service. Production safeguarding, real tutor communication, reviewed language media, and durable learner records remain work to complete.
+The repository is best understood as a rich interactive prototype with a growing server-backed boundary, not a fully deployed learning service. The shared client application integrates Supabase Auth and separate translation, Yoruba-code, phoneme-data, and Three.js modules. Sign-up/sign-in require configured Supabase Auth. Code for Kids provides age-banded curriculum and STEM lessons. Production safeguarding, real tutor communication, reviewed language media, and durable learner records remain work to complete.
 
 ## 2. Product Intent
 
@@ -58,7 +58,7 @@ Language learning can become detached from the family, community, history, and e
 3. **Follow a course.** The intended structure is language -> level -> module -> lesson. The code describes three levels and 20 lessons per level, organized into four modules.
 4. **Practice.** Lesson views include a prompt, short activity, answers or response fields, feedback, and local progress behavior. The voice trainer adds selectable phrases, tone examples, speed settings, lesson navigation, and a recording/analysis flow.
 5. **Explore culture through oral forms.** Learners can move from the oral-traditions overview into stories, proverbs, Oríkì, voice samples, and introductory Ifá/Odu pages. Some experiences gate later steps on a previous comprehension check.
-6. **Create with code.** The coding route introduces K-8 curriculum bands, a language-aware code environment, and free STEM lessons. Challenges use points and completion state.
+6. **Create with code.** Code for Kids introduces K-8 curriculum bands and free STEM lessons. Challenges use points and completion state.
 7. **Reflect and continue.** Learners can save sample stories, write a proverb reflection, view progress, and revisit course or culture routes.
 8. **Connect with an educator (intended flow).** A child requests family approval; a guardian completes the consent flow and may approve a specific tutor; the child verifies a code; the tutor validates the matching code before seeing an anonymous assignment. In the current demo, these checks are local browser checks and do not establish real identity or secure authorization.
 
@@ -119,7 +119,7 @@ The trainer UI includes six language choices (Yorùbá, Igbo, Hausa, Kiswahili, 
 
 ### E. Shell consistency and route caveat
 
-All HTML entries use a shared page shell with a skip link, header mount point, main-content mount point, mobile-nav mount point, modal/toast roots, `styles.css`, and `app.js`. `vite.config.ts` lists 36 HTML build inputs. The application has its own hash route allowlist and renderer; a valid entry file does not automatically mean its `data-default-route` is recognized by that renderer.
+All HTML entries use a shared page shell with a skip link, header mount point, main-content mount point, mobile-nav mount point, modal/toast roots, `styles.css`, and `app.js`. `vite.config.js` lists the configured HTML build inputs. The application has its own hash route allowlist and renderer; a valid entry file does not automatically mean its `data-default-route` is recognized by that renderer.
 
 The `trainer` route is in the app allowlist and renders with `#/trainer`. The value `voice_lessons` is not in the allowlist or `renderPage` switch. Both `trainer.html` and `voice_lessons.html` currently declare `data-default-route="voice_lessons"`; their no-hash default is consequently rejected and resolves to `index`. This should be corrected by setting the shell default to `trainer` or explicitly supporting the intended route.
 
@@ -141,7 +141,7 @@ The shared CSS tokens are defined near the top of `styles.css`. The visual direc
 
 Other recurring design choices:
 
-- Deep forest and vibrant leaf greens establish a shared identity across the core site, AI Conversations, family/tutor portals, coding, and heritage experiences.
+- Deep forest and vibrant leaf greens establish a shared identity across the core site, AI Conversations, family/tutor portals, and language learning.
 - White text on primary action buttons uses the deep-forest shade for legible contrast; vibrant leaf green remains the supporting interactive accent.
 - The CSS defines soft green-tinted shadows, a 1200px content width, 22px and 30px radius tokens, and shared button, card, pill, section, and navigation styles.
 - A light translucent sticky header, breadcrumbs, clear active navigation, compact uppercase section labels, rounded buttons, stepper flows, and repeated card patterns establish a common interaction language.
@@ -197,7 +197,7 @@ HTML shells use the shared off-white `#F9FBF9` as their browser theme color to m
 - Plain HTML entry shells with a shared client-side JavaScript application in `app.js`.
 - CSS in `styles.css` provides global tokens, responsive layout, components, and route-specific styling.
 - Vite is the development server and multi-page build tool (`npm run dev`, `npm run build`, `npm run preview`).
-- `vite.config.ts` enumerates the HTML entry points; production output is written to `dist/`.
+- `vite.config.js` enumerates the HTML entry points; production output is written to `dist/`.
 - JavaScript package type is ES modules; the main `app.js` imports relevant `src/` feature modules and is bundled by Vite.
 
 ### Main project files
@@ -214,7 +214,7 @@ HTML shells use the shared off-white `#F9FBF9` as their browser theme color to m
 | `src/yorubaCodeEngine.js` | Separate Yoruba code keyword map, lesson data, transpiler, and interpreter. |
 | `src/threeScene.js` | Separate Three.js scene/visualizer helpers. |
 | `assets/` and `public/assets/` | Images, icons, and other static media used by the interface and build. |
-| `vite.config.ts` | Multi-page entry list and relative base configuration. |
+| `vite.config.js` | Multi-page entry list and relative base configuration. |
 | `vercel.json` | Deployment-related configuration exists; deployment behavior should be verified against its current contents and hosting setup. |
 | `README.md` | Product overview, local setup, IDE/auth environment configuration, and static-host versus Vercel runtime boundaries. |
 | `scratch/` | Development experiments, inspection scripts, and redesign/debugging artifacts; not the main runtime product. |

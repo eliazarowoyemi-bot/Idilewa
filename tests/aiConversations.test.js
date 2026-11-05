@@ -5,7 +5,7 @@ import test from 'node:test';
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const styleSource = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 
-test('AI Conversations registers every supplied interface as a navigable Idilewa route', () => {
+test('AI Conversations registers its supplied interfaces and workspace navigation', () => {
   for (const route of [
     'ai-conversations', 'ai-login', 'ai-signup', 'ai-dashboard', 'ai-chat',
     'ai-everyday', 'ai-voice', 'ai-history', 'ai-analytics', 'ai-profile',
@@ -15,7 +15,8 @@ test('AI Conversations registers every supplied interface as a navigable Idilewa
     assert.match(appSource, new RegExp(`case '${route}':`));
   }
   assert.match(appSource, /label: 'AI Conversations', route: 'ai-conversations'/);
-  assert.match(appSource, /data-route="ai-dashboard"/);
+  assert.match(appSource, /route: 'ai-dashboard', label: 'Dashboard'/);
+  assert.match(appSource, /data-route="\$\{item\.route\}"/);
   assert.match(appSource, /data-route="ai-chat"/);
   assert.match(appSource, /data-route="ai-voice"/);
 });
@@ -32,13 +33,12 @@ test('AI Conversations removes My Children and redirects its old route to the da
   assert.match(parentLinks, /route: 'parent-children', label: 'My Children'/);
 });
 
-test('AI Conversations starts a guest directly in practice without requiring account creation', () => {
-  const landingSource = appSource.slice(appSource.indexOf('function renderAiLanding()'), appSource.indexOf('function renderAiAuth('));
-  assert.match(landingSource, /href="#\/ai-everyday\?lang=\$\{getAiConversationLanguage\(\)\.id\}" data-route="ai-everyday"/);
-  assert.match(landingSource, /No account needed · start practising right away/);
-  assert.match(landingSource, /Optional sign in/);
-  assert.doesNotMatch(landingSource, /Create account|data-route="ai-signup"/);
-  assert.match(appSource, /<form class="ai-message-form" data-form="ai-conversation">/);
+test('AI Conversations opens guests directly in live, translation-backed practice', () => {
+  assert.match(appSource, /if \(page === 'ai-conversations'\) return renderAiEveryday\(params\);/);
+  assert.match(appSource, /<form class="ai-message-form" data-form="ai-conversation"/);
+  assert.match(appSource, /translateWithPlotweaver\(\{[\s\S]*?sourceLanguage: 'en',[\s\S]*?targetLanguage: language\.speech/);
+  assert.match(appSource, /Messages are sent to Plotweaver for translation/);
+  assert.doesNotMatch(appSource, /renderAiLanding|Offline guided sample|pre-written prompts/);
 });
 
 test('conversation practice, local history, account forms and voice tools are wired', () => {
@@ -49,8 +49,9 @@ test('conversation practice, local history, account forms and voice tools are wi
   assert.match(appSource, /transcribeWithPlotweaver\(recording/);
   assert.match(appSource, /data-form="login"/);
   assert.match(appSource, /data-form="profile-settings"/);
-  assert.match(appSource, /No account needed · start practising right away/);
-  assert.match(appSource, /The chat preview does not contact a live AI service/);
+  assert.match(appSource, /Your message is sent to Plotweaver for translation/);
+  assert.match(appSource, /ai-conversation-status/);
+  assert.match(appSource, /transcribeWithPlotweaver\(recording/);
 });
 
 test('AI Conversations has responsive workspace and mobile navigation layouts', () => {

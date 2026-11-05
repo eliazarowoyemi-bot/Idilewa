@@ -4,7 +4,6 @@ import test from 'node:test';
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const viteConfig = await readFile(new URL('../vite.config.js', import.meta.url), 'utf8');
-const viteConfigTs = await readFile(new URL('../vite.config.ts', import.meta.url), 'utf8');
 
 test('retired pages and unknown routes redirect to the Family homepage', async () => {
   const routes = appSource.match(/const ROUTES = \[([\s\S]*?)\n  \];/)?.[1];
@@ -21,7 +20,6 @@ test('retired pages and unknown routes redirect to the Family homepage', async (
   const retiredShells = ['base', 'guides', 'human', 'ifa', 'ifa_odu', 'individuals', 'method', 'schools'];
   for (const route of retiredShells) {
     assert.doesNotMatch(viteConfig, new RegExp(`'${route}'`));
-    assert.doesNotMatch(viteConfigTs, new RegExp(`'${route}'`));
     await assert.rejects(access(new URL(`../${route}.html`, import.meta.url)), { code: 'ENOENT' });
   }
   assert.doesNotMatch(appSource, /function renderDirectory|function renderBase|function renderLibrary|function renderTileGame|TILE_WORDS/);

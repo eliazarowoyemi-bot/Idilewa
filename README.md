@@ -101,9 +101,10 @@ The HTML entries declared in the active `vite.config.js` are supported:
 | **Voice & Speech** | `#/trainer` (`trainer.html`) | Voice African Language Trainer: 6 languages, 60 audio lessons, Do-Re-Mi soundboard, 3D visualizer. |
 | | `#/voice_lessons` (`voice_lessons.html`) | Route alias & standalone shell resolving to the Voice Trainer studio. |
 | | `#/voices` (`voices.html`) | Sample greeting library for Yorùbá, Igbo, Hausa, and Swahili with Plotweaver speech audio where supported. |
+| | `#/voice-translation`, `#/voice-text-to-speech`, `#/voice-speech-to-text`, `#/voice-cloning` | Dedicated Plotweaver-backed language tools linked from the homepage. |
+| **AI Conversations** | `#/ai-conversations` | Opens directly into guest-ready language practice; text is sent to Plotweaver for translation, and chat history stays in the current browser. |
 | **Culture & Stories** | `#/ere` (`ere.html`) | Living story shelf featuring shared family tales and save controls. |
 | | `#/ere_game` (`ere_game.html`) | “The story that travelled” interactive reading and comprehension reflection. |
-| | `#/heritage` (hash route) | Responsive Stories, Culture & Riddles experience with story listening, lesson quizzes, festival learning, riddles, saved progress, streaks, and profile screens. |
 | | `#/oral` (`oral.html`) | Oral traditions gateway (Oríkì, Òwe, spoken word, and song). |
 | | `#/oral_genre` (`oral_genre.html`) | Guided genre index linking attribution, speaker context, and consent. |
 | | `#/oriki` (`oriki.html`) | Yorùbá praise poetry & remembrance, exploring rhythm, speaker, and permission. |
@@ -152,13 +153,11 @@ Open `http://localhost:5173` in your browser.
 ```bash
 npm run build
 ```
-Vite bundles all 37 HTML entry points and compiles assets to the `dist/` directory.
+Vite bundles the configured HTML entry points and compiles assets to the `dist/` directory.
 
 ### IDE and authentication services
 
-The Code page runs Yorùbá/Igbo/Hausa/Kiswahili lessons and HTML, CSS, and JavaScript previews in the browser. Additional compiler languages are available only when the app is deployed with its Vercel API routes and a reachable private Judge0 CE service. The API reports installed languages rather than promising that every allowlisted runtime is installed.
-
-In Code Studio, drag the divider above the console to resize the output panel, or focus it and use the arrow keys. The chosen height is saved in the current browser.
+The Code for Kids page provides age-banded coding and STEM lessons. Translation, text-to-speech, speech-to-text, and voice cloning use the server-side Plotweaver proxy when `PLOTWEAVER_API_KEY` (or the supported legacy `Idilewa` variable) is configured in the deployment environment.
 
 Configure these values in `.env.local` for the Vite client and in the deployment environment settings:
 
@@ -228,18 +227,4 @@ npm run preview
 ```
 Serves the production bundle at `http://localhost:4173`.
 
-### Multilingual visual-code studio
-
-The starter-project gallery and the three-pane visual studio are standalone Vite entries at `/starter-projects` and `/coding-studio`. They use React, strict TypeScript, Tailwind CSS, Lucide icons, and `@hello-pangea/dnd`; the branded block interface is an original Idilewa design and does not bundle Scratch artwork or logos.
-
-The editor supports Events, Motion, Looks, Language, and Control blocks, drag/reorder and nested control stacks, a bounded asynchronous interpreter, local autosave, JSON export, and a sprite stage. Exact curated phrases use `src/translationEngine.js`; unmatched text in the studio and voice tools uses the server-side `/api/plotweaver/translations` proxy. Speech generation, voice discovery/cloning, and speech-to-text also use the Plotweaver proxy, keeping the provider key server-side. The studio attempts provider speech for supported Yorùbá, Igbo, Hausa, and Pidgin voices and reports errors before falling back to the device voice; Swahili speech uses a device voice. Provider availability, costs, and voice quality depend on Vercel environment configuration and the learner's device; machine translations should be reviewed by a fluent speaker.
-
-Apply `supabase/migrations/20261104000000_multilingual_block_studio.sql` to add the `starter_templates` and `user_projects` tables, indexes, seed starters, and row-level policies. The migration adds `username` and `full_name` to existing profiles and preserves the existing role values while allowing `student` and `admin`; the existing account-creation and profile-protection triggers remain active. Published templates are public-read, template writes require an admin profile, and project rows are private to their owner. Studio credentials resolve from the `VITE_`, `NEXT_PUBLIC_`, or server-side Supabase URL and anonymous-key environment names; the browser never receives a service-role key. Without a configured Supabase session, projects save in browser storage.
-
-Key modules:
-- `src/components/gallery/StarterGallery.tsx` — template gallery and launch links.
-- `src/components/editor/StudioEditor.tsx`, `BlockCard.tsx`, and `Stage.tsx` — palette, nested workspace, controls, stage, and assets.
-- `src/studio/types.ts`, `catalog.ts`, `translation.ts`, and `interpreter.ts` — typed block model, starters, translation pipeline, speech, and runtime.
-- `src/studio/storage.ts` and `database.types.ts` — validated project persistence and Supabase schema types.
-
-Local static previews can run with Vite. To exercise `/api/plotweaver/*`, use `vercel dev` with server-side provider keys configured; never place those keys in `VITE_` variables. Validate changes with `npm run typecheck`, `npm test`, and `npm run build`.
+Local static previews can run with Vite. To exercise `/api/plotweaver/*`, use `vercel dev` with server-side provider keys configured; never place those keys in `VITE_` variables. Validate changes with `npm test` and `npm run build`.
