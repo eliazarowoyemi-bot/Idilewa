@@ -4,6 +4,7 @@ import test from 'node:test';
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const viteConfig = await readFile(new URL('../vite.config.js', import.meta.url), 'utf8');
+const styleSource = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 
 test('Code for Kids opens the kids learning page, not the general curriculum', () => {
   const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderFullHome()'));
@@ -27,4 +28,10 @@ test('the standalone Creative Studio and its build entries are removed', async (
   ]) {
     await assert.rejects(access(new URL(path, import.meta.url)), { code: 'ENOENT' });
   }
+});
+
+test('the unreachable block editor and game builder are removed without removing kids curriculum', () => {
+  assert.doesNotMatch(appSource, /renderCodePlay|renderCodingStudio|CODE_PLAY_GAMES|data-route="coding-studio"/);
+  assert.doesNotMatch(styleSource, /\.code-play-|\.code-studio-|\.code-design-page/);
+  assert.match(appSource, /function renderCurriculum\(\)/);
 });
