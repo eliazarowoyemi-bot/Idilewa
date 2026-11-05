@@ -33,9 +33,8 @@ a { color: inherit; text-decoration: none; }
 .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
 
 /* Shared brand and controls */
-.brand-lockup { display: inline-flex; align-items: center; flex: 0 0 auto; color: var(--ink); font-size: 19px; font-weight: 850; letter-spacing: -.075em; }
-.brand-mark { display: grid; width: 29px; height: 29px; margin-right: 7px; place-items: center; border-radius: 10px 10px 10px 3px; background: var(--green); color: white; font-family: Georgia, serif; font-size: 23px; font-weight: 800; line-height: 1; }
-.brand-dot { color: #edac3d; }
+.brand-lockup { display: inline-flex; align-items: center; flex: 0 0 auto; }
+.gallery-brand .brand-logo { display: block; width: 158px; height: auto; }
 .button { display: inline-flex; min-height: 42px; align-items: center; justify-content: center; gap: 9px; border: 0; border-radius: 13px; padding: 0 16px; font-size: 12px; font-weight: 800; transition: transform .18s ease, box-shadow .18s ease; }
 .button:hover { transform: translateY(-2px); }
 .button-green { background: var(--green); color: white; box-shadow: 0 8px 18px #0c8b6128; }
@@ -119,16 +118,14 @@ a { color: inherit; text-decoration: none; }
 .gallery-notice, .gallery-loading { width: min(1220px, calc(100% - 64px)); margin: 0 auto 15px; border-radius: 10px; padding: 11px 15px; background: #fff2d6; color: #6a5122; font-size: 11px; }
 .gallery-loading { background: #edf4e9; color: #49715a; }
 .gallery-footer { display: flex; min-height: 78px; align-items: center; justify-content: space-between; gap: 20px; border-top: 1px solid #e8e7de; padding: 14px max(6.7vw, calc((100vw - 1200px) / 2)); background: #faf8f0; }
-.gallery-footer .brand-lockup { font-size: 16px; }
-.gallery-footer .brand-mark { width: 26px; height: 26px; font-size: 19px; }
+.gallery-footer .brand-logo { width: 145px; }
 .gallery-footer p { margin: 0; color: #7d877f; font-size: 10px; }
 .gallery-footer > a:last-child { display: inline-flex; align-items: center; gap: 8px; color: var(--green); font-size: 10px; font-weight: 800; }
 
 /* Editor shell: three-pane studio */
 .editor-app { min-height: 100vh; background: #f5f7fb; color: #233b36; }
 .editor-topbar { position: relative; z-index: 3; display: flex; height: 58px; align-items: center; gap: 25px; border-bottom: 1px solid #e5e8ec; padding: 0 20px; background: white; }
-.editor-topbar .brand-lockup { font-size: 17px; }
-.editor-topbar .brand-mark { width: 27px; height: 27px; font-size: 21px; }
+.editor-topbar .brand-logo { display: block; width: 142px; height: auto; }
 .topbar-project { display: flex; min-width: 190px; max-width: 500px; height: 34px; align-items: center; gap: 9px; border: 1px solid #e8e9e4; border-radius: 10px; padding: 0 10px; background: #fbfcfa; }
 .topbar-project-icon { display: grid; color: #819087; }
 .topbar-project input { width: 180px; min-width: 70px; border: 0; outline: 0; background: transparent; color: #36544a; font-size: 11px; font-weight: 800; }
@@ -305,7 +302,7 @@ a { color: inherit; text-decoration: none; }
 }
 @media (max-width: 560px) {
   .studio-site-header { gap: 11px; }
-  .brand-lockup { font-size: 17px; }
+  .gallery-brand .brand-logo { width: 138px; }
   .gallery-nav { gap: 11px; margin-left: auto; }
   .gallery-nav a { font-size: 9px; }
   .header-create { width: 35px; justify-content: center; overflow: hidden; padding: 0; font-size: 0; }
@@ -323,8 +320,7 @@ a { color: inherit; text-decoration: none; }
   .gallery-footer { flex-wrap: wrap; justify-content: center; padding: 15px; }
   .gallery-footer p { display: none; }
   .editor-topbar { height: 52px; gap: 10px; padding-inline: 10px; }
-  .editor-topbar .brand-lockup { font-size: 14px; }
-  .editor-topbar .brand-mark { width: 23px; height: 23px; font-size: 18px; }
+  .editor-topbar .brand-logo { width: 108px; }
   .topbar-project { min-width: 0; flex: 1; padding-inline: 6px; }
   .topbar-project input { width: 100%; }
   .topbar-project-icon, .topbar-actions .icon-action, .back-gallery { display: none; }
@@ -376,8 +372,7 @@ a { color: inherit; text-decoration: none; }
   background: #21756a;
   color: #fff;
 }
-.editor-topbar .brand-lockup { color: #fff; }
-.editor-topbar .brand-mark { background: #fff; color: #21756a; }
+.editor-topbar .brand-lockup { border-radius: 7px; padding: 3px 6px; background: #fff; }
 .topbar-project { border-color: #ffffff4d; background: #fff; }
 .topbar-project input { width: clamp(120px, 18vw, 260px); color: #344c53; }
 .autosave-status { color: #6b7b7f; font-size: 10px; }

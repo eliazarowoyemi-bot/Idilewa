@@ -3,6 +3,7 @@ import { ArrowRight, BookOpen, Code2, Globe2, Sparkles } from 'lucide-react';
 import { LOCAL_TEMPLATES } from '../../studio/catalog';
 import { fetchTemplates } from '../../studio/storage';
 import type { StarterCategory, StarterTemplate } from '../../studio/types';
+import brandLogoUrl from '../../../assets/idilewa-brand.svg';
 
 const GROUPS: { category: StarterCategory; title: string; subtitle: string; color: string }[] = [
   { category: 'Translation Sandbox', title: 'Language playgrounds', subtitle: 'Try a greeting, discover a phrase, and listen together.', color: 'mint' },
@@ -74,8 +75,8 @@ export function StarterGallery() {
   return (
     <div className="gallery-app">
       <header className="studio-site-header">
-        <a className="brand-lockup" href="/" aria-label="Idilewa home">
-          <span className="brand-mark">ì</span><span>idilewa</span><span className="brand-dot">.</span>
+        <a className="brand-lockup gallery-brand" href="/" aria-label="Idilewa · Learn · Speak · Grow">
+          <img className="brand-logo" src={brandLogoUrl} alt="Idilewa · Learn · Speak · Grow" />
         </a>
         <nav className="gallery-nav" aria-label="Main navigation">
           <a href="/kids">Learn</a>
@@ -131,7 +132,7 @@ export function StarterGallery() {
         </div>
       </main>
       <footer className="gallery-footer">
-        <a className="brand-lockup" href="/"><span className="brand-mark">ì</span><span>idilewa</span><span className="brand-dot">.</span></a>
+        <a className="brand-lockup gallery-brand" href="/" aria-label="Idilewa · Learn · Speak · Grow"><img className="brand-logo" src={brandLogoUrl} alt="Idilewa · Learn · Speak · Grow" /></a>
         <p>Keep your language close. Keep your imagination closer.</p>
         <a href="/coding-studio">Make something <ArrowRight size={15} /></a>
       </footer>

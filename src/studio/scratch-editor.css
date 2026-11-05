@@ -20,39 +20,10 @@
 }
 .editor-topbar .brand-lockup, .back-gallery { color: white; }
 .studio-brand {
-  min-width: max-content;
-  gap: 9px;
-  color: #fff;
-  letter-spacing: -.035em;
+  min-width: 0;
+  flex: 0 0 auto;
 }
-.studio-brand-mark {
-  display: grid;
-  width: 35px;
-  height: 35px;
-  place-items: center;
-  border: 2px solid #fff;
-  border-radius: 11px 11px 11px 3px;
-  color: #136443;
-  background: #fff;
-  box-shadow: 3px 3px 0 var(--studio-gold);
-  font-size: 21px;
-  font-weight: 900;
-}
-.studio-brand-word {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 7px;
-  color: #fff;
-  font-size: 20px;
-  font-weight: 850;
-  line-height: 1;
-}
-.studio-brand-word small {
-  color: #ffe2a1;
-  font-size: 8px;
-  font-weight: 850;
-  letter-spacing: .14em;
-}
+.studio-brand .brand-logo { width: 142px; height: auto; }
 .topbar-menu-button, .topbar-share, .topbar-page {
   display: inline-flex;
   min-height: 34px;
@@ -413,10 +384,7 @@
 @media (max-width: 800px) {
   .editor-app { height: auto; min-height: 100vh; overflow: auto; }
   .editor-topbar { position: sticky; top: 0; z-index: 30; height: 58px; gap: 8px; padding: 0 9px; }
-  .studio-brand { gap: 7px; }
-  .studio-brand-mark { width: 29px; height: 29px; border-radius: 9px 9px 9px 3px; font-size: 18px; }
-  .studio-brand-word { gap: 5px; font-size: 16px; }
-  .studio-brand-word small { font-size: 7px; }
+  .studio-brand .brand-logo { width: 118px; }
   .topbar-menu-button { display: none; }
   .topbar-project { flex: 1 1 100px; min-width: 0; }
   .topbar-project input { font-size: 11px; }
@@ -445,10 +413,7 @@
 }
 @media (max-width: 560px) {
   .editor-topbar { height: 56px; gap: 6px; padding-inline: 7px; }
-  .studio-brand { gap: 5px; }
-  .studio-brand-mark { width: 25px; height: 25px; border-radius: 7px 7px 7px 2px; font-size: 16px; }
-  .studio-brand-word { font-size: 14px; letter-spacing: -.05em; }
-  .studio-brand-word small { display: none; }
+  .studio-brand .brand-logo { width: 102px; }
   .topbar-project { flex: 1 1 60px; min-width: 0; height: 34px; padding-inline: 6px; }
   .topbar-project input { overflow: hidden; font-size: 10px; text-overflow: ellipsis; }
   .studio-navigation-actions { gap: 3px; }

@@ -754,7 +754,7 @@ import {
       ${page === 'index' ? `<div class="home-promo-strip"><span>A little every day brings you closer to your language.</span></div>` : ''}
       <div class="header-inner">
         <a class="brand" href="#/index" data-route="index" aria-label="Idilewa home">
-          ${page === 'index' ? `<span class="landing-brand-mark">${icon('leaf', 24)}</span><span class="landing-brand-copy"><strong>Idilewa</strong><small>Language · Culture · Future</small></span>` : brandLogo()}
+          ${brandLogo('Idilewa · Learn · Speak · Grow')}
         </a>
         <nav class="desktop-nav" aria-label="Main navigation">${nav}</nav>
         <div class="header-actions">
@@ -818,7 +818,7 @@ import {
         </nav>
       </div>
       <div class="footer-bottom"><div class="container footer-bottom-inner">
-        <p>© Idilewa · Language · culture · future</p>
+        <p>© Idilewa · Learn · Speak · Grow</p>
         ${routeLink('contact', 'Contact Idilewa', 'footer-bottom-link')}
       </div></div>
     </footer>`;
@@ -1206,8 +1206,7 @@ import {
               <div class="landing-phone-screen">
                 <div class="landing-phone-status"><span>9:41</span><span>● ▰</span></div>
                 <div class="landing-phone-brand">
-                  <span class="landing-phone-mark">${icon('leaf', 19)}</span>
-                  <span><strong>idilewa</strong><small>Language · Culture · Stories</small></span>
+                  ${brandLogo('Idilewa · Learn · Speak · Grow')}
                   <span class="landing-phone-tools">${icon('search', 15)}${icon('user', 15)}</span>
                 </div>
                 <div class="landing-phone-welcome">
@@ -5219,7 +5218,7 @@ import {
       ['profile', 'Profile', 'user', screen === 'profile' || screen === 'settings']
     ];
     const nav = navItems.map(([route, label, glyph, active]) => heritageLink(route, `${icon(glyph, 18)}<span>${label}</span>`, `heritage-tab ${active ? 'is-active' : ''}`)).join('');
-    return `<div class="heritage-app"><div class="heritage-device"><header class="heritage-topbar">${heritageLink('home', `<span class="heritage-brand-mark">${brandLogo('Idilewa')}</span><span class="heritage-brand-copy"><strong>IDILEWA</strong><small>Language · Culture · Stories</small></span>`, 'heritage-brand')}<div class="heritage-topbar-actions">${heritageLink('progress', icon('trophy', 17), 'heritage-icon-button', { 'aria-label': 'Your progress' })}${heritageLink('profile', '<span class="heritage-avatar-small">A</span>', 'heritage-avatar-link', { 'aria-label': 'Open profile' })}</div></header>${screen !== 'home' ? `<div class="heritage-screen-title">${heritageLink('home', icon('arrow', 18), 'heritage-back', { 'aria-label': 'Back to home' })}<h2>${pageTitle}</h2><span class="heritage-status-mark">●</span></div>` : ''}<main class="heritage-screen ${screen === 'home' ? 'is-home' : ''}" aria-label="${pageTitle}">${content}</main><nav class="heritage-bottom-nav" aria-label="Heritage navigation">${nav}</nav></div><aside class="heritage-desktop-aside"><span class="heritage-kicker">Idilewa · Learn, explore, grow</span><h2>Carry a story.<br />Discover a tradition.<br /><em>Share what you learn.</em></h2><p>Choose a path and move between folktales, culture and playful challenges whenever you like.</p>${heritageLink('story-list', `Explore folktales ${icon('arrow', 14)}`, 'heritage-button heritage-button-primary')}${heritageLink('culture-list', `Discover culture ${icon('arrow', 14)}`, 'heritage-button heritage-button-outline')}</aside></div>`;
+    return `<div class="heritage-app"><div class="heritage-device"><header class="heritage-topbar">${heritageLink('home', brandLogo('Idilewa · Learn · Speak · Grow'), 'heritage-brand', { 'aria-label': 'Idilewa home · Learn · Speak · Grow' })}<div class="heritage-topbar-actions">${heritageLink('progress', icon('trophy', 17), 'heritage-icon-button', { 'aria-label': 'Your progress' })}${heritageLink('profile', '<span class="heritage-avatar-small">A</span>', 'heritage-avatar-link', { 'aria-label': 'Open profile' })}</div></header>${screen !== 'home' ? `<div class="heritage-screen-title">${heritageLink('home', icon('arrow', 18), 'heritage-back', { 'aria-label': 'Back to home' })}<h2>${pageTitle}</h2><span class="heritage-status-mark">●</span></div>` : ''}<main class="heritage-screen ${screen === 'home' ? 'is-home' : ''}" aria-label="${pageTitle}">${content}</main><nav class="heritage-bottom-nav" aria-label="Heritage navigation">${nav}</nav></div><aside class="heritage-desktop-aside"><span class="heritage-kicker">Idilewa · Learn · Speak · Grow</span><h2>Carry a story.<br />Discover a tradition.<br /><em>Share what you learn.</em></h2><p>Choose a path and move between folktales, culture and playful challenges whenever you like.</p>${heritageLink('story-list', `Explore folktales ${icon('arrow', 14)}`, 'heritage-button heritage-button-primary')}${heritageLink('culture-list', `Discover culture ${icon('arrow', 14)}`, 'heritage-button heritage-button-outline')}</aside></div>`;
   }
 
   function renderLegacyStoryGame() {
@@ -5644,7 +5643,7 @@ import {
   }
 
   function renderTutorBrand() {
-    return `<a class="tutor-brand" href="#/tutor" data-route="tutor" aria-label="Idilewa tutor portal home">${brandLogo('Idilewa')}</a>`;
+    return `<a class="tutor-brand" href="#/tutor" data-route="tutor" aria-label="Idilewa tutor portal home">${brandLogo('Idilewa · Learn · Speak · Grow')}</a>`;
   }
 
   function renderTutorLanding() {
@@ -5655,7 +5654,7 @@ import {
         <section class="tutor-public-steps" aria-label="How the tutor portal works"><article><span>01</span><strong>Create your account</strong><p>Use your one-time educator invitation to sign up securely.</p></article><article><span>02</span><strong>Connect with care</strong><p>Families approve each learner connection before any details are shared.</p></article><article><span>03</span><strong>Help learners grow</strong><p>See approved learning progress and prepare thoughtful lessons.</p></article></section>
         <p class="tutor-public-note">${icon('lock', 14)} Learner information is only available after a parent or guardian approves your specific connection request.</p>
       </main>
-      <footer class="tutor-public-footer">${renderTutorBrand()}<span>Language · Culture · Future</span><a href="#/privacy" data-route="privacy">Privacy</a></footer>
+      <footer class="tutor-public-footer">${renderTutorBrand()}<a href="#/privacy" data-route="privacy">Privacy</a></footer>
     </div>`;
   }
 
@@ -5690,7 +5689,7 @@ import {
     const initial = name.trim().charAt(0).toUpperCase() || 'T';
     const active = TUTOR_ACTIVE_LINK[page] || 'tutor-dashboard';
     const links = TUTOR_PORTAL_LINKS.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="tutor-sidebar-link ${item.route === active ? 'is-active' : ''}" ${item.route === active ? 'aria-current="page"' : ''}>${icon(item.icon, 17)}<span>${item.label}</span></a>`).join('');
-    return `<div class="tutor-workspace"><aside class="tutor-sidebar"><a class="tutor-sidebar-brand" href="#/tutor-dashboard" data-route="tutor-dashboard">${brandLogo('Idilewa')}<span><strong>IDILEWA</strong><small>Learn · Inspire · Grow</small></span></a><nav class="tutor-sidebar-nav" aria-label="Tutor workspace">${links}<a href="#/tutor-availability" data-route="tutor-availability" class="tutor-sidebar-link ${page === 'tutor-availability' ? 'is-active' : ''}">${icon('calendar', 17)}<span>Availability</span></a></nav><a href="#/tutor-profile" data-route="tutor-profile" class="tutor-sidebar-user"><span class="tutor-avatar">${esc(initial)}</span><span><strong>${esc(name)}</strong><small>Educator</small></span></a></aside><main class="tutor-workspace-main"><header class="tutor-topbar"><div><a href="#/tutor-dashboard" data-route="tutor-dashboard">Tutor Portal</a><span>/</span><strong>${esc(title)}</strong></div><div><span class="tutor-secure-status"><i></i> Secure workspace</span><a class="tutor-topbar-avatar" href="#/tutor-profile" data-route="tutor-profile" aria-label="Open tutor profile">${esc(initial)}</a></div></header><div class="tutor-workspace-content">${content}</div></main></div>`;
+    return `<div class="tutor-workspace"><aside class="tutor-sidebar"><a class="tutor-sidebar-brand" href="#/tutor-dashboard" data-route="tutor-dashboard" aria-label="Idilewa · Learn · Speak · Grow">${brandLogo('Idilewa · Learn · Speak · Grow')}</a><nav class="tutor-sidebar-nav" aria-label="Tutor workspace">${links}<a href="#/tutor-availability" data-route="tutor-availability" class="tutor-sidebar-link ${page === 'tutor-availability' ? 'is-active' : ''}">${icon('calendar', 17)}<span>Availability</span></a></nav><a href="#/tutor-profile" data-route="tutor-profile" class="tutor-sidebar-user"><span class="tutor-avatar">${esc(initial)}</span><span><strong>${esc(name)}</strong><small>Educator</small></span></a></aside><main class="tutor-workspace-main"><header class="tutor-topbar"><div><a href="#/tutor-dashboard" data-route="tutor-dashboard">Tutor Portal</a><span>/</span><strong>${esc(title)}</strong></div><div><span class="tutor-secure-status"><i></i> Secure workspace</span><a class="tutor-topbar-avatar" href="#/tutor-profile" data-route="tutor-profile" aria-label="Open tutor profile">${esc(initial)}</a></div></header><div class="tutor-workspace-content">${content}</div></main></div>`;
   }
 
   function renderTutorHeading(eyebrow, title, description, actions = '') {
@@ -5912,7 +5911,7 @@ import {
   }
 
   function renderAiBrand() {
-    return `<a class="ai-brand" href="#/ai-conversations" data-route="ai-conversations" aria-label="Idilewa AI Conversations home"><span class="ai-brand-globe">${icon('globe', 21)}</span><span><strong>IDILEWA</strong><small>Learn · Speak · Grow</small></span></a>`;
+    return `<a class="ai-brand" href="#/ai-conversations" data-route="ai-conversations" aria-label="Idilewa AI Conversations home">${brandLogo('Idilewa · Learn · Speak · Grow')}</a>`;
   }
 
   function renderAiLanding() {
@@ -5934,7 +5933,7 @@ import {
           <article><span class="ai-feature-icon">${icon('leaf', 19)}</span><h2>Learn at your pace</h2><p>Choose your language and keep each practice short.</p></article>
         </section>
       </main>
-      <footer class="ai-landing-footer">${renderAiBrand()}<span>Language · Culture · Future</span><a href="#/privacy" data-route="privacy">Privacy</a></footer>
+      <footer class="ai-landing-footer">${renderAiBrand()}<a href="#/privacy" data-route="privacy">Privacy</a></footer>
     </div>`;
   }
 
@@ -5991,7 +5990,7 @@ import {
     const active = AI_WORKSPACE_ACTIVE[page] || 'ai-dashboard';
     const links = AI_WORKSPACE_LINKS.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="ai-sidebar-link ${item.route === active ? 'is-active' : ''}" ${item.route === active ? 'aria-current="page"' : ''}>${icon(item.icon, 17)}<span>${item.label}</span></a>`).join('');
     return `<div class="ai-workspace">
-      <aside class="ai-sidebar"><a class="ai-sidebar-brand" href="#/ai-conversations" data-route="ai-conversations" aria-label="AI Conversations home"><span class="ai-brand-globe">${icon('globe', 21)}</span><span><strong>IDILEWA</strong><small>Learn · Speak · Grow</small></span></a>
+      <aside class="ai-sidebar"><a class="ai-sidebar-brand" href="#/ai-conversations" data-route="ai-conversations" aria-label="AI Conversations home">${brandLogo('Idilewa · Learn · Speak · Grow')}</a>
         <nav class="ai-sidebar-nav" aria-label="Conversation workspace">${links}<a href="#/ai-history" data-route="ai-history" class="ai-sidebar-link ${page === 'ai-history' ? 'is-active' : ''}">${icon('clock', 17)}<span>History</span></a><a href="#/ai-voice" data-route="ai-voice" class="ai-sidebar-link ${page === 'ai-voice' ? 'is-active' : ''}">${icon('mic', 17)}<span>Voice Practice</span></a></nav>
         <a href="#/ai-profile" data-route="ai-profile" class="ai-sidebar-user"><span class="ai-user-avatar">${esc(initial)}</span><span><strong>${esc(name)}</strong><small>${user ? 'Learner' : 'Guest learner'}</small></span>${icon('arrow', 14)}</a>
       </aside>
@@ -6153,7 +6152,7 @@ import {
   }
 
   function renderParentBrand(className = '') {
-    return `<a class="family-brand ${className}" href="#/families" data-route="families"><img src="${brandLogoUrl}" alt="Idilewa" /><span>Learn · Explore · Grow</span></a>`;
+    return `<a class="family-brand ${className}" href="#/families" data-route="families" aria-label="Idilewa · Learn · Speak · Grow">${brandLogo('Idilewa · Learn · Speak · Grow')}</a>`;
   }
 
   function renderFamiliesLanding() {
@@ -6164,7 +6163,7 @@ import {
       </nav></header>
       <main class="family-public-main">
         <section class="family-hero">
-          <div class="family-hero-copy"><span class="family-eyebrow"><i></i> Language · culture · future</span><h1>Every child deserves a <em>global voice.</em></h1>
+          <div class="family-hero-copy"><span class="family-eyebrow"><i></i> Learn · Speak · Grow</span><h1>Every child deserves a <em>global voice.</em></h1>
             <p>Idilewa helps children learn languages, explore cultures, and build confidence for a brighter future.</p>
             <div class="family-hero-actions"><a class="family-button family-button-primary" href="#/parent-signup" data-route="parent-signup">Get Started ${icon('arrow', 15)}</a><a class="family-button family-button-light" href="#/about" data-route="about">Learn More</a></div>
             <div class="family-hero-points"><span>${icon('book', 15)} Language learning</span><span>${icon('globe', 15)} Cultural exploration</span><span>${icon('sparkles', 15)} Confidence building</span></div>
@@ -6177,7 +6176,7 @@ import {
           <article><span>${icon('heart', 17)}</span><div><strong>Confidence building</strong><small>Grow with a safe, family-first learning space.</small></div></article>
         </section>
       </main>
-      <footer class="family-public-footer">${renderParentBrand()}<span>Language · Culture · Future</span><a href="#/privacy" data-route="privacy">Privacy</a></footer>
+      <footer class="family-public-footer">${renderParentBrand()}<a href="#/privacy" data-route="privacy">Privacy</a></footer>
     </div>`;
   }
 
@@ -6235,7 +6234,7 @@ import {
     const active = page === 'parent-progress' ? 'parent-progress' : page;
     const links = PARENT_PORTAL_LINKS.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="family-sidebar-link ${item.route === active ? 'is-active' : ''}" ${item.route === active ? 'aria-current="page"' : ''}>${icon(item.icon, 17)}<span>${item.label}</span></a>`).join('');
     return `<div class="family-workspace">
-      <aside class="family-sidebar"><a class="family-sidebar-brand" href="#/parent-dashboard" data-route="parent-dashboard"><img src="./assets/favicon.svg" alt="" /><span><strong>IDILEWA</strong><small>Learn · Explore · Grow</small></span></a>
+      <aside class="family-sidebar"><a class="family-sidebar-brand" href="#/parent-dashboard" data-route="parent-dashboard" aria-label="Idilewa · Learn · Speak · Grow">${brandLogo('Idilewa · Learn · Speak · Grow')}</a>
         <nav class="family-sidebar-nav" aria-label="Family portal">${links}</nav>
         <button type="button" class="family-sidebar-user" data-action="profile-sign-out"><span class="family-avatar">${esc(initial)}</span><span><strong>${esc(name)}</strong><small>Parent</small></span>${icon('arrow', 14)}</button>
       </aside>
@@ -6528,7 +6527,7 @@ import {
       { title: 'Explore before creating an account', text: 'You can browse language lessons and learning activities without signing in. Account features require a configured sign-in service.', action: routeLink('languages', 'Browse learning languages') }
     ];
 
-    const introSplash = authIntroPending ? `<div class="auth-intro-screen">${brandLogo('Idilewa — Language · culture · future')}</div>` : '';
+    const introSplash = authIntroPending ? `<div class="auth-intro-screen">${brandLogo('Idilewa · Learn · Speak · Grow')}</div>` : '';
     authIntroPending = false;
     return `${introSplash}<div class="container route-page auth-page modern-auth-page">
       <!-- Right-side learning artwork -->
@@ -6569,7 +6568,7 @@ import {
       <!-- Left-side sign-in and account creation form -->
       <main class="auth-panel modern-auth-panel">
         <div class="auth-brand" aria-label="Idilewa">
-          ${brandLogo('Idilewa — Language · culture · future')}
+          ${brandLogo('Idilewa · Learn · Speak · Grow')}
         </div>
 
         <div class="auth-header-block">

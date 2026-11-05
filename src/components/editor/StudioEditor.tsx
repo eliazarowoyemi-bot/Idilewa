@@ -14,6 +14,7 @@ import { runBlocks, speakText } from '../../studio/interpreter';
 import { getLocalProjects, getProject, getTemplate, saveProject, saveProjectLocally } from '../../studio/storage';
 import { translateEnglish } from '../../studio/translation';
 import { signOut as signOutAccount } from '../../supabaseClient';
+import brandLogoUrl from '../../../assets/idilewa-brand.svg';
 import type {
   BlockCategory, BlockInputs, BlockNode, BlockType, CostumeAsset, LanguageCode, ProjectDraft, SoundAsset, SpriteState, StarterTemplate,
 } from '../../studio/types';
@@ -568,9 +569,8 @@ export function StudioEditor() {
   return (
     <div className={`editor-app editor-tab-${activeTab}`}>
       <header className="editor-topbar">
-        <a className="brand-lockup studio-brand" href="/" aria-label="Idilewa home">
-          <span className="studio-brand-mark" aria-hidden="true">I</span>
-          <span className="studio-brand-word">Idilewa<small>STUDIO</small></span>
+        <a className="brand-lockup studio-brand" href="/" aria-label="Idilewa · Learn · Speak · Grow">
+          <img className="brand-logo" src={brandLogoUrl} alt="Idilewa · Learn · Speak · Grow" />
         </a>
         <div className="topbar-project">
           <input aria-label="Project title" maxLength={120} value={project.title} onChange={(event) => setProject((current) => ({ ...current, title: event.target.value }))} />

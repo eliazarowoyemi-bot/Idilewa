@@ -26,8 +26,8 @@ test('signup requires email confirmation and the frontend has no signup code ste
   assert.doesNotMatch(app, /signup-otp|verifySignupOtp|resendSignupOtp/);
   assert.match(template, /{{ \.ConfirmationURL }}/);
   assert.match(app, /data-action="resend-signup-confirmation"/);
-  assert.match(template, /https:\/\/www\.idilewa\.com\/assets\/idilewa-email-logo\.png\?v=2/);
-  assert.match(template, /alt="Idilewa — Language · culture · future"/);
+  assert.match(template, /https:\/\/www\.idilewa\.com\/assets\/idilewa-email-logo\.png\?v=3/);
+  assert.match(template, /alt="Idilewa · Learn · Speak · Grow"/);
   assert.doesNotMatch(template, /LANGUAGE · CULTURE · CURIOSITY|>È<\/td>/);
 });
 
