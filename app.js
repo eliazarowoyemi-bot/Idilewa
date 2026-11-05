@@ -746,6 +746,7 @@ import {
     ].map((item) => `<a class="mobile-menu-link ${page === item.route ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.ico, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('');
     const menu = MENU_NAV.map((item) => `<a class="mobile-menu-link ${currentGroup === item.group ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.group === 'home' ? 'home' : item.group === 'trainer' ? 'mic' : item.group === 'learn' ? 'book' : item.group === 'read' ? 'headphones' : item.group === 'code' ? 'code' : item.group === 'stories' ? 'quote' : item.group === 'community' ? 'people' : 'sparkles', 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('') +
       '<a class="mobile-menu-link" href="/starter-projects"><span class="icon" aria-hidden="true">⌘</span><span>Creative studio</span></a>' + mobileShortcuts;
+    document.getElementById('mobile-menu')?.remove();
     document.getElementById('site-header').innerHTML = `
       ${page === 'index' ? `<div class="home-promo-strip"><span>A little every day brings you closer to your language.</span></div>` : ''}
       <div class="header-inner">
@@ -760,12 +761,17 @@ import {
         </div>
       </div>
       <div id="mobile-menu" class="mobile-menu" aria-hidden="true">
-        <div class="mobile-menu-head"><span>Explore Idilewa</span><button class="icon-button" type="button" data-action="toggle-menu" aria-label="Close navigation">${icon('close', 20)}</button></div>
-        <div class="mobile-menu-list">${menu}${routeLink('contact', `${icon('send', 19)}<span>Contact</span>${icon('arrow', 16)}`, 'mobile-menu-link')}${routeLink('privacy', `${icon('lock', 19)}<span>Privacy</span>${icon('arrow', 16)}`, 'mobile-menu-link')}</div>
-        <div class="mobile-menu-bottom">${currentUser
-          ? `${routeLink('profile', `${icon('user', 15)} Open your profile ${icon('arrow', 14)}`, 'button button-primary')}<button class="button button-outline" type="button" data-action="account-sign-out">Sign out</button>`
-          : `${routeLink('login', 'Log in', 'button button-outline', 'data-mode="signin"')}${routeLink('login', 'Get started', 'button button-primary', 'data-mode="signup"')}`}</div>
+        <button class="mobile-menu-backdrop" type="button" data-action="toggle-menu" aria-label="Close navigation" tabindex="-1"></button>
+        <div class="mobile-menu-panel">
+          <div class="mobile-menu-head"><div class="mobile-menu-heading"><span>YOUR NEXT STEP</span><strong>Explore Idilewa</strong></div><button class="icon-button mobile-menu-close" type="button" data-action="toggle-menu" aria-label="Close navigation">${icon('close', 20)}</button></div>
+          <div class="mobile-menu-list">${menu}${routeLink('contact', `${icon('send', 19)}<span>Contact</span>${icon('arrow', 16)}`, 'mobile-menu-link')}${routeLink('privacy', `${icon('lock', 19)}<span>Privacy</span>${icon('arrow', 16)}`, 'mobile-menu-link')}</div>
+          <div class="mobile-menu-bottom">${currentUser
+            ? `${routeLink('profile', `${icon('user', 15)} Open your profile ${icon('arrow', 14)}`, 'button button-primary')}<button class="button button-outline" type="button" data-action="account-sign-out">Sign out</button>`
+            : `${routeLink('login', 'Log in', 'button button-outline', 'data-mode="signin"')}${routeLink('login', 'Get started', 'button button-primary', 'data-mode="signup"')}`}</div>
+        </div>
       </div>`;
+    const mobileMenu = document.getElementById('mobile-menu');
+    if (mobileMenu) document.body.append(mobileMenu);
   }
 
   function renderMobileNav(page) {
