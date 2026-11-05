@@ -58,6 +58,23 @@ export function BlockCard({
         <span className="block-label">{BLOCK_LABELS[block.type]}</span>
         {block.type === 'move_steps' && <NumberInput value={block.inputs.steps ?? 10} label="Steps to move" onChange={(value) => updateNumber('steps', value)} />}
         {block.type === 'turn_degrees' && <NumberInput value={block.inputs.degrees ?? 15} label="Degrees to turn" onChange={(value) => updateNumber('degrees', value)} />}
+        {['change_x', 'change_y', 'set_x', 'set_y'].includes(block.type) && <NumberInput value={block.inputs.steps ?? 10} label="Coordinate value" onChange={(value) => updateNumber('steps', value)} />}
+        {block.type === 'point_direction' && <NumberInput value={block.inputs.direction ?? 90} label="Direction" onChange={(value) => updateNumber('direction', value)} />}
+        {block.type === 'go_to_xy' && (
+          <>
+            <NumberInput value={block.inputs.x ?? 0} label="X coordinate" onChange={(value) => updateNumber('x', value)} />
+            <NumberInput value={block.inputs.y ?? 0} label="Y coordinate" onChange={(value) => updateNumber('y', value)} />
+          </>
+        )}
+        {['change_size', 'set_size'].includes(block.type) && <NumberInput value={block.inputs.size ?? 10} label="Size" onChange={(value) => updateNumber('size', value)} />}
+        {block.type === 'when_key_pressed' && (
+          <select className="block-select" aria-label="Key to press" value={block.inputs.key ?? 'space'} onChange={(event) => updateText('key', event.target.value)}>
+            {['space', 'up arrow', 'down arrow', 'left arrow', 'right arrow', ...'abcdefghijklmnopqrstuvwxyz'].map((key) => <option value={key} key={key}>{key}</option>)}
+          </select>
+        )}
+        {block.type === 'play_sound' && (
+          <input className="block-text-input" aria-label="Sound name" value={block.inputs.sound ?? 'Meow'} onChange={(event) => updateText('sound', event.target.value)} />
+        )}
         {block.type === 'wait_seconds' && <NumberInput value={block.inputs.seconds ?? 1} label="Seconds to wait" onChange={(value) => updateNumber('seconds', value)} />}
         {block.type === 'repeat_times' && <NumberInput value={block.inputs.times ?? 3} label="Repeat count" onChange={(value) => updateNumber('times', value)} />}
         {['say_message', 'translate_text', 'display_speech_bubble'].includes(block.type) && (

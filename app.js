@@ -104,6 +104,7 @@ import {
     'parent-progress', 'parent-messages', 'parent-settings', 'parent-welcome',
     'tutor', 'tutor-login', 'tutor-signup', 'tutor-dashboard', 'tutor-find-child', 'tutor-students',
     'tutor-consent', 'tutor-lesson', 'tutor-messages', 'tutor-profile', 'tutor-availability', 'tutor-settings',
+    'mentors',
     'curriculum',
     'index', 'about', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
     'ere', 'ere_game', 'heritage', 'keepers',
@@ -300,6 +301,7 @@ import {
     { label: 'Curriculum', route: 'curriculum', group: 'curriculum' }
   ];
   const MENU_NAV = [...NAV,
+    { label: 'Mentors', route: 'mentors', group: 'mentors' },
     { label: 'For Parents', route: 'families', group: 'families' },
     { label: 'Read & listen', route: 'oral', group: 'read' },
     { label: 'Stories', route: 'ere', group: 'stories' },
@@ -330,6 +332,7 @@ import {
     'ai-messages': 'ai-conversations',
     'ai-settings': 'ai-conversations',
     tutor: 'tutor',
+    mentors: 'mentors',
     'tutor-login': 'tutor',
     'tutor-signup': 'tutor',
     'tutor-dashboard': 'tutor',
@@ -776,18 +779,24 @@ import {
 
   function renderMobileNav(page) {
     const currentUser = getCurrentUser();
-    if (page === 'heritage' || page.startsWith('ai-') || page.startsWith('tutor') || page.startsWith('parent') || page === 'families' || currentUser?.role === 'parent' || currentUser?.role === 'educator') {
+    const familyDashboard = currentUser?.role === 'parent' && page === 'parent-dashboard';
+    const mainAiPage = page === 'ai-conversations' || page === 'ai-dashboard';
+    if (page === 'heritage' || (page.startsWith('ai-') && !mainAiPage) || page.startsWith('tutor') || page === 'families' ||
+      (page.startsWith('parent') && !familyDashboard) || (currentUser?.role === 'parent' && !familyDashboard) || currentUser?.role === 'educator') {
       document.getElementById('mobile-nav').innerHTML = '';
       return;
     }
     const items = [
       { route: 'index', label: 'Home', ico: 'home' },
-      { route: 'voice_lessons', label: 'Voice Lessons', ico: 'mic' },
-      { route: 'ai-conversations', label: 'AI Conversation', ico: 'sparkles' },
+      { route: 'voice_lessons', label: 'Voice', ico: 'mic' },
+      { route: 'ai-conversations', label: 'AI Chat', ico: 'sparkles' },
       { route: 'curriculum', label: 'Code', ico: 'code' },
       { route: 'profile', label: 'Profile', ico: 'user' }
     ];
-    document.getElementById('mobile-nav').innerHTML = items.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="mobile-tab ${page === item.route ? 'active' : ''}">${icon(item.ico, 19)}<span>${item.label}</span></a>`).join('');
+    document.getElementById('mobile-nav').innerHTML = items.map((item) => {
+      const active = page === item.route || (item.route === 'index' && familyDashboard);
+      return `<a href="#/${item.route}" data-route="${item.route}" class="mobile-tab ${active ? 'active' : ''}"${active ? ' aria-current="page"' : ''}>${icon(item.ico, 19)}<span>${item.label}</span></a>`;
+    }).join('');
   }
 
   function renderFooter(page) {
@@ -5386,12 +5395,71 @@ import {
     return `<div class="container route-page pricing-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>Plans</strong></div><section class="pricing-hero page-depth-reveal"><span class="section-kicker">Free to start · no checkout</span><h1>More language.<br /><em>More belonging.</em></h1><p>All current learning plans are free. No payment details are collected and no subscription is started.</p><div class="pricing-free-note">${icon('check', 16)} Family: $0 USD/month <span aria-hidden="true">·</span> School: $0 USD/month</div></section>${renderStepper(['Explore plans', 'Choose learning paths', 'Review as a family', 'Begin together'], 0)}<div class="pricing-grid"><article class="pricing-card"><span class="pricing-label">Begin here</span><h2>Explorer</h2><p>For learners ready to try a first path.</p><div class="pricing-cost"><strong>Free</strong><small>to get started</small></div><ul><li>${icon('check', 15)} Explore available languages</li><li>${icon('check', 15)} Try sample lessons & stories</li><li>${icon('check', 15)} Follow a personal learning path</li></ul>${routeLink('languages', 'Start exploring ' + icon('arrow', 15), 'button button-outline')}</article><article class="pricing-card pricing-featured"><span class="popular-pill">Made for together</span><span class="pricing-label">For home</span><h2>Family</h2><p>Free access to the current language, culture and story learning previews.</p><div class="pricing-cost"><strong>$0</strong><small>USD · per month</small></div><ul><li>${icon('check', 15)} Explore available family learning paths</li><li>${icon('check', 15)} Try sample stories and activities</li><li>${icon('check', 15)} Keep progress in this browser preview</li></ul>${routeLink('login', `Create a free account ${icon('arrow', 15)}`, 'button button-primary', 'data-mode="signup"')}</article><article class="pricing-card"><span class="pricing-label">For educators</span><h2>School</h2><p>Free preview of classroom learning paths; no school service or student roster is active.</p><div class="pricing-cost"><strong>$0</strong><small>USD · per month</small></div><ul><li>${icon('check', 15)} Explore sample language modules</li><li>${icon('check', 15)} Preview culture and coding activities</li><li>${icon('lock', 15)} Student connections are not available</li></ul>${routeLink('curriculum', 'Explore curriculum ' + icon('arrow', 15), 'button button-outline')}</article></div><p class="pricing-footnote">Current plan prices are $0. No Paystack checkout is started for free plans. ${routeLink('payment', 'View payment information ' + icon('arrow', 14), 'text-link')}. If prices change, confirm the new amount and billing terms before enabling payments.</p></div>`;
   }
 
-  function renderPayment() {
-    return `<div class="container route-page payment-page">
+  const MENTOR_PREVIEWS = [
+    { id: 'folake', name: 'Dr. Folake Adeyemi', initials: 'FA', detail: 'Ph.D. African Linguistics & Computational Dialectology', price: 7500, rating: '4.98', count: '142', expertise: 'Yorùbá phonetics · Heritage', next: 'Today, 10:00 AM', photo: 'yoruba-educator-woman.jpg' },
+    { id: 'chidiebere', name: 'Chidiebere Okafor', initials: 'CO', detail: 'Igbo Language Immersion & Cultural Stories', price: 6800, rating: '4.95', count: '86', expertise: 'Proverbs & STEM', next: 'Today, 4:00 PM' },
+    { id: 'amina', name: 'Amina Bello', initials: 'AB', detail: 'Hausa Conversation & Young Makers', price: 6500, rating: '4.92', count: '74', expertise: 'Robotics & Code', next: 'Tomorrow, 11:30 AM' },
+    { id: 'tunde', name: 'Tunde Bakare', initials: 'TB', detail: 'Talking Drum & Yorùbá Tone Coach', price: 8000, rating: '5.0', count: '59', expertise: 'Acoustics & Tone', next: 'Saturday, 1:00 PM' },
+  ];
+  let selectedMentorBooking = { mentorId: 'folake', day: 'Today', time: 'Morning 10:00 AM' };
+  let activePaymentChannel = 'card';
+  let activePaymentCurrency = 'NGN';
+  let activePaymentWallet = 'momo';
+
+  function renderMentors() {
+    const featured = MENTOR_PREVIEWS[0];
+    const selected = MENTOR_PREVIEWS.find((mentor) => mentor.id === selectedMentorBooking.mentorId) || featured;
+    const days = ['Today', 'Tomorrow', 'Saturday'];
+    const times = ['Morning 10:00 AM', 'Afternoon 2:30 PM'];
+    const dayChoices = days.map((day) => `<button type="button" class="mentor-slot-choice ${selectedMentorBooking.day === day ? 'is-selected' : ''}" data-action="mentor-select-slot" data-day="${day}" aria-pressed="${selectedMentorBooking.day === day}">${day}</button>`).join('');
+    const timeChoices = times.map((time) => `<button type="button" class="mentor-time-choice ${selectedMentorBooking.time === time ? 'is-selected' : ''}" data-action="mentor-select-slot" data-time="${time}" aria-pressed="${selectedMentorBooking.time === time}">${icon(time.startsWith('Morning') ? 'sun' : 'clock', 14)} ${time}</button>`).join('');
+    const previewCards = MENTOR_PREVIEWS.slice(1).map((mentor) => `<article class="mentor-list-card">
+      <div class="mentor-list-avatar" aria-hidden="true">${mentor.initials}</div>
+      <div class="mentor-list-copy"><strong>${mentor.name}</strong><span>${mentor.detail}</span><small>${mentor.next}</small></div>
+      <div class="mentor-list-meta"><strong>${icon('star', 13)} ${mentor.rating}</strong><span>₦${mentor.price.toLocaleString('en-NG')} / hr</span><em>${mentor.expertise}</em><button type="button" class="mentor-select-button" data-action="mentor-select-preview" data-mentor="${mentor.id}">Select slot</button></div>
+    </article>`).join('');
+    return `<div class="container route-page mentors-page">
+      <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>Mentors</strong></div>
+      <header class="mentor-page-heading"><div><span class="section-kicker">Heritage scholars · Cultural & STEM mentors</span><h1>Learn with people who carry the story.</h1><p>Explore language, culture and creative technology with educators whose experience connects generations.</p></div><span class="mentor-preview-badge">${icon('info', 14)} Mentor directory preview</span></header>
+      <article class="mentor-feature-card">
+        <div class="mentor-feature-photo"><img src="${imageUrl(featured.photo)}" alt="Mentor profile preview for ${featured.name}" loading="lazy" /><span>${icon('sparkles', 14)} Profile preview</span></div>
+        <div class="mentor-feature-content"><div class="mentor-feature-badges"><span>${icon('shield', 13)} Family-first learning</span><span>${icon('star', 13)} ${featured.rating} <small>(${featured.count})</small></span></div>
+          <div class="mentor-feature-title"><div><h2>${featured.name}</h2><p>${featured.detail}</p></div><strong>₦${featured.price.toLocaleString('en-NG')}<small> / hr</small></strong></div>
+          <section class="mentor-availability" aria-label="Choose a mentor session time"><div class="mentor-availability-heading"><strong>${icon('calendar', 15)} Available slots</strong><span>West Africa Time (WAT)</span></div><div class="mentor-day-options">${dayChoices}</div><div class="mentor-time-options">${timeChoices}<button type="button" class="mentor-time-choice mentor-night-choice" data-action="mentor-select-slot" data-time="Evening 7:00 PM" aria-pressed="${selectedMentorBooking.time === 'Evening 7:00 PM'}">${icon('moon', 14)} Evening 7:00 PM</button></div></section>
+          <button type="button" class="mentor-book-button" data-action="mentor-book" data-mentor="${featured.id}">${icon('lock', 16)} Review session via KoraPay <span>₦${featured.price.toLocaleString('en-NG')}</span></button>
+          <p class="mentor-checkout-note">Preview only. No session is reserved and no payment is taken until secure booking is enabled.</p>
+        </div>
+      </article>
+      <section class="mentor-safeguarding" aria-label="Ancestral Safeguard Protocol"><span class="mentor-safety-icon">${icon('shield', 21)}</span><div><h2>Ancestral Safeguard Protocol</h2><p>Family-first learning sanctuary</p></div><ul><li>${icon('check', 14)} Parent-approved connections</li><li>${icon('lock', 14)} Private learning sessions</li><li>${icon('shield', 14)} Child safety comes first</li></ul></section>
+      <section class="mentor-list-section"><div class="mentor-list-heading"><div><span class="section-kicker">Explore the community</span><h2>Cultural & STEM mentors</h2></div><span>${MENTOR_PREVIEWS.length} profile previews</span></div><div class="mentor-list">${previewCards}</div></section>
+    </div>`;
+  }
+
+  function renderPayment(params = {}) {
+    const mentor = MENTOR_PREVIEWS.find((item) => item.id === params.mentorId);
+    const price = mentor?.price ?? 48000;
+    const title = mentor ? `Session with ${mentor.name}` : 'Idilewa Family Pass';
+    const selectedSlot = mentor ? [params.day, params.time].filter(Boolean).map((value) => esc(value)).join(' · ') : '';
+    const priceLabel = `₦${price.toLocaleString('en-NG')}`;
+    const channels = [
+      ['card', 'Card', 'credit-card'],
+      ['transfer', 'Transfer', 'landmark'],
+      ['momo', 'MoMo', 'smartphone'],
+      ['ussd', 'USSD', 'grid'],
+    ];
+    const channelButtons = channels.map(([id, label, glyph]) => `<button type="button" class="payment-channel-tab ${activePaymentChannel === id ? 'is-active' : ''}" data-action="payment-channel" data-channel="${id}" aria-pressed="${activePaymentChannel === id}">${icon(glyph, 22)}<span>${label}</span></button>`).join('');
+    const channelContent = activePaymentChannel === 'transfer'
+      ? `<section class="payment-channel-panel"><span class="payment-channel-icon">${icon('landmark', 22)}</span><h2>Virtual transfer</h2><p>A one-time account number is normally created securely for each payment. KoraPay transfer setup is not connected yet, so no account details are available.</p><button class="payment-copy-account" type="button" data-action="payment-copy-account">${icon('copy', 15)} Check transfer details</button><small>No transfer should be made from this preview.</small></section>`
+      : activePaymentChannel === 'momo'
+        ? `<section class="payment-channel-panel"><span class="payment-channel-icon">${icon('smartphone', 22)}</span><h2>Mobile money</h2><p>Choose your local wallet when KoraPay is connected. No mobile-money request is sent from this preview.</p><div class="payment-momo-options"><button type="button" class="payment-momo-option ${activePaymentWallet === 'momo' ? 'is-active' : ''}" data-action="payment-momo-select" data-wallet="momo" aria-pressed="${activePaymentWallet === 'momo'}">${icon('phone', 16)} MoMo</button><button type="button" class="payment-momo-option ${activePaymentWallet === 'mpesa' ? 'is-active' : ''}" data-action="payment-momo-select" data-wallet="mpesa" aria-pressed="${activePaymentWallet === 'mpesa'}">${icon('globe', 16)} M-Pesa</button></div></section>`
+        : activePaymentChannel === 'ussd'
+          ? `<section class="payment-channel-panel"><span class="payment-channel-icon">${icon('grid', 22)}</span><h2>Pay with USSD</h2><p>USSD codes are issued by the configured payment provider and your bank. No code or dial request is available in this preview.</p><div class="payment-disabled-code">${icon('lock', 15)} Provider setup required</div></section>`
+          : `<section class="payment-channel-panel"><span class="payment-channel-icon">${icon('credit-card', 22)}</span><h2>Bank card</h2><p>Card details are collected only by a secure, provider-hosted checkout. KoraPay is not configured for this project, so this page will not request card numbers or security codes.</p><div class="payment-card-brands"><span>VERVE</span><span>VISA</span><span>MASTERCARD</span></div></section>`;
+    return `<div class="container route-page payment-page payment-checkout-preview">
       <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>Payment</strong></div>
-      <section class="payment-hero page-depth-reveal"><div class="payment-hero-copy"><span class="section-kicker">Billing & payment information</span><h1>Your learning is<br /><em>free to explore.</em></h1><p>All current Idilewa plans are $0. There is no checkout, recurring charge or payment information to enter.</p><div class="payment-free-status">${icon('shield', 20)}<span><strong>No payment due</strong><small>No card or bank details are collected here.</small></span></div>${routeLink('pricing', 'Review plans and what’s included ' + icon('arrow', 15), 'button button-primary')}</div><div class="payment-hero-art"><img src="${imageUrl('page-pricing-1.jpg')}" alt="A family exploring a learning plan together" loading="eager" /><span>${icon('check', 16)} Family and School · $0 USD/month</span></div></section>
-      <section class="payment-details"><article class="payment-summary-card"><span class="section-kicker">Current plan</span><div><span class="payment-plan-icon">${icon('sparkles', 21)}</span><span><strong>Idilewa learning preview</strong><small>Family and School plans · no charge</small></span></div><strong class="payment-zero">$0 <small>USD / month</small></strong><p>Explore the available learning paths, stories and activities at no cost.</p><span class="payment-plan-status">${icon('check', 14)} Active preview · no billing set up</span></article><article class="payment-safety-card">${icon('lock', 21)}<div><h2>Nothing to pay or manage</h2><p>Billing history, saved payment methods and paid subscriptions are not enabled. We will not ask for card details while all plans remain free.</p>${routeLink('contact', 'Questions? Contact Idilewa ' + icon('arrow', 14), 'text-link')}</div></article></section>
-      <p class="payment-footnote">This page is an account-information view, not a payment service. If paid plans are introduced, prices, terms and a secure payment provider must be confirmed before checkout is enabled.</p>
+      <div class="payment-secure-strip">${icon('shield', 17)} <strong>KoraPay secure checkout</strong><span><i></i> Provider connection pending</span></div>
+      <section class="family-pass-card"><div class="family-pass-top"><span class="family-pass-discount">${icon('sparkles', 13)} ${mentor ? 'Mentor session · preview' : 'Family Pass · design preview'}</span><div class="payment-currency-switch" aria-label="Currency"><button type="button" class="is-selected" aria-pressed="true">${activePaymentCurrency}</button><button type="button" disabled title="USD pricing is not configured">USD</button><button type="button" disabled title="GBP pricing is not configured">GBP</button></div></div><h1>${title}</h1><p>${mentor ? `Selected session: ${selectedSlot || 'date and time not chosen'}.` : 'Empowering the next generation of African innovators.'}</p><div class="family-pass-price"><strong>${priceLabel}</strong><span>${mentor ? 'illustrative one-time rate' : 'illustrative annual rate · not currently offered'}</span></div><div class="family-pass-includes"><span>${icon('people', 17)} 4 Child Explorers</span><span>${icon('sparkles', 17)} Unlimited AI Speak</span><span>${icon('code', 17)} Code for Kids STEM</span><span>${icon('school', 17)} 2 Live 1-on-1 Mentors</span></div></section>
+      <section class="payment-checkout-section"><div class="payment-checkout-heading"><h2>Payment channel</h2><span>Zero hidden fees</span></div><div class="payment-channel-tabs" role="tablist" aria-label="Payment channel">${channelButtons}</div>${channelContent}<button type="button" class="payment-submit-button" disabled aria-disabled="true">${icon('lock', 18)} Secure checkout unavailable <span>${priceLabel}</span></button><div class="payment-compliance"><span>${icon('shield', 15)} PCI-DSS hosted checkout only</span><span>${icon('lock', 15)} Child and family privacy</span><p>No payment details are stored in this app. This screen is a design preview; no charge or booking is created.</p></div></section>
     </div>`;
   }
 
@@ -7140,7 +7208,30 @@ import {
                   <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span>${routeLink('voice_lessons', 'Voice Lessons')}<span>/</span><strong>Sound foundations &amp; practice</strong></div>
                   ${routeLink('voice_lessons', `${icon('arrow', 14, 'voice-arrow-back')} Back to Voice Lessons`, 'button button-outline')}
                 </div>
-                <section class="voice-foundations" aria-labelledby="voice-foundations-title">
+                  <section class="tonal-contrast-lab" aria-labelledby="tonal-contrast-title">
+                    <header class="tonal-lab-intro"><span class="tonal-lab-kicker">${icon('headphones', 15)} Acoustic tonal studio</span><span class="tonal-lab-level">LAB 04 · PHONETICS</span><h1 id="tonal-contrast-title">Tonal Contrast Lab: Three Yorùbá Pitch Registers (Dò, Re, Mí)</h1><p>Pitch contour can distinguish meaning in Yorùbá. Listen to the three register references, then practice them in your selected lesson.</p></header>
+                    <div class="tonal-pair-heading"><strong>${icon('people', 15)} Choose a pitch reference</strong><small>Tap a register to listen</small></div>
+                    <div class="tonal-pair-list">
+                      <button class="tonal-pair-card" type="button" data-action="trainer-play-syllable" data-freq="220" data-tone="low" data-syllable="Dò, low register"><span class="tonal-pair-glyph tone-low">\\<br />\\</span><span><strong>Dò <small>Low register</small></strong><em>Listen to the lower pitch reference.</em></span><span class="tonal-pair-play">${icon('volume', 17)}</span></button>
+                      <button class="tonal-pair-card is-focused" type="button" data-action="trainer-play-syllable" data-freq="294" data-tone="mid" data-syllable="Re, middle register"><span class="tonal-pair-glyph tone-mid">——<br />——</span><span><strong>Re <small>Middle register</small></strong><em>Listen to a steady middle pitch.</em></span><span class="tonal-pair-play">${icon('play', 16)}</span></button>
+                      <button class="tonal-pair-card" type="button" data-action="trainer-play-syllable" data-freq="370" data-tone="high" data-syllable="Mí, high register"><span class="tonal-pair-glyph tone-high">//<br />//</span><span><strong>Mí <small>High register</small></strong><em>Listen to the higher pitch reference.</em></span><span class="tonal-pair-play">${icon('volume', 17)}</span></button>
+                    </div>
+                    <figure class="tonal-spectrogram">
+                      <figcaption><span><i></i> Pitch trajectory spectrogram</span><strong>${completedCount ? `${avgScore}% match` : 'Practice to build your match'}</strong></figcaption>
+                      <svg viewBox="0 0 640 230" role="img" aria-label="Illustrative pitch trajectory rising from low Dò through mid Re to high Mí; not a recording">
+                        <g class="tonal-chart-grid"><path d="M56 34H620M56 108H620M56 182H620M56 34V194M220 34V194M390 34V194M560 34V194" /></g>
+                        <g class="tonal-chart-labels"><text x="8" y="46">Mí</text><text x="8" y="61">(High)</text><text x="8" y="116">Re</text><text x="8" y="131">(Mid)</text><text x="8" y="188">Dò</text><text x="8" y="204">(Low)</text></g>
+                        <path class="tonal-chart-ideal" d="M62 181 C160 180 250 177 326 151 S477 80 592 51" />
+                        <path class="tonal-chart-user" d="M62 187 C165 185 260 175 334 148 S482 86 592 56" />
+                        <circle cx="62" cy="181" r="7" /><circle cx="334" cy="148" r="7" /><circle cx="592" cy="51" r="7" />
+                        <text x="70" y="220">Dò [Dò]</text><text x="520" y="220">wó [Mí]</text>
+                      </svg>
+                      <div class="tonal-chart-legend"><span><i></i> Pitch reference</span><span><i></i> Illustrative glide · not recorded</span><span>${icon('activity', 13)} Personal analysis is not available</span></div>
+                    </figure>
+                    <section class="tonal-record-panel" aria-label="Record a phrase from your selected lesson"><div class="tonal-record-options"><span>${icon('mic', 14)} Listen, then repeat</span><button type="button" data-action="trainer-play-native" data-lesson-id="${activeLesson.id}">${icon('volume', 15)} Hear lesson phrase</button></div><div class="tonal-record-wrap"><button type="button" class="tonal-record-button ${state.trainer.isRecording ? 'is-recording' : ''}" data-action="${state.trainer.isRecording ? 'trainer-stop-record' : 'trainer-start-record'}" data-lesson-id="${activeLesson.id}" aria-pressed="${Boolean(state.trainer.isRecording)}">${icon(state.trainer.isRecording ? 'square' : 'mic', 24)}<strong>${state.trainer.isRecording ? 'STOP' : 'RECORD'}</strong></button></div><strong>Practice: ${esc(activeLesson.phrase)}</strong><p>Listen to your selected lesson phrase, then repeat it while noticing the pitch changes.</p><span class="tonal-record-status" aria-live="polite">${state.trainer.isRecording ? 'Recording… speak clearly, then stop.' : 'Recording is sent for transcription only; no voice score is produced.'}</span></section>
+                    <section class="tonal-mechanics"><span class="tonal-mechanics-icon">${icon('lightbulb', 18)}</span><div><span class="section-kicker">Linguistic rule</span><h2>Tonogenesis &amp; glide mechanics</h2><p>Open vowel sound “O” and a natural shift in pitch can distinguish meaning. Listen closely, then repeat at a comfortable pace.</p><ul><li>${icon('check', 14)} Keep vowels open and clear; avoid adding English stress.</li><li>${icon('check', 14)} Allow the pitch to glide while keeping the breath steady.</li></ul></div></section>
+                  </section>
+                  <section class="voice-foundations" aria-labelledby="voice-foundations-title">
                   <div class="section-heading">
                     <div><span class="section-kicker">Start here · Yorùbá sound foundations</span><h1 id="voice-foundations-title">Vowels, consonants &amp; tone</h1><p>Learn the mouth sounds before moving into words and conversation. Listen to the vowel sequences or choose a consonant to hear Idilewa pronounce it.</p></div>
                   </div>
@@ -7569,6 +7660,7 @@ import {
       case 'tutor-profile':
       case 'tutor-availability':
       case 'tutor-settings': return renderTutorPortal(page);
+      case 'mentors': return renderMentors();
       case 'voice_lessons': return renderVoiceLessonsHome();
       case 'trainer': return renderTrainer(params);
       case 'voice-language':
@@ -7617,7 +7709,7 @@ import {
       case 'owe_detail': return renderOweDetail();
       case 'owe_story': return renderOweStory();
       case 'owe_reflection': return renderOweReflection();
-      case 'payment': return renderPayment();
+      case 'payment': return renderPayment(params);
       case 'connect_teachers': return renderConnectTeachers();
       case 'connect_students': return renderConnectStudents();
       case 'voices': return renderVoices();
@@ -8453,6 +8545,43 @@ import {
   function handleAction(action, el) {
     const lang = el.dataset.lang;
     switch (action) {
+      case 'payment-channel':
+        if (['card', 'transfer', 'momo', 'ussd'].includes(el.dataset.channel || '')) {
+          activePaymentChannel = el.dataset.channel;
+          render();
+        }
+        break;
+      case 'payment-copy-account':
+        showToast('KoraPay transfer details are not configured. Do not send funds to an account from this preview.', 'error');
+        break;
+      case 'payment-momo-select':
+        if (['momo', 'mpesa'].includes(el.dataset.wallet || '')) {
+          activePaymentWallet = el.dataset.wallet;
+          render();
+        }
+        break;
+      case 'mentor-select-slot':
+        selectedMentorBooking = {
+          ...selectedMentorBooking,
+          ...(el.dataset.day ? { day: el.dataset.day } : {}),
+          ...(el.dataset.time ? { time: el.dataset.time } : {}),
+        };
+        render();
+        break;
+      case 'mentor-select-preview':
+        if (MENTOR_PREVIEWS.some((mentor) => mentor.id === el.dataset.mentor)) {
+          selectedMentorBooking = { mentorId: el.dataset.mentor, day: 'Today', time: 'Afternoon 2:30 PM' };
+          render();
+          document.querySelector('.mentor-feature-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          showToast('Mentor selected. Review the preview slot before continuing.');
+        }
+        break;
+      case 'mentor-book':
+        if (el.dataset.mentor && MENTOR_PREVIEWS.some((mentor) => mentor.id === el.dataset.mentor)) {
+          selectedMentorBooking = { ...selectedMentorBooking, mentorId: el.dataset.mentor };
+          navigate('payment', { mentorId: el.dataset.mentor, day: selectedMentorBooking.day, time: selectedMentorBooking.time });
+        }
+        break;
       case 'heritage-share':
         void shareHeritageResult();
         break;

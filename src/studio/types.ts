@@ -7,13 +7,28 @@ export const LANGUAGES = [
 ] as const;
 
 export type LanguageCode = (typeof LANGUAGES)[number]['code'];
-export type BlockCategory = 'Events' | 'Motion' | 'Looks' | 'Language' | 'Control';
+export type BlockCategory = 'Motion' | 'Looks' | 'Sound' | 'Events' | 'Control' | 'Sensing' | 'Language';
 export type BlockType =
   | 'when_flag_clicked'
   | 'when_sprite_clicked'
+  | 'when_key_pressed'
   | 'move_steps'
   | 'turn_degrees'
+  | 'go_to_xy'
+  | 'change_x'
+  | 'change_y'
+  | 'set_x'
+  | 'set_y'
+  | 'point_direction'
+  | 'if_on_edge_bounce'
   | 'say_message'
+  | 'show_sprite'
+  | 'hide_sprite'
+  | 'change_size'
+  | 'set_size'
+  | 'next_costume'
+  | 'play_sound'
+  | 'stop_sounds'
   | 'translate_text'
   | 'speak_text'
   | 'display_speech_bubble'
@@ -32,6 +47,13 @@ export interface BlockInputs {
   times?: number;
   condition?: string;
   translatedText?: string;
+  x?: number;
+  y?: number;
+  size?: number;
+  direction?: number;
+  key?: string;
+  sound?: string;
+  pitch?: number;
 }
 
 export interface BlockNode {
@@ -50,6 +72,26 @@ export interface SpriteState {
   translation: string;
   spokenText: string;
   spokenLanguage: LanguageCode;
+  size: number;
+  costumeIndex: number;
+}
+
+export interface CostumeAsset {
+  id: string;
+  name: string;
+  spriteName: string;
+  dataUrl: string;
+}
+
+export interface SoundAsset {
+  id: string;
+  name: string;
+  dataUrl: string;
+  duration: number;
+  playbackRate?: number;
+  volume?: number;
+  reversed?: boolean;
+  muted?: boolean;
 }
 
 export type StarterCategory = 'Translation Sandbox' | 'Animation' | 'Games' | 'Culture';
@@ -71,6 +113,8 @@ export interface ProjectDraft {
   title: string;
   blocks: BlockNode[];
   assets: { name: string; kind: 'sprite' | 'backdrop'; icon: string }[];
+  costumes: CostumeAsset[];
+  sounds: SoundAsset[];
   updatedAt: string;
 }
 
@@ -79,4 +123,5 @@ export interface InterpreterHooks {
   onState: (state: SpriteState) => void;
   onStatus: (status: string) => void;
   onSpeaking: (speaking: boolean) => void;
+  sounds: SoundAsset[];
 }

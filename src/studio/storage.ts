@@ -1,17 +1,10 @@
-import { createClient, type SupabaseClient } from '@supabase/supabase-js';
+import { supabase } from '../supabaseClient';
 import { LOCAL_TEMPLATES, isBlockNode } from './catalog';
 import { blocksToJson, type Database, type Json } from './database.types';
-import type { BlockNode, ProjectDraft, StarterTemplate } from './types';
+import type { BlockNode, CostumeAsset, ProjectDraft, SoundAsset, StarterTemplate } from './types';
 
 const STORAGE_KEY = 'idilewa_studio_projects_v1';
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL?.trim();
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY?.trim();
-
-export const studioSupabase: SupabaseClient<Database> | null = supabaseUrl && supabaseKey
-  ? createClient<Database>(supabaseUrl, supabaseKey, {
-    auth: { persistSession: true, autoRefreshToken: true, flowType: 'pkce' },
-  })
-  : null;
+export const studioSupabase = supabase;
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value && typeof value === 'object' && !Array.isArray(value));
@@ -44,14 +37,51 @@ function parseProject(value: unknown): ProjectDraft | null {
     || !Array.isArray(value.assets)
     || !value.assets.every(isAsset)
     || typeof value.updatedAt !== 'string') return null;
+  const costumes = Array.isArray(value.costumes) && value.costumes.every(isCostume) ? value.costumes : [];
+  const sounds = Array.isArray(value.sounds) && value.sounds.every(isSound) ? value.sounds : [];
   return {
     id: value.id,
     title: value.title,
     templateId: typeof value.templateId === 'string' ? value.templateId : null,
     blocks: value.blocks,
     assets: value.assets,
+    costumes,
+    sounds,
     updatedAt: value.updatedAt,
   };
+}
+
+function isCostume(value: unknown): value is CostumeAsset {
+  return isRecord(value)
+    && typeof value.id === 'string'
+    && typeof value.name === 'string'
+    && typeof value.spriteName === 'string'
+    && typeof value.dataUrl === 'string';
+}
+
+function isSound(value: unknown): value is SoundAsset {
+  return isRecord(value)
+    && typeof value.id === 'string'
+    && typeof value.name === 'string'
+    && typeof value.dataUrl === 'string'
+    && typeof value.duration === 'number'
+    && Number.isFinite(value.duration)
+    && ['playbackRate', 'volume'].every((key) => value[key] === undefined || (typeof value[key] === 'number' && Number.isFinite(value[key])))
+    && ['reversed', 'muted'].every((key) => value[key] === undefined || typeof value[key] === 'boolean');
+}
+
+function parseCostumes(value: unknown): CostumeAsset[] {
+  if (!Array.isArray(value)) return [];
+  const costumes: CostumeAsset[] = [];
+  for (const item of value) if (isCostume(item)) costumes.push(item);
+  return costumes;
+}
+
+function parseSounds(value: unknown): SoundAsset[] {
+  if (!Array.isArray(value)) return [];
+  const sounds: SoundAsset[] = [];
+  for (const item of value) if (isSound(item)) sounds.push(item);
+  return sounds;
 }
 
 function isAsset(value: unknown): value is ProjectDraft['assets'][number] {
@@ -132,9 +162,11 @@ export async function getProject(id: string): Promise<ProjectDraft | null> {
   if (error) throw new Error(`Could not load this project: ${error.message}`);
   if (!data) return null;
   const blocks = parseBlocks(data.workspace_blocks_json);
-  const assets = Array.isArray(data.stage_assets_json) && data.stage_assets_json.every(isAsset)
-    ? data.stage_assets_json
-    : [];
+  const savedAssets = data.stage_assets_json;
+  const assetData = Array.isArray(savedAssets) ? { assets: savedAssets } : isRecord(savedAssets) ? savedAssets : {};
+  const assets = Array.isArray(assetData.assets) && assetData.assets.every(isAsset) ? assetData.assets : [];
+  const costumes = parseCostumes(assetData.costumes);
+  const sounds = parseSounds(assetData.sounds);
   if (!blocks) return null;
   return {
     id: data.id,
@@ -142,6 +174,8 @@ export async function getProject(id: string): Promise<ProjectDraft | null> {
     title: data.title,
     blocks,
     assets,
+    costumes,
+    sounds,
     updatedAt: data.updated_at,
   };
 }
@@ -169,7 +203,7 @@ export async function saveProject(project: ProjectDraft): Promise<'cloud' | 'dev
     template_id: project.templateId,
     title: project.title,
     workspace_blocks_json: blocksToJson(project.blocks),
-    stage_assets_json: toJson(project.assets),
+    stage_assets_json: toJson({ assets: project.assets, costumes: project.costumes, sounds: project.sounds }),
     updated_at: new Date().toISOString(),
   };
   const { error } = await studioSupabase.from('user_projects').upsert(row, { onConflict: 'id' });

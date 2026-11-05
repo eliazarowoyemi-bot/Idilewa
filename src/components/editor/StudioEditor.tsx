@@ -2,17 +2,20 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import type { CSSProperties } from 'react';
 import { DragDropContext, Draggable, Droppable, type DropResult } from '@hello-pangea/dnd';
 import {
-  ArrowLeft, Check, ChevronDown, CircleHelp, Code2, Download, Globe2, Pause, Play, Plus,
-  Save, Sparkles, X,
+  ArrowLeft, Check, ChevronDown, CircleHelp, Code2, Download, Globe2, Home, LogOut, Music2, Paintbrush,
+  Pause, Play, Plus, Sparkles, X,
 } from 'lucide-react';
 import { BlockCard } from './BlockCard';
+import { CostumeEditor } from './CostumeEditor';
+import { SoundEditor } from './SoundEditor';
 import { AyoIllustration, Stage } from './Stage';
 import { BLOCK_CATEGORIES, BLOCK_LABELS, LOCAL_TEMPLATES, TYPE_CATEGORY, createBlock } from '../../studio/catalog';
 import { runBlocks, speakText } from '../../studio/interpreter';
 import { getLocalProjects, getProject, getTemplate, saveProject, saveProjectLocally } from '../../studio/storage';
 import { translateEnglish } from '../../studio/translation';
+import { signOut as signOutAccount } from '../../supabaseClient';
 import type {
-  BlockCategory, BlockInputs, BlockNode, BlockType, LanguageCode, ProjectDraft, SpriteState, StarterTemplate,
+  BlockCategory, BlockInputs, BlockNode, BlockType, CostumeAsset, LanguageCode, ProjectDraft, SoundAsset, SpriteState, StarterTemplate,
 } from '../../studio/types';
 
 const INITIAL_STAGE: SpriteState = {
@@ -24,6 +27,8 @@ const INITIAL_STAGE: SpriteState = {
   translation: '',
   spokenText: '',
   spokenLanguage: 'yo',
+  size: 100,
+  costumeIndex: 0,
 };
 const EXTRA_SPRITES = [
   { name: 'Sisi the lion', icon: '🦁' },
@@ -106,14 +111,15 @@ function containsBlock(nodes: BlockNode[], id: string): boolean {
   return nodes.some((node) => node.id === id || containsBlock(node.children, id));
 }
 
-function selectEventStack(nodes: BlockNode[], eventType: 'when_flag_clicked' | 'when_sprite_clicked'): BlockNode[] {
-  const eventBlocks = nodes.filter((node) => node.type === 'when_flag_clicked' || node.type === 'when_sprite_clicked');
+function selectEventStack(nodes: BlockNode[], eventType: 'when_flag_clicked' | 'when_sprite_clicked' | 'when_key_pressed', key?: string): BlockNode[] {
+  const isEvent = (node: BlockNode) => ['when_flag_clicked', 'when_sprite_clicked', 'when_key_pressed'].includes(node.type);
+  const eventBlocks = nodes.filter(isEvent);
   if (!eventBlocks.length) return nodes;
   const selected: BlockNode[] = [];
   let include = false;
   for (const node of nodes) {
-    if (node.type === 'when_flag_clicked' || node.type === 'when_sprite_clicked') {
-      include = node.type === eventType;
+    if (isEvent(node)) {
+      include = node.type === eventType && (eventType !== 'when_key_pressed' || (node.inputs.key ?? 'space') === key);
       if (include) selected.push(node);
     } else if (include) {
       selected.push(node);
@@ -123,12 +129,16 @@ function selectEventStack(nodes: BlockNode[], eventType: 'when_flag_clicked' | '
 }
 
 function newDraft(template: StarterTemplate | null): ProjectDraft {
+  const assets = template ? structuredClone(template.default_assets_json) : [{ name: 'Sprite1', kind: 'sprite' as const, icon: '🐱' }, { name: 'Backdrop1', kind: 'backdrop' as const, icon: '🌤️' }];
+  const sprite = assets.find((asset) => asset.kind === 'sprite');
   return {
     id: crypto.randomUUID(),
     templateId: template?.id ?? null,
     title: template ? `${template.title} remix` : 'My new project',
     blocks: template ? structuredClone(template.default_blocks_json) : [],
-    assets: template ? structuredClone(template.default_assets_json) : [{ name: 'Ayo', kind: 'sprite', icon: '🧑🏿' }, { name: 'Sunshine', kind: 'backdrop', icon: '🌤️' }],
+    assets,
+    costumes: sprite ? [{ id: crypto.randomUUID(), name: 'costume1', spriteName: sprite.name, dataUrl: '' }] : [],
+    sounds: [],
     updatedAt: new Date().toISOString(),
   };
 }
@@ -203,12 +213,18 @@ export function StudioEditor() {
   const [project, setProject] = useState<ProjectDraft>(() => newDraft(LOCAL_TEMPLATES.find((item) => item.id === templateId) ?? null));
   const [projectReady, setProjectReady] = useState(!projectId && !templateId);
   const [activeCategory, setActiveCategory] = useState<BlockCategory>('Motion');
+  const [activeTab, setActiveTab] = useState<'code' | 'costumes' | 'sounds'>('code');
   const [activeNestId, setActiveNestId] = useState<string | null>(null);
   const [stage, setStage] = useState<SpriteState>(INITIAL_STAGE);
   const [selectedAsset, setSelectedAsset] = useState('Ayo');
   const [activeBackdrop, setActiveBackdrop] = useState('Sunshine');
+  const [activeCostumeId, setActiveCostumeId] = useState('');
   const [running, setRunning] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [tempoBpm, setTempoBpm] = useState(90);
+  const [metronomeRunning, setMetronomeRunning] = useState(false);
+  const [metronomeBeat, setMetronomeBeat] = useState(0);
+  const [signingOut, setSigningOut] = useState(false);
   const [status, setStatus] = useState('Choose a block, then press the green flag.');
   const [notice, setNotice] = useState('');
   const [savedAt, setSavedAt] = useState('');
@@ -218,6 +234,12 @@ export function StudioEditor() {
   const [translateLanguage, setTranslateLanguage] = useState<LanguageCode>('yo');
   const [savedProjectCount, setSavedProjectCount] = useState(0);
   const abortRef = useRef<AbortController | null>(null);
+
+  useEffect(() => {
+    if (!metronomeRunning) return;
+    const intervalId = window.setInterval(() => setMetronomeBeat((beat) => (beat + 1) % 4), 60000 / tempoBpm);
+    return () => window.clearInterval(intervalId);
+  }, [metronomeRunning, tempoBpm]);
 
   useEffect(() => {
     let active = true;
@@ -279,6 +301,17 @@ export function StudioEditor() {
       setActiveBackdrop(firstBackdrop.name);
     }
   }, [project.assets, selectedAsset, activeBackdrop]);
+
+  useEffect(() => {
+    const spriteCostumes = project.costumes.filter((costume) => costume.spriteName === selectedAsset);
+    if (!spriteCostumes.length && project.assets.some((asset) => asset.kind === 'sprite' && asset.name === selectedAsset)) {
+      const costume: CostumeAsset = { id: crypto.randomUUID(), name: 'costume1', spriteName: selectedAsset, dataUrl: '' };
+      setProject((current) => ({ ...current, costumes: [...current.costumes, costume] }));
+      setActiveCostumeId(costume.id);
+    } else if (spriteCostumes.length && !spriteCostumes.some((costume) => costume.id === activeCostumeId)) {
+      setActiveCostumeId(spriteCostumes[0].id);
+    }
+  }, [project.costumes, project.assets, selectedAsset, activeCostumeId]);
 
   const addBlock = useCallback((type: BlockType) => {
     const block = createBlock(type);
@@ -357,7 +390,7 @@ export function StudioEditor() {
     }
   };
 
-  const runProject = async (eventType: 'when_flag_clicked' | 'when_sprite_clicked' = 'when_flag_clicked') => {
+  const runProject = async (eventType: 'when_flag_clicked' | 'when_sprite_clicked' | 'when_key_pressed' = 'when_flag_clicked', key?: string) => {
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
@@ -365,11 +398,12 @@ export function StudioEditor() {
     setStage({ ...INITIAL_STAGE, spokenLanguage: stage.spokenLanguage });
     setStatus('Running your blocks…');
     try {
-      await runBlocks(selectEventStack(project.blocks, eventType), INITIAL_STAGE, {
+      await runBlocks(selectEventStack(project.blocks, eventType, key), INITIAL_STAGE, {
         signal: controller.signal,
         onState: setStage,
         onStatus: setStatus,
         onSpeaking: setSpeaking,
+        sounds: project.sounds,
       });
     } catch (error) {
       if (!(error instanceof DOMException && error.name === 'AbortError')) {
@@ -382,6 +416,26 @@ export function StudioEditor() {
       }
     }
   };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (activeTab !== 'code' || running) return;
+      const target = event.target;
+      if (target instanceof HTMLElement && (['INPUT', 'TEXTAREA', 'SELECT'].includes(target.tagName) || target.isContentEditable)) return;
+      const key = event.key === ' ' ? 'space' : ({
+        ArrowUp: 'up arrow',
+        ArrowDown: 'down arrow',
+        ArrowLeft: 'left arrow',
+        ArrowRight: 'right arrow',
+      }[event.key] ?? event.key.toLowerCase());
+      if (project.blocks.some((block) => block.type === 'when_key_pressed' && (block.inputs.key ?? 'space') === key)) {
+        event.preventDefault();
+        void runProject('when_key_pressed', key);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [activeTab, running, project.blocks]);
 
   const stopProject = () => {
     abortRef.current?.abort();
@@ -403,6 +457,22 @@ export function StudioEditor() {
       setNotice(destination === 'cloud' ? 'Saved to your Idilewa account.' : 'Saved on this device. Sign in and configure Supabase to sync across devices.');
     } catch (error) {
       setNotice(error instanceof Error ? error.message : 'Project save failed.');
+    }
+  };
+
+  const leaveEditor = () => {
+    window.location.assign('/starter-projects');
+  };
+
+  const signOut = async () => {
+    if (signingOut) return;
+    setSigningOut(true);
+    try {
+      await signOutAccount({ notify: false });
+      window.location.assign('/');
+    } catch (error) {
+      setNotice(error instanceof Error ? error.message : 'You could not be signed out. Please try again.');
+      setSigningOut(false);
     }
   };
 
@@ -440,12 +510,49 @@ export function StudioEditor() {
       setNotice('You have added all the starter characters.');
       return;
     }
+    const costume: CostumeAsset = { id: crypto.randomUUID(), name: 'costume1', spriteName: addition.name, dataUrl: '' };
     setProject((current) => ({
       ...current,
       assets: [...current.assets, { ...addition, kind: 'sprite' }],
+      costumes: [...current.costumes, costume],
       updatedAt: new Date().toISOString(),
     }));
     setSelectedAsset(addition.name);
+    setActiveCostumeId(costume.id);
+  };
+
+  const addCostume = () => {
+    const costume: CostumeAsset = {
+      id: crypto.randomUUID(),
+      name: `costume${project.costumes.filter((item) => item.spriteName === selectedAsset).length + 1}`,
+      spriteName: selectedAsset,
+      dataUrl: '',
+    };
+    setProject((current) => ({ ...current, costumes: [...current.costumes, costume], updatedAt: new Date().toISOString() }));
+    setActiveCostumeId(costume.id);
+  };
+  const saveCostume = (id: string, dataUrl: string) => {
+    setProject((current) => ({
+      ...current,
+      costumes: current.costumes.map((costume) => costume.id === id ? { ...costume, dataUrl } : costume),
+      updatedAt: new Date().toISOString(),
+    }));
+  };
+  const renameCostume = (id: string, name: string) => {
+    setProject((current) => ({
+      ...current,
+      costumes: current.costumes.map((costume) => costume.id === id ? { ...costume, name } : costume),
+      updatedAt: new Date().toISOString(),
+    }));
+  };
+  const saveSound = (sound: SoundAsset) => {
+    setProject((current) => ({
+      ...current,
+      sounds: current.sounds.some((item) => item.id === sound.id)
+        ? current.sounds.map((item) => item.id === sound.id ? sound : item)
+        : [...current.sounds, sound],
+      updatedAt: new Date().toISOString(),
+    }));
   };
 
   const paletteItems = Object.entries(BLOCK_LABELS)
@@ -455,45 +562,49 @@ export function StudioEditor() {
   const backdrops = project.assets.filter((asset) => asset.kind === 'backdrop');
   const lastSaved = savedAt ? `Saved on this device at ${savedAt}` : projectReady ? 'Saving your work on this device…' : 'Loading project…';
   const selectedSprite = project.assets.find((asset) => asset.kind === 'sprite' && asset.name === selectedAsset);
+  const selectedCostumes = project.costumes.filter((costume) => costume.spriteName === selectedAsset);
+  const stageCostume = selectedCostumes[stage.costumeIndex % Math.max(1, selectedCostumes.length)];
 
   return (
-    <div className="editor-app">
+    <div className={`editor-app editor-tab-${activeTab}`}>
       <header className="editor-topbar">
-        <a className="brand-lockup" href="/starter-projects" aria-label="Back to Idilewa projects">
-          <span className="brand-mark">ì</span><span>idilewa</span><span className="brand-dot">.</span>
+        <a className="brand-lockup studio-brand" href="/" aria-label="Idilewa home">
+          <span className="studio-brand-mark" aria-hidden="true">I</span>
+          <span className="studio-brand-word">Idilewa<small>STUDIO</small></span>
         </a>
         <div className="topbar-project">
-          <span className="topbar-project-icon"><Code2 size={17} /></span>
           <input aria-label="Project title" maxLength={120} value={project.title} onChange={(event) => setProject((current) => ({ ...current, title: event.target.value }))} />
           <span className="autosave-status"><Check size={13} /> {lastSaved}</span>
         </div>
         <div className="topbar-actions">
           <button type="button" className="icon-action" onClick={() => setShowHelp(true)} aria-label="Open studio guide"><CircleHelp size={18} /></button>
-          <button type="button" className="icon-action" onClick={downloadProject} aria-label="Download project"><Download size={18} /></button>
-          <button type="button" className="button button-save" onClick={() => void saveToAccount()}><Save size={16} /> Save</button>
-          <a className="back-gallery" href="/starter-projects"><ArrowLeft size={16} /> Projects</a>
+          <button type="button" className="topbar-share" onClick={() => void saveToAccount()}>Save to account</button>
+          <button type="button" className="topbar-page" onClick={downloadProject}><Download size={15} /> Export</button>
         </div>
+        <nav className="studio-navigation-actions" aria-label="Editor navigation">
+          <button type="button" className="studio-nav-button studio-nav-back" onClick={leaveEditor} aria-label="Back" title="Back to starter projects"><ArrowLeft size={15} /><span>Back</span></button>
+          <a className="studio-nav-button studio-nav-home" href="/" aria-label="Home" title="Home"><Home size={15} /><span>Home</span></a>
+          <button type="button" className="studio-nav-button studio-nav-signout" onClick={() => void signOut()} disabled={signingOut} aria-label={signingOut ? 'Signing out' : 'Sign out'} title={signingOut ? 'Signing out' : 'Sign out'}>{signingOut ? <span className="studio-signout-spinner" aria-hidden="true" /> : <LogOut size={15} />}<span>{signingOut ? 'Signing out' : 'Sign out'}</span></button>
+        </nav>
       </header>
 
       <div className="studio-toolbar">
         <div className="studio-tabs" aria-label="Editor views">
-          <span className="studio-tab active" aria-current="page"><Code2 size={15} /> Code</span>
-          <span className="studio-tab" aria-disabled="true"><Sparkles size={15} /> Costumes</span>
-          <span className="studio-tab" aria-disabled="true"><Sparkles size={15} /> Sounds</span>
+          <button type="button" className={`studio-tab ${activeTab === 'code' ? 'active' : ''}`} aria-pressed={activeTab === 'code'} onClick={() => setActiveTab('code')}><Code2 size={15} /> Code</button>
+          <button type="button" className={`studio-tab ${activeTab === 'costumes' ? 'active' : ''}`} aria-pressed={activeTab === 'costumes'} onClick={() => setActiveTab('costumes')}><Paintbrush size={15} /> Costumes</button>
+          <button type="button" className={`studio-tab ${activeTab === 'sounds' ? 'active' : ''}`} aria-pressed={activeTab === 'sounds'} onClick={() => setActiveTab('sounds')}><Music2 size={15} /> Sounds</button>
         </div>
         <div className="toolbar-center">
-          <button type="button" className="flag-button" onClick={() => void runProject()} disabled={running} aria-label="Run project with the green flag">⚑</button>
-          <button type="button" className="stop-button" onClick={stopProject} disabled={!running} aria-label="Stop project"><Pause size={13} /></button>
           <span className={`runtime-status ${running ? 'is-running' : ''}`} role="status">{status}</span>
         </div>
-        <button type="button" className="language-lab-toggle" onClick={() => setShowTranslate(!showTranslate)}><Globe2 size={15} /> Language lab <ChevronDown size={14} /></button>
+        <button type="button" className="language-lab-toggle" onClick={() => setShowTranslate(!showTranslate)} aria-label="Language lab" aria-expanded={showTranslate} title="Language lab"><Globe2 size={15} /><span>Language lab</span><ChevronDown size={14} /></button>
       </div>
 
       {notice && <div className="editor-notice" role="status">{notice}<button type="button" onClick={() => setNotice('')} aria-label="Dismiss message"><X size={15} /></button></div>}
 
       <DragDropContext onDragEnd={handleDrop}>
-        <main className="studio-layout">
-          <nav className="category-rail" role="tablist" aria-label="Block categories">
+        <main className={`studio-layout studio-layout-${activeTab}`}>
+          {activeTab === 'code' && <nav className="category-rail" role="tablist" aria-label="Block categories">
             {BLOCK_CATEGORIES.map((category) => (
               <button
                 type="button"
@@ -510,8 +621,8 @@ export function StudioEditor() {
                 <span className="category-name">{category.name}</span>
               </button>
             ))}
-          </nav>
-          <aside className="palette-pane" aria-label="Block palette">
+          </nav>}
+          {activeTab === 'code' && <aside className="palette-pane" aria-label="Block palette">
             <div className="palette-heading"><div><span className="pane-kicker">Blocks</span><h2>{activeCategory}</h2></div><span className="block-count">{paletteItems.length}</span></div>
             <div className="palette-content">
               <div className="palette-category-title"><span style={{ background: BLOCK_CATEGORIES.find((item) => item.name === activeCategory)?.color }} />{activeCategory}</div>
@@ -542,9 +653,9 @@ export function StudioEditor() {
               </Droppable>
               <div className="palette-tip"><span>✦</span> Drag a block to your workspace, or tap <Plus size={12} /> to add it.</div>
             </div>
-          </aside>
+          </aside>}
 
-          <section className="workspace-pane" aria-label="Coding workspace">
+          {activeTab === 'code' && <section className="workspace-pane" aria-label="Coding workspace">
             <div className="workspace-heading">
               <div><span className="pane-kicker">Your canvas</span><h2>Workspace <span>·</span> {project.blocks.length} blocks</h2></div>
               <button type="button" className="workspace-zoom" onClick={() => setProject((current) => ({ ...current, blocks: [] }))} title="Clear workspace"><X size={15} /> Clear</button>
@@ -562,10 +673,41 @@ export function StudioEditor() {
               {activeNestId && <div className="nesting-hint" role="status">Choose a block from the palette to add it inside <button type="button" onClick={() => setActiveNestId(null)}>Cancel</button></div>}
             </div>
             <div className="workspace-footer"><span><span className="live-dot" /> {lastSaved}</span><span>Tip: loops can hold other blocks.</span></div>
-          </section>
+          </section>}
+
+          {activeTab === 'costumes' && (
+            <CostumeEditor
+              costumes={selectedCostumes}
+              activeCostumeId={activeCostumeId}
+              onSelect={setActiveCostumeId}
+              onSave={saveCostume}
+              onRename={renameCostume}
+              onAdd={addCostume}
+            />
+          )}
+          {activeTab === 'sounds' && (
+            <SoundEditor
+              sounds={project.sounds}
+              onSave={saveSound}
+              onDelete={(id) => setProject((current) => ({ ...current, sounds: current.sounds.filter((sound) => sound.id !== id), updatedAt: new Date().toISOString() }))}
+            />
+          )}
 
           <aside className="stage-pane" aria-label="Stage and project assets">
-            <div className="stage-pane-heading"><div><span className="pane-kicker">See it come alive</span><h2>The stage</h2></div><button type="button" className="icon-action" onClick={resetStage} aria-label="Reset stage"><RotateCcwIcon /></button></div>
+            <div className="stage-pane-heading">
+              <div className="stage-run-controls">
+                <button type="button" className="flag-button" onClick={() => void runProject()} disabled={running} aria-label="Run project with the green flag">⚑</button>
+                <button type="button" className="stop-button" onClick={stopProject} disabled={!running} aria-label="Stop project"><Pause size={13} /></button>
+              </div>
+              <div className="stage-tempo-control" aria-label="Practice tempo metronome">
+                <button type="button" onClick={() => setTempoBpm((bpm) => Math.max(40, bpm - 5))} aria-label="Decrease tempo" disabled={tempoBpm <= 40}>−</button>
+                <span><strong>{tempoBpm}</strong><small>BPM</small></span>
+                <button type="button" onClick={() => setTempoBpm((bpm) => Math.min(180, bpm + 5))} aria-label="Increase tempo" disabled={tempoBpm >= 180}>+</button>
+                <button type="button" className="metronome-toggle" onClick={() => setMetronomeRunning((active) => !active)} aria-pressed={metronomeRunning} aria-label={metronomeRunning ? 'Stop tempo metronome' : 'Start tempo metronome'}>{metronomeRunning ? <Pause size={12} /> : <Play size={12} />}</button>
+                <span className="metronome-beats" aria-hidden="true">{[0, 1, 2, 3].map((beat) => <i key={beat} className={metronomeRunning && metronomeBeat === beat ? 'is-current' : ''} />)}</span>
+              </div>
+              <div className="stage-view-actions"><button type="button" aria-label="Small stage">▣</button><button type="button" aria-label="Large stage">▱</button><button type="button" className="icon-action" onClick={resetStage} aria-label="Reset stage"><RotateCcwIcon /></button></div>
+            </div>
             <Stage
               state={stage}
               spriteName={selectedAsset}
@@ -575,12 +717,14 @@ export function StudioEditor() {
               onSpeak={speakTranslation}
               onReset={resetStage}
               onSpriteClick={() => void runProject('when_sprite_clicked')}
+              costumeUrl={stageCostume?.dataUrl || undefined}
             />
+            <div className="stage-coordinate-readout" aria-live="polite"><span>Canvas position</span><strong><i>X</i> {stage.x} <i>Y</i> {stage.y}</strong></div>
             <div className="asset-panel">
-              <div className="asset-panel-header"><span>My characters</span><button type="button" onClick={addSprite}><Plus size={14} /> Add</button></div>
+              <div className="asset-panel-header"><span>Sprites</span><button type="button" onClick={addSprite}><Plus size={14} /> Add sprite</button></div>
               <div className="asset-row">
                 {sprites.map((asset) => (
-                  <button type="button" key={asset.name} className={`asset-card ${selectedAsset === asset.name ? 'asset-selected' : ''}`} onClick={() => setSelectedAsset(asset.name)}>
+                  <button type="button" key={asset.name} className={`asset-card ${selectedAsset === asset.name ? 'asset-selected' : ''}`} onClick={() => { setSelectedAsset(asset.name); setStage((current) => ({ ...current, costumeIndex: 0 })); }}>
                     <span className="asset-art">{asset.name === 'Ayo' ? <AyoIllustration className="ayo-asset-illustration" /> : asset.icon}</span><span>{asset.name}</span>
                   </button>
                 ))}
@@ -592,6 +736,13 @@ export function StudioEditor() {
                   </select>
                 </div>
               </div>
+              {selectedSprite && <div className="sprite-properties">
+                <label>SPRITE <input value={selectedSprite.name} readOnly aria-label="Selected sprite name" /></label>
+                <label>X <input type="number" value={stage.x} onChange={(event) => setStage((current) => ({ ...current, x: Number(event.target.value) }))} /></label>
+                <label>Y <input type="number" value={stage.y} onChange={(event) => setStage((current) => ({ ...current, y: Number(event.target.value) }))} /></label>
+                <label>SIZE <input type="number" value={stage.size} onChange={(event) => setStage((current) => ({ ...current, size: Number(event.target.value) }))} /></label>
+                <label>DIRECTION <input type="number" value={stage.direction} onChange={(event) => setStage((current) => ({ ...current, direction: Number(event.target.value) }))} /></label>
+              </div>}
             </div>
             {showTranslate && (
               <section className="language-lab" aria-label="Quick translation lab">
@@ -621,7 +772,7 @@ export function StudioEditor() {
           <span className="help-icon"><Sparkles size={22} /></span><span className="pane-kicker">A tiny guide</span>
           <h2 id="help-title">Your ideas, in blocks.</h2>
           <ol><li><b>Pick a category</b> to find a block.</li><li><b>Drag or tap +</b> to add it to your workspace.</li><li><b>Choose a language</b> in a translation block.</li><li><b>Press the green flag</b> to watch your character move and talk.</li></ol>
-          <p>Translations use Idilewa’s phrasebook; browser voices vary by device and language.</p>
+          <p>Curated phrases use the Idilewa phrasebook; other text uses Plotweaver. Voice playback depends on service and device support.</p>
           <button type="button" className="button button-green" onClick={() => setShowHelp(false)}>Let’s create <Play size={16} /></button>
         </section>
       </div>}

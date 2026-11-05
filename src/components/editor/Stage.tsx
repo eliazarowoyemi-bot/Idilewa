@@ -11,6 +11,7 @@ interface StageProps {
   onSpeak: () => Promise<void>;
   onReset: () => void;
   onSpriteClick: () => void;
+  costumeUrl?: string;
 }
 
 export function AyoIllustration({ className }: { className?: string }) {
@@ -34,7 +35,7 @@ export function AyoIllustration({ className }: { className?: string }) {
   );
 }
 
-export function Stage({ state, spriteName, spriteIcon, backdrop, busy, onSpeak, onReset, onSpriteClick }: StageProps) {
+export function Stage({ state, spriteName, spriteIcon, backdrop, busy, onSpeak, onReset, onSpriteClick, costumeUrl }: StageProps) {
   const [expanded, setExpanded] = useState(false);
   const localeByLanguage: Record<LanguageCode, string> = {
     yo: 'Yorùbá', ig: 'Igbo', pcm: 'Pidgin', ha: 'Hausa', sw: 'Swahili',
@@ -76,14 +77,14 @@ export function Stage({ state, spriteName, spriteIcon, backdrop, busy, onSpeak, 
             }
           }}
           style={{
-            transform: `translate(calc(-50% + ${state.x}px), calc(-50% - ${state.y}px)) rotate(${state.direction}deg)`,
+            transform: `translate(calc(-50% + ${state.x}px), calc(-50% - ${state.y}px)) rotate(${state.direction}deg) scale(${state.size / 100})`,
             visibility: state.visible ? 'visible' : 'hidden',
           }}
           aria-label={`${spriteName} character`}
         >
           <div className="sprite-aura" />
           <div className="sprite-figure" aria-hidden="true">
-            {spriteName === 'Ayo' ? <AyoIllustration className="ayo-illustration" /> : spriteIcon}
+            {costumeUrl ? <img className="stage-costume-image" src={costumeUrl} alt="" /> : spriteName === 'Ayo' ? <AyoIllustration className="ayo-illustration" /> : spriteIcon}
           </div>
           <span className="sprite-name">{spriteName}</span>
         </div>

@@ -1,19 +1,36 @@
 import { LANGUAGES, type BlockCategory, type BlockNode, type BlockType, type StarterTemplate } from './types';
 
 export const BLOCK_CATEGORIES: { name: BlockCategory; color: string; icon: string }[] = [
-  { name: 'Events', color: '#e9a923', icon: '⚑' },
-  { name: 'Motion', color: '#438ce5', icon: '↗' },
-  { name: 'Looks', color: '#9a64df', icon: '◉' },
+  { name: 'Motion', color: '#4c97ff', icon: '↗' },
+  { name: 'Looks', color: '#9966ff', icon: '◉' },
+  { name: 'Sound', color: '#cf63cf', icon: '♫' },
+  { name: 'Events', color: '#ffbf00', icon: '⚑' },
+  { name: 'Control', color: '#ffab19', icon: '↻' },
+  { name: 'Sensing', color: '#5cb1d6', icon: '☝' },
   { name: 'Language', color: '#139d92', icon: '✳' },
-  { name: 'Control', color: '#ed9e18', icon: '↻' },
 ];
 
 export const BLOCK_LABELS: Record<BlockType, string> = {
   when_flag_clicked: 'when 🟢 clicked',
   when_sprite_clicked: 'when this sprite is clicked',
+  when_key_pressed: 'when key pressed',
   move_steps: 'move steps',
   turn_degrees: 'turn degrees',
+  go_to_xy: 'go to x: y:',
+  change_x: 'change x by',
+  change_y: 'change y by',
+  set_x: 'set x to',
+  set_y: 'set y to',
+  point_direction: 'point in direction',
+  if_on_edge_bounce: 'if on edge, bounce',
   say_message: 'say',
+  show_sprite: 'show',
+  hide_sprite: 'hide',
+  change_size: 'change size by',
+  set_size: 'set size to',
+  next_costume: 'next costume',
+  play_sound: 'play sound',
+  stop_sounds: 'stop all sounds',
   translate_text: 'translate to',
   speak_text: 'speak translation',
   display_speech_bubble: 'show speech bubble',
@@ -26,9 +43,24 @@ export const BLOCK_LABELS: Record<BlockType, string> = {
 export const TYPE_CATEGORY: Record<BlockType, BlockCategory> = {
   when_flag_clicked: 'Events',
   when_sprite_clicked: 'Events',
+  when_key_pressed: 'Events',
   move_steps: 'Motion',
   turn_degrees: 'Motion',
+  go_to_xy: 'Motion',
+  change_x: 'Motion',
+  change_y: 'Motion',
+  set_x: 'Motion',
+  set_y: 'Motion',
+  point_direction: 'Motion',
+  if_on_edge_bounce: 'Motion',
   say_message: 'Looks',
+  show_sprite: 'Looks',
+  hide_sprite: 'Looks',
+  change_size: 'Looks',
+  set_size: 'Looks',
+  next_costume: 'Looks',
+  play_sound: 'Sound',
+  stop_sounds: 'Sound',
   translate_text: 'Language',
   speak_text: 'Language',
   display_speech_bubble: 'Language',
@@ -46,6 +78,29 @@ export function createBlock(type: BlockType): BlockNode {
       break;
     case 'turn_degrees':
       inputs.degrees = 15;
+      break;
+    case 'go_to_xy':
+      inputs.x = 0;
+      inputs.y = 0;
+      break;
+    case 'change_x':
+    case 'change_y':
+    case 'set_x':
+    case 'set_y':
+      inputs.steps = 10;
+      break;
+    case 'point_direction':
+      inputs.direction = 90;
+      break;
+    case 'change_size':
+    case 'set_size':
+      inputs.size = 10;
+      break;
+    case 'when_key_pressed':
+      inputs.key = 'space';
+      break;
+    case 'play_sound':
+      inputs.sound = 'Meow';
       break;
     case 'say_message':
     case 'translate_text':
@@ -69,6 +124,11 @@ export function createBlock(type: BlockType): BlockNode {
       break;
     case 'when_flag_clicked':
     case 'when_sprite_clicked':
+    case 'if_on_edge_bounce':
+    case 'show_sprite':
+    case 'hide_sprite':
+    case 'next_costume':
+    case 'stop_sounds':
     case 'forever_loop':
       break;
   }
@@ -188,7 +248,7 @@ export function isBlockNode(value: unknown): value is BlockNode {
     || !Array.isArray(candidate.children) || !candidate.children.every(isBlockNode)) return false;
   const values = inputs as Record<string, unknown>;
   const languageCodes: readonly string[] = LANGUAGES.map((language) => language.code);
-  return ['steps', 'degrees', 'seconds', 'times'].every((key) => values[key] === undefined || (typeof values[key] === 'number' && Number.isFinite(values[key])))
-    && ['text', 'condition', 'translatedText'].every((key) => values[key] === undefined || typeof values[key] === 'string')
+  return ['steps', 'degrees', 'seconds', 'times', 'x', 'y', 'size', 'direction', 'pitch'].every((key) => values[key] === undefined || (typeof values[key] === 'number' && Number.isFinite(values[key])))
+    && ['text', 'condition', 'translatedText', 'key', 'sound'].every((key) => values[key] === undefined || typeof values[key] === 'string')
     && ['targetLanguage', 'language'].every((key) => values[key] === undefined || (typeof values[key] === 'string' && languageCodes.includes(values[key])));
 }

@@ -41,6 +41,35 @@ async function playAudioBlob(blob: Blob, signal?: AbortSignal): Promise<void> {
   });
 }
 
+async function playAudioUrl(url: string, signal: AbortSignal): Promise<void> {
+  if (signal.aborted) throw abortError();
+  activeAudio?.pause();
+  const audio = new Audio(url);
+  activeAudio = audio;
+  await new Promise<void>((resolve, reject) => {
+    const cleanup = () => {
+      signal.removeEventListener('abort', abort);
+      audio.removeEventListener('ended', finish);
+      audio.removeEventListener('error', fail);
+      if (activeAudio === audio) activeAudio = null;
+    };
+    const finish = () => { cleanup(); resolve(); };
+    const fail = () => { cleanup(); reject(new Error('The project sound could not be played.')); };
+    const abort = () => {
+      audio.pause();
+      cleanup();
+      reject(abortError());
+    };
+    signal.addEventListener('abort', abort, { once: true });
+    audio.addEventListener('ended', finish, { once: true });
+    audio.addEventListener('error', fail, { once: true });
+    void audio.play().catch((error: unknown) => {
+      cleanup();
+      reject(error instanceof Error ? error : new Error('The project sound could not be played.'));
+    });
+  });
+}
+
 function pause(ms: number, signal: AbortSignal): Promise<void> {
   if (signal.aborted) return Promise.reject(new DOMException('Execution stopped', 'AbortError'));
   return new Promise((resolve, reject) => {
@@ -134,6 +163,7 @@ export async function runBlocks(
       switch (node.type) {
         case 'when_flag_clicked':
         case 'when_sprite_clicked':
+        case 'when_key_pressed':
           break;
         case 'move_steps': {
           const steps = Number(inputs.steps ?? 10);
@@ -145,9 +175,56 @@ export async function runBlocks(
           await pause(120, hooks.signal);
           break;
         }
+        case 'go_to_xy':
+          update({ x: Math.max(-220, Math.min(220, Number(inputs.x ?? 0))), y: Math.max(-160, Math.min(160, Number(inputs.y ?? 0))) });
+          break;
+        case 'change_x':
+          update({ x: Math.max(-220, Math.min(220, state.x + Number(inputs.steps ?? 10))) });
+          break;
+        case 'change_y':
+          update({ y: Math.max(-160, Math.min(160, state.y + Number(inputs.steps ?? 10))) });
+          break;
+        case 'set_x':
+          update({ x: Math.max(-220, Math.min(220, Number(inputs.steps ?? 0))) });
+          break;
+        case 'set_y':
+          update({ y: Math.max(-160, Math.min(160, Number(inputs.steps ?? 0))) });
+          break;
+        case 'point_direction':
+          update({ direction: Number(inputs.direction ?? 90) });
+          break;
+        case 'if_on_edge_bounce':
+          if (Math.abs(state.x) >= 215 || Math.abs(state.y) >= 155) update({ direction: (180 - state.direction + 360) % 360 });
+          break;
         case 'turn_degrees':
           update({ direction: (state.direction + Number(inputs.degrees ?? 15)) % 360 });
           await pause(100, hooks.signal);
+          break;
+        case 'show_sprite':
+          update({ visible: true });
+          break;
+        case 'hide_sprite':
+          update({ visible: false });
+          break;
+        case 'change_size':
+          update({ size: Math.max(10, Math.min(500, state.size + Number(inputs.size ?? 10))) });
+          break;
+        case 'set_size':
+          update({ size: Math.max(10, Math.min(500, Number(inputs.size ?? 100))) });
+          break;
+        case 'next_costume':
+          update({ costumeIndex: state.costumeIndex + 1 });
+          break;
+        case 'play_sound': {
+          const sound = hooks.sounds.find((item) => item.name === String(inputs.sound ?? ''));
+          if (sound) await playAudioUrl(sound.dataUrl, hooks.signal);
+          else hooks.onStatus(`Add a sound named "${String(inputs.sound ?? '')}" in the Sounds tab first.`);
+          break;
+        }
+        case 'stop_sounds':
+          activeAudio?.pause();
+          activeAudio = null;
+          window.speechSynthesis?.cancel();
           break;
         case 'say_message':
           update({ message: String(inputs.text ?? '') });

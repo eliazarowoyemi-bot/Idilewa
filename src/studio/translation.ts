@@ -27,41 +27,15 @@ export async function translateEnglish(text: string, language: LanguageCode, sig
   if (signal?.aborted) throw new DOMException('Translation cancelled.', 'AbortError');
 
   try {
-    if (language === 'pcm') {
-      const translated = await translateWithPlotweaver({
-        text: text.trim(),
-        sourceLanguage: 'en',
-        targetLanguage: language,
-        signal,
-      });
-      if (signal?.aborted) throw new DOMException('Translation cancelled.', 'AbortError');
-      return {
-        text: translated.translated_text,
-        language,
-        found: true,
-        phonetic: '',
-        provider: 'machine',
-      };
-    }
-
-    const response = await fetch('/api/translate', {
-      method: 'POST',
-      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ text: text.trim(), target: language }),
+    const translated = await translateWithPlotweaver({
+      text: text.trim(),
+      sourceLanguage: 'en',
+      targetLanguage: language,
       signal,
     });
-    const payload: unknown = await response.json();
-    if (!response.ok) {
-      const message = payload && typeof payload === 'object' && 'error' in payload && typeof payload.error === 'string'
-        ? payload.error
-        : `Online translation failed (${response.status}).`;
-      throw new Error(message);
-    }
-    if (!payload || typeof payload !== 'object' || !('translated' in payload) || typeof payload.translated !== 'string' || !payload.translated.trim()) {
-      throw new Error('Online translation returned an invalid response.');
-    }
+    if (signal?.aborted) throw new DOMException('Translation cancelled.', 'AbortError');
     return {
-      text: payload.translated,
+      text: translated.translated_text,
       language,
       found: true,
       phonetic: '',
