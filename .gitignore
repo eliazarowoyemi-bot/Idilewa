@@ -12,3 +12,4 @@ scratch/
 supabase/.temp/
 
 .env*.local
+.env*
