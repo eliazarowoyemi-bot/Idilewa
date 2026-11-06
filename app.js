@@ -674,16 +674,24 @@ import {
       return;
     }
     const currentUser = getCurrentUser();
-    const currentGroup = NAV_GROUPS[page] || (page === 'index' ? 'home' : '');
-    const nav = NAV.map((item) => (item.href
-      ? `<a class="nav-link ${currentGroup === item.group ? 'active' : ''}" href="${item.href}">${item.label}</a>`
-      : `<a class="nav-link ${currentGroup === item.group ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${item.label}</a>`)).join('');
+    const currentGroup = NAV_GROUPS[page] || (page === 'index'
+      ? 'home'
+      : page === 'trainer' || page === 'voice_lessons' || page.startsWith('voice-')
+        ? 'trainer'
+        : '');
+    const nav = NAV.map((item) => {
+      const active = currentGroup === item.group;
+      const current = active ? ' aria-current="page"' : '';
+      return item.href
+        ? `<a class="nav-link ${active ? 'active' : ''}" href="${item.href}"${current}>${item.label}</a>`
+        : `<a class="nav-link ${active ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}"${current}>${item.label}</a>`;
+    }).join('');
     const avatarLabel = currentUser?.name?.trim()?.charAt(0)?.toUpperCase() || 'S';
     const profileAvatar = profilePhoto
       ? `<img src="${esc(profilePhoto)}" alt="" />`
       : esc(avatarLabel);
     const accountActions = currentUser
-      ? `<a class="header-profile" href="#/profile" data-route="profile" aria-label="Open profile"><span class="header-avatar">${profileAvatar}</span><span class="header-profile-label">${esc(currentUser.name || 'Profile')}</span></a><button class="header-signout" type="button" data-action="account-sign-out">Sign out</button>`
+      ? `<a class="header-profile ${page === 'profile' ? 'active' : ''}" href="#/profile" data-route="profile" aria-label="Open profile"${page === 'profile' ? ' aria-current="page"' : ''}><span class="header-avatar">${profileAvatar}</span><span class="header-profile-label">${esc(currentUser.name || 'Profile')}</span></a><button class="header-signout" type="button" data-action="account-sign-out">Sign out</button>`
       : `${routeLink('login', 'Log in', 'header-signin', 'data-mode="signin"')}${routeLink('login', 'Get started', 'button button-primary header-cta', 'data-mode="signup"')}`;
     const mobileShortcuts = [
       { route: 'profile', label: 'Profile', ico: 'user' },
@@ -728,20 +736,35 @@ import {
   function renderMobileNav(page) {
     const currentUser = getCurrentUser();
     const familyDashboard = currentUser?.role === 'parent' && page === 'parent-dashboard';
-    if (page.startsWith('ai-') || page.startsWith('tutor') || page === 'families' ||
+    const aiWorkspace = page.startsWith('ai-') && !['ai-login', 'ai-signup'].includes(page);
+    const mobileNav = document.getElementById('mobile-nav');
+    mobileNav.className = 'mobile-nav mobile-bottom-navigation';
+    mobileNav.setAttribute('aria-label', 'Primary navigation');
+    if (page === 'login' || (page.startsWith('ai-') && !aiWorkspace) ||
+      page.startsWith('tutor') || page === 'families' ||
       (page.startsWith('parent') && !familyDashboard) || (currentUser?.role === 'parent' && !familyDashboard) || currentUser?.role === 'educator') {
-      document.getElementById('mobile-nav').innerHTML = '';
+      mobileNav.replaceChildren();
+      mobileNav.hidden = true;
+      document.body.classList.remove('has-mobile-bottom-navigation');
       return;
     }
+    mobileNav.hidden = false;
+    document.body.classList.add('has-mobile-bottom-navigation');
     const items = [
       { route: 'index', label: 'Home', ico: 'home' },
       { route: 'voice_lessons', label: 'Voice', ico: 'mic' },
       { route: 'ai-conversations', label: 'AI Chat', ico: 'sparkles' },
       { route: 'profile', label: 'Profile', ico: 'user' }
     ];
-    document.getElementById('mobile-nav').innerHTML = items.map((item) => {
-      const active = page === item.route || (item.route === 'index' && familyDashboard);
-      return `<a href="#/${item.route}" data-route="${item.route}" class="mobile-tab ${active ? 'active' : ''}"${active ? ' aria-current="page"' : ''}>${icon(item.ico, 19)}<span>${item.label}</span></a>`;
+    mobileNav.innerHTML = items.map((item) => {
+      const active = item.route === 'index'
+        ? page === 'index' || familyDashboard
+        : item.route === 'voice_lessons'
+          ? page === 'trainer' || page === 'voice_lessons' || page.startsWith('voice-')
+          : item.route === 'ai-conversations'
+            ? aiWorkspace
+            : page === item.route;
+      return `<a href="#/${item.route}" data-route="${item.route}" class="mobile-tab mobile-navigation-item ${active ? 'active' : ''}"${active ? ' aria-current="page"' : ''}>${icon(item.ico, 20)}<span>${item.label}</span></a>`;
     }).join('');
   }
 
@@ -4347,20 +4370,6 @@ import {
     </div>`;
   }
 
-  function renderAiChatTabs(view) {
-    const items = [
-      { route: 'index', label: 'Home', icon: 'home', view: '' },
-      { route: 'voice_lessons', label: 'Learn', icon: 'book', view: '' },
-      { route: 'ai-conversations', label: 'AI Chat', icon: 'message', view: 'conversation' },
-      { route: 'ai-voice', label: 'Practise', icon: 'mic', view: 'practice' },
-      { route: 'oral', label: 'Library', icon: 'headphones', view: '' }
-    ];
-    return `<nav class="aic-tabs" aria-label="Idilewa sections">${items.map((item) => {
-      const active = Boolean(item.view) && item.view === view;
-      return `<a class="aic-tab ${active ? 'is-active' : ''}" href="#/${item.route}" data-route="${item.route}"${active ? ' aria-current="page"' : ''}>${icon(item.icon, 20)}<span>${item.label}</span></a>`;
-    }).join('')}</nav>`;
-  }
-
   function renderAiChatShell(view, content) {
     const { name } = aiChatProfile();
     const links = AI_CHAT_VIEWS.map((item) => `<a class="aic-sidebar-link ${item.id === view ? 'is-active' : ''}" href="#/${item.route}" data-route="${item.route}"${item.id === view ? ' aria-current="page"' : ''}>${icon(item.icon, 18)}<span>${item.label}</span></a>`).join('');
@@ -4375,7 +4384,6 @@ import {
         ${renderAiChatTopbar()}
         ${renderAiChatDrawer(view)}
         <div class="aic-main" id="aic-main" tabindex="-1">${content}</div>
-        ${renderAiChatTabs(view)}
       </div>
     </div>`;
   }

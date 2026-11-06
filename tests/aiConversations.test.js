@@ -41,21 +41,23 @@ test('AI Conversation registers every section route and its workspace navigation
   assert.match(appSource, /\{ route: 'ai-conversations', label: 'AI Chat', ico: 'sparkles' \}/);
 });
 
-test('the AI Conversation shell renders a sidebar, mobile topbar, tabs and drawer', () => {
+test('the AI Conversation shell renders its sidebar, mobile topbar and drawer', () => {
   assert.match(appSource, /function renderAiChatShell\(view, content\)/);
   assert.match(appSource, /<div class="aic" data-view="\$\{esc\(view\)\}">/);
   assert.match(appSource, /<aside class="aic-sidebar" aria-label="AI Conversation sections">/);
   assert.match(appSource, /<nav class="aic-sidebar-nav">\$\{links\}<\/nav>/);
   assert.match(appSource, /\$\{renderAiChatTopbar\(\)\}/);
   assert.match(appSource, /\$\{renderAiChatDrawer\(view\)\}/);
-  assert.match(appSource, /\$\{renderAiChatTabs\(view\)\}/);
+  assert.doesNotMatch(appSource, /renderAiChatTabs/);
+  assert.match(appSource, /class="mobile-tab mobile-navigation-item \$\{active \? 'active' : ''\}"/);
   assert.match(appSource, /<div class="aic-main" id="aic-main" tabindex="-1">\$\{content\}<\/div>/);
   assert.match(appSource, /class="aic-sidebar-link \$\{item\.id === view \? 'is-active' : ''\}" href="#\/\$\{item\.route\}" data-route="\$\{item\.route\}"/);
 
-  // The legacy site header, footer and bottom navigation step aside for the AI workspace.
+  // The AI workspace keeps its own desktop shell and shares the global mobile tabs.
   assert.match(styleSource, /body\[data-page\^="ai-"\] \.site-header,/);
-  assert.match(styleSource, /body\[data-page\^="ai-"\] \.mobile-nav \{ display: none; \}/);
-  assert.match(appSource, /if \(page\.startsWith\('ai-'\) \|\| page\.startsWith\('tutor'\) \|\| page === 'families' \|\|/);
+  assert.doesNotMatch(styleSource, /body\[data-page\^="ai-"\] \.mobile-nav \{ display: none; \}/);
+  assert.match(styleSource, /\.mobile-bottom-navigation \{[\s\S]*?grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);/);
+  assert.match(appSource, /const aiWorkspace = page\.startsWith\('ai-'\) && !\['ai-login', 'ai-signup'\]\.includes\(page\);/);
 });
 
 test('learners pick from five languages and six scripted topics with no network AI', () => {
@@ -116,8 +118,8 @@ test('speech, translation, saved phrases and history persist on the device', () 
 });
 
 test('AI Conversation styles cover phones, tablets and desktops', () => {
-  const classes = ['aic', 'aic-sidebar', 'aic-sidebar-link', 'aic-main', 'aic-topbar', 'aic-tabs',
-    'aic-tab', 'aic-drawer', 'aic-drawer-scrim', 'aic-stage', 'aic-welcome', 'aic-step', 'aic-option',
+  const classes = ['aic', 'aic-sidebar', 'aic-sidebar-link', 'aic-main', 'aic-topbar',
+    'aic-drawer', 'aic-drawer-scrim', 'aic-stage', 'aic-welcome', 'aic-step', 'aic-option',
     'aic-option-topic', 'aic-option-icon', 'aic-chat', 'aic-thread', 'aic-msg', 'aic-bubble',
     'aic-chips', 'aic-chip', 'aic-toolbar', 'aic-tool', 'aic-composer', 'aic-composer-field',
     'aic-composer-record', 'aic-composer-send', 'aic-form', 'aic-list', 'aic-gloss'];
@@ -125,11 +127,12 @@ test('AI Conversation styles cover phones, tablets and desktops', () => {
     assert.ok(styleSource.includes(`.${name}`), `.${name} should be styled`);
   }
 
-  // The sidebar only appears from tablet-landscape upwards; phones use tabs and a drawer.
+  // The sidebar only appears from tablet-landscape upwards; phones use the shared tab bar and AI drawer.
   assert.match(styleSource, /\.aic-sidebar \{ display: none; \}/);
   assert.match(styleSource, /@media \(min-width: 960px\) \{[\s\S]{0,400}\.aic \{ grid-template-columns: 268px minmax\(0, 1fr\);/);
   assert.match(styleSource, /@media \(min-width: 640px\) \{/);
-  assert.match(styleSource, /\.aic-tabs \{/);
-  assert.match(styleSource, /body\[data-page\^="ai-"\] \.mobile-nav \{ display: none; \}/);
+  assert.match(styleSource, /\.mobile-bottom-navigation \{/);
+  assert.match(styleSource, /body\.has-mobile-bottom-navigation\[data-page\^="ai-"\] \.aic-composer \{/);
+  assert.match(styleSource, /body\[data-page="ai-login"\] #mobile-nav,[\s\S]*?body\[data-page="ai-signup"\] #mobile-nav \{ display: none; \}/);
   assert.match(styleSource, /@media \(prefers-reduced-motion: reduce\) \{[\s\S]{0,600}\.aic/);
 });

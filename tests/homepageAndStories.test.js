@@ -42,6 +42,14 @@ test('main and expanded mobile navigation omit retired pages', () => {
   assert.match(navSource, /\{ label: 'AI Conversations', route: 'ai-conversations', group: 'ai-conversations' \}/);
   const mobileItems = [...mobileNavSource.matchAll(/\{ route: '([^']+)', label: '([^']+)'/g)].map((match) => [match[1], match[2]]);
   assert.deepEqual(mobileItems, [['index', 'Home'], ['voice_lessons', 'Voice'], ['ai-conversations', 'AI Chat'], ['profile', 'Profile']]);
+  assert.match(mobileNavSource, /page === 'trainer' \|\| page === 'voice_lessons' \|\| page\.startsWith\('voice-'\)/);
+  assert.match(mobileNavSource, /\?\s*aiWorkspace/);
+  assert.match(mobileNavSource, /class="mobile-tab mobile-navigation-item \$\{active \? 'active' : ''\}"/);
+  assert.match(mobileNavSource, /mobileNav\.className = 'mobile-nav mobile-bottom-navigation'/);
+  assert.match(mobileNavSource, /currentUser\?\.role === 'educator'/);
+  assert.match(styleSource, /\.mobile-bottom-navigation \{[\s\S]*?grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);[\s\S]*?align-items: center;/);
+  assert.match(styleSource, /\.mobile-navigation-item \{[\s\S]*?align-items: center;[\s\S]*?text-align: center;/);
+  assert.match(styleSource, /body\.has-mobile-bottom-navigation:not\(\[data-page\^="ai-"\]\) #main/);
   assert.match(appSource, /const REMOVED_ROUTES = new Set\(\[[\s\S]*?'world'[\s\S]*?'coding', 'coding-studio'/);
   assert.match(appSource, /const REMOVED_ROUTES = new Set\(\[[\s\S]*?'curriculum', 'learn', 'payment'/);
   assert.doesNotMatch(appSource, /route: 'world'|label: 'Explore'|function renderCulturalWorld|initCulturalWorld|cultural-zone|cultural-world-replacement/);
