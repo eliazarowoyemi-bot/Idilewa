@@ -10,3 +10,5 @@ scratch/
 .vercel
 
 supabase/.temp/
+
+.env*.local
