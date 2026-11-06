@@ -33,5 +33,6 @@ test('the standalone Creative Studio and its build entries are removed', async (
 test('the unreachable block editor and game builder are removed without removing kids curriculum', () => {
   assert.doesNotMatch(appSource, /renderCodePlay|renderCodingStudio|CODE_PLAY_GAMES|data-route="coding-studio"/);
   assert.doesNotMatch(styleSource, /\.code-play-|\.code-studio-|\.code-design-page/);
-  assert.match(appSource, /function renderCurriculum\(\)/);
+  assert.match(appSource, /function renderLanguages\(\)/);
+  assert.doesNotMatch(appSource, /function renderCurriculum\(\)|function renderPayment\(\)/);
 });

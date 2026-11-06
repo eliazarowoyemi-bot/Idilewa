@@ -5,58 +5,131 @@ import test from 'node:test';
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const styleSource = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 
-test('AI Conversations registers its supplied interfaces and workspace navigation', () => {
+const slice = (startToken, endToken) => appSource.slice(appSource.indexOf(startToken), appSource.indexOf(endToken));
+
+test('AI Conversation registers every section route and its workspace navigation', () => {
+  const routes = slice('const ROUTES = [', 'const REMOVED_ROUTES');
+  const views = slice('const AI_CHAT_VIEWS = [', 'let aiAuthReturnRoute');
+
   for (const route of [
-    'ai-conversations', 'ai-login', 'ai-signup', 'ai-dashboard', 'ai-chat',
-    'ai-everyday', 'ai-voice', 'ai-history', 'ai-analytics', 'ai-profile',
-    'ai-messages', 'ai-settings'
+    'ai-conversations', 'ai-login', 'ai-signup', 'ai-dashboard', 'ai-chat', 'ai-everyday',
+    'ai-voice', 'ai-history', 'ai-analytics', 'ai-profile', 'ai-messages', 'ai-settings',
+    'ai-translate', 'ai-saved'
   ]) {
-    assert.match(appSource, new RegExp(`'${route}'`));
-    assert.match(appSource, new RegExp(`case '${route}':`));
+    assert.match(routes, new RegExp(`'${route}'`), `${route} should be a registered route`);
+    assert.match(appSource, new RegExp(`case '${route}':`), `${route} should resolve to a renderer`);
   }
-  assert.match(appSource, /label: 'AI Conversations', route: 'ai-conversations'/);
-  assert.match(appSource, /route: 'ai-dashboard', label: 'Dashboard'/);
-  assert.match(appSource, /data-route="\$\{item\.route\}"/);
-  assert.match(appSource, /data-route="ai-chat"/);
-  assert.match(appSource, /data-route="ai-voice"/);
+
+  const expectedViews = [
+    ['conversation', 'ai-conversations'],
+    ['translate', 'ai-translate'],
+    ['practice', 'ai-voice'],
+    ['history', 'ai-history'],
+    ['saved', 'ai-saved']
+  ];
+  for (const [id, route] of expectedViews) {
+    assert.match(views, new RegExp(`\\{ id: '${id}', route: '${route}'`), `${id} view should link to ${route}`);
+  }
+
+  assert.match(views, /'ai-chat': 'conversation'/);
+  assert.match(views, /'ai-everyday': 'conversation'/);
+  assert.match(views, /'ai-analytics': 'history'/);
+  assert.match(views, /'ai-messages': 'saved'/);
+  assert.match(views, /'ai-settings': 'translate'/);
+
+  assert.match(appSource, /\{ label: 'AI Conversations', route: 'ai-conversations', group: 'ai-conversations' \}/);
+  assert.match(appSource, /\{ route: 'ai-conversations', label: 'AI Chat', ico: 'sparkles' \}/);
 });
 
-test('AI Conversations removes My Children and redirects its old route to the dashboard', () => {
-  const workspaceLinks = appSource.slice(appSource.indexOf('const AI_WORKSPACE_LINKS'), appSource.indexOf('const AI_WORKSPACE_ACTIVE'));
-  const parentLinks = appSource.slice(appSource.indexOf('const PARENT_PORTAL_LINKS'), appSource.indexOf('const PARENT_PREFERENCES_KEY'));
-  const routes = appSource.slice(appSource.indexOf('const ROUTES = ['), appSource.indexOf('const REMOVED_ROUTES'));
+test('the AI Conversation shell renders a sidebar, mobile topbar, tabs and drawer', () => {
+  assert.match(appSource, /function renderAiChatShell\(view, content\)/);
+  assert.match(appSource, /<div class="aic" data-view="\$\{esc\(view\)\}">/);
+  assert.match(appSource, /<aside class="aic-sidebar" aria-label="AI Conversation sections">/);
+  assert.match(appSource, /<nav class="aic-sidebar-nav">\$\{links\}<\/nav>/);
+  assert.match(appSource, /\$\{renderAiChatTopbar\(\)\}/);
+  assert.match(appSource, /\$\{renderAiChatDrawer\(view\)\}/);
+  assert.match(appSource, /\$\{renderAiChatTabs\(view\)\}/);
+  assert.match(appSource, /<div class="aic-main" id="aic-main" tabindex="-1">\$\{content\}<\/div>/);
+  assert.match(appSource, /class="aic-sidebar-link \$\{item\.id === view \? 'is-active' : ''\}" href="#\/\$\{item\.route\}" data-route="\$\{item\.route\}"/);
 
-  assert.doesNotMatch(routes, /ai-children/);
-  assert.doesNotMatch(workspaceLinks, /ai-children|My Children/);
-  assert.doesNotMatch(appSource, /renderAiChildren|case 'ai-children'/);
-  assert.match(appSource, /if \(page === 'ai-children'\) \{\s*page = 'ai-dashboard';\s*history\.replaceState\(null, '', `\$\{window\.location\.pathname\}\$\{window\.location\.search\}#\/ai-dashboard`\);/);
-  assert.match(parentLinks, /route: 'parent-children', label: 'My Children'/);
+  // The legacy site header, footer and bottom navigation step aside for the AI workspace.
+  assert.match(styleSource, /body\[data-page\^="ai-"\] \.site-header,/);
+  assert.match(styleSource, /body\[data-page\^="ai-"\] \.mobile-nav \{ display: none; \}/);
+  assert.match(appSource, /if \(page\.startsWith\('ai-'\) \|\| page\.startsWith\('tutor'\) \|\| page === 'families' \|\|/);
 });
 
-test('AI Conversations opens guests directly in live, translation-backed practice', () => {
-  assert.match(appSource, /if \(page === 'ai-conversations'\) return renderAiEveryday\(params\);/);
-  assert.match(appSource, /<form class="ai-message-form" data-form="ai-conversation"/);
-  assert.match(appSource, /translateWithPlotweaver\(\{[\s\S]*?sourceLanguage: 'en',[\s\S]*?targetLanguage: language\.speech/);
-  assert.match(appSource, /Messages are sent to Plotweaver for translation/);
-  assert.doesNotMatch(appSource, /renderAiLanding|Offline guided sample|pre-written prompts/);
+test('learners pick from five languages and six scripted topics with no network AI', () => {
+  const languages = slice('const AI_CHAT_LANGUAGES = [', 'const AI_CHAT_TOPICS = [');
+  for (const id of ['yoruba', 'igbo', 'hausa', 'swahili', 'pidgin']) {
+    assert.match(languages, new RegExp(`\\{ id: '${id}'`), `${id} should be offered`);
+  }
+  assert.equal((languages.match(/\{ id: '/g) || []).length, 5);
+
+  const topics = slice('const AI_CHAT_TOPICS = [', 'const AI_CHAT_DIALOGUE = {');
+  for (const id of ['everyday', 'family', 'school', 'market', 'culture', 'storytelling']) {
+    assert.match(topics, new RegExp(`\\{ id: '${id}'`), `${id} should be offered`);
+  }
+  assert.equal((topics.match(/\{ id: '/g) || []).length, 6);
+
+  // The welcome → language → topic → chat journey is driven by a single stage machine.
+  assert.match(appSource, /function aiChatStage\(\) \{/);
+  assert.match(appSource, /if \(!\['welcome', 'language', 'topic', 'chat'\]\.includes\(aiChatState\.step\)\) return 'welcome';/);
+  assert.match(appSource, /data-action="aic-start"/);
+  assert.match(appSource, /data-action="aic-choose-language" data-language="\$\{language\.id\}"/);
+  assert.match(appSource, /data-action="aic-choose-topic" data-topic="\$\{topic\.id\}"/);
+  assert.match(appSource, /<span class="aic-step-index">Step 1 of 2<\/span>/);
+  assert.match(appSource, /<span class="aic-step-index">Step 2 of 2<\/span>/);
+
+  // Replies are read from the local script — the next line comes from the dialogue array.
+  assert.match(appSource, /const next = dialogue\[index \+ 1\] \|\| null;/);
+  assert.match(appSource, /const gloss = scripted && message\.toLowerCase\(\) === scripted\.reply\.toLowerCase\(\) \? scripted\.replyEn : '';/);
+  assert.match(appSource, /data-action="aic-quick-reply" data-reply="\$\{esc\(scripted\.reply\)\}"/);
+  assert.match(appSource, /: \{ role: 'assistant', text: language\.close, gloss: language\.closeEn, at: Date\.now\(\) \}\);/);
+  assert.doesNotMatch(appSource, /fetch\([^)]*api\/chat/);
 });
 
-test('conversation practice, local history, account forms and voice tools are wired', () => {
-  assert.match(appSource, /data-form="ai-conversation"/);
-  assert.match(appSource, /data-action="ai-delete-conversation"/);
-  assert.match(appSource, /data-action="ai-clear-history"/);
-  assert.match(appSource, /data-action="ai-record-start"/);
-  assert.match(appSource, /transcribeWithPlotweaver\(recording/);
-  assert.match(appSource, /data-form="login"/);
-  assert.match(appSource, /data-form="profile-settings"/);
-  assert.match(appSource, /Your message is sent to Plotweaver for translation/);
-  assert.match(appSource, /ai-conversation-status/);
-  assert.match(appSource, /transcribeWithPlotweaver\(recording/);
+test('speech, translation, saved phrases and history persist on the device', () => {
+  // Chat replies are read aloud with the shared Plotweaver voice helper.
+  assert.match(appSource, /return \(slow \? aiChatSpeakSlow\(phrase\) : playPlotweaverSpeech\(phrase, aiChatAccent\(\)\)\)/);
+  assert.match(appSource, /utterance\.rate = 0\.65;/);
+  assert.match(appSource, /utterance\.lang = aiChatLocale\(\);/);
+
+  // Record & Practise transcribes the learner recording before typing it into the composer.
+  assert.match(appSource, /void transcribeWithPlotweaver\(recording, aiChatAccent\(\)\)/);
+  assert.match(appSource, /if \(aiVoiceTarget === 'chat'\) \{\s+aiChatDraft = text;/);
+  assert.match(appSource, /if \(!navigator\.mediaDevices\?\.getUserMedia \|\| typeof MediaRecorder === 'undefined'\) \{/);
+  assert.match(appSource, /<button class="aic-composer-mic aic-composer-record" type="button" data-action="aic-record" data-target="chat"/);
+
+  // Translate & Listen calls the Plotweaver translation endpoint.
+  assert.match(appSource, /<form class="aic-form" data-form="ai-translate">/);
+  assert.match(appSource, /const result = await translateWithPlotweaver\(\{ text, sourceLanguage: 'en', targetLanguage: language\.speech \}\);/);
+
+  // Saved phrases and conversation history are stored locally per language and topic.
+  assert.match(appSource, /const AI_CHAT_STORAGE_KEY = 'idilewa-ai-chat-v1';/);
+  assert.match(appSource, /raw = JSON\.parse\(localStorage\.getItem\(AI_CHAT_STORAGE_KEY\) \|\| 'null'\);/);
+  assert.match(appSource, /localStorage\.setItem\(AI_CHAT_STORAGE_KEY, JSON\.stringify\(aiChatState\)\);/);
+  assert.match(appSource, /data-action="aic-save-phrase" data-text="\$\{esc\(message\.text\)\}" data-gloss="\$\{esc\(message\.gloss \|\| ''\)\}"/);
+  assert.match(appSource, /data-action="aic-delete-thread" data-key="\$\{esc\(key\)\}"/);
+  assert.match(appSource, /data-action="aic-remove-saved" data-index="\$\{index\}"/);
+  assert.match(appSource, /data-action="aic-clear-history"/);
+  assert.match(appSource, /data-action="aic-resume" data-language="\$\{esc\(languageId\)\}" data-topic="\$\{esc\(topicId\)\}"/);
 });
 
-test('AI Conversations has responsive workspace and mobile navigation layouts', () => {
-  assert.match(styleSource, /\.ai-workspace\s*\{[^}]*grid-template-columns: 196px/s);
-  assert.match(styleSource, /@media \(max-width: 740px\)[\s\S]*?\.ai-workspace \{ display: block; \}/);
-  assert.match(styleSource, /@media \(max-width: 520px\)[\s\S]*?\.ai-language-grid \{ grid-template-columns: repeat\(2, minmax\(0,1fr\)\); \}/);
-  assert.match(styleSource, /prefers-reduced-motion: reduce[\s\S]*?\.ai-button/);
+test('AI Conversation styles cover phones, tablets and desktops', () => {
+  const classes = ['aic', 'aic-sidebar', 'aic-sidebar-link', 'aic-main', 'aic-topbar', 'aic-tabs',
+    'aic-tab', 'aic-drawer', 'aic-drawer-scrim', 'aic-stage', 'aic-welcome', 'aic-step', 'aic-option',
+    'aic-option-topic', 'aic-option-icon', 'aic-chat', 'aic-thread', 'aic-msg', 'aic-bubble',
+    'aic-chips', 'aic-chip', 'aic-toolbar', 'aic-tool', 'aic-composer', 'aic-composer-field',
+    'aic-composer-record', 'aic-composer-send', 'aic-form', 'aic-list', 'aic-gloss'];
+  for (const name of classes) {
+    assert.ok(styleSource.includes(`.${name}`), `.${name} should be styled`);
+  }
+
+  // The sidebar only appears from tablet-landscape upwards; phones use tabs and a drawer.
+  assert.match(styleSource, /\.aic-sidebar \{ display: none; \}/);
+  assert.match(styleSource, /@media \(min-width: 960px\) \{[\s\S]{0,400}\.aic \{ grid-template-columns: 268px minmax\(0, 1fr\);/);
+  assert.match(styleSource, /@media \(min-width: 640px\) \{/);
+  assert.match(styleSource, /\.aic-tabs \{/);
+  assert.match(styleSource, /body\[data-page\^="ai-"\] \.mobile-nav \{ display: none; \}/);
+  assert.match(styleSource, /@media \(prefers-reduced-motion: reduce\) \{[\s\S]{0,600}\.aic/);
 });

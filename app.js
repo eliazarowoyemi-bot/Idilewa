@@ -100,22 +100,22 @@ import {
     'voice-text-to-speech', 'voice-cloning', 'voice-speech-to-text', 'voice-translation',
     'ai-conversations', 'ai-login', 'ai-signup', 'ai-dashboard', 'ai-chat', 'ai-everyday',
     'ai-voice', 'ai-history', 'ai-analytics', 'ai-profile', 'ai-messages', 'ai-settings',
+    'ai-translate', 'ai-saved',
     'families', 'parent-login', 'parent-signup', 'parent-dashboard', 'parent-children',
     'parent-progress', 'parent-messages', 'parent-settings', 'parent-welcome',
     'tutor', 'tutor-login', 'tutor-signup', 'tutor-dashboard', 'tutor-find-child', 'tutor-students',
     'tutor-consent', 'tutor-lesson', 'tutor-messages', 'tutor-profile', 'tutor-availability', 'tutor-settings',
     'mentors',
-    'curriculum',
     'index', 'about', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
     'ere', 'ere_game', 'keepers',
     'kids', 'languages', 'lesson', 'login', 'oral', 'oral_genre', 'oriki', 'owe',
-    'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'payment', 'pricing', 'profile',
+    'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'pricing', 'profile',
     'voices'
   ];
   const REMOVED_ROUTES = new Set([
     'adult', 'parent_dashboard', 'educator_dashboard', 'world', 'explore', 'undefined',
     'coding', 'coding-studio', 'method', 'base', 'human', 'guides', 'game', 'library',
-    'individuals', 'schools', 'ifa', 'ifa_odu'
+    'individuals', 'schools', 'ifa', 'ifa_odu', 'curriculum', 'learn', 'payment'
   ]);
   const OWE_ROUTE_SECTIONS = {
     owe_detail: 'meaning',
@@ -183,7 +183,24 @@ import {
     refresh: '<path d="M20 7v5h-5M4 17v-5h5"/><path d="M5.7 9a7 7 0 0 1 12-2L20 12M4 12l2.3 5a7 7 0 0 0 12-2"/>',
     copy: '<rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h3"/>',
     pause: '<path d="M8 5v14M16 5v14"/>',
-    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/>'
+    info: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5m0-8h.01"/>',
+    chevronRight: '<path d="m9 6 6 6-6 6"/>',
+    message: '<path d="M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.4A8 8 0 1 1 21 12Z"/>',
+    translate: '<path d="M4 5h10M9 3v2c0 4-2.5 7.5-6 9"/><path d="M6 12c1.6 2.6 4 4.4 7 5M13 21l4-10 4 10m-6.8-3h5.6"/>',
+    image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m4 18 5-5 4 4 3-3 4 4"/>',
+    bell: '<path d="M18 9a6 6 0 1 0-12 0c0 4-2 5-2 5h16s-2-1-2-5"/><path d="M10.5 20a2 2 0 0 0 3 0"/>',
+    'arrow-right': '<path d="M4 12h16m-6-6 6 6-6 6"/>',
+    gamepad: '<rect x="2" y="7" width="20" height="10" rx="4"/><path d="M7 10v4m-2-2h4m7 0h.01M17.5 13.5h.01"/>',
+    moon: '<path d="M21 13a8.5 8.5 0 1 1-9.9-9.6 7 7 0 0 0 9.9 9.6Z"/>',
+    landmark: '<path d="M3 21h18M4 21V10m5 11V10m6 11V10m5 11V10M3 10l9-6 9 6z"/>',
+    smartphone: '<rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/>',
+    phone: '<path d="M7 3h3l2 5-2.5 1.5a12 12 0 0 0 5 5L16 12l5 2v3a2 2 0 0 1-2.2 2A17 17 0 0 1 5 5.2 2 2 0 0 1 7 3Z"/>',
+    grid: '<rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/>',
+    'credit-card': '<rect x="2" y="5" width="20" height="14" rx="2"/><path d="M2 10h20m-16 5h3"/>',
+    download: '<path d="M12 3v12m-5-5 5 5 5-5M4 21h16"/>',
+    activity: '<path d="M3 12h4l2.5-7 5 14 2.5-7h4"/>',
+    lightbulb: '<path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3 11.2V16h6v-1.8A6 6 0 0 0 12 3Z"/>',
+
   };
 
   const PAGE_META = {
@@ -213,43 +230,17 @@ import {
         { title: '60 Audio Lessons', text: 'Beginner, intermediate, and advanced curriculum for Yorùbá, Igbo, Hausa, Swahili, isiZulu, and Twi.', icon: 'book', route: 'trainer', tone: 'blue' }
       ]
     },
-    curriculum: {
-      title: 'Curriculum',
-      eyebrow: 'Curriculum',
-      desc: 'Standards-aligned STEM lessons infused with Yoruba, Igbo, Hausa and African cultural concepts from Kindergarten to Grade 8.',
-      icon: 'layers', image: 'code-kids.jpg', imageAlt: 'African students exploring STEM and coding curriculum',
-      active: 0, flow: ['Choose Grade Band', 'Explore Concepts', 'Teach Lesson', 'Code Live'],
-      cta: 'Explore STEM curriculum', ctaRoute: 'curriculum',
-      cards: [
-        { title: 'Lower Elementary', text: 'Visual Block Patterns & African Cultural Storytelling (K–2).', icon: 'sparkles', route: 'curriculum', tone: 'mint' },
-        { title: 'Upper Elementary', text: 'Algorithmic Decision Trees & Yoruba Logic Syntax (3–5).', icon: 'layers', route: 'curriculum', tone: 'peach' },
-        { title: 'Middle School', text: 'Full Indigenous Syntax, Physical Computing & Web (6–8+).', icon: 'code', route: 'curriculum', tone: 'blue' }
-      ]
-    },
     adult: {
       title: 'Adult Learning',
       eyebrow: 'For independent adult learners',
       desc: 'Build practical confidence in African languages, coding, robotics and creative technology at your own pace.',
       icon: 'compass', image: 'code-kids.jpg', imageAlt: 'Learners exploring creative technology',
       active: 1, flow: ['Choose a goal', 'Learn a concept', 'Build a project', 'Reflect and grow'],
-      cta: 'Explore STEM curriculum', ctaRoute: 'curriculum',
+      cta: 'Start a language path', ctaRoute: 'languages',
       cards: [
         { title: 'Learn a language', text: 'Practice real-world listening and speaking in supported African language paths.', icon: 'volume', route: 'languages', tone: 'mint' },
-        { title: 'Build with code', text: 'Strengthen programming foundations with HTML, JavaScript, Python and project-based practice.', icon: 'code', route: 'curriculum', tone: 'blue' },
-        { title: 'Explore robotics', text: 'Move into sensors, microcontrollers, automation, CAD and responsible AI projects.', icon: 'compass', route: 'curriculum', tone: 'peach' }
-      ]
-    },
-    coding: {
-      title: 'Kọ Koodu ní Èdè Rẹ · Code.',
-      eyebrow: 'Interactive Bilingual Studio',
-      desc: 'Write and test computer programs in Yorùbá, Igbo, Hausa, Swahili, and Python with live compiler terminal output.',
-      icon: 'code', image: 'code-kids.jpg', imageAlt: 'Children coding in African languages',
-      active: 1, flow: ['Select Language', 'Load Preset', 'Write Code', 'Execute Live'],
-      cta: 'View Curriculum', ctaRoute: 'curriculum',
-      cards: [
-        { title: 'Yorùbá Syntax', text: 'Code with tẹ_jade, jẹ́, bí, and kò_bá_jẹ́.', icon: 'code', route: 'curriculum', tone: 'mint' },
-        { title: 'Multi-Lingual', text: 'Supports Yorùbá, Igbo, Hausa, Swahili, and Python.', icon: 'globe', route: 'curriculum', tone: 'yellow' },
-        { title: 'Canvas Turtle', text: 'Interactive Adire geometric graphics and shapes.', icon: 'sparkles', route: 'curriculum', tone: 'blue' }
+        { title: 'Practice with a mentor', text: 'Meet heritage scholars for guided speaking and cultural context.', icon: 'people', route: 'mentors', tone: 'blue' },
+        { title: 'Read and listen', text: 'Explore proverbs, oral history and cultural notes at your own pace.', icon: 'headphones', route: 'oral', tone: 'peach' }
       ]
     },
     about: {
@@ -258,11 +249,11 @@ import {
       desc: 'A welcoming digital home where African languages, living heritage and future-facing skills grow together.',
       icon: 'leaf', image: 'story', imageAlt: 'A grandmother sharing a story with children',
       active: 2, flow: ['Belong', 'Discover', 'Learn', 'Pass it on'],
-      cta: 'Explore our approach', ctaRoute: 'curriculum',
+      cta: 'Explore our approach', ctaRoute: 'about',
       cards: [
         { title: 'Language lives in community', text: 'Learning grows through everyday words, family stories and the voices of people who carry them.', icon: 'people', route: 'families', tone: 'mint' },
         { title: 'Culture belongs in the classroom', text: 'Proverbs, oral traditions and cultural context sit beside language practice—not on the sidelines.', icon: 'book', route: 'oral', tone: 'peach' },
-        { title: 'Technology can carry us forward', text: 'Young learners can explore coding while staying rooted in the languages they know.', icon: 'code', route: 'curriculum', tone: 'blue' }
+        { title: 'Practice real conversations', text: 'Guided everyday dialogue helps learners speak with confidence and warmth.', icon: 'message', route: 'ai-conversations', tone: 'blue' }
       ]
     },
     kids: {
@@ -275,7 +266,7 @@ import {
       cards: [
         { title: 'Words you can use today', text: 'Learn friendly greetings and everyday phrases with clear audio prompts.', icon: 'volume', route: 'course', tone: 'mint' },
         { title: 'Stories made to share', text: 'Read or listen together, then answer a short question about what happened.', icon: 'book', route: 'ere', tone: 'peach' },
-        { title: 'Create with code', text: 'See beginner coding ideas explained in English and an African language side by side.', icon: 'code', route: 'curriculum', tone: 'yellow' }
+        { title: 'Create with stories', text: 'Read, listen and retell stories with words from the language you are learning.', icon: 'book', route: 'ere', tone: 'yellow' }
       ]
     },
     keepers: {
@@ -297,9 +288,7 @@ import {
     { label: 'Home', route: 'index', group: 'home' },
     { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' },
     { label: 'AI Conversations', route: 'ai-conversations', group: 'ai-conversations' },
-    { label: 'For Tutors', route: 'tutor', group: 'tutor' },
-    { label: 'Curriculum', route: 'curriculum', group: 'curriculum' },
-    { label: 'STEM Studio', href: '/studio', group: 'studio' }
+    { label: 'For Tutors', route: 'tutor', group: 'tutor' }
   ];
   const MENU_NAV = [...NAV,
     { label: 'Mentors', route: 'mentors', group: 'mentors' },
@@ -344,19 +333,17 @@ import {
     'tutor-profile': 'tutor',
     'tutor-availability': 'tutor',
     'tutor-settings': 'tutor',
-    curriculum: 'curriculum',
     trainer: 'trainer', voice_lessons: 'trainer',
-    languages: 'curriculum', course: 'curriculum', lesson: 'curriculum', kids: 'curriculum',
+    languages: 'read', course: 'read', lesson: 'read', kids: 'read',
     oral: 'read', oral_genre: 'read', oriki: 'read', owe: 'read', owe_add: 'read',
     owe_detail: 'read', owe_story: 'read', owe_reflection: 'read', voices: 'read',
     connect_students: 'about', connect_teachers: 'about', consent: 'about', contact: 'about', privacy: 'about',
-    ere: 'stories', ere_game: 'stories', payment: 'about',
+    ere: 'stories', ere_game: 'stories',
     about: 'about',
     keepers: 'culture'
   };
 
   const LABELS = Object.fromEntries(ROUTES.map((r) => [r, r === 'index' ? 'Home' : r.replaceAll('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())]));
-  LABELS.curriculum = 'Curriculum';
   Object.assign(LABELS, {
     'voice-language': 'Choose a voice lesson language',
     'voice-grade': 'Choose a voice lesson grade',
@@ -377,7 +364,6 @@ import {
   LABELS.privacy = 'Privacy';
   LABELS.library = 'Library';
   LABELS.game = 'Tile game';
-  LABELS.payment = 'Payment';
   LABELS.trainer = 'Voice Lessons';
   LABELS.voice_lessons = 'Voice Lessons';
   LABELS['ai-conversations'] = 'AI Conversations';
@@ -627,7 +613,6 @@ import {
     }
     const [path, query = ''] = hash.split('?');
     let page = path.split('/')[0] || 'index';
-    if (page === 'learn') page = 'curriculum';
     const params = Object.fromEntries(new URLSearchParams(query));
     if (page === 'ai-children') {
       page = 'ai-dashboard';
@@ -702,7 +687,8 @@ import {
       : `${routeLink('login', 'Log in', 'header-signin', 'data-mode="signin"')}${routeLink('login', 'Get started', 'button button-primary header-cta', 'data-mode="signup"')}`;
     const mobileShortcuts = [
       { route: 'profile', label: 'Profile', ico: 'user' },
-      { route: 'payment', label: 'Payment', ico: 'shield' }
+      { route: 'ai-conversations', label: 'AI Chat', ico: 'sparkles' },
+      { route: 'trainer', label: 'Voice Lessons', ico: 'mic' }
     ].map((item) => `<a class="mobile-menu-link ${page === item.route ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.ico, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('');
     const menu = MENU_NAV.map((item) => {
       const iconName = item.href ? 'code' : item.group === 'home' ? 'home' : item.group === 'trainer' ? 'mic' : item.group === 'learn' ? 'book' : item.group === 'read' ? 'headphones' : item.group === 'code' ? 'code' : item.group === 'stories' ? 'quote' : item.group === 'community' ? 'people' : 'sparkles';
@@ -742,8 +728,7 @@ import {
   function renderMobileNav(page) {
     const currentUser = getCurrentUser();
     const familyDashboard = currentUser?.role === 'parent' && page === 'parent-dashboard';
-    const mainAiPage = page === 'ai-conversations' || page === 'ai-dashboard';
-    if ((page.startsWith('ai-') && !mainAiPage) || page.startsWith('tutor') || page === 'families' ||
+    if (page.startsWith('ai-') || page.startsWith('tutor') || page === 'families' ||
       (page.startsWith('parent') && !familyDashboard) || (currentUser?.role === 'parent' && !familyDashboard) || currentUser?.role === 'educator') {
       document.getElementById('mobile-nav').innerHTML = '';
       return;
@@ -752,7 +737,6 @@ import {
       { route: 'index', label: 'Home', ico: 'home' },
       { route: 'voice_lessons', label: 'Voice', ico: 'mic' },
       { route: 'ai-conversations', label: 'AI Chat', ico: 'sparkles' },
-      { route: 'curriculum', label: 'Code', ico: 'code' },
       { route: 'profile', label: 'Profile', ico: 'user' }
     ];
     document.getElementById('mobile-nav').innerHTML = items.map((item) => {
@@ -775,7 +759,7 @@ import {
           </div>
         </section>
         <nav class="footer-directory" aria-label="Footer navigation">
-          <section class="footer-links"><h2>Quick links</h2>${routeLink('index', 'Home')}${routeLink('curriculum', 'Curriculum')}${routeLink('languages', 'Languages')}${routeLink('trainer', 'Voice lessons')}${routeLink('ere', 'Stories')}</section>
+          <section class="footer-links"><h2>Quick links</h2>${routeLink('index', 'Home')}${routeLink('languages', 'Languages')}${routeLink('trainer', 'Voice lessons')}${routeLink('ai-conversations', 'AI conversations')}${routeLink('ere', 'Stories')}</section>
           <section class="footer-links"><h2>Information</h2>${routeLink('about', 'About Idilewa')}${routeLink('families', 'Parent portal')}${routeLink('privacy', 'Privacy policy')}</section>
         </nav>
       </div>
@@ -794,7 +778,7 @@ import {
       ['sparkles', 'Made for discovery', 'Short activities help learners build confidence at their own pace.'],
       ['layers', 'Culture in context', 'Stories and language learning stay connected to community.'],
       ['volume', 'Listen and speak', 'Hear phrases, practice pronunciation and explore tonal patterns.'],
-      ['code', 'Create with code', 'Build computational thinking through interactive STEM lessons.']
+      ['message', 'Practice conversations', 'Rehearse everyday dialogue with a patient partner that speaks and listens.']
     ];
     return `<section class="home-benefits-section home-ribbon-section" aria-labelledby="home-benefits-title"><div class="container"><div class="home-section-heading"><span class="section-kicker">A learning space for every kind of curious</span><h2 id="home-benefits-title">Why Idilewa?</h2><p>Language, culture and technology belong in the same learning journey.</p></div><div class="home-benefits-grid">${benefits.map(([glyph,title,copy]) => `<article class="home-benefit"><span class="home-benefit-icon">${icon(glyph, 24)}</span><h3>${title}</h3><p>${copy}</p></article>`).join('')}</div></div></section>`;
   }
@@ -802,13 +786,13 @@ import {
   function renderHomeAppPreview() {
     const previews = [
       { title: 'Hear a greeting', label: 'Yorùbá · Language', copy: 'Start with a phrase, then listen for the tones that shape its meaning.', image: 'page-languages-1.jpg', route: 'languages', action: 'Explore languages' },
-      { title: 'Explore technology', label: 'STEM curriculum', copy: 'Discover hands-on technology and problem-solving lessons.', image: 'code-kids.jpg', route: 'curriculum', action: 'Explore curriculum' },
+      { title: 'Practise a conversation', label: 'AI Conversations', copy: 'Rehearse everyday, market and travel dialogue with gentle spoken replies.', image: 'listening-reader.jpg', route: 'ai-conversations', action: 'Start practising' },
       { title: 'Find a story', label: 'Stories · Culture', copy: 'Read, listen and explore folktales, traditions and riddles.', image: 'story-grandmother.jpg', route: 'ere', action: 'Explore stories' },
       { title: 'Practice a sound', label: 'Voice Lessons', copy: 'Build confidence with vowels, consonants and guided speaking practice.', image: 'listening-reader.jpg', route: 'voice_lessons', action: 'Start a lesson' }
     ];
     const phonePreviews = [
       { type: 'language', glyph: 'Ẹ', label: 'YORÙBÁ · FIRST WORDS', title: 'Ẹ káàárọ̀', copy: 'Good morning', action: 'Listen', text: 'Ẹ káàárọ̀' },
-      { type: 'code', glyph: '</>', label: 'CODE · CREATE', title: 'Make a pattern', copy: 'Try your first steps in code.', action: 'Explore', text: '' },
+      { type: 'code', glyph: 'Ìj', label: 'AI · CONVERSATION', title: 'Kí ni orúkọ rẹ?', copy: 'Practise a greeting reply.', action: 'Practise', text: 'Kí ni orúkọ rẹ?' },
       { type: 'story', glyph: 'Ìt', label: 'STORIES · LISTEN', title: 'A story travels', copy: 'Read, listen and share together.', action: 'Discover', text: '' },
       { type: 'voice', glyph: 'Ohùn', label: 'VOICE LESSONS', title: 'Sound foundations', copy: 'Practice vowels, consonants and tones.', action: 'Practice', text: '' }
     ];
@@ -821,7 +805,7 @@ import {
       <div class="home-app-swipe-area"><div class="home-app-swipe-heading"><div><span class="section-kicker">Look around</span><h3>One space. Many ways to grow.</h3></div></div>
         <div class="home-app-swipe-track" id="home-app-swipe-track" tabindex="0" aria-label="Automatically scrolling Idilewa learning previews">${previews.map((item, index) => renderPreviewCard(item, index)).join('')}${previews.map((item, index) => renderPreviewCard(item, index, true)).join('')}</div><div class="home-app-swipe-hint">Swipe or scroll to explore <span aria-hidden="true">→</span></div>
       </div>
-    </div></section><section class="home-principles-strip" aria-label="Idilewa learning principles"><div class="container"><span>${icon('globe', 17)} African languages</span><span>${icon('people', 17)} Family learning</span><span>${icon('leaf', 17)} Culture with context</span><span>${icon('code', 17)} STEM for young makers</span></div></section>`;
+    </div></section><section class="home-principles-strip" aria-label="Idilewa learning principles"><div class="container"><span>${icon('globe', 17)} African languages</span><span>${icon('people', 17)} Family learning</span><span>${icon('leaf', 17)} Culture with context</span><span>${icon('message', 17)} Conversation practice</span></div></section>`;
   }
 
   function renderHome() {
@@ -870,8 +854,7 @@ import {
 
   function renderFullHome() {
     const featureCards = [
-      { title: 'K–8 STEM Curriculum', desc: 'Standards-aligned lessons infused with African culture.', icon: 'layers', route: 'curriculum', tone: 'blue', tag: 'Curriculum', image: 'page-languages-1.jpg' },
-      { title: 'Technology and STEM', desc: 'Explore hands-on learning across technology and problem-solving.', icon: 'code', route: 'curriculum', tone: 'yellow', tag: 'Curriculum', image: 'code-kids.jpg' },
+      { title: 'AI Conversation Practice', desc: 'Rehearse everyday Yorùbá, Igbo, Hausa, Swahili and Pidgin dialogue with a partner that speaks and listens.', icon: 'message', route: 'ai-conversations', tone: 'blue', tag: 'Practice', image: 'listening-reader.jpg' },
       { title: 'Voice Lessons', desc: 'Start with Yorùbá sounds, then practice pitch and pronunciation across African languages.', icon: 'mic', route: 'voice_lessons', tone: 'mint', tag: 'Interactive Audio Lessons', image: 'listening-reader.jpg' },
       { title: 'Read & listen', desc: 'Hear words, voices and ideas.', icon: 'headphones', route: 'voices', tone: 'mint', tag: 'Audio & text', image: 'listening-reader.jpg' },
       { title: 'Stories & culture', desc: 'Discover stories, people and traditions.', icon: 'book', route: 'ere', tone: 'pink', tag: 'Explore', image: 'story-grandmother.jpg' },
@@ -881,7 +864,6 @@ import {
     const books = [
       { title: 'A Morning Greeting', label: 'Yorùbá · Beginner', bg: 'cover-green', shape: 'È', route: 'course' },
       { title: 'Stories We Share', label: 'Story · Read & listen', bg: 'cover-blue', shape: '♫', route: 'ere' },
-      { title: 'Little Code Garden', label: 'English + Yorùbá', bg: 'cover-yellow', shape: '</>', route: 'curriculum' },
       { title: 'Wisdom We Carry', label: 'Culture · Short read', bg: 'cover-pink', shape: '“', route: 'oral' }
     ];
     return `
@@ -893,8 +875,8 @@ import {
             <p class="hero-mantra">Learn. Speak. Code. Create. Belong.</p>
             <p class="hero-lede">A joyful place to learn a language, hear the stories behind it and imagine what you can create next.</p>
             <div class="hero-actions">
-              ${routeLink('curriculum', `Explore Curriculum ${icon('arrow', 17)}`, 'button button-primary')}
-              ${routeLink('curriculum', `${icon('layers', 16)} Explore STEM curriculum`, 'button button-accent')}
+              ${routeLink('ai-conversations', `Start AI conversation practice ${icon('arrow', 17)}`, 'button button-primary')}
+              ${routeLink('voice_lessons', `${icon('layers', 16)} Explore voice lessons`, 'button button-accent')}
               ${routeLink('about', `${icon('play', 15)} Our story`, 'button button-outline')}
             </div>
             <div class="hero-social-proof"><div class="mini-avatars"><span>A</span><span>Ẹ</span><span>Ụ</span><span>✳</span></div><span>For curious learners, families<br class="desktop-only" /> and the next generation</span></div>
@@ -1027,30 +1009,30 @@ import {
             </div>
           </div>
 
-          <!-- Pillar 5: K-8 Code & STEM -->
+          <!-- Pillar 5: AI Conversation Practice -->
           <div class="journey-card-3d tone-blue">
             <div class="journey-card-header">
-              <div class="journey-3d-step-badge">Pillar 05 · Koodu</div>
-              <span class="journey-3d-glyph">&lt;/&gt;</span>
+              <div class="journey-3d-step-badge">Pillar 05 · Ìjíròrò</div>
+              <span class="journey-3d-glyph">🗣</span>
             </div>
             <div class="journey-3d-content">
-              <h3>Indigenous STEM &amp; Code</h3>
-              <p>K-8 computational thinking in African languages. Unplugged logic for K–2, turtle geometry for 3–5, full syntax for 6–8.</p>
+              <h3>Guided AI Conversation</h3>
+              <p>Practise everyday, market, travel, school and storytelling conversations with a patient partner that speaks and listens.</p>
               <ul class="journey-highlights" aria-label="Key features">
-                <li><span>✓</span> Code in Yorùbá (ṣe, ti, fun, pada)</li>
-                <li><span>✓</span> Unplugged Quests &amp; Turtle Graphics</li>
-                <li><span>✓</span> Interactive In-Browser Live IDE</li>
+                <li><span>✓</span> 5 languages · 6 conversation topics</li>
+                <li><span>✓</span> Listen, repeat and save key phrases</li>
+                <li><span>✓</span> Your progress stays on your own device</li>
               </ul>
             </div>
             <div class="journey-card-action">
-              ${routeLink('curriculum', `Explore the curriculum ${icon('arrow', 15)}`, 'button button-primary')}
+              ${routeLink('ai-conversations', `Start practising ${icon('arrow', 15)}`, 'button button-primary')}
             </div>
           </div>
         </div>
       </section>
 
       <section class="container section section-start home-ribbon-section">
-        <div class="section-heading"><div><span class="section-kicker">A world of ways to learn</span><h2>Learn a little. Carry a lot.</h2><p>Choose a path that feels like you. There is always room to explore.</p></div>${routeLink('curriculum', 'Explore the curriculum ' + icon('arrow', 15), 'text-link desktop-only')}</div>
+        <div class="section-heading"><div><span class="section-kicker">A world of ways to learn</span><h2>Learn a little. Carry a lot.</h2><p>Choose a path that feels like you. There is always room to explore.</p></div>${routeLink('ai-conversations', 'Practise a conversation ' + icon('arrow', 15), 'text-link desktop-only')}</div>
         <div class="feature-grid">${featureCards.map((card) => `<a class="feature-card tone-${card.tone}" href="#/${card.route}" data-route="${card.route}"><span class="feature-card-portrait"><img src="./assets/${card.image}" alt="${card.imageAlt ? esc(card.imageAlt) : ''}" ${card.imageAlt ? '' : 'aria-hidden="true"'} loading="lazy" /></span><div class="feature-card-top"><span class="feature-icon">${icon(card.icon, 23)}</span><span class="feature-tag">${card.tag}</span></div><h3>${card.title}</h3><p>${card.desc}</p><span class="card-arrow">${icon('arrow', 17)}</span></a>`).join('')}</div>
       </section>
 
@@ -1167,7 +1149,7 @@ import {
     const pathways = [
       { icon: 'book', title: 'Learn', copy: 'African languages', route: 'voice-language' },
       { icon: 'volume', title: 'Listen', copy: 'Stories & audiobooks', route: 'voices' },
-      { icon: 'code', title: 'STEM', copy: 'Build technology skills', route: 'curriculum' },
+      { icon: 'message', title: 'Practise', copy: 'Everyday conversations', route: 'ai-conversations' },
       { icon: 'people', title: 'Join', copy: 'A global community', route: 'connect_students' }
     ];
     return `<div class="landing-home">
@@ -1902,820 +1884,6 @@ import {
 
   const codeTextFor = (languageId) => CODE_COPY[languageId] || CODE_COPY.yoruba;
 
-  const CODE_CURRICULUM_BANDS = [
-    {
-      id: 'Lower-Elementary',
-      bandKey: 'lower',
-      title: 'Lower Elementary',
-      range: 'Kindergarten to Grade 2',
-      badge: 'Ages 5–8',
-      desc: 'Foundational computer science, unplugged problem solving, directional robot logic, and early digital citizenship.',
-      flowchart: {
-        title: 'K–2nd Grade STEM Progression Roadmap',
-        image: 'https://cdn.prod.website-files.com/67515ca117da61ac21154553/688763017d473a3cf18f822b_flowchart_k-2nd.png',
-        summary: 'From pattern recognition and story-led algorithms to loop repetitions and beginner physical robotics.'
-      },
-      grades: [
-        {
-          id: 'kindergarten',
-          name: 'Kindergarten',
-          badgeColor: 'red',
-          badgeLabel: 'Red',
-          lessonCount: '36+ Pre-Built Lessons',
-          duration: '30-60 min each',
-          image: imageUrl('c4k-kindergarten.jpg'),
-          desc: 'Introduce young students to coding and robotics through the engaging Kindergarten curriculum. Designed with fun, hands-on activities, it fosters problem-solving, creativity, and foundational digital skills.',
-          topics: ['Unplugged Algorithms', 'Directional Logic', 'Robot Helper Stories', 'Pattern Recognition'],
-          bilingualFocus: 'Greetings & simple directions in African languages (Òkè, Ọ̀tún, Ìsàlẹ̀, Òsì)'
-        },
-        {
-          id: 'grade-1',
-          name: '1st Grade',
-          badgeColor: 'orange',
-          badgeLabel: 'Orange',
-          lessonCount: '36+ Pre-Built Lessons',
-          duration: '30-60 min each',
-          image: imageUrl('c4k-grade-1.jpg'),
-          desc: 'Young students will discover the basics of algorithms and robot control through interactive activities. From building simple commands to exploring robot movements, these lessons make coding an exciting hands-on adventure!',
-          topics: ['Command Sequences', 'Event Triggers (Tap & Go)', 'Early Loops', 'Basic Robotics Movements'],
-          bilingualFocus: 'Action verbs & sequence vocabulary in Yorùbá, Igbo, Hausa, and Swahili'
-        },
-        {
-          id: 'grade-2',
-          name: '2nd Grade',
-          badgeColor: 'yellow',
-          badgeLabel: 'Yellow',
-          lessonCount: '36+ Pre-Built Lessons',
-          duration: '30-60 min each',
-          image: imageUrl('c4k-grade-2.jpg'),
-          desc: 'Students will take their coding skills further by exploring complex algorithms, loops, and robot behavior. From mastering control commands to discovering basic digital communication, this class makes coding an exciting challenge!',
-          topics: ['Complex Loops (Repeat N times)', 'Conditionals (If/Else)', 'Sensor Inputs', 'Digital Communication Basics'],
-          bilingualFocus: 'Condition & choice terms (Bí / Tí ó bá, Ọ̀rọ̀ ìbánisọ̀rọ̀)'
-        }
-      ]
-    },
-    {
-      id: 'Upper-Elementary',
-      bandKey: 'upper',
-      title: 'Upper Elementary',
-      range: 'Grade 3 to 5',
-      badge: 'Ages 8–11',
-      desc: 'Visual block programming, Scratch games, micro:bit physical computing, electrical circuits, and safe digital creation.',
-      flowchart: {
-        title: '3rd–5th Grade STEM Progression Infographic',
-        image: 'https://cdn.prod.website-files.com/67515ca117da61ac21154553/68876243a382cb50defa2dff_infographic_3rd-5th.png',
-        summary: 'From Scratch animation and game physics to microcontrollers, sensor engineering, and floor plan CAD.'
-      },
-      grades: [
-        {
-          id: 'grade-3',
-          name: '3rd Grade',
-          badgeColor: 'green',
-          badgeLabel: 'Green',
-          lessonCount: '36+ Pre-Built Lessons',
-          duration: '30-60 min each',
-          image: imageUrl('c4k-grade-3.jpg'),
-          desc: 'In our 3rd Grade Course, students will tackle advanced problem-solving with conditionals and complex robot programming. From coding challenges to responsible digital creation, our lessons take their skills to the next level!',
-          topics: ['Scratch Animation & Games', 'Variables & Timers', 'Simple Circuit Components', 'Pattern Encoding'],
-          bilingualFocus: 'Variables & score tracking glosses across 4 African languages'
-        },
-        {
-          id: 'grade-4',
-          name: '4th Grade',
-          badgeColor: 'blue',
-          badgeLabel: 'Blue',
-          lessonCount: '36+ Pre-Built Lessons',
-          duration: '30-60 min each',
-          image: imageUrl('c4k-grade-4.jpg'),
-          desc: 'Our Grade 4 Curriculum introduces basic programming structures such as variables and loops, explores simple robotics with gears and sensors, and emphasises online safety and digital citizenship.',
-          topics: ['Micro:bit Microcontrollers', 'Gears & Mechanical Linkages', 'Logic Gates & Operators', 'Cyber Citizenship'],
-          bilingualFocus: 'Hardware components & safety expressions'
-        },
-        {
-          id: 'grade-5',
-          name: '5th Grade',
-          badgeColor: 'purple',
-          badgeLabel: 'Purple',
-          lessonCount: '36+ Pre-Built Lessons',
-          duration: '30-60 min each',
-          image: imageUrl('c4k-grade-5.jpg'),
-          desc: 'This course advances students to intermediate programming, incorporating functions, problem-solving, robotics, and real-world sensor applications. With a focus on research and collaboration, these lessons make coding hands-on and engaging.',
-          topics: ['Custom Functions & Parameters', '2D CAD Floor Plans', 'Sensory Robots', 'Data Spreadsheets'],
-          bilingualFocus: 'Function definitions & collaborative project terminology'
-        }
-      ]
-    },
-    {
-      id: 'Middle-School',
-      bandKey: 'middle',
-      title: 'Middle School',
-      range: 'Grade 6 to 8',
-      badge: 'Ages 11–15+',
-      desc: 'Transition to line-based languages (Python, JavaScript, HTML/CSS), 3D CAD modeling, cybersecurity defense, and artificial intelligence.',
-      flowchart: {
-        title: 'Middle School Computer Science & STEM Roadmap',
-        image: 'https://cdn.prod.website-files.com/67515ca117da61ac21154553/689080b566fcae4ee8198124_US%20General%20Flowchart%20Middle%20School.png',
-        summary: 'From text-based coding to OOP architecture, data encryption, web publication, and AI ethics.'
-      },
-      grades: [
-        {
-          id: 'grade-6',
-          name: '6th Grade',
-          badgeColor: 'blue',
-          badgeLabel: '6 Blue',
-          lessonCount: '36+ Pre-Built Lessons',
-          duration: '30-60 min each',
-          image: imageUrl('c4k-grade-6.jpg'),
-          desc: 'Students dive into advanced programming with arrays, data structures, robotics, and AI. Lessons emphasize innovation, ethics, and the impact of technology on society, preparing them for the future of tech.',
-          topics: ['JavaScript & Python Syntax', 'Arrays & Lists', 'AI Machine Learning Intro', 'Web Development (HTML/CSS)'],
-          bilingualFocus: 'Syntax translations, algorithms & African technology milestones'
-        },
-        {
-          id: 'grade-7',
-          name: '7th Grade',
-          badgeColor: 'blue',
-          badgeLabel: '7 Indigo',
-          lessonCount: '36+ Pre-Built Lessons',
-          duration: '30-60 min each',
-          image: imageUrl('c4k-grade-7.jpg'),
-          desc: 'In this course students will explore Object-Oriented Programming, learning about objects, classes, and inheritance. Lessons also cover robotics systems, digital communication, and the ethics of information in technology.',
-          topics: ['Object-Oriented Programming', 'Classes & Methods', 'Networks (Wired/Wireless)', 'Cyber Threats & Defense'],
-          bilingualFocus: 'Object models, classification & digital security terms'
-        },
-        {
-          id: 'grade-8',
-          name: '8th Grade',
-          badgeColor: 'purple',
-          badgeLabel: '8th Grade',
-          lessonCount: '36+ Pre-Built Lessons',
-          duration: '30-60 min each',
-          image: imageUrl('c4k-grade-8.jpg'),
-          desc: 'This course introduces students to advanced robotics and automation, allowing them to push the boundaries of digital collaboration and cybersecurity. Through hands-on projects and real-world applications, they dive into programming, critical thinking, and problem-solving.',
-          topics: ['Binary, ASCII & Unicode', '3D CAD Mechanical Toy Design', 'Automated Robotics', 'Full-Stack Web Projects'],
-          bilingualFocus: 'Computational linguistics & African digital preservation'
-        }
-      ]
-    }
-  ];
-
-  const C4K_FREE_LESSONS = [
-    {
-      id: 'simple-electrical-components',
-      title: 'Exploring Simple Circuit Components',
-      grades: '3-5',
-      band: 'upper',
-      bandLabel: 'Upper Elementary (3-5)',
-      category: 'Robotics & Circuits',
-      badgeColor: 'green',
-      icon: 'sparkles',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/682589bd57879a677a03ed68_electronics_robotics_circuits_lesson.png',
-      desc: 'Introduce the basics of robotics and electrical circuits using real components like buzzers, bulbs, motors, and switches.',
-      bilingual: { yoruba: 'Àwọn Ẹ̀yà Iná Ọ̀tọ̀ọ̀tọ̀ (Circuit components)', igbo: 'Ngwa eletriki dị mfe', hausa: 'Kayan Wutar Lantarki', swahili: 'Vipengele vya saketi ya umeme' },
-      duration: '45 mins',
-      highlights: ['Battery power sources', 'Closed vs open circuits', 'LED lights & buzzers', 'Interactive switch simulation']
-    },
-    {
-      id: 'exploring-patterns-with-ozzy-the-owl',
-      title: 'Exploring Patterns with Ozzy the Owl',
-      grades: '3-5',
-      band: 'upper',
-      bandLabel: 'Upper Elementary (3-5)',
-      category: 'Algorithmic Thinking',
-      badgeColor: 'green',
-      icon: 'eye',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/68258a37491fbb93a02f54e0_ozzy_patterns_Algorithmic%20thinking.png',
-      desc: 'Identify, complete, and debug visual and number patterns using clear rules and logic.',
-      bilingual: { yoruba: 'Ìfihàn Àpẹẹrẹ (Patterns & Logic)', igbo: 'Usoro ụkpụrụ na ezi uche', hausa: 'Tsarin Hankali', swahili: 'Mifumo na Mantiki' },
-      duration: '35 mins',
-      highlights: ['Pattern recognition', 'Visual sequences', 'Debugging broken rules', 'Algorithmic reasoning']
-    },
-    {
-      id: 'digital-citizenship-technology-all-around',
-      title: 'Digital Citizenship: Technology Around Us',
-      grades: '5-6',
-      band: 'upper',
-      bandLabel: 'Upper Elementary (3-5)',
-      category: 'Digital Citizenship',
-      badgeColor: 'blue',
-      icon: 'shield',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/6824a92c8b78958327d9f3e0_digital_technology_all_around.png',
-      desc: 'Explore the digital world and the devices we use every day. Think critically about the pros and cons of being online.',
-      bilingual: { yoruba: 'Ààbò Orí Ayélujára (Digital safety)', igbo: 'Nchekwa na ịntanetị', hausa: 'Tsaron Intanet', swahili: 'Uraia wa Kidijitali' },
-      duration: '40 mins',
-      highlights: ['Everyday smart devices', 'Screen time balance', 'Protecting private data', 'Kind online communication']
-    },
-    {
-      id: 'introduction-to-micro-bits',
-      title: 'Introducing Micro:bits',
-      grades: '3-5',
-      band: 'upper',
-      bandLabel: 'Upper Elementary (3-5)',
-      category: 'Hardware & Micro:bits',
-      badgeColor: 'green',
-      icon: 'layers',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/682597db5c98e45260d2f838_introduction_microbits_robotics.png',
-      desc: 'Explore the micro:bit and learn about its parts, about microcontrollers and how they receive instructions.',
-      bilingual: { yoruba: 'Kọ̀ǹpútà Kékèké (Microcontrollers)', igbo: 'Obere kọmputa nchịkwa', hausa: 'Karamar Kwamfuta', swahili: 'Kompyuta ndogo ya micro:bit' },
-      duration: '50 mins',
-      highlights: ['5x5 LED matrix', 'A & B input buttons', 'Microcontroller processors', 'Flashing first code']
-    },
-    {
-      id: 'input-and-output-devices',
-      title: 'Input and Output Devices',
-      grades: '5-6',
-      band: 'upper',
-      bandLabel: 'Upper Elementary (3-5)',
-      category: 'Hardware & Micro:bits',
-      badgeColor: 'blue',
-      icon: 'refresh',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/6825a2eba24f00f39de316e8_input_output_lesson_card.png',
-      desc: 'Explore how computers receive, process, and respond to information using input and output devices.',
-      bilingual: { yoruba: 'Ìrúnwọlé àti Ìfihàn (Input & Output)', igbo: 'Ntinye na mmepụta ozi', hausa: 'Shigarwa da Fitarwa', swahili: 'Vifaa vya Kuingiza na Kutoa Data' },
-      duration: '45 mins',
-      highlights: ['Keyboards, sensors & mics', 'Monitors, speakers & motors', 'The CPU processing loop', 'Real-world machine examples']
-    },
-    {
-      id: 'robotics-joining-materials',
-      title: 'Robotics: Joining Materials',
-      grades: '3-5',
-      band: 'upper',
-      bandLabel: 'Upper Elementary (3-5)',
-      category: 'Robotics & Circuits',
-      badgeColor: 'green',
-      icon: 'compass',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/6825a70aed91448038bfdea8_robotics_joining_materials.png',
-      desc: 'Learn how different materials are joined in robotics and simple engineering builds.',
-      bilingual: { yoruba: 'Ìsopọ̀ Àwọn Ohun Èlò (Joining materials)', igbo: 'Ijiko ngwa ọrụ', hausa: 'Hada Kayan Aiki', swahili: 'Kuunganisha Vifaa vya Roboti' },
-      duration: '40 mins',
-      highlights: ['Structural joints & fasteners', 'Pivots & axles', 'Rigid vs flexible connections', 'Engineering design process']
-    },
-    {
-      id: 'cad-designing-floor-plans',
-      title: 'CAD: Designing Floor Plans',
-      grades: '5-6',
-      band: 'upper',
-      bandLabel: 'Upper Elementary (3-5)',
-      category: 'CAD & 3D Design',
-      badgeColor: 'blue',
-      icon: 'home',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/682b847507a194824d09aeee_CAD_Designing_Floor_Plans_Lesson.png',
-      desc: 'Discover how CAD is used by architects and engineers to design buildings, cars, and cities.',
-      bilingual: { yoruba: 'Àwòrán Ilé CAD (Floor plan design)', igbo: 'Nhazi eserese ụlọ', hausa: 'Zanen Gine-gine', swahili: 'Ubunifu wa Ramani za Majengo (CAD)' },
-      duration: '50 mins',
-      highlights: ['2D architectural scale', 'Walls, doorways & windows', 'Measurement units', 'Exporting digital blueprints']
-    },
-    {
-      id: 'cad-toy-design-with-tinkercad',
-      title: 'CAD: Toy Design with Tinkercad',
-      grades: '6-8+',
-      band: 'middle',
-      bandLabel: 'Middle School (6-8)+',
-      category: 'CAD & 3D Design',
-      badgeColor: 'purple',
-      icon: 'sparkles',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/682ed8c00b9043aac0bea99d_Toy%20Design_TinkerCAD.png',
-      desc: 'Design a simple mechanical toy using Tinkercad. Learn key CAD and robotics skills like pivots, linkages, and alignment.',
-      bilingual: { yoruba: 'Àwòrán 3D Fún Ẹ̀rọ Ìṣiré (3D Toy design)', igbo: 'Imebe ihe egwuregwu 3D', hausa: 'Zanen Kayan Wasa na 3D', swahili: 'Muundo wa Vitu vya Kuchezea vya 3D' },
-      duration: '60 mins',
-      highlights: ['3D shape manipulation', 'Holes and solid groups', 'Mechanical pivots', '3D printing preparation']
-    },
-    {
-      id: 'spreadsheets-formatting-fun',
-      title: 'Spreadsheets: Formatting Fun',
-      grades: '3-5',
-      band: 'upper',
-      bandLabel: 'Upper Elementary (3-5)',
-      category: 'Spreadsheets & Data',
-      badgeColor: 'green',
-      icon: 'book',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/682f02b0c230e91424a0fdd8_Spreadsheets_Formatting_fun_LessonCard.png',
-      desc: 'Learn how to organise, format, and visualise data using spreadsheets. A beginner-friendly lesson that introduces rows, columns, cells, and file saving.',
-      bilingual: { yoruba: 'Ìtòlẹ́sẹẹsẹ̀ Dátà (Spreadsheets & Data)', igbo: 'Nhazi tebụl data', hausa: 'Teburin Bayanai', swahili: 'Majedwali na Mpangilio wa Data' },
-      duration: '45 mins',
-      highlights: ['Rows, columns & cell addresses', 'Cell color formatting', 'Simple SUM & AVERAGE formulas', 'Bar chart creation']
-    },
-    {
-      id: 'block-based-coding-vs-line-based-coding',
-      title: 'Block-Based vs Line-Based Coding',
-      grades: '6-8',
-      band: 'middle',
-      bandLabel: 'Middle School (6-8)+',
-      category: 'Coding & Games',
-      badgeColor: 'purple',
-      icon: 'code',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/682f1967c722f92a295166d9_Line_Block_Coding_Free_LEsson_Card.png',
-      desc: 'Discover the difference between block-based and line-based coding through loops and fun coding games.',
-      bilingual: { yoruba: 'Kóòdù Ẹlẹ́yà vs Kóòdù Ìlà (Blocks vs Syntax)', igbo: 'Koodu ngọngọ na koodu ederede', hausa: "Nau'o'in Lambobin Kwamfuta", swahili: 'Misimbo ya Vitalu dhidi ya Mistari' },
-      duration: '50 mins',
-      highlights: ['Scratch visual blocks vs Python syntax', 'Syntax errors vs logic bugs', 'Loops & conditions comparison', 'Smooth text-code transition']
-    },
-    {
-      id: 'robot-sensors-detecting-the-world',
-      title: 'Robot Sensors: Detecting the World',
-      grades: '6-8',
-      band: 'middle',
-      bandLabel: 'Middle School (6-8)+',
-      category: 'Robotics & Circuits',
-      badgeColor: 'purple',
-      icon: 'eye',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/682f4193d09b27eeca46e9a0_robotics_sensors_elesson%20card.png',
-      desc: 'How do robots "see" the world? Discover how sensors help robots sense, move, and react.',
-      bilingual: { yoruba: 'Àwọn Ohun Ìfura Rọ́bọ́ọ̀tì (Sensors)', igbo: 'Ihe nchọpụta rọbọt', hausa: "Kayan Jin Yanayi na Na'ura", swahili: 'Vihisi vya Roboti (Sensors)' },
-      duration: '55 mins',
-      highlights: ['Ultrasonic distance sensors', 'Light & infrared detection', 'Sensor threshold triggers', 'Autonomous obstacle avoidance']
-    },
-    {
-      id: 'exploring-games-in-scratch',
-      title: 'Exploring Games in Scratch',
-      grades: '3-5',
-      band: 'upper',
-      bandLabel: 'Upper Elementary (3-5)',
-      category: 'Coding & Games',
-      badgeColor: 'green',
-      icon: 'play',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/683000e54a844c9084375187_exploring_games_scratch_lessoncard.png',
-      desc: 'Explore how games are built in Scratch using variables, timers, and control blocks.',
-      bilingual: { yoruba: 'Ṣíṣe Eré Kóòdù nínú Scratch (Scratch Games)', igbo: 'Ime egwuregwu na Scratch', hausa: 'Kera Wasanni a Scratch', swahili: 'Kutengeneza Michezo katika Scratch' },
-      duration: '45 mins',
-      highlights: ['Sprite movement & arrow keys', 'Score & timer variables', 'Collision detection', 'Win & Game Over screens']
-    },
-    {
-      id: 'flowcharts-the-decision-making-process',
-      title: 'Flowcharts: Decision Making',
-      grades: '6-8',
-      band: 'middle',
-      bandLabel: 'Middle School (6-8)+',
-      category: 'Algorithmic Thinking',
-      badgeColor: 'purple',
-      icon: 'compass',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/6835cff283d0d34df03a7b7c_Flowcharts_lesson%20card.png',
-      desc: 'Learn how to break down everyday decisions into clear, visual steps using flowcharts.',
-      bilingual: { yoruba: 'Àwòrán Ìpinnu (Flowcharts & logic)', igbo: 'Chaatị mkpebi echiche', hausa: 'Tsarin Yanke Shawara', swahili: 'Michoro ya Mtiririko (Flowcharts)' },
-      duration: '45 mins',
-      highlights: ['Start/End terminators', 'Decision diamonds (Yes/No)', 'Process rectangles', 'Mapping complex game logic']
-    },
-    {
-      id: 'crack-the-code-ascii-and-unicode',
-      title: 'Crack the Code: ASCII and Unicode',
-      grades: '6-8+',
-      band: 'middle',
-      bandLabel: 'Middle School (6-8)+',
-      category: 'AI & Data',
-      badgeColor: 'purple',
-      icon: 'lock',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/683c7fbb28be90d2ebaa227e_crack_the_code_ASCII_Unicode_lessoncard.png',
-      desc: 'Learn how text, symbols, and emojis are stored and shared using binary code.',
-      bilingual: { yoruba: 'Àwọn Kóòdù Lẹ́tà (ASCII & Unicode)', igbo: 'Koodu ederede ASCII na Unicode', hausa: 'Fassarar Lambobin Rubutu', swahili: 'Usimbaji wa Maandishi (ASCII & Unicode)' },
-      duration: '50 mins',
-      highlights: ['ASCII character table (A=65)', 'Unicode & multilingual glyphs', 'Emoji byte encodings', 'Secret binary message decoder']
-    },
-    {
-      id: 'ozzy-explores-robots',
-      title: 'Ozzy Explores Robots',
-      grades: 'Preschool / K-2',
-      band: 'lower',
-      bandLabel: 'Lower Elementary (K-2)',
-      category: 'Robotics & Circuits',
-      badgeColor: 'red',
-      icon: 'smile',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/6841a7440966521e663c930a_ozzy_explores_robots_lesson_card.png',
-      desc: 'Meet Ozzy the owl and Dizzy the drone as you explore what robots are and how they help us, in this unplugged robotics lesson.',
-      bilingual: { yoruba: 'Àwọn Rọ́bọ́ọ̀tì Olùrànlọ́wọ́ (Robots for kids)', igbo: 'Rọbọt na-enyere anyị aka', hausa: 'Mutum-mutumi Mai Taimako', swahili: 'Roboti Zinavyotusaidia' },
-      duration: '30 mins',
-      highlights: ['What makes a machine a robot', 'Robot helper story', 'Body, brain & power parts', 'Hands-on movement roleplay']
-    },
-    {
-      id: 'exploring-artificial-intelligence',
-      title: 'Exploring Artificial Intelligence',
-      grades: '3-5',
-      band: 'upper',
-      bandLabel: 'Upper Elementary (3-5)',
-      category: 'AI & Data',
-      badgeColor: 'green',
-      icon: 'sparkles',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/6849716ffb4e02045d4ad26e_Exploring_artificial_intelligence_Lessoncard.png',
-      desc: 'An introduction to Artificial Intelligence (AI). Explore how AI recognises patterns, processes data, and learns over time.',
-      bilingual: { yoruba: 'Ọgbọ́n Àtọwọ́dá Kọ̀ǹpútà (Artificial Intelligence)', igbo: 'Amamihe Artificial Intelligence', hausa: 'Fasahar AI', swahili: 'Akili Unde (Artificial Intelligence)' },
-      duration: '45 mins',
-      highlights: ['How machines learn from data', 'Computer vision & speech recognition', 'Training vs testing examples', 'Ethical & responsible AI']
-    },
-    {
-      id: 'social-media-and-you-whats-your-brand',
-      title: 'Social Media and You: What’s Your Brand?',
-      grades: '6-8+',
-      band: 'middle',
-      bandLabel: 'Middle School (6-8)+',
-      category: 'Digital Citizenship',
-      badgeColor: 'purple',
-      icon: 'user',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/684c25beb2ff4f18d3deb053_FINAL_free%20lessons_lesson%20card_headers%20(658%20x%20502%20px)%20(4).png',
-      desc: 'Explore how personal branding and digital footprints shape your online identity.',
-      bilingual: { yoruba: 'Àpẹẹrẹ Rẹ Lórí Ayélujára (Digital identity)', igbo: 'Njirimara gị na ntanetị', hausa: 'Hotonku a Yanar Gizo', swahili: 'Utambulisho Wako Mtandaoni' },
-      duration: '45 mins',
-      highlights: ['Digital footprints & permanence', 'Privacy settings and safety', 'Constructive digital creation', 'Positive online impact']
-    },
-    {
-      id: 'my-country-my-world',
-      title: 'My Country: My World',
-      grades: '6-8',
-      band: 'middle',
-      bandLabel: 'Middle School (6-8)+',
-      category: 'Web Development',
-      badgeColor: 'purple',
-      icon: 'globe',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/68552a1f9197a895a1a1d4e6_myfirstwebsite_mycountry.png',
-      desc: 'Code your first Website! Learn how to structure and style content using HTML and CSS, changing colours, headings, and even designing a fictional country.',
-      bilingual: { yoruba: 'Kíkọ Ojú-òpó Wẹ́ẹ̀bù (Building Webpages)', igbo: 'Iwu ibe weebụ mbụ gị', hausa: 'Gina Shafin Yanar Gizo', swahili: 'Kutengeneza Tovuti Yako ya Kwanza' },
-      duration: '55 mins',
-      highlights: ['HTML tags (<h1>, <p>, <img>)', 'CSS background and color styling', 'Borders and responsive containers', 'Live browser preview']
-    },
-    {
-      id: 'scratch-text-variables',
-      title: 'Scratch: Text Variables',
-      grades: '3-5',
-      band: 'upper',
-      bandLabel: 'Upper Elementary (3-5)',
-      category: 'Coding & Games',
-      badgeColor: 'green',
-      icon: 'edit',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/686544f7f490862234b417d8_Scratch%20Text%20Variables.png',
-      desc: 'Create and use text variables in Scratch to make projects more dynamic.',
-      bilingual: { yoruba: 'Àwọn Ìpamọ́ Ọ̀rọ̀ (Text Variables)', igbo: 'Mgbanwe ederede na Scratch', hausa: "Ma'ajiyar Kalmomi", swahili: 'Vibadilika vya Maandishi (Text Variables)' },
-      duration: '40 mins',
-      highlights: ['Making custom variables', 'Joining strings with “join” blocks', 'Asking for user input (Ask & Wait)', 'Personalized character dialogue']
-    },
-    {
-      id: 'exploring-micro-bits',
-      title: 'Exploring Micro:bits Hands-On',
-      grades: '3-5',
-      band: 'upper',
-      bandLabel: 'Upper Elementary (3-5)',
-      category: 'Hardware & Micro:bits',
-      badgeColor: 'green',
-      icon: 'layers',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/686e80c5efe68b6bd79fcc06_exploring_microbits.png',
-      desc: 'Learn how micro:bits work by exploring their parts, LEDs, and buzzers and display your name on a virtual micro:bit.',
-      bilingual: { yoruba: 'Ṣíṣe Àdánwò Micro:bit (Micro:bit Lab)', igbo: 'Ihe omume Micro:bit', hausa: 'Gwajin Micro:bit', swahili: 'Majaribio ya Micro:bit' },
-      duration: '45 mins',
-      highlights: ['Show String scrolling animation', 'Custom LED icon designs', 'Play Tone melody sounds', 'Compass and shake triggers']
-    },
-    {
-      id: 'introduction-to-tess-the-dog-javascript-lesson',
-      title: 'Introduction to Tess the Dog - JavaScript',
-      grades: '6-8',
-      band: 'middle',
-      bandLabel: 'Middle School (6-8)+',
-      category: 'Coding & Games',
-      badgeColor: 'purple',
-      icon: 'code',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/687512ab7a72f165acfb6d1b_Tess%20the%20dog%20JS.png',
-      desc: 'Meet Tess the Dog and learn basic JavaScript commands to guide movements and actions.',
-      bilingual: { yoruba: 'Kóòdù JavaScript pẹ̀lú Tess (JavaScript Basics)', igbo: 'Iwu JavaScript na Tess', hausa: 'Koyan JavaScript', swahili: 'Mafunzo ya JavaScript na Mbwa Tess' },
-      duration: '50 mins',
-      highlights: ['Function calls: tess.bark(), tess.fetch()', 'Parameters & arguments', 'JavaScript camelCase syntax', 'Interactive virtual canine sandbox']
-    },
-    {
-      id: 'an-introduction-to-cyber-security',
-      title: 'An Introduction to Cyber Security',
-      grades: '7-8',
-      band: 'middle',
-      bandLabel: 'Middle School (6-8)+',
-      category: 'Cybersecurity',
-      badgeColor: 'purple',
-      icon: 'shield',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/6878d3f77c47e8422f3085ee_cyber%20security.png',
-      desc: 'Discover the basics of cybersecurity by identifying online threats like phishing, malware, and weak passwords.',
-      bilingual: { yoruba: 'Ààbò Kọ̀ǹpútà àti Nẹ́tíwọ́ọ̀kì (Cyber Security)', igbo: 'Nchekwa kọmputa na ozi', hausa: 'Kariyar Yanar Gizo', swahili: 'Usalama Mtandaoni (Cyber Security)' },
-      duration: '50 mins',
-      highlights: ['Spotting phishing emails', 'Creating fortress passwords', 'Two-Factor Authentication (2FA)', 'Safe browsing habits']
-    },
-    {
-      id: 'augmented-reality-real-world-applications',
-      title: 'Augmented Reality: Real-World Applications',
-      grades: '6-7',
-      band: 'middle',
-      bandLabel: 'Middle School (6-8)+',
-      category: 'AI & Data',
-      badgeColor: 'purple',
-      icon: 'sparkles',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/68823759c7e478e8deb2b018_AR%20Lesson%20Card.png',
-      desc: 'Discover the difference between Augmented and Virtual Reality in this interactive digital skills lesson.',
-      bilingual: { yoruba: 'Àwòrán Ayélujára Àfipọ̀ (Augmented Reality)', igbo: 'Eziokwu Augmented Reality', hausa: 'Fasahar AR', swahili: 'Uhalisia Ulioboreshwa (Augmented Reality)' },
-      duration: '45 mins',
-      highlights: ['AR vs VR definitions', 'Camera overlay tracking', 'Healthcare & engineering uses', 'Designing a phone AR filter']
-    },
-    {
-      id: 'bits-bytes-and-binary-numbers',
-      title: 'Bits, Bytes and Binary Numbers',
-      grades: '7-8',
-      band: 'middle',
-      bandLabel: 'Middle School (6-8)+',
-      category: 'AI & Data',
-      badgeColor: 'purple',
-      icon: 'lock',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/68936cb20ab474b1e00eb5a9_bits_bytes_binary_lesson_card.png',
-      desc: 'Understand how binary numbers work and why computers use them.',
-      bilingual: { yoruba: 'Àwọn Nọ́ḿbà Kọ̀ǹpútà 0 àti 1 (Binary)', igbo: 'Nọmba abụọ nke kọmputa (Binary)', hausa: 'Lambobin Binary 0 da 1', swahili: 'Namba za Mfumo wa Jozi (Binary)' },
-      duration: '45 mins',
-      highlights: ['Base-2 vs Base-10 systems', 'Powers of 2 (1, 2, 4, 8, 16, 32, 64, 128)', 'Converting numbers to binary', 'Transistors as electronic on/off switches']
-    },
-    {
-      id: 'ozzy-introduces-patterns',
-      title: 'Ozzy Introduces Patterns',
-      grades: 'Preschool / K-2',
-      band: 'lower',
-      bandLabel: 'Lower Elementary (K-2)',
-      category: 'Algorithmic Thinking',
-      badgeColor: 'red',
-      icon: 'sparkles',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/6896132640e0a68a26d89a61_ozzy_introduces_patterns_lesson.png',
-      desc: 'Discover how pattern recognition builds coding skills through this unplugged, interactive robotics and computer science lesson.',
-      bilingual: { yoruba: 'Ìfihàn Àpẹẹrẹ pẹ̀lú Ozzy (Patterns for young coders)', igbo: 'Usoro ihe atụ dị mfe', hausa: 'Kayan Tsari na Farko', swahili: 'Mifumo ya Awali ya Kujifunza' },
-      duration: '30 mins',
-      highlights: ['AB, ABB & ABC repeating rhythms', 'Pattern prediction games', 'Body percussion coding', 'Unplugged robotics logic']
-    },
-    {
-      id: 'taking-your-first-steps-in-coding',
-      title: 'Taking Your First Steps in Coding',
-      grades: 'K-2',
-      band: 'lower',
-      bandLabel: 'Lower Elementary (K-2)',
-      category: 'Algorithmic Thinking',
-      badgeColor: 'red',
-      icon: 'compass',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/68a8122e3e2695f00f7fb74a_first%20steps%20in%20coding.jpg',
-      desc: 'Learn the basics of coding through fun unplugged activities that teach sequencing, logic, and problem-solving - no computers required.',
-      bilingual: { yoruba: 'Àwọn Ìgbésẹ̀ Àkọ́kọ́ nínú Kóòdù (First steps in code)', igbo: 'Nzọụkwụ mbụ na koodu', hausa: 'Matakan Farko na Kwamfuta', swahili: 'Hatua za Kwanza katika Msimbo' },
-      duration: '35 mins',
-      highlights: ['Step-by-step algorithms', 'Direction cards (Forward, Turn)', 'Debugging human robot paths', 'Building teamwork & resilience']
-    },
-    {
-      id: 'digital-identity-and-communicating-online',
-      title: 'Digital Identity & Communicating Online',
-      grades: 'K-2',
-      band: 'lower',
-      bandLabel: 'Lower Elementary (K-2)',
-      category: 'Digital Citizenship',
-      badgeColor: 'red',
-      icon: 'smile',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/68b187ac468fdb830e0f9c7e_Digital%20Identity_Free%20Lesson.png',
-      desc: 'Learn how digital identities are formed, why online safety matters, and how to make smart choices when communicating online.',
-      bilingual: { yoruba: 'Ìbánisọ̀rọ̀ rere lórí Ayélujára (Online manners & safety)', igbo: 'Nkwurịta okwu dị mma na ntanetị', hausa: 'Kyakkyawan Sadarwa a Intanet', swahili: 'Mawasiliano Salama Mtandaoni' },
-      duration: '30 mins',
-      highlights: ['What is a screen avatar?', 'Keeping secrets & passwords safe', 'Asking an adult before sharing', 'Kind words in online spaces']
-    },
-    {
-      id: 'networks-wired-and-wireless',
-      title: 'Networks: Wired and Wireless',
-      grades: '6-7',
-      band: 'middle',
-      bandLabel: 'Middle School (6-8)+',
-      category: 'Cybersecurity',
-      badgeColor: 'purple',
-      icon: 'refresh',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/68c9804957cef7c04faf1b54_networks_wired_wireless.png',
-      desc: 'Explore wired and wireless networks, IoT, and digital connectivity through interactive tasks and a creative smart device design challenge.',
-      bilingual: { yoruba: 'Àwọn Nẹ́tíwọ́ọ̀kì Wáyà àti Aláìlówáyà (Networks & IoT)', igbo: 'Netwọk wired na wireless', hausa: 'Hanyoyin Sadarwa na Intanet', swahili: 'Mitandao ya Waya na Isiyo na Waya' },
-      duration: '50 mins',
-      highlights: ['Ethernet vs Wi-Fi vs Bluetooth', 'Routers, packets and IP addresses', 'Smart home Internet of Things (IoT)', 'Designing a solar-powered connected farm']
-    },
-    {
-      id: 'using-patterns-to-encode-and-decode',
-      title: 'Using Patterns to Encode and Decode',
-      grades: '3-5',
-      band: 'upper',
-      bandLabel: 'Upper Elementary (3-5)',
-      category: 'Algorithmic Thinking',
-      badgeColor: 'green',
-      icon: 'lock',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/68da617be13369068373328a_encoding_decoding_patterns.png',
-      desc: 'Learn how patterns, encoding, and decoding build the foundation for coding, problem-solving, and creative thinking.',
-      bilingual: { yoruba: 'Ìpamọ́ àti Ìtúmọ̀ Kóòdù (Encoding & Decoding)', igbo: 'Izo na imeghe koodu', hausa: 'Boye da Bayyana Sakonni', swahili: 'Kufunga na Kufungua Misimbo (Encoding)' },
-      duration: '40 mins',
-      highlights: ['Substitution ciphers (Caesar cipher)', 'Pattern rule tables', 'Morse code & drum rhythms', 'Creating secret classroom codes']
-    },
-    {
-      id: 'an-introduction-to-scratch',
-      title: 'An Introduction to Scratch',
-      grades: '3-5',
-      band: 'upper',
-      bandLabel: 'Upper Elementary (3-5)',
-      category: 'Coding & Games',
-      badgeColor: 'green',
-      icon: 'sparkles',
-      image: 'https://cdn.prod.website-files.com/67515ca117da61ac211545bc/68e8e5cf9aedfdf2c00545c3_scratch%20lesson%20intro.jpg',
-      desc: 'An introduction to Scratch is a beginner-friendly programming lesson where students animate sprites, explore algorithms, and build core computer science skills.',
-      bilingual: { yoruba: 'Ìbẹ̀rẹ̀ Kóòdù pẹ̀lú Scratch (Scratch Intro)', igbo: 'Mmalite koodu na Scratch', hausa: 'Fara Kayan Scratch', swahili: 'Utangulizi wa Scratch' },
-      duration: '45 mins',
-      highlights: ['Blocks palette & stage window', 'Green flag event blocks', 'Costume animations & speech bubbles', 'Sound effects and loop repetition']
-    }
-  ];
-
-  function filterFreeLessons() {
-    const bandFilter = state.coding.filter || 'all';
-    const catFilter = state.coding.category || 'all';
-    const searchQ = (state.coding.lessonSearch || '').trim().toLowerCase();
-
-    return C4K_FREE_LESSONS.filter((lesson) => {
-      if (bandFilter !== 'all' && lesson.band !== bandFilter) return false;
-      if (catFilter !== 'all' && lesson.category !== catFilter) return false;
-      if (searchQ) {
-        const hay = (lesson.title + ' ' + lesson.desc + ' ' + lesson.category + ' ' + lesson.grades + ' ' + lesson.bandLabel).toLowerCase();
-        if (!hay.includes(searchQ)) return false;
-      }
-      return true;
-    });
-  }
-
-  function renderFreeLessonCards(lessons) {
-    if (!lessons.length) {
-      return '<div class="c4k-empty-lessons"><span class="empty-icon">' + icon('search', 32) + '</span><h3>No lessons matched your search or filters</h3><p>Try resetting the category filter or choosing “All Bands”.</p><button type="button" class="button button-primary button-sm" data-action="coding-filter-band" data-band="all">Reset All Filters</button></div>';
-    }
-
-    return lessons.map((lesson) => {
-      const isDone = state.coding.completedLessons && state.coding.completedLessons.includes(lesson.id);
-      const langKey = CODE_COPY[state.coding.helperLanguage] ? state.coding.helperLanguage : 'yoruba';
-      const bilingualTerm = lesson.bilingual[langKey] || lesson.bilingual.yoruba || 'Kóòdù';
-      const highlightsHtml = (lesson.highlights || []).slice(0, 3).map((h) => '<li><span class="hl-check">✓</span> <span>' + esc(h) + '</span></li>').join('');
-
-      return '<div class="c4k-lesson-card ' + (isDone ? 'is-completed-lesson' : '') + '" data-lesson-id="' + lesson.id + '">' +
-        '<div class="activity-card-image-wrapper">' +
-          '<img src="' + lesson.image + '" loading="lazy" alt="' + esc(lesson.title) + '" class="lesson-card-image" />' +
-          '<span class="c4k-card-category-pill">' + esc(lesson.category) + '</span>' +
-          '<span class="c4k-card-band-pill">' + esc(lesson.bandLabel) + '</span>' +
-          (isDone ? '<span class="c4k-card-done-badge">' + icon('check', 14) + ' Completed</span>' : '') +
-        '</div>' +
-        '<div class="c4k-lesson-card-body">' +
-          '<div class="c4k-lesson-meta-row">' +
-            '<span class="c4k-lesson-duration">' + icon('clock', 13) + ' ' + esc(lesson.duration) + '</span>' +
-            '<span class="c4k-grades-badge">' + icon('smile', 13) + ' Grades ' + esc(lesson.grades) + '</span>' +
-          '</div>' +
-          '<h3 class="free-lessons-cards-heading">' + esc(lesson.title) + '</h3>' +
-          '<div class="c4k-bilingual-chip" title="Bilingual concept in selected African language">' +
-            '<span class="chip-lang">' + icon('globe', 13) + '</span>' +
-            '<span class="chip-text">' + esc(bilingualTerm) + '</span>' +
-          '</div>' +
-          '<p class="c4k-lesson-desc">' + esc(lesson.desc) + '</p>' +
-          (highlightsHtml ? '<ul class="c4k-card-highlights" aria-label="Key concepts">' + highlightsHtml + '</ul>' : '') +
-          '<div class="c4k-card-actions">' +
-            '<button type="button" class="button button-primary button-full c4k-start-btn" data-action="coding-start-lesson" data-lesson-id="' + lesson.id + '">' +
-              (isDone ? icon('check', 15) + ' Review Lesson' : 'Open Lesson ' + icon('arrow', 15)) +
-            '</button>' +
-          '</div>' +
-        '</div>' +
-      '</div>';
-    }).join('');
-  }
-
-  function renderCurriculumGradeCard(grade, bandId) {
-    return '<div class="activity-card c4k-grade-card" data-grade="' + grade.id + '">' +
-      '<div class="activity-card-wrapper">' +
-        '<div class="imagewrapper">' +
-          '<div class="activity-card-image-wrapper">' +
-            '<span class="badge badge-' + grade.badgeColor + '">' + esc(grade.badgeLabel) + '</span>' +
-            '<div class="activity-image">' +
-              '<img src="' + grade.image + '" loading="lazy" alt="' + esc(grade.name) + ' activity preview" class="activity-card-image" />' +
-            '</div>' +
-            '<div class="activity-gradient"></div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="activity-card-content-wrapper">' +
-          '<div class="activity-card-content">' +
-            '<div class="activity-card-header-wrapper">' +
-              '<div class="heading-6">' + esc(grade.name) + '</div>' +
-              '<div class="activity-date-wrapper">' +
-                '<div class="text-md font-weight-semibold">' + esc(grade.lessonCount) + '</div>' +
-                '<div class="text-s font-weight-medium">' + esc(grade.duration) + '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="text-md c4k-grade-desc">' + esc(grade.desc) + '</div>' +
-            '<div class="c4k-grade-topics">' +
-              grade.topics.map((t) => '<span class="c4k-topic-pill">' + esc(t) + '</span>').join('') +
-            '</div>' +
-            '<div class="c4k-grade-card-btn-row">' +
-              '<button type="button" class="button button-soft c4k-grade-syllabus-btn" data-action="coding-explore-grade" data-grade="' + grade.id + '">' +
-                'Explore Syllabus ' + icon('book', 14) +
-              '</button>' +
-              '<button type="button" class="button button-outline c4k-grade-sample-btn" data-action="close-modal-and-jump" data-target="free-lessons">' +
-                'Matching Lessons ' + icon('arrow', 14) +
-              '</button>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  }
-
-  function openCurriculumModal(gradeId) {
-    let foundGrade = null;
-    let foundBand = null;
-    for (const band of CODE_CURRICULUM_BANDS) {
-      const g = band.grades.find((item) => item.id === gradeId);
-      if (g) { foundGrade = g; foundBand = band; break; }
-    }
-    if (!foundGrade) return;
-
-    const topicsHtml = foundGrade.topics.map((t) => '<span class="curriculum-topic-tag">' + icon('check', 14) + ' ' + esc(t) + '</span>').join('');
-    const modalHtml = '<div class="modal-backdrop" data-action="close-modal">' +
-      '<section class="modal-card modal-card-curriculum" role="dialog" aria-modal="true" aria-labelledby="currModalTitle">' +
-        '<button class="modal-close icon-button" data-action="close-modal" aria-label="Close">' + icon('close', 19) + '</button>' +
-        '<div class="curriculum-modal-header">' +
-          '<span class="curriculum-band-pill">' + esc(foundBand.title) + ' · ' + esc(foundBand.badge) + '</span>' +
-          '<h2 id="currModalTitle">' + esc(foundGrade.name) + ' Curriculum Syllabus</h2>' +
-          '<div class="curriculum-meta-row">' +
-            '<span>' + icon('book', 15) + ' <strong>' + esc(foundGrade.lessonCount) + '</strong></span>' +
-            '<span>' + icon('clock', 15) + ' <strong>' + esc(foundGrade.duration) + '</strong></span>' +
-            '<span>' + icon('sparkles', 15) + ' STEM & Robotics Integrated</span>' +
-          '</div>' +
-        '</div>' +
-        '<div class="curriculum-modal-body">' +
-          '<p class="curriculum-modal-desc">' + esc(foundGrade.desc) + '</p>' +
-          '<div class="curriculum-modal-box">' +
-            '<h4>Key Computational Concepts & Modules:</h4>' +
-            '<div class="curriculum-topics-grid">' + topicsHtml + '</div>' +
-          '</div>' +
-          '<div class="curriculum-modal-box tone-mint">' +
-            '<h4>' + icon('globe', 16) + ' Cultural & Bilingual Integration:</h4>' +
-            '<p>' + esc(foundGrade.bilingualFocus) + '</p>' +
-          '</div>' +
-          '<div class="curriculum-modal-actions">' +
-            '<button type="button" class="button button-primary" data-action="close-modal-and-jump" data-target="free-lessons">' +
-              'Browse Matching Free Lessons ' + icon('arrow', 15) +
-            '</button>' +
-            '<button type="button" class="button button-outline" data-action="close-modal">Close Syllabus</button>' +
-          '</div>' +
-        '</div>' +
-      '</section>' +
-    '</div>';
-
-    const root = document.getElementById('modal-root');
-    if (root) {
-      root.innerHTML = modalHtml;
-      root.querySelector('.modal-close')?.focus();
-    }
-  }
-
-  function openFreeLessonModal(lessonId) {
-    const lesson = C4K_FREE_LESSONS.find((item) => item.id === lessonId);
-    if (!lesson) return;
-
-    const completed = state.coding.completedLessons.includes(lesson.id);
-    const highlightsHtml = lesson.highlights.map((h) => '<li>' + icon('check', 14) + ' <span>' + esc(h) + '</span></li>').join('');
-    const langKey = CODE_COPY[state.coding.helperLanguage] ? state.coding.helperLanguage : 'yoruba';
-    const bilingualNote = lesson.bilingual[langKey] || lesson.bilingual.yoruba || 'Kóòdù àti ìmọ̀ ẹ̀rọ';
-    const langLabel = LANGUAGES.find((l) => l.id === langKey)?.name || 'Yorùbá';
-
-    const modalHtml = '<div class="modal-backdrop" data-action="close-modal">' +
-      '<section class="modal-card modal-card-lesson" role="dialog" aria-modal="true" aria-labelledby="lessonModalTitle">' +
-        '<button class="modal-close icon-button" data-action="close-modal" aria-label="Close">' + icon('close', 19) + '</button>' +
-        '<div class="lesson-modal-hero">' +
-          '<div class="lesson-modal-meta">' +
-            '<span class="lesson-modal-band-badge">' + esc(lesson.bandLabel) + '</span>' +
-            '<span class="lesson-modal-cat-badge">' + esc(lesson.category) + '</span>' +
-            '<span class="lesson-modal-duration">' + icon('clock', 14) + ' ' + esc(lesson.duration) + '</span>' +
-          '</div>' +
-          '<h2 id="lessonModalTitle">' + esc(lesson.title) + '</h2>' +
-          '<p class="lesson-modal-lead">' + esc(lesson.desc) + '</p>' +
-        '</div>' +
-        '<div class="lesson-modal-grid">' +
-          '<div class="lesson-modal-col">' +
-            '<h4>' + icon('star', 16) + ' Core Learning Objectives:</h4>' +
-            '<ul class="lesson-modal-highlights">' + highlightsHtml + '</ul>' +
-          '</div>' +
-          '<div class="lesson-modal-col">' +
-            '<div class="lesson-bilingual-pill">' +
-              '<small>' + icon('globe', 14) + ' ' + langLabel + ' Bilingual Concept:</small>' +
-              '<strong>' + esc(bilingualNote) + '</strong>' +
-            '</div>' +
-            '<div class="lesson-quick-challenge">' +
-              '<h4>' + icon('sparkles', 16) + ' Maker STEM Challenge:</h4>' +
-              '<p>Try applying this concept in our interactive sandbox or robot garden quest!</p>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-        '<div class="lesson-modal-foot">' +
-          '<button type="button" class="button button-primary" data-action="coding-complete-free-lesson" data-lesson-id="' + lesson.id + '" ' + (completed ? 'disabled' : '') + '>' +
-            (completed ? icon('check', 16) + ' Completed (+15 XP Earned)' : icon('sparkles', 16) + ' Complete Lesson & Claim +15 XP') +
-          '</button>' +
-          '<button type="button" class="button button-outline" data-action="close-modal-and-jump" data-target="coding-start">' +
-            'Open in Bilingual Code Studio ' + icon('arrow', 15) +
-          '</button>' +
-          '<button type="button" class="text-link" data-action="close-modal">Close</button>' +
-        '</div>' +
-      '</section>' +
-    '</div>';
-
-    const root = document.getElementById('modal-root');
-    if (root) {
-      root.innerHTML = modalHtml;
-      root.querySelector('.modal-close')?.focus();
-    }
-  }
-
-  
-  // ==========================================
-  // CODE IN YOUR LANGUAGE ENGINE & PRESETS (IDE)
-  // ==========================================
   const IDE_PRESETS = {
     yoruba: [
       {
@@ -3748,563 +2916,6 @@ import {
   // ==========================================
   // RENDER: CODE IN YOUR LANGUAGE (IDE STANDALONE)
   // ==========================================
-  function renderIdeSidebar(currentPreset) {
-    const extensions = [
-      { id: 'yoruba-language-tools', name: 'Yorùbá Language Tools', description: 'Diacritic helpers and language-aware snippets.', icon: 'globe' },
-      { id: 'african-code-snippets', name: 'African Code Snippets', description: 'Starter patterns for the Idilewa languages.', icon: 'code' },
-      { id: 'kid-safe-runner', name: 'Kid-safe Code Runner', description: 'Run code in the existing isolated preview.', icon: 'shield' },
-      { id: 'voice-pronunciation', name: 'Voice & Pronunciation', description: 'Open pronunciation practice alongside code.', icon: 'mic' }
-    ];
-    if (state.coding.ideSidebar === 'extensions') {
-      return `<div class="ide-sidebar-title"><span>LEARNING TOOLS</span><button type="button" data-action="ide-sidebar-mode" data-mode="explorer" aria-label="Back to learning navigation">${icon('arrow', 14)}</button></div><label class="ide-extension-search-label" for="ide-extension-search">Search tools</label><input id="ide-extension-search" type="search" placeholder="Search tools" /><div class="ide-extension-list">${extensions.map((extension) => {
-        const installed = (state.coding.ideInstalledExtensions || []).includes(extension.id);
-        return `<article class="ide-extension-card" data-extension-name="${esc(extension.name.toLowerCase())}"><span class="ide-extension-icon">${icon(extension.icon, 18)}</span><div><strong>${esc(extension.name)}</strong><p>${esc(extension.description)}</p><small>Idilewa · Built-in</small></div><button type="button" data-action="ide-toggle-extension" data-extension-id="${extension.id}" aria-pressed="${installed}">${installed ? 'Installed' : 'Install'}</button></article>`;
-      }).join('')}</div>`;
-    }
-    return `<nav class="ide-learning-nav" aria-label="Learning navigation">
-      <a class="ide-nav-item" href="#/index">${icon('home', 18)}<span>Home</span></a>
-      <a class="ide-nav-item is-active" href="#/curriculum" data-route="curriculum" aria-current="page">${icon('layers', 18)}<span>Curriculum</span></a>
-      <a class="ide-nav-item" href="#/oral">${icon('book', 18)}<span>Library</span></a>
-      <a class="ide-nav-item" href="#/ere_game">${icon('gamepad', 18)}<span>Games</span></a>
-      <a class="ide-nav-item" href="#/profile">${icon('user', 18)}<span>Profile</span></a>
-    </nav>
-    <figure class="ide-nav-illustration">
-      <img src="./assets/code-reference-children.png?v=1" alt="Two children learning to code together with the words Small steps, big dreams!" />
-    </figure>`;
-  }
-
-  function renderIdeAssistant() {
-    const messages = state.coding.ideAssistantMessages || [];
-    return `<aside class="ide-assistant-panel" aria-label="Code Buddy">
-      <div class="ide-assistant-header"><span>${icon('sparkles', 16)} Code Buddy</span><span class="ide-buddy-online">● Ready to help</span></div>
-      <figure class="ide-buddy-art"><img src="./assets/code-reference-buddy.png?v=1" alt="The Code Buddy robot says, Great job! You just ran your code!" /></figure>
-      <div class="ide-assistant-notice"><strong>Need help?</strong><span>Try one step at a time:</span><ul><li>Press Run to see what your code does.</li><li>Keep your code simple.</li><li>Check for spelling mistakes.</li><li>Run your code to see the result.</li></ul></div>
-      <div class="ide-assistant-actions">
-        <button type="button" data-action="ide-load-sample">${icon('code', 14)} Show me a sample code</button>
-        <button type="button" data-action="ide-explain-code">${icon('book', 14)} Explain this code</button>
-        <button type="button" data-action="ide-next-challenge">${icon('star', 14)} Give me a new challenge</button>
-      </div>
-      <p class="ide-assistant-privacy">Code checks happen on this device; no hosted AI service is connected.</p>
-      <div class="ide-assistant-messages" id="ide-assistant-messages" aria-live="polite">${messages.length ? messages.map((message) => `<article class="ide-chat-message is-${message.role}"><small>${message.role === 'user' ? 'You' : 'Code Buddy'}</small><p>${esc(message.text)}</p></article>`).join('') : '<article class="ide-chat-message is-assistant"><small>Code Buddy</small><p>Ask about your code or check it for missing brackets and quotes.</p></article>'}</div>
-      <form class="ide-assistant-form" data-form="ide-assistant"><textarea name="question" id="ide-assistant-question" rows="3" maxlength="600" placeholder="Ask about this code…"></textarea><button type="submit" aria-label="Send question">${icon('arrow', 15)}</button></form>
-      <div class="ide-keep-going"><span aria-hidden="true">✿</span><div><strong>Keep Going!</strong><small>Every line you write is a new idea taking shape.</small></div></div>
-    </aside>`;
-  }
-
-  function initializeIdeOutputResize() {
-    const split = document.querySelector('.c4k-ide-split');
-    const handle = split?.querySelector('.ide-output-resize');
-    if (!split || !handle) return;
-
-    const minOutputHeight = 170;
-    const minEditorHeight = 140;
-    const dividerHeight = 8;
-    const getMaximumHeight = () => Math.max(
-      minOutputHeight,
-      Math.floor(split.getBoundingClientRect().height - minEditorHeight - dividerHeight),
-    );
-    const applyHeight = (requestedHeight, persist = false) => {
-      const maximum = getMaximumHeight();
-      const height = Math.min(maximum, Math.max(minOutputHeight, Math.round(requestedHeight)));
-      split.style.setProperty('--ide-output-height', `${height}px`);
-      handle.setAttribute('aria-valuemax', String(maximum));
-      handle.setAttribute('aria-valuenow', String(height));
-      handle.setAttribute('aria-valuetext', `${height} pixels`);
-      state.coding.ideOutputHeight = height;
-      if (persist) saveState();
-      return height;
-    };
-
-    if (window.matchMedia('(max-width: 620px)').matches) {
-      handle.tabIndex = -1;
-      handle.setAttribute('aria-hidden', 'true');
-      return;
-    }
-
-    applyHeight(state.coding.ideOutputHeight || defaults.coding.ideOutputHeight);
-
-    handle.addEventListener('pointerdown', (event) => {
-      if (event.button !== 0) return;
-      event.preventDefault();
-      handle.setPointerCapture(event.pointerId);
-      handle.dataset.resizing = 'true';
-    });
-    handle.addEventListener('pointermove', (event) => {
-      if (handle.dataset.resizing !== 'true') return;
-      const bounds = split.getBoundingClientRect();
-      applyHeight(bounds.bottom - event.clientY);
-    });
-    const finishResize = (event) => {
-      if (handle.dataset.resizing !== 'true') return;
-      delete handle.dataset.resizing;
-      if (handle.hasPointerCapture(event.pointerId)) handle.releasePointerCapture(event.pointerId);
-      applyHeight(state.coding.ideOutputHeight, true);
-    };
-    handle.addEventListener('pointerup', finishResize);
-    handle.addEventListener('pointercancel', finishResize);
-    handle.addEventListener('keydown', (event) => {
-      const currentHeight = state.coding.ideOutputHeight || defaults.coding.ideOutputHeight;
-      const increment = event.shiftKey ? 100 : 24;
-      let nextHeight;
-      if (event.key === 'ArrowUp' || event.key === 'PageUp') {
-        nextHeight = currentHeight + (event.key === 'PageUp' ? 100 : increment);
-      } else if (event.key === 'ArrowDown' || event.key === 'PageDown') {
-        nextHeight = currentHeight - (event.key === 'PageDown' ? 100 : increment);
-      } else if (event.key === 'Home') {
-        nextHeight = minOutputHeight;
-      } else if (event.key === 'End') {
-        nextHeight = getMaximumHeight();
-      } else {
-        return;
-      }
-      event.preventDefault();
-      applyHeight(nextHeight, true);
-    });
-    handle.addEventListener('dblclick', () => {
-      applyHeight(defaults.coding.ideOutputHeight, true);
-    });
-  }
-
-  function renderLegacyCoding() {
-    const flow = state.coding;
-    const ideLang = flow.ideLang || 'yoruba';
-    const presetsForLang = getIdePresets(ideLang);
-    const currentPreset = presetsForLang.find((p) => p.id === flow.idePresetId) || presetsForLang[0];
-    const ideCode = flow.ideCode !== undefined ? flow.ideCode : currentPreset.code;
-
-    const keywordsByLang = {
-      yoruba: [
-        { label: 'tẹ_jade', snippet: 'tẹ_jade("")' },
-        { label: 'jẹ́', snippet: 'jẹ́ orúkọ = ""' },
-        { label: 'bí', snippet: 'bí ipo == òótọ́ {\n    \n}' },
-        { label: 'kò_bá_jẹ́', snippet: 'kò_bá_jẹ́ {\n    \n}' },
-        { label: 'fún', snippet: 'fún i = 1 dé 5 {\n    \n}' },
-        { label: 'bẹ̀rẹ̀_àwòrán', snippet: 'bẹ̀rẹ̀_àwòrán()\nyi_awo("ofeefe")' }
-      ],
-      igbo: [
-        { label: 'dee', snippet: 'dee("")' },
-        { label: 'ka', snippet: 'ka aha = ""' },
-        { label: 'ọ bụrụ na', snippet: 'ọ bụrụ na ipo == eziokwu {\n    \n}' },
-        { label: 'ọzọ', snippet: 'ọzọ {\n    \n}' },
-        { label: 'maka', snippet: 'maka i = 1 ruo 5 {\n    \n}' },
-        { label: 'kwaa', snippet: 'kwaa("")' }
-      ],
-      hausa: [
-        { label: 'buga', snippet: 'buga("")' },
-        { label: 'sanya', snippet: 'sanya suna = ""' },
-        { label: 'idan', snippet: 'idan sharadi == gaskiya {\n    \n}' },
-        { label: 'in ba haka ba', snippet: 'in ba haka ba {\n    \n}' },
-        { label: 'don', snippet: 'don i = 1 zuwa 5 {\n    \n}' },
-        { label: 'rubuta', snippet: 'rubuta("")' }
-      ],
-      swahili: [
-        { label: 'andika', snippet: 'andika("")' },
-        { label: 'weka', snippet: 'weka jina = ""' },
-        { label: 'kama', snippet: 'kama hali == kweli {\n    \n}' },
-        { label: 'vinginevyo', snippet: 'vinginevyo {\n    \n}' },
-        { label: 'kwa', snippet: 'kwa i = 1 hadi 5 {\n    \n}' },
-        { label: 'chapisha', snippet: 'chapisha("")' }
-      ],
-      python: [
-        { label: 'print', snippet: 'print("")' },
-        { label: 'for in', snippet: 'for item in items:\n    print(item)' },
-        { label: 'if else', snippet: 'if condition:\n    print("True")\nelse:\n    print("False")' },
-        { label: 'def', snippet: 'def greet(name):\n    return f"Hello {name}"' },
-        { label: 'range', snippet: 'for i in range(1, 6):\n    print(i)' },
-        { label: 'list', snippet: 'items = ["Yoruba", "Igbo", "Hausa", "Swahili"]' }
-      ]
-    };
-    const kwList = keywordsByLang[ideLang] || keywordsByLang.yoruba;
-
-    const initialOutput = flow.ideOutput || (
-      '> [Idilewa Engine v2.4 Online - ' + ideLang.toUpperCase() + ']\n' +
-      '> Kọ koodu ki o tẹ "Ṣe Koodu (Run)" lati wo àbájáde.'
-    );
-
-    const sidebarMode = state.coding.ideSidebar || 'explorer';
-    const outputHeight = flow.ideOutputHeight || defaults.coding.ideOutputHeight;
-    return '<div class="coding-page ide-fullscreen-page ide-page-root">' +
-      '<section class="c4k-ide-section ide-main-standalone ide-vscode-shell" id="code-ide" aria-labelledby="ide-title">' +
-        '<div class="ide-workbench-shell">' +
-          '<header class="ide-app-topbar">' +
-            '<nav class="ide-topbar-languages" aria-label="Choose a coding language">' +
-              IDE_LOCAL_LANGUAGES.slice(0, 4).map((language) => '<button type="button" class="ide-language-chip ' + (language.id === ideLang ? 'is-active' : '') + '" data-action="ide-set-lang" data-lang="' + language.id + '" aria-pressed="' + (language.id === ideLang) + '">' + esc(language.name) + '</button>').join('') +
-              '<button type="button" class="ide-language-chip ide-python-chip ' + (ideLang === 'python' ? 'is-active' : '') + '" data-action="ide-set-lang" data-lang="python" aria-pressed="' + (ideLang === 'python') + '">Python</button>' +
-            '</nav>' +
-            '<div class="ide-topbar-account"><div class="ide-level-progress"><span>Level 1</span><meter min="0" max="100" value="' + Math.min(100, (flow.ideXp || 10) * 2) + '">Level progress</meter></div><span class="ide-maker-points">' + icon('star', 14) + ' ' + (flow.ideXp || 10) + ' XP</span><a href="#/profile" aria-label="Open your profile"><span class="ide-avatar-mark">I</span></a></div>' +
-          '</header>' +
-          '<aside class="ide-explorer-sidebar ' + (sidebarMode === 'extensions' ? 'ide-sidebar-extensions' : '') + '" aria-label="Learning navigation">' + renderIdeSidebar(currentPreset) + '</aside>' +
-          '<div class="ide-main-column">' +
-            '<section class="ide-learning-heading"><div><span class="ide-heading-eyebrow">INTERACTIVE BILINGUAL STUDIO</span><h1 id="ide-title">My Code</h1><p>Write, run and see your ideas come to life!</p></div><span class="ide-heading-level">' + icon('sparkles', 15) + ' Beginner</span></section>' +
-
-        '<div class="c4k-ide-workspace">' +
-          '<div class="ide-lesson-banner"><span class="ide-lesson-icon">' + icon('sparkles', 21) + '</span><div><span>LESSON 1</span><strong>' + esc(currentPreset.title) + '</strong><small>Let’s write your first idea and watch it appear on the screen.</small></div><span class="ide-lesson-tag">Beginner · ★</span></div>' +
-          '<div class="c4k-ide-toolbar">' +
-            '<div class="c4k-ide-lang-selector">' +
-              '<label class="toolbar-label" for="ide-language-select">Programming language:</label>' +
-              '<select id="ide-language-select" class="ide-preset-dropdown" aria-describedby="ide-language-status">' +
-                '<optgroup label="Learn in an African language">' +
-                  IDE_LOCAL_LANGUAGES.slice(0, 4).map((language) => '<option value="' + language.id + '" ' + (language.id === ideLang ? 'selected' : '') + '>' + esc(language.name) + '</option>').join('') +
-                '</optgroup>' +
-                '<optgroup label="Web · runs in this browser">' +
-                  IDE_LOCAL_LANGUAGES.slice(4).map((language) => '<option value="' + language.id + '" ' + (language.id === ideLang ? 'selected' : '') + '>' + esc(language.name) + '</option>').join('') +
-                '</optgroup>' +
-                '<optgroup label="Compiler · private Judge0 runner">' +
-                  IDE_REMOTE_LANGUAGE_OPTIONS.map((language) => '<option value="' + language.id + '" data-runner-language ' + (language.id === ideLang ? 'selected' : 'disabled') + '>' + esc(language.name) + '</option>').join('') +
-                '</optgroup>' +
-              '</select>' +
-              '<small id="ide-language-status" class="ide-language-status" role="status">Checking private language runtimes…</small>' +
-            '</div>' +
-
-            '<div class="c4k-ide-preset-selector">' +
-              '<span class="toolbar-label">Àpẹẹrẹ Ẹkọ / Preset:</span>' +
-              '<select class="ide-preset-dropdown" data-action="ide-select-preset" aria-label="Select Code Preset">' +
-                presetsForLang.map((p) => '<option value="' + p.id + '" ' + (p.id === currentPreset.id ? 'selected' : '') + '>' + esc(p.title) + '</option>').join('') +
-              '</select>' +
-            '</div>' +
-          '</div>' +
-
-          '<!-- Yoruba Diacritics Accent Bar -->' +
-          '<div class="c4k-ide-diacritics-bar">' +
-            '<span class="diacritic-label">Àmì Ohùn Yorùbá:</span>' +
-            ['á', 'à', 'é', 'è', 'ẹ́', 'ẹ̀', 'í', 'ì', 'ó', 'ò', 'ọ́', 'ọ̀', 'ú', 'ù', 'ṣ'].map((char) =>
-              '<button type="button" class="diacritic-btn" data-action="ide-insert-char" data-char="' + char + '" title="Insert ' + char + '">' + char + '</button>'
-            ).join('') +
-          '</div>' +
-
-          '<!-- Split: Code Area (Left) & Output Area (Right) -->' +
-          '<div class="c4k-ide-split">' +
-            '<!-- Left: Code Area (Editor) -->' +
-            '<div class="c4k-ide-editor-pane">' +
-              '<div class="pane-header">' +
-                '<div class="file-tab">' +
-                  '<span class="file-icon">' + icon('code', 14) + '</span>' +
-                  '<span class="file-name" id="ide-filename">' + esc(currentPreset.filename) + '</span>' +
-                '</div>' +
-                '<div class="editor-actions">' +
-                  '<button type="button" class="btn-ide-run" data-action="ide-run-code">' +
-                    icon('play', 14) + ' <span>Run My Code</span>' +
-                  '</button>' +
-                  '<button type="button" class="btn-ide-secondary" data-action="ide-reset-code" title="Reset Code">' +
-                    icon('play', 14) + ' <span>Try it!</span>' +
-                  '</button>' +
-                  '<button type="button" class="btn-ide-secondary" data-action="ide-save-code" title="Save code on this device">' +
-                    icon('check', 14) + ' <span>Save</span>' +
-                  '</button>' +
-                  '<button type="button" class="btn-ide-secondary" data-action="ide-copy-code" title="Copy Code">' +
-                    icon('check', 14) + ' <span>Ṣe Àdàkọ</span>' +
-                  '</button>' +
-                '</div>' +
-              '</div>' +
-
-              '<div class="editor-body">' +
-                '<div class="line-numbers" id="ide-line-numbers">' +
-                  ideCode.split('\n').map((_, i) => '<div>' + (i + 1) + '</div>').join('') +
-                '</div>' +
-                '<textarea class="code-textarea" id="ide-code-input" spellcheck="false" placeholder="Kọ koodu rẹ síbí...">' + esc(ideCode) + '</textarea>' +
-              '</div>' +
-
-              '<!-- Quick keyword snippets -->' +
-              '<div class="editor-keywords-bar">' +
-                '<span class="kw-label">Aṣẹ Koodu:</span>' +
-                kwList.map(kw => '<button type="button" class="kw-pill" data-action="ide-insert-snippet" data-snippet="' + esc(kw.snippet) + '">' + esc(kw.label) + '</button>').join('') +
-              '</div>' +
-            '</div>' +
-
-            '<button type="button" class="ide-output-resize" role="separator" aria-orientation="horizontal" aria-label="Resize console output area. Use arrow keys to adjust or drag the divider." aria-valuemin="170" aria-valuemax="900" aria-valuenow="' + outputHeight + '" title="Drag to resize the output panel; use arrow keys when focused"><span aria-hidden="true"></span></button>' +
-
-            '<!-- Right: Output Area -->' +
-            '<div class="c4k-ide-output-pane">' +
-              '<div class="pane-header">' +
-                '<div class="output-tab-switcher">' +
-                  '<button type="button" class="output-tab ' + (flow.ideTab === 'terminal' ? 'active' : '') + '" data-action="ide-switch-tab" data-tab="terminal">' +
-                    'Output' +
-                  '</button>' +
-                  '<button type="button" class="output-tab ' + (flow.ideTab === 'preview' ? 'active' : '') + '" data-action="ide-switch-tab" data-tab="preview">' +
-                    'Preview' +
-                  '</button>' +
-                  '<button type="button" class="output-tab ' + (flow.ideTab === 'canvas' ? 'active' : '') + '" data-action="ide-switch-tab" data-tab="canvas">' +
-                    'Canvas' +
-                  '</button>' +
-                '</div>' +
-                '<button type="button" class="btn-ide-clear" data-action="ide-clear-output" title="Clear output">' +
-                  'Clear' +
-                '</button>' +
-              '</div>' +
-
-              '<div class="output-body">' +
-                '<!-- Terminal View -->' +
-                '<div class="terminal-view ' + (flow.ideTab === 'terminal' ? '' : 'hide') + '" id="ide-terminal-view">' +
-                  '<div class="terminal-status-bar">' +
-                    '<span class="status-indicator">● Engine ready</span>' +
-                    '<span class="status-runtime" id="ide-status-runtime">Execution Time: ' + (flow.ideRuntime || '0.02ms') + '</span>' +
-                    '<span class="status-xp" id="ide-status-xp">+' + (flow.ideXp || 10) + ' Maker XP</span>' +
-                  '</div>' +
-                  '<pre class="terminal-logs" id="ide-terminal-logs">' + esc(initialOutput) + '</pre>' +
-                  '<div class="ide-translation-tools" aria-label="Translate output into African languages">' +
-                    '<label>Translations output in other African languages</label>' +
-                    '<div class="ide-translation-language-chips">' +
-                      [['yo', 'Yorùbá'], ['ha', 'Hausa'], ['ig', 'Igbo'], ['sw', 'Swahili'], ['pcm', 'Pidgin']].map(([code, label]) => '<button type="button" class="ide-translation-chip" data-action="ide-translate-to" data-language="' + code + '">' + label + '</button>').join('') +
-                    '</div>' +
-                    '<select id="ide-output-language" aria-label="Output language"><option value="yo">Yorùbá</option><option value="ig">Igbo</option><option value="ha">Hausa</option><option value="pcm">Nigerian Pidgin</option><option value="sw">Swahili</option></select>' +
-                    '<button type="button" class="button button-small button-outline" data-action="translate-ide-output">Translate</button>' +
-                    '<button type="button" class="button button-small button-outline" data-action="speak-ide-output">Say result</button>' +
-                    '<p id="ide-output-translation" class="ide-translation-result" aria-live="polite">Choose a language to translate the output.</p>' +
-                    '<small>Curated phrasebook matches only; unsupported sentences are not auto-translated.</small>' +
-                  '</div>' +
-                '</div>' +
-
-                '<!-- Canvas View -->' +
-                '<div class="canvas-view ' + (flow.ideTab === 'canvas' ? '' : 'hide') + '" id="ide-canvas-view">' +
-                  '<canvas id="ide-graphic-canvas" width="400" height="260"></canvas>' +
-                  '<div class="canvas-caption">Graphic Turtle & Shapes Renderer</div>' +
-                '</div>' +
-                '<div class="preview-view ' + (flow.ideTab === 'preview' ? '' : 'hide') + '" id="ide-preview-view">' +
-                  '<iframe id="ide-preview-frame" title="Code preview" sandbox="allow-scripts" referrerpolicy="no-referrer"></iframe>' +
-                '</div>' +
-              '</div>' +
-
-              '<!-- Line-by-Line Educational Explainer -->' +
-              '<div class="c4k-ide-explainer" id="ide-explainer-box">' +
-                '<div class="explainer-title">' +
-                  icon('sparkles', 14) + ' <span>Ètò Ẹ̀kọ́ & Ìtumọ̀ / Concept Breakdown:</span>' +
-                '</div>' +
-                '<div class="explainer-content" id="ide-explainer-content">' +
-                  (currentPreset.explainer ? currentPreset.explainer.map((step) => '<div class="explainer-step">' + step + '</div>').join('') : '<p>Execute code to view conceptual breakdown.</p>') +
-                '</div>' +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-        '</div>' +
-        renderIdeAssistant() +
-        '</div>' +
-      '</section>' +
-    '</div>';
-  }
-
-  function renderCurriculum() {
-    const flow = state.coding;
-
-    // Filter free lessons
-    const filteredLessons = C4K_FREE_LESSONS.filter((lesson) => {
-      if (flow.filter !== 'all' && lesson.band !== flow.filter) return false;
-      if (flow.category !== 'all' && lesson.category !== flow.category) return false;
-      if (flow.lessonSearch) {
-        const q = flow.lessonSearch.toLowerCase();
-        return lesson.title.toLowerCase().includes(q) || lesson.desc.toLowerCase().includes(q);
-      }
-      return true;
-    });
-
-    const categories = Array.from(new Set(C4K_FREE_LESSONS.map((l) => l.category)));
-
-    return '<div class="container route-page curriculum-page c4k-redesigned-page">' +
-      '<div class="breadcrumbs">' +
-        routeLink('index', 'Home') + '<span>/</span><strong>Curriculum</strong>' +
-      '</div>' +
-
-      '<!-- Curriculum learning hero artwork -->' +
-      '<section class="c4k-3d-hero-stage scroll-3d-reveal" id="code-hero-stage">' +
-        '<figure class="c4k-curriculum-photo">' +
-          '<img src="./assets/code-kids.jpg" alt="Two young learners working together on a coding activity on a laptop" loading="eager" />' +
-        '</figure>' +
-
-        '<div class="c4k-hero-content-wrapper">' +
-          '<div class="c4k-badge-pill">' +
-            icon('sparkles', 16) + ' <span>IDILEWA CODE FOR KIDS · K-8 INDIGENOUS STEM CURRICULUM</span>' +
-          '</div>' +
-          '<h1 class="c4k-3d-main-heading">Curriculum</h1>' +
-          '<p class="c4k-3d-sub-lead">' +
-            'From Kindergarten to Grade 8 · Engaging STEM, Algorithmic Thinking & Indigenous Language Coding for Young African Innovators.' +
-          '</p>' +
-
-          '<!-- Quick Jump Action Pills -->' +
-          '<div class="c4k-quick-pills-row">' +
-            '<button type="button" class="c4k-nav-pill active" data-action="coding-jump-band" data-band="curriculum-bands">' + icon('layers', 14) + ' K-8 Curriculum</button>' +
-            '<button type="button" class="c4k-nav-pill" data-action="coding-jump-band" data-band="free-lessons">' + icon('book', 14) + ' Free STEM Lessons (' + C4K_FREE_LESSONS.length + ')</button>' +
-            routeLink('curriculum', icon('layers', 14) + ' Curriculum', 'c4k-nav-pill') +
-          '</div>' +
-
-          '<!-- 3 Interactive Grade Band 3D Hub Cards -->' +
-          '<div class="c4k-3d-cards-grid" id="curriculum-bands">' +
-            '<div class="c4k-3d-hub-card card-k2" data-action="coding-jump-band" data-band="Lower-Elementary">' +
-              '<div class="c4k-card-3d-inner">' +
-                '<div class="c4k-hub-icon">🌱</div>' +
-                '<div class="c4k-hub-text">' +
-                  '<h3>Lower Elementary</h3>' +
-                  '<p class="c4k-grade-tag">Kindergarten – Grade 2</p>' +
-                  '<p class="c4k-desc">Visual Block Patterns, Unplugged Logic & African Cultural STEM Storytelling.</p>' +
-                '</div>' +
-                '<div class="c4k-card-cta"><span>Explore Grades K–2</span> ' + icon('arrow-right', 14) + '</div>' +
-              '</div>' +
-            '</div>' +
-
-            '<div class="c4k-3d-hub-card card-g35" data-action="coding-jump-band" data-band="Upper-Elementary">' +
-              '<div class="c4k-card-3d-inner">' +
-                '<div class="c4k-hub-icon">🌿</div>' +
-                '<div class="c4k-hub-text">' +
-                  '<h3>Upper Elementary</h3>' +
-                  '<p class="c4k-grade-tag">Grade 3 to 5</p>' +
-                  '<p class="c4k-desc">Algorithmic Decision Trees, Turtle Canvas Geometry & Yoruba Logic Syntax.</p>' +
-                '</div>' +
-                '<div class="c4k-card-cta"><span>Explore Grades 3–5</span> ' + icon('arrow-right', 14) + '</div>' +
-              '</div>' +
-            '</div>' +
-
-            '<div class="c4k-3d-hub-card card-g68" data-action="coding-jump-band" data-band="Middle-School">' +
-              '<div class="c4k-card-3d-inner">' +
-                '<div class="c4k-hub-icon">🚀</div>' +
-                '<div class="c4k-hub-text">' +
-                  '<h3>Middle School</h3>' +
-                  '<p class="c4k-grade-tag">Grade 6 to 8</p>' +
-                  '<p class="c4k-desc">Full Syntax Programming, Indigenous Functions, Physical Computing & Web.</p>' +
-                '</div>' +
-                '<div class="c4k-card-cta"><span>Explore Grades 6–8</span> ' + icon('arrow-right', 14) + '</div>' +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-      '</section>' +
-
-      '<!-- 2. Section: Lower Elementary (K-2) -->' +
-      '<section id="Lower-Elementary" class="section-foundation-phase c4k-band-section scroll-3d-reveal">' +
-        '<div class="section-container">' +
-          '<div class="container-vertical align-center">' +
-            '<div class="activity-heading">' +
-              '<div class="category-heading-wrapper">' +
-                '<div class="category-heading-list">' +
-                  '<div class="category-heading-item">' +
-                    '<span class="section-kicker">Grade Band 01 · Ages 5–8</span>' +
-                    '<h2 class="heading-4">Lower Elementary (K – 2nd Grade)</h2>' +
-                  '</div>' +
-                '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="activities-list-wrapper">' +
-              '<div class="activities-list c4k-grades-grid">' +
-                CODE_CURRICULUM_BANDS[0].grades.map((g) => renderCurriculumGradeCard(g, 'Lower-Elementary')).join('') +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-      '</section>' +
-
-      '<!-- 3. Section: Upper Elementary (3-5) -->' +
-      '<section id="Upper-Elementary" class="section-intermediate-phase c4k-band-section scroll-3d-reveal">' +
-        '<div class="section-container">' +
-          '<div class="container-vertical align-center">' +
-            '<div class="activity-heading">' +
-              '<div class="category-heading-wrapper">' +
-                '<div class="category-heading-list">' +
-                  '<div class="category-heading-item">' +
-                    '<span class="section-kicker">Grade Band 02 · Ages 8–11</span>' +
-                    '<h2 class="heading-4">Upper Elementary (Grade 3 to 5)</h2>' +
-                  '</div>' +
-                '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="activities-list-wrapper">' +
-              '<div class="activities-list c4k-grades-grid">' +
-                CODE_CURRICULUM_BANDS[1].grades.map((g) => renderCurriculumGradeCard(g, 'Upper-Elementary')).join('') +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-      '</section>' +
-
-      '<!-- 4. Section: Middle School (6-8+) -->' +
-      '<section id="Middle-School" class="section-senior-phase c4k-band-section scroll-3d-reveal">' +
-        '<div class="section-container">' +
-          '<div class="container-vertical align-center">' +
-            '<div class="activity-heading">' +
-              '<div class="category-heading-wrapper">' +
-                '<div class="category-heading-list">' +
-                  '<div class="category-heading-item">' +
-                    '<span class="section-kicker">Grade Band 03 · Ages 11–14+</span>' +
-                    '<h2 class="heading-4">Middle School (Grade 6 to 8)</h2>' +
-                  '</div>' +
-                '</div>' +
-              '</div>' +
-            '</div>' +
-            '<div class="activities-list-wrapper">' +
-              '<div class="activities-list c4k-grades-grid">' +
-                CODE_CURRICULUM_BANDS[2].grades.map((g) => renderCurriculumGradeCard(g, 'Middle-School')).join('') +
-              '</div>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-      '</section>' +
-
-      '<!-- 5. Section: Free Lessons (Teach Computer Science Today) in Cards -->' +
-      '<section class="c4k-free-lessons-section" id="free-lessons" aria-labelledby="free-lessons-title">' +
-        '<div class="c4k-free-header text-center">' +
-          '<div class="c4k-free-badge">' + icon('sparkles', 16) + ' <span>30+ FREE STEM LESSONS</span></div>' +
-          '<h2 class="c4k-free-title" id="free-lessons-title">Teach Computer Science Today</h2>' +
-          '<p class="text-sub-heading-free-lessons">Jump directly into ready-to-teach, standards-aligned STEM lessons infused with Yoruba, Igbo, Hausa and African cultural concepts.</p>' +
-        '</div>' +
-
-        '<div class="c4k-filter-box">' +
-          '<div class="c4k-filter-header">' +
-            '<div class="c4k-filter-band-pills">' +
-              '<span class="filter-description">Grade Band:</span>' +
-              '<button type="button" class="c4k-band-pill ' + (flow.filter === 'all' ? 'is-active' : '') + '" data-action="coding-filter-band" data-band="all">All Bands</button>' +
-              '<button type="button" class="c4k-band-pill ' + (flow.filter === 'k2' ? 'is-active' : '') + '" data-action="coding-filter-band" data-band="k2">K–2 Lower Elementary</button>' +
-              '<button type="button" class="c4k-band-pill ' + (flow.filter === '35' ? 'is-active' : '') + '" data-action="coding-filter-band" data-band="35">3–5 Upper Elementary</button>' +
-              '<button type="button" class="c4k-band-pill ' + (flow.filter === '68' ? 'is-active' : '') + '" data-action="coding-filter-band" data-band="68">6–8+ Middle School</button>' +
-            '</div>' +
-            '<div class="c4k-count-badge">' +
-              '<span>Showing <strong>' + filteredLessons.length + '</strong> of ' + C4K_FREE_LESSONS.length + ' free STEM lessons</span>' +
-            '</div>' +
-          '</div>' +
-
-          '<div class="c4k-category-chips-row">' +
-            '<span class="cat-label">Category:</span>' +
-            '<button type="button" class="c4k-cat-chip ' + (flow.category === 'all' ? 'is-active' : '') + '" data-action="coding-filter-category" data-cat="all">All Categories (' + C4K_FREE_LESSONS.length + ')</button>' +
-            categories.map((cat) => {
-              const count = C4K_FREE_LESSONS.filter((l) => l.category === cat).length;
-              return '<button type="button" class="c4k-cat-chip ' + (flow.category === cat ? 'is-active' : '') + '" data-action="coding-filter-category" data-cat="' + esc(cat) + '">' + esc(cat) + ' (' + count + ')</button>';
-            }).join('') +
-          '</div>' +
-        '</div>' +
-
-        '<div class="c4k-free-grid">' +
-          renderFreeLessonCards(filteredLessons) +
-        '</div>' +
-      '</section>' +
-
-      '<!-- Call to Action Banner: Jump to Code Studio -->' +
-      '<div class="curriculum-ide-cta-banner">' +
-        '<div class="curriculum-ide-cta-content">' +
-          '<h3>Ready to code in your language?</h3>' +
-          '<p>Experience live compilation in Yorùbá, Igbo, Hausa, Swahili, and Python in our interactive bilingual studio.</p>' +
-        '</div>' +
-        routeLink('curriculum', 'Explore STEM curriculum ' + icon('arrow', 15), 'curriculum-ide-cta-btn') +
-      '</div>' +
-
-      '<!-- Section: Subscription / Stay in the Loop -->' +
-      '<div class="section-footer-cta">' +
-        '<div class="section-container">' +
-          '<div class="c4k-subscribe-wrapper">' +
-            '<div class="c4k-subscribe-content">' +
-              '<span class="badge badge-curriculum-orange">Stay Connected</span>' +
-              '<h3 class="heading-3 c4k-sub-title">Get Free Monthly African STEM Lessons</h3>' +
-              '<div class="text-lg text-color-bright-overlay-80 max-width-480">' +
-                'Join thousands of teachers and families getting culturally rich STEM lesson plans, robotics challenges, and coding activities with African language roots.' +
-              '</div>' +
-              '<form class="c4k-subscribe-form" data-form="coding-subscribe">' +
-                '<input type="email" name="email" placeholder="Enter your school or guardian email…" required class="c4k-sub-input" />' +
-                '<button type="submit" class="footer-button c4k-sub-btn">' +
-                  '<span class="text-md bold">Sign Up ' + icon('arrow', 14) + '</span>' +
-                '</button>' +
-              '</form>' +
-            '</div>' +
-          '</div>' +
-        '</div>' +
-      '</div>' +
-    '</div>';
-  }
-
   function renderVoiceTranslationTool({ showDictation = true, lesson = null, language = 'yoruba' } = {}) {
     const selectedTranslation = [...state.savedTranslations, ...state.translationLessons]
       .find((item) => item.id === state.activeTranslationId);
@@ -4799,10 +3410,6 @@ import {
     { id: 'tunde', name: 'Tunde Bakare', initials: 'TB', detail: 'Talking Drum & Yorùbá Tone Coach', price: 8000, rating: '5.0', count: '59', expertise: 'Acoustics & Tone', next: 'Saturday, 1:00 PM' },
   ];
   let selectedMentorBooking = { mentorId: 'folake', day: 'Today', time: 'Morning 10:00 AM' };
-  let activePaymentChannel = 'card';
-  let activePaymentCurrency = 'NGN';
-  let activePaymentWallet = 'momo';
-
   function renderMentors() {
     const featured = MENTOR_PREVIEWS[0];
     const selected = MENTOR_PREVIEWS.find((mentor) => mentor.id === selectedMentorBooking.mentorId) || featured;
@@ -4817,7 +3424,7 @@ import {
     </article>`).join('');
     return `<div class="container route-page mentors-page">
       <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>Mentors</strong></div>
-      <header class="mentor-page-heading"><div><span class="section-kicker">Heritage scholars · Cultural & STEM mentors</span><h1>Learn with people who carry the story.</h1><p>Explore language, culture and creative technology with educators whose experience connects generations.</p></div><span class="mentor-preview-badge">${icon('info', 14)} Mentor directory preview</span></header>
+      <header class="mentor-page-heading"><div><span class="section-kicker">Heritage scholars · Language & culture mentors</span><h1>Learn with people who carry the story.</h1><p>Explore language, culture and storytelling with educators whose experience connects generations.</p></div><span class="mentor-preview-badge">${icon('info', 14)} Mentor directory preview</span></header>
       <article class="mentor-feature-card">
         <div class="mentor-feature-photo"><img src="${imageUrl(featured.photo)}" alt="Mentor profile preview for ${featured.name}" loading="lazy" /><span>${icon('sparkles', 14)} Profile preview</span></div>
         <div class="mentor-feature-content"><div class="mentor-feature-badges"><span>${icon('shield', 13)} Family-first learning</span><span>${icon('star', 13)} ${featured.rating} <small>(${featured.count})</small></span></div>
@@ -4828,35 +3435,7 @@ import {
         </div>
       </article>
       <section class="mentor-safeguarding" aria-label="Ancestral Safeguard Protocol"><span class="mentor-safety-icon">${icon('shield', 21)}</span><div><h2>Ancestral Safeguard Protocol</h2><p>Family-first learning sanctuary</p></div><ul><li>${icon('check', 14)} Parent-approved connections</li><li>${icon('lock', 14)} Private learning sessions</li><li>${icon('shield', 14)} Child safety comes first</li></ul></section>
-      <section class="mentor-list-section"><div class="mentor-list-heading"><div><span class="section-kicker">Explore the community</span><h2>Cultural & STEM mentors</h2></div><span>${MENTOR_PREVIEWS.length} profile previews</span></div><div class="mentor-list">${previewCards}</div></section>
-    </div>`;
-  }
-
-  function renderPayment(params = {}) {
-    const mentor = MENTOR_PREVIEWS.find((item) => item.id === params.mentorId);
-    const price = mentor?.price ?? 48000;
-    const title = mentor ? `Session with ${mentor.name}` : 'Idilewa Family Pass';
-    const selectedSlot = mentor ? [params.day, params.time].filter(Boolean).map((value) => esc(value)).join(' · ') : '';
-    const priceLabel = `₦${price.toLocaleString('en-NG')}`;
-    const channels = [
-      ['card', 'Card', 'credit-card'],
-      ['transfer', 'Transfer', 'landmark'],
-      ['momo', 'MoMo', 'smartphone'],
-      ['ussd', 'USSD', 'grid'],
-    ];
-    const channelButtons = channels.map(([id, label, glyph]) => `<button type="button" class="payment-channel-tab ${activePaymentChannel === id ? 'is-active' : ''}" data-action="payment-channel" data-channel="${id}" aria-pressed="${activePaymentChannel === id}">${icon(glyph, 22)}<span>${label}</span></button>`).join('');
-    const channelContent = activePaymentChannel === 'transfer'
-      ? `<section class="payment-channel-panel"><span class="payment-channel-icon">${icon('landmark', 22)}</span><h2>Virtual transfer</h2><p>A one-time account number is normally created securely for each payment. KoraPay transfer setup is not connected yet, so no account details are available.</p><button class="payment-copy-account" type="button" data-action="payment-copy-account">${icon('copy', 15)} Check transfer details</button><small>No transfer should be made from this preview.</small></section>`
-      : activePaymentChannel === 'momo'
-        ? `<section class="payment-channel-panel"><span class="payment-channel-icon">${icon('smartphone', 22)}</span><h2>Mobile money</h2><p>Choose your local wallet when KoraPay is connected. No mobile-money request is sent from this preview.</p><div class="payment-momo-options"><button type="button" class="payment-momo-option ${activePaymentWallet === 'momo' ? 'is-active' : ''}" data-action="payment-momo-select" data-wallet="momo" aria-pressed="${activePaymentWallet === 'momo'}">${icon('phone', 16)} MoMo</button><button type="button" class="payment-momo-option ${activePaymentWallet === 'mpesa' ? 'is-active' : ''}" data-action="payment-momo-select" data-wallet="mpesa" aria-pressed="${activePaymentWallet === 'mpesa'}">${icon('globe', 16)} M-Pesa</button></div></section>`
-        : activePaymentChannel === 'ussd'
-          ? `<section class="payment-channel-panel"><span class="payment-channel-icon">${icon('grid', 22)}</span><h2>Pay with USSD</h2><p>USSD codes are issued by the configured payment provider and your bank. No code or dial request is available in this preview.</p><div class="payment-disabled-code">${icon('lock', 15)} Provider setup required</div></section>`
-          : `<section class="payment-channel-panel"><span class="payment-channel-icon">${icon('credit-card', 22)}</span><h2>Bank card</h2><p>Card details are collected only by a secure, provider-hosted checkout. KoraPay is not configured for this project, so this page will not request card numbers or security codes.</p><div class="payment-card-brands"><span>VERVE</span><span>VISA</span><span>MASTERCARD</span></div></section>`;
-    return `<div class="container route-page payment-page payment-checkout-preview">
-      <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>Payment</strong></div>
-      <div class="payment-secure-strip">${icon('shield', 17)} <strong>KoraPay secure checkout</strong><span><i></i> Provider connection pending</span></div>
-      <section class="family-pass-card"><div class="family-pass-top"><span class="family-pass-discount">${icon('sparkles', 13)} ${mentor ? 'Mentor session · preview' : 'Family Pass · design preview'}</span><div class="payment-currency-switch" aria-label="Currency"><button type="button" class="is-selected" aria-pressed="true">${activePaymentCurrency}</button><button type="button" disabled title="USD pricing is not configured">USD</button><button type="button" disabled title="GBP pricing is not configured">GBP</button></div></div><h1>${title}</h1><p>${mentor ? `Selected session: ${selectedSlot || 'date and time not chosen'}.` : 'Empowering the next generation of African innovators.'}</p><div class="family-pass-price"><strong>${priceLabel}</strong><span>${mentor ? 'illustrative one-time rate' : 'illustrative annual rate · not currently offered'}</span></div><div class="family-pass-includes"><span>${icon('people', 17)} 4 Child Explorers</span><span>${icon('sparkles', 17)} Unlimited AI Speak</span><span>${icon('code', 17)} Code for Kids STEM</span><span>${icon('school', 17)} 2 Live 1-on-1 Mentors</span></div></section>
-      <section class="payment-checkout-section"><div class="payment-checkout-heading"><h2>Payment channel</h2><span>Zero hidden fees</span></div><div class="payment-channel-tabs" role="tablist" aria-label="Payment channel">${channelButtons}</div>${channelContent}<button type="button" class="payment-submit-button" disabled aria-disabled="true">${icon('lock', 18)} Secure checkout unavailable <span>${priceLabel}</span></button><div class="payment-compliance"><span>${icon('shield', 15)} PCI-DSS hosted checkout only</span><span>${icon('lock', 15)} Child and family privacy</span><p>No payment details are stored in this app. This screen is a design preview; no charge or booking is created.</p></div></section>
+      <section class="mentor-list-section"><div class="mentor-list-heading"><div><span class="section-kicker">Explore the community</span><h2>Language & culture mentors</h2></div><span>${MENTOR_PREVIEWS.length} profile previews</span></div><div class="mentor-list">${previewCards}</div></section>
     </div>`;
   }
 
@@ -4931,7 +3510,7 @@ import {
     const profile = getProfileDetails();
     const interests = [
       ['speaking', 'Speaking & listening'], ['stories', 'Stories & culture'],
-      ['coding', 'Coding & STEM'], ['family', 'Learning with family']
+      ['conversation', 'Everyday conversations'], ['family', 'Learning with family']
     ];
     return `<section class="profile-editor" aria-labelledby="profile-editor-title">
       <div class="profile-editor-heading"><span class="section-kicker">Your account · your learning path</span><h2 id="profile-editor-title">Complete your profile</h2><p>Tell us how you want to learn. You can update these details any time.</p></div>
@@ -5241,73 +3820,477 @@ import {
     return renderTutorSettings();
   }
 
-  const AI_CONVERSATION_LANGUAGES = [
-    { id: 'yoruba', name: 'Yorùbá', greeting: 'Ẹ káàárọ̀', meaning: 'Good morning', flag: '🇳🇬', speech: 'yo' },
-    { id: 'igbo', name: 'Igbo', greeting: 'Ndewo', meaning: 'Hello', flag: '🇳🇬', speech: 'ig' },
-    { id: 'hausa', name: 'Hausa', greeting: 'Sannu', meaning: 'Hello', flag: '🇳🇬', speech: 'ha' }
+  /* ==========================================================================
+     AI Conversation · Speak · Learn · Translate · Practise
+     One guided journey: welcome → choose language → choose topic → chat.
+     No live AI service is contacted; replies come from the local script below.
+     ========================================================================== */
+  const AI_CHAT_STORAGE_KEY = 'idilewa-ai-chat-v1';
+
+  const AI_CHAT_LANGUAGES = [
+    { id: 'yoruba', name: 'Yorùbá', short: 'YO', speech: 'yo', locale: 'yo-NG', hello: 'Ẹ káàárọ̀', helloEn: 'Good morning', praise: 'Ó dára gan-an!', praiseEn: 'Well done!', close: 'Ó dàá! Kí ni o fẹ́ bá mi sọ lónìí?', closeEn: 'Alright! What would you like to talk to me about today?' },
+    { id: 'igbo', name: 'Igbo', short: 'IG', speech: 'ig', locale: 'ig-NG', hello: 'Ndewo', helloEn: 'Hello', praise: 'I mere nke ọma!', praiseEn: 'You did well!', close: 'Ọ dị mma! Gịnị ka ị chọrọ ịgwa m taa?', closeEn: 'Alright! What would you like to tell me today?' },
+    { id: 'hausa', name: 'Hausa', short: 'HA', speech: 'ha', locale: 'ha-NG', hello: 'Sannu', helloEn: 'Hello', praise: 'Ka yi kyau!', praiseEn: 'Well done!', close: 'To, madalla! Me kake so mu yi magana akai yau?', closeEn: 'Alright! What would you like us to talk about today?' },
+    { id: 'swahili', name: 'Swahili', short: 'SW', speech: 'sw', locale: 'sw-KE', hello: 'Habari', helloEn: 'Hello', praise: 'Vizuri sana!', praiseEn: 'Very good!', close: 'Sawa! Unataka tuzungumze nini leo?', closeEn: 'Alright! What would you like us to talk about today?' },
+    { id: 'pidgin', name: 'Nigerian Pidgin', short: 'PG', speech: 'en', locale: 'en-NG', hello: 'How you dey?', helloEn: 'How are you?', praise: 'You try well well!', praiseEn: 'You did really well!', close: 'Alright! Wetin you wan make we talk about today?', closeEn: 'Alright! What would you like to talk about today?' }
   ];
-  const AI_CONVERSATION_STORAGE_KEY = 'idilewa-ai-conversations';
-  let aiAuthReturnRoute = 'ai-dashboard';
-  let aiConversationLanguage = state.currentLang;
-  let aiConversationRecords = null;
-  let aiConversationPending = false;
+
+  const AI_CHAT_TOPICS = [
+    { id: 'everyday', name: 'Everyday Conversation', icon: 'message', blurb: 'Greetings and everyday small talk' },
+    { id: 'family', name: 'Family & Friends', icon: 'people', blurb: 'Talk about the people close to you' },
+    { id: 'school', name: 'At School', icon: 'school', blurb: 'Classroom words and school days' },
+    { id: 'market', name: 'Market & Shopping', icon: 'cart', blurb: 'Prices, produce and polite bargaining' },
+    { id: 'culture', name: 'Culture & Traditions', icon: 'globe', blurb: 'Places, proverbs and belonging' },
+    { id: 'storytelling', name: 'Storytelling', icon: 'quote', blurb: 'Ask for a story and talk about it' }
+  ];
+
+  const AI_CHAT_DIALOGUE = {
+    yoruba: {
+      everyday: [
+        { ask: 'Báwo ni ọ ṣe wà?', askEn: 'How are you?', reply: 'Mo wà dáadáa, ẹ ṣé.', replyEn: 'I am fine, thank you.' },
+        { ask: 'Kí ni orúkọ rẹ?', askEn: 'What is your name?', reply: 'Orúkọ mi ni Adé.', replyEn: 'My name is Ade.' },
+        { ask: 'Ẹ káàárọ̀. Ṣé o sùn dáadáa?', askEn: 'Good morning. Did you sleep well?', reply: 'Bẹ́ẹ̀ ni, mo sùn dáadáa.', replyEn: 'Yes, I slept well.' }
+      ],
+      family: [
+        { ask: 'Ṣé ẹbí rẹ wà nílé?', askEn: 'Is your family at home?', reply: 'Bẹ́ẹ̀ ni, wọ́n wà nílé.', replyEn: 'Yes, they are at home.' },
+        { ask: 'Kí ni orúkọ ìyá rẹ?', askEn: 'What is your mother’s name?', reply: 'Orúkọ ìyá mi ni Fọláṣadé.', replyEn: 'My mother’s name is Fọláṣadé.' },
+        { ask: 'Ẹ kú ìrọ̀lẹ́, ṣé àwọn ọmọ wà dáadáa?', askEn: 'Good afternoon, are the children well?', reply: 'Wọ́n wà dáadáa, ẹ ṣé.', replyEn: 'They are well, thank you.' }
+      ],
+      school: [
+        { ask: 'Ṣé o lọ sí ilé-ìwé lónìí?', askEn: 'Did you go to school today?', reply: 'Bẹ́ẹ̀ ni, mo lọ sí ilé-ìwé.', replyEn: 'Yes, I went to school.' },
+        { ask: 'Kí ni o kọ́ ní ilé-ìwé?', askEn: 'What did you learn at school?', reply: 'Mo kọ́ nípa ìṣirò.', replyEn: 'I learned about numbers.' },
+        { ask: 'Ṣé olùkọ́ rẹ dára?', askEn: 'Is your teacher kind?', reply: 'Bẹ́ẹ̀ ni, olùkọ́ mi dára.', replyEn: 'Yes, my teacher is kind.' }
+      ],
+      market: [
+        { ask: 'Èló ni èyí?', askEn: 'How much is this?', reply: 'Ó jẹ́ náírà àádọ́ta.', replyEn: 'It is fifty naira.' },
+        { ask: 'Ṣé ẹ ní ọ̀gẹ̀dẹ̀?', askEn: 'Do you have bananas?', reply: 'Bẹ́ẹ̀ ni, ọ̀gẹ̀dẹ̀ wà.', replyEn: 'Yes, there are bananas.' },
+        { ask: 'Kí ni o fẹ́ ra?', askEn: 'What would you like to buy?', reply: 'Mo fẹ́ ra tòmátì.', replyEn: 'I would like to buy tomatoes.' }
+      ],
+      culture: [
+        { ask: 'Kí ni orílẹ̀-èdè rẹ?', askEn: 'What is your country?', reply: 'Orílẹ̀-èdè mi ni Nàìjíríà.', replyEn: 'My country is Nigeria.' },
+        { ask: 'Níbo ni o ti wá?', askEn: 'Where are you from?', reply: 'Mo ti Ìbàdàn wá.', replyEn: 'I am from Ibadan.' },
+        { ask: 'Ṣé o mọ òwe Yorùbá kan?', askEn: 'Do you know a Yorùbá proverb?', reply: 'Bẹ́ẹ̀ ni: sùúrù ni baba ìwà.', replyEn: 'Yes: patience is the father of good character.' }
+      ],
+      storytelling: [
+        { ask: 'Ẹ jọ̀ọ́, sọ ìtàn kan fún mi.', askEn: 'Please tell me a story.', reply: 'Ìtàn kan wà nípa ìjàpá.', replyEn: 'There is a story about the tortoise.' },
+        { ask: 'Kí ni ìjàpá ṣe nínú ìtàn?', askEn: 'What did the tortoise do in the story?', reply: 'Ìjàpá jẹ́ olóye.', replyEn: 'The tortoise was wise.' },
+        { ask: 'Báwo ni ìtàn náà ṣe parí?', askEn: 'How did the story end?', reply: 'Ìtàn náà parí pẹ̀lú ẹ̀kọ́.', replyEn: 'The story ended with a lesson.' }
+      ]
+    },
+
+    igbo: {
+      everyday: [
+        { ask: 'Kedu ka ị mere?', askEn: 'How are you?', reply: 'Adị m mma, daalụ.', replyEn: 'I am fine, thank you.' },
+        { ask: 'Kedu aha gị?', askEn: 'What is your name?', reply: 'Aha m bụ Ada.', replyEn: 'My name is Ada.' },
+        { ask: 'Ụtụtụ ọma. Ị rahụrụ ụra ọma?', askEn: 'Good morning. Did you sleep well?', reply: 'Ee, ahụrụ m ụra ọma.', replyEn: 'Yes, I slept well.' }
+      ],
+      family: [
+        { ask: 'Ndị ezinụlọ gị ọ nọ n’ụlọ?', askEn: 'Is your family at home?', reply: 'Ee, ha nọ n’ụlọ.', replyEn: 'Yes, they are at home.' },
+        { ask: 'Kedu aha nne gị?', askEn: 'What is your mother’s name?', reply: 'Aha nne m bụ Ngozi.', replyEn: 'My mother’s name is Ngozi.' },
+        { ask: 'Kedu ka ụmụaka mere?', askEn: 'How are the children?', reply: 'Ha dị mma, daalụ.', replyEn: 'They are well, thank you.' }
+      ],
+      school: [
+        { ask: 'Ị gara ụlọ akwụkwọ taa?', askEn: 'Did you go to school today?', reply: 'Ee, m gara ụlọ akwụkwọ.', replyEn: 'Yes, I went to school.' },
+        { ask: 'Gịnị ka ị mụtara?', askEn: 'What did you learn?', reply: 'Amụtara m banyere ọnụọgụgụ.', replyEn: 'I learned about numbers.' },
+        { ask: 'Onye nkụzi gị ọ dị mma?', askEn: 'Is your teacher kind?', reply: 'Ee, onye nkụzi m dị mma.', replyEn: 'Yes, my teacher is kind.' }
+      ],
+      market: [
+        { ask: 'Ego ole bụ nke a?', askEn: 'How much is this?', reply: 'Ọ bụ naira iri ise.', replyEn: 'It is fifty naira.' },
+        { ask: 'Ị nwere unere?', askEn: 'Do you have bananas?', reply: 'Ee, unere dị.', replyEn: 'Yes, there are bananas.' },
+        { ask: 'Gịnị ka ị chọrọ ịzụ?', askEn: 'What would you like to buy?', reply: 'Achọrọ m ịzụ tomato.', replyEn: 'I would like to buy tomatoes.' }
+      ],
+      culture: [
+        { ask: 'Olee obodo gị?', askEn: 'What is your country?', reply: 'Obodo m bụ Naịjịrịa.', replyEn: 'My country is Nigeria.' },
+        { ask: 'Olee ebe ị si?', askEn: 'Where are you from?', reply: 'Esi m Enugwu.', replyEn: 'I am from Enugu.' },
+        { ask: 'Ị ma ilu Igbo?', askEn: 'Do you know an Igbo proverb?', reply: 'Ee: ofu osisi adịghị eme ọhịa.', replyEn: 'Yes: one tree does not make a forest.' }
+      ],
+      storytelling: [
+        { ask: 'Biko kọọrọ m akụkọ.', askEn: 'Please tell me a story.', reply: 'Akụkọ dị banyere mbe.', replyEn: 'There is a story about the tortoise.' },
+        { ask: 'Gịnị ka mbe mere?', askEn: 'What did the tortoise do?', reply: 'Mbe nwere amamihe.', replyEn: 'The tortoise was wise.' },
+        { ask: 'Kedu ka akụkọ ahụ si gwụ?', askEn: 'How did the story end?', reply: 'Akụkọ ahụ gwụrụ na nkuzi.', replyEn: 'The story ended with a lesson.' }
+      ]
+    },
+    hausa: {
+      everyday: [
+        { ask: 'Yaya kake?', askEn: 'How are you?', reply: 'Ina lafiya, na gode.', replyEn: 'I am fine, thank you.' },
+        { ask: 'Menene sunanka?', askEn: 'What is your name?', reply: 'Sunana Amina.', replyEn: 'My name is Amina.' },
+        { ask: 'Barka da safiya. Ka yi barci lafiya?', askEn: 'Good morning. Did you sleep well?', reply: 'Na yi barci lafiya.', replyEn: 'I slept well.' }
+      ],
+      family: [
+        { ask: 'Iyalinka suna gida?', askEn: 'Is your family at home?', reply: 'Iya, suna gida.', replyEn: 'Yes, they are at home.' },
+        { ask: 'Menene sunan mahaifiyarka?', askEn: 'What is your mother’s name?', reply: 'Sunan mahaifiyata Hauwa.', replyEn: 'My mother’s name is Hauwa.' },
+        { ask: 'Yara suna lafiya?', askEn: 'Are the children well?', reply: 'Suna lafiya, na gode.', replyEn: 'They are well, thank you.' }
+      ],
+      school: [
+        { ask: 'Ka je makaranta yau?', askEn: 'Did you go to school today?', reply: 'Iya, na je makaranta.', replyEn: 'Yes, I went to school.' },
+        { ask: 'Me ka koya a makaranta?', askEn: 'What did you learn at school?', reply: 'Na koyi game da lissafi.', replyEn: 'I learned about numbers.' },
+        { ask: 'Malaminka yana da kirki?', askEn: 'Is your teacher kind?', reply: 'Iya, malamina yana da kirki.', replyEn: 'Yes, my teacher is kind.' }
+      ],
+      market: [
+        { ask: 'Nawa ne wannan?', askEn: 'How much is this?', reply: 'Naira hamsin ne.', replyEn: 'It is fifty naira.' },
+        { ask: 'Kana da ayaba?', askEn: 'Do you have bananas?', reply: 'Iya, muna da ayaba.', replyEn: 'Yes, we have bananas.' },
+        { ask: 'Me kake son saya?', askEn: 'What would you like to buy?', reply: 'Ina son sayen tumatir.', replyEn: 'I would like to buy tomatoes.' }
+      ],
+      culture: [
+        { ask: 'Wace ƙasa ce tamu?', askEn: 'Which country are you from?', reply: 'Ƙasata ita ce Najeriya.', replyEn: 'My country is Nigeria.' },
+        { ask: 'Daga ina kake?', askEn: 'Where are you from?', reply: 'Na fito daga Kano.', replyEn: 'I am from Kano.' },
+        { ask: 'Ka san karin magana na Hausa?', askEn: 'Do you know a Hausa proverb?', reply: 'Iya: hakuri maganin duniya.', replyEn: 'Yes: patience is the medicine of the world.' }
+      ],
+      storytelling: [
+        { ask: 'Don Allah ba ni labari.', askEn: 'Please tell me a story.', reply: 'Akwai labari game da kunkuru.', replyEn: 'There is a story about the tortoise.' },
+        { ask: 'Me kunkuru ya yi?', askEn: 'What did the tortoise do?', reply: 'Kunkuru yana da wayo.', replyEn: 'The tortoise was clever.' },
+        { ask: 'Yaya labarin ya ƙare?', askEn: 'How did the story end?', reply: 'Labarin ya ƙare da darasi.', replyEn: 'The story ended with a lesson.' }
+      ]
+    },
+    swahili: {
+      everyday: [
+        { ask: 'Habari yako?', askEn: 'How are you?', reply: 'Nzuri, asante.', replyEn: 'I am fine, thank you.' },
+        { ask: 'Jina lako nani?', askEn: 'What is your name?', reply: 'Jina langu ni Zuri.', replyEn: 'My name is Zuri.' },
+        { ask: 'Habari za asubuhi. Umelala vizuri?', askEn: 'Good morning. Did you sleep well?', reply: 'Ndiyo, nimelala vizuri.', replyEn: 'Yes, I slept well.' }
+      ],
+      family: [
+        { ask: 'Familia yako iko nyumbani?', askEn: 'Is your family at home?', reply: 'Ndiyo, wako nyumbani.', replyEn: 'Yes, they are at home.' },
+        { ask: 'Jina la mama yako nani?', askEn: 'What is your mother’s name?', reply: 'Jina la mama yangu ni Asha.', replyEn: 'My mother’s name is Asha.' },
+        { ask: 'Watoto wako wazima?', askEn: 'Are the children well?', reply: 'Wazima, asante.', replyEn: 'They are well, thank you.' }
+      ],
+      school: [
+        { ask: 'Umekwenda shule leo?', askEn: 'Did you go to school today?', reply: 'Ndiyo, nimekwenda shule.', replyEn: 'Yes, I went to school.' },
+        { ask: 'Umejifunza nini?', askEn: 'What did you learn?', reply: 'Nimejifunza kuhusu hesabu.', replyEn: 'I learned about numbers.' },
+        { ask: 'Mwalimu wako ni mzuri?', askEn: 'Is your teacher kind?', reply: 'Ndiyo, mwalimu wangu ni mzuri.', replyEn: 'Yes, my teacher is kind.' }
+      ],
+      market: [
+        { ask: 'Hii ni bei gani?', askEn: 'How much is this?', reply: 'Ni shilingi hamsini.', replyEn: 'It is fifty shillings.' },
+        { ask: 'Una ndizi?', askEn: 'Do you have bananas?', reply: 'Ndiyo, tuna ndizi.', replyEn: 'Yes, we have bananas.' },
+        { ask: 'Unataka kununua nini?', askEn: 'What would you like to buy?', reply: 'Nataka kununua nyanya.', replyEn: 'I would like to buy tomatoes.' }
+      ],
+      culture: [
+        { ask: 'Wewe ni raia wa nchi gani?', askEn: 'Which country are you a citizen of?', reply: 'Mimi ni raia wa Kenya.', replyEn: 'I am a citizen of Kenya.' },
+        { ask: 'Unatoka wapi?', askEn: 'Where are you from?', reply: 'Ninatoka Mombasa.', replyEn: 'I am from Mombasa.' },
+        { ask: 'Unajua methali ya Kiswahili?', askEn: 'Do you know a Swahili proverb?', reply: 'Ndiyo: haraka haraka haina baraka.', replyEn: 'Yes: hurry has no blessing.' }
+      ],
+      storytelling: [
+        { ask: 'Tafadhali niambie hadithi.', askEn: 'Please tell me a story.', reply: 'Kuna hadithi kuhusu kobe.', replyEn: 'There is a story about the tortoise.' },
+        { ask: 'Kobe alifanya nini?', askEn: 'What did the tortoise do?', reply: 'Kobe alikuwa na busara.', replyEn: 'The tortoise was wise.' },
+        { ask: 'Hadithi iliishaje?', askEn: 'How did the story end?', reply: 'Hadithi iliisha na funzo.', replyEn: 'The story ended with a lesson.' }
+      ]
+    },
+
+
+    pidgin: {
+      everyday: [
+        { ask: 'How you dey?', askEn: 'How are you?', reply: 'I dey fine, thank you.', replyEn: 'I am fine, thank you.' },
+        { ask: 'Wetin be your name?', askEn: 'What is your name?', reply: 'My name na Emeka.', replyEn: 'My name is Emeka.' },
+        { ask: 'Good morning. You sleep well?', askEn: 'Good morning. Did you sleep well?', reply: 'Yes, I sleep well.', replyEn: 'Yes, I slept well.' }
+      ],
+      family: [
+        { ask: 'Your family dey house?', askEn: 'Is your family at home?', reply: 'Yes, dem dey house.', replyEn: 'Yes, they are at home.' },
+        { ask: 'Wetin be your mama name?', askEn: 'What is your mother’s name?', reply: 'My mama name na Ngozi.', replyEn: 'My mother’s name is Ngozi.' },
+        { ask: 'How the children dey?', askEn: 'How are the children?', reply: 'Dem dey fine, thank you.', replyEn: 'They are fine, thank you.' }
+      ],
+      school: [
+        { ask: 'You go school today?', askEn: 'Did you go to school today?', reply: 'Yes, I go school.', replyEn: 'Yes, I went to school.' },
+        { ask: 'Wetin you learn for school?', askEn: 'What did you learn at school?', reply: 'I learn about number.', replyEn: 'I learned about numbers.' },
+        { ask: 'Your teacher good?', askEn: 'Is your teacher kind?', reply: 'Yes, my teacher good.', replyEn: 'Yes, my teacher is kind.' }
+      ],
+      market: [
+        { ask: 'How much be this one?', askEn: 'How much is this?', reply: 'Na fifty naira.', replyEn: 'It is fifty naira.' },
+        { ask: 'You get banana?', askEn: 'Do you have bananas?', reply: 'Yes, banana dey.', replyEn: 'Yes, there are bananas.' },
+        { ask: 'Wetin you wan buy?', askEn: 'What would you like to buy?', reply: 'I wan buy tomato.', replyEn: 'I would like to buy tomatoes.' }
+      ],
+      culture: [
+        { ask: 'Which country you come from?', askEn: 'Which country are you from?', reply: 'My country na Nigeria.', replyEn: 'My country is Nigeria.' },
+        { ask: 'Where you come from?', askEn: 'Where are you from?', reply: 'I come from Lagos.', replyEn: 'I am from Lagos.' },
+        { ask: 'You sabi one Pidgin proverb?', askEn: 'Do you know a Pidgin proverb?', reply: 'Yes: small small na how monkey take chop banana.', replyEn: 'Yes: little by little is how the monkey eats a banana.' }
+      ],
+      storytelling: [
+        { ask: 'Abeg tell me story.', askEn: 'Please tell me a story.', reply: 'One story dey about tortoise.', replyEn: 'There is a story about the tortoise.' },
+        { ask: 'Wetin tortoise do?', askEn: 'What did the tortoise do?', reply: 'Tortoise wise well well.', replyEn: 'The tortoise was very wise.' },
+        { ask: 'How the story end?', askEn: 'How did the story end?', reply: 'The story end with lesson.', replyEn: 'The story ended with a lesson.' }
+      ]
+    }
+  };
+
+  const AI_CHAT_VIEWS = [
+    { id: 'conversation', route: 'ai-conversations', label: 'AI Conversation', icon: 'message' },
+    { id: 'translate', route: 'ai-translate', label: 'Translate & Listen', icon: 'translate' },
+    { id: 'practice', route: 'ai-voice', label: 'Record & Practise', icon: 'mic' },
+    { id: 'history', route: 'ai-history', label: 'My Conversations', icon: 'clock' },
+    { id: 'saved', route: 'ai-saved', label: 'Saved Phrases', icon: 'bookmark' }
+  ];
+  const AI_CHAT_VIEW_BY_PAGE = {
+    'ai-conversations': 'conversation',
+    'ai-dashboard': 'conversation',
+    'ai-chat': 'conversation',
+    'ai-everyday': 'conversation',
+    'ai-analytics': 'history',
+    'ai-messages': 'saved',
+    'ai-profile': 'saved',
+    'ai-settings': 'translate',
+    'ai-translate': 'translate',
+    'ai-voice': 'practice',
+    'ai-history': 'history',
+    'ai-saved': 'saved'
+  };
+
+  let aiAuthReturnRoute = 'ai-conversations';
+  let aiChatState = loadAiChatState();
+  let aiChatDraft = '';
+  let aiChatPending = false;
+  let aiChatLastSpoken = '';
   let aiVoiceRecorder = null;
   let aiVoiceStream = null;
   let aiVoiceChunks = [];
+  let aiVoiceTarget = 'practice';
   let aiVoiceTranscriptionPending = false;
   let aiVoiceTranscriptionRequested = false;
-  let aiVoicePhraseIndex = 0;
   let aiVoiceTranscript = '';
-  let aiAutoSpeak = false;
+  let aiPracticeIndex = 0;
 
-  function getAiConversationLanguage(language = aiConversationLanguage) {
-    return AI_CONVERSATION_LANGUAGES.find((item) => item.id === language) || AI_CONVERSATION_LANGUAGES[0];
-  }
-
-  function getAiConversationRecords() {
-    if (aiConversationRecords) return aiConversationRecords;
-    try {
-      const saved = JSON.parse(localStorage.getItem(AI_CONVERSATION_STORAGE_KEY) || '[]');
-      if (!Array.isArray(saved)) throw new Error('Saved conversation history is not a list.');
-      aiConversationRecords = saved.filter((item) => item
-        && typeof item.id === 'string'
-        && typeof item.language === 'string'
-        && AI_CONVERSATION_LANGUAGES.some((language) => language.id === item.language)
-        && typeof item.title === 'string'
-        && Number.isFinite(item.updatedAt)
-        && Array.isArray(item.messages))
-        .map((item) => ({
-          id: item.id.slice(0, 100),
-          language: item.language,
-          title: item.title.slice(0, 80),
-          updatedAt: item.updatedAt,
-          messages: item.messages
-            .filter((message) => message && ['learner', 'assistant'].includes(message.role) && typeof message.text === 'string')
-            .slice(-40)
-            .map((message) => ({ role: message.role, text: message.text.slice(0, 500), at: Number(message.at) || item.updatedAt }))
-        }))
-        .slice(-30);
-    } catch (error) {
-      console.error('Could not read the local AI conversation history.', error);
-      aiConversationRecords = [];
+  function loadAiChatState() {
+    const fallback = { step: 'welcome', language: '', topic: '', showGloss: true, threads: {}, saved: [], translation: null };
+    let raw = null;
+    try { raw = JSON.parse(localStorage.getItem(AI_CHAT_STORAGE_KEY) || 'null'); } catch (error) {
+      console.warn('Saved AI conversation state could not be read.', error);
     }
-    return aiConversationRecords;
+    if (!raw || typeof raw !== 'object') return fallback;
+    const threads = {};
+    if (raw.threads && typeof raw.threads === 'object') {
+      Object.entries(raw.threads).forEach(([key, thread]) => {
+        const [languageId, topicId] = String(key).split(':');
+        if (!AI_CHAT_LANGUAGES.some((item) => item.id === languageId)) return;
+        if (!AI_CHAT_TOPICS.some((item) => item.id === topicId)) return;
+        if (!thread || !Array.isArray(thread.messages)) return;
+        threads[`${languageId}:${topicId}`] = {
+          updatedAt: Number(thread.updatedAt) || Date.now(),
+          messages: thread.messages
+            .filter((message) => message && ['learner', 'assistant'].includes(message.role) && typeof message.text === 'string')
+            .slice(-60)
+            .map((message) => ({
+              role: message.role,
+              text: message.text.slice(0, 500),
+              gloss: typeof message.gloss === 'string' ? message.gloss.slice(0, 500) : '',
+              at: Number(message.at) || Date.now()
+            }))
+        };
+      });
+    }
+    const saved = Array.isArray(raw.saved)
+      ? raw.saved.filter((item) => item && typeof item.text === 'string' && AI_CHAT_LANGUAGES.some((language) => language.id === item.language))
+        .map((item) => ({
+          text: item.text.slice(0, 500),
+          gloss: typeof item.gloss === 'string' ? item.gloss.slice(0, 500) : '',
+          language: item.language,
+          topic: AI_CHAT_TOPICS.some((topic) => topic.id === item.topic) ? item.topic : 'everyday',
+          at: Number(item.at) || Date.now()
+        })).slice(-60)
+      : [];
+    return {
+      step: ['welcome', 'language', 'topic', 'chat'].includes(raw.step) ? raw.step : 'welcome',
+      language: AI_CHAT_LANGUAGES.some((item) => item.id === raw.language) ? raw.language : '',
+      topic: AI_CHAT_TOPICS.some((item) => item.id === raw.topic) ? raw.topic : '',
+      showGloss: raw.showGloss !== false,
+      threads,
+      saved,
+      translation: raw.translation && typeof raw.translation.translated === 'string' ? raw.translation : null
+    };
   }
 
-  function saveAiConversationRecords() {
+  function saveAiChatState() {
     try {
-      localStorage.setItem(AI_CONVERSATION_STORAGE_KEY, JSON.stringify(getAiConversationRecords().slice(-30)));
+      localStorage.setItem(AI_CHAT_STORAGE_KEY, JSON.stringify(aiChatState));
       return true;
     } catch (error) {
-      console.error('Could not save the local AI conversation history.', error);
+      console.error('Your conversation could not be saved in this browser.', error);
       return false;
     }
   }
 
-  function getAiCurrentConversation() {
-    return getAiConversationRecords().find((item) => item.id === `everyday-${aiConversationLanguage}`) || null;
+  const aiChatLanguage = () => AI_CHAT_LANGUAGES.find((item) => item.id === aiChatState.language) || null;
+  const aiChatTopic = () => AI_CHAT_TOPICS.find((item) => item.id === aiChatState.topic) || null;
+  const aiChatThreadKey = () => `${aiChatState.language}:${aiChatState.topic}`;
+  const aiChatDialogue = () => AI_CHAT_DIALOGUE[aiChatState.language]?.[aiChatState.topic] || [];
+  const aiChatAccent = () => aiChatLanguage()?.speech || 'yo';
+  const aiChatLocale = () => aiChatLanguage()?.locale || 'yo-NG';
+
+  function aiChatThread() {
+    if (!aiChatState.language || !aiChatState.topic) return { messages: [], updatedAt: 0 };
+    const key = aiChatThreadKey();
+    if (!aiChatState.threads[key]) aiChatState.threads[key] = { messages: [], updatedAt: Date.now() };
+    return aiChatState.threads[key];
   }
 
+  function aiChatExchangeIndex() {
+    return aiChatThread().messages.filter((message) => message.role === 'learner').length;
+  }
+
+  function aiChatStartConversation() {
+    const language = aiChatLanguage();
+    const topic = aiChatTopic();
+    const dialogue = aiChatDialogue();
+    if (!language || !topic || !dialogue.length) return false;
+    aiChatState.step = 'chat';
+    const key = aiChatThreadKey();
+    const thread = aiChatState.threads[key] || { messages: [], updatedAt: Date.now() };
+    if (!thread.messages.length) {
+      thread.messages = [{ role: 'assistant', text: dialogue[0].ask, gloss: dialogue[0].askEn, at: Date.now() }];
+    }
+    thread.updatedAt = Date.now();
+    aiChatState.threads[key] = thread;
+    aiPracticeIndex = 0;
+    return saveAiChatState();
+  }
+
+  function aiChatSendMessage(value) {
+    const message = String(value || '').trim().slice(0, 300);
+    if (!message) return false;
+    const language = aiChatLanguage();
+    const dialogue = aiChatDialogue();
+    if (!language || !dialogue.length) return false;
+    const thread = aiChatThread();
+    const index = thread.messages.filter((item) => item.role === 'learner').length;
+    const scripted = dialogue[index] || null;
+    const gloss = scripted && message.toLowerCase() === scripted.reply.toLowerCase() ? scripted.replyEn : '';
+    thread.messages.push({ role: 'learner', text: message, gloss, at: Date.now() });
+    const next = dialogue[index + 1] || null;
+    thread.messages.push(next
+      ? { role: 'assistant', text: next.ask, gloss: next.askEn, at: Date.now() }
+      : { role: 'assistant', text: language.close, gloss: language.closeEn, at: Date.now() });
+    thread.messages = thread.messages.slice(-60);
+    thread.updatedAt = Date.now();
+    aiChatState.threads[aiChatThreadKey()] = thread;
+    aiChatDraft = '';
+    saveAiChatState();
+    return true;
+  }
+
+  function aiChatSavePhrase(text, gloss) {
+    const phrase = String(text || '').trim().slice(0, 500);
+    if (!phrase || !aiChatState.language) return false;
+    if (aiChatState.saved.some((item) => item.text === phrase && item.language === aiChatState.language)) return false;
+    aiChatState.saved.unshift({
+      text: phrase,
+      gloss: String(gloss || '').trim().slice(0, 500),
+      language: aiChatState.language,
+      topic: aiChatState.topic || 'everyday',
+      at: Date.now()
+    });
+    aiChatState.saved = aiChatState.saved.slice(0, 60);
+    return saveAiChatState();
+  }
+
+  function aiChatSpeakSlow(text) {
+    const synth = window.speechSynthesis;
+    if (!synth || typeof window.SpeechSynthesisUtterance !== 'function') return aiChatSpeak(text);
+    try {
+      synth.cancel();
+      const utterance = new window.SpeechSynthesisUtterance(text);
+      utterance.lang = aiChatLocale();
+      utterance.rate = 0.65;
+      synth.speak(utterance);
+      return Promise.resolve('device');
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  function aiChatSpeak(text, { slow = false } = {}) {
+    const phrase = String(text || '').trim();
+    if (!phrase) return Promise.resolve('skipped');
+    aiChatLastSpoken = phrase;
+    return (slow ? aiChatSpeakSlow(phrase) : playPlotweaverSpeech(phrase, aiChatAccent()))
+      .catch((error) => {
+        showToast(error instanceof Error ? error.message : 'This phrase could not be read aloud.', 'error');
+        return 'error';
+      });
+  }
+
+  function aiChatLastAssistantMessage() {
+    const messages = aiChatThread().messages;
+    for (let index = messages.length - 1; index >= 0; index -= 1) {
+      if (messages[index].role === 'assistant') return messages[index];
+    }
+    return null;
+  }
+
+  async function startAiVoiceRecording(target = 'practice') {
+    if (aiVoiceRecorder?.state === 'recording') return;
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      showToast('Voice recording is not available in this browser.', 'error');
+      return;
+    }
+    aiVoiceTarget = target;
+    try {
+      aiVoiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      aiVoiceChunks = [];
+      aiVoiceTranscriptionRequested = false;
+      aiVoiceRecorder = new MediaRecorder(aiVoiceStream);
+      aiVoiceRecorder.addEventListener('dataavailable', (event) => {
+        if (event.data.size) aiVoiceChunks.push(event.data);
+      });
+      aiVoiceRecorder.addEventListener('stop', () => {
+        const stream = aiVoiceStream;
+        aiVoiceStream = null;
+        stream?.getTracks().forEach((track) => track.stop());
+        const recording = new Blob(aiVoiceChunks, { type: aiVoiceRecorder?.mimeType || 'audio/webm' });
+        aiVoiceChunks = [];
+        aiVoiceRecorder = null;
+        if (!aiVoiceTranscriptionRequested || !recording.size) {
+          render();
+          return;
+        }
+        aiVoiceTranscriptionPending = true;
+        render();
+        void transcribeWithPlotweaver(recording, aiChatAccent())
+          .then((result) => {
+            const text = String(result.text || '').trim().slice(0, 500);
+            if (!text) {
+              showToast('We could not hear that clearly. Please try again.', 'error');
+              return;
+            }
+            if (aiVoiceTarget === 'chat') {
+              aiChatDraft = text;
+              showToast('Your spoken reply is ready — check it and send.');
+            } else {
+              aiVoiceTranscript = text;
+              showToast('Your voice transcription is ready.');
+            }
+          })
+          .catch((error) => showToast(error instanceof Error ? error.message : 'Your recording could not be transcribed.', 'error'))
+          .finally(() => {
+            aiVoiceTranscriptionPending = false;
+            render();
+          });
+      }, { once: true });
+      aiVoiceRecorder.start();
+      render();
+      showToast('Recording… tap the microphone again to stop.');
+    } catch (error) {
+      aiVoiceStream?.getTracks().forEach((track) => track.stop());
+      aiVoiceStream = null;
+      aiVoiceRecorder = null;
+      showToast(error instanceof Error ? error.message : 'Microphone access was not available.', 'error');
+      render();
+    }
+  }
+
+  function stopAiVoiceRecording() {
+    if (aiVoiceRecorder?.state !== 'recording') return;
+    aiVoiceTranscriptionRequested = true;
+    aiVoiceTranscriptionPending = true;
+    aiVoiceRecorder.stop();
+    render();
+  }
+
+  function aiChatProfile() {
+    const profile = getProfileDetails();
+    const name = profile.name || getCurrentUser()?.name || 'Learner';
+    return { name, initial: name.trim().charAt(0).toUpperCase() || 'S' };
+  }
+
+  function aiChatAvatarMarkup() {
+    const { initial } = aiChatProfile();
+    return profilePhoto ? `<img src="${esc(profilePhoto)}" alt="" />` : esc(initial);
+  }
   function renderAiBrand() {
     return `<a class="ai-brand" href="#/ai-conversations" data-route="ai-conversations" aria-label="Idilewa AI Conversations home">${brandLogo('Idilewa · Language · Culture · Future')}</a>`;
   }
@@ -5338,168 +4321,64 @@ import {
     </div>`;
   }
 
-  const AI_WORKSPACE_LINKS = [
-    { route: 'ai-dashboard', label: 'Dashboard', icon: 'home' },
-    { route: 'ai-chat', label: 'AI Conversation', icon: 'sparkles' },
-    { route: 'ai-analytics', label: 'Analytics', icon: 'layers' },
-    { route: 'ai-messages', label: 'Messages', icon: 'send' },
-    { route: 'ai-settings', label: 'Settings', icon: 'lock' }
-  ];
-  const AI_WORKSPACE_ACTIVE = {
-    'ai-dashboard': 'ai-dashboard',
-    'ai-chat': 'ai-chat',
-    'ai-everyday': 'ai-chat',
-    'ai-voice': 'ai-chat',
-    'ai-history': 'ai-chat',
-    'ai-analytics': 'ai-analytics',
-    'ai-profile': 'ai-dashboard',
-    'ai-messages': 'ai-messages',
-    'ai-settings': 'ai-settings'
-  };
+  function renderAiChatTopbar() {
+    return `<header class="aic-topbar">
+      <button class="aic-icon-button" type="button" data-action="aic-open-menu" aria-label="Open menu" aria-expanded="false" aria-controls="aic-drawer">${icon('menu', 21)}</button>
+      <a class="aic-brand" href="#/ai-conversations" data-route="ai-conversations" aria-label="Idilewa AI Conversation home">${brandLogo('Idilewa')}</a>
+      <div class="aic-topbar-actions">
+        <button class="aic-icon-button" type="button" data-action="aic-notifications" aria-label="Notifications">${icon('bell', 20)}</button>
+        <a class="aic-avatar" href="#/profile" data-route="profile" aria-label="Open your profile">${aiChatAvatarMarkup()}</a>
+      </div>
+    </header>`;
+  }
 
-  function renderAiWorkspace(page, title, content) {
-    const user = getCurrentUser();
-    const profile = getProfileDetails();
-    const name = profile.name || user?.name || 'Sarah Johnson';
-    const initial = name.trim().charAt(0).toUpperCase() || 'S';
-    const active = AI_WORKSPACE_ACTIVE[page] || 'ai-dashboard';
-    const links = AI_WORKSPACE_LINKS.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="ai-sidebar-link ${item.route === active ? 'is-active' : ''}" ${item.route === active ? 'aria-current="page"' : ''}>${icon(item.icon, 17)}<span>${item.label}</span></a>`).join('');
-    return `<div class="ai-workspace">
-      <aside class="ai-sidebar"><a class="ai-sidebar-brand" href="#/ai-conversations" data-route="ai-conversations" aria-label="AI Conversations home">${brandLogo('Idilewa · Language · Culture · Future')}</a>
-        <nav class="ai-sidebar-nav" aria-label="Conversation workspace">${links}<a href="#/ai-history" data-route="ai-history" class="ai-sidebar-link ${page === 'ai-history' ? 'is-active' : ''}">${icon('clock', 17)}<span>History</span></a><a href="#/ai-voice" data-route="ai-voice" class="ai-sidebar-link ${page === 'ai-voice' ? 'is-active' : ''}">${icon('mic', 17)}<span>Voice Practice</span></a></nav>
-        <a href="#/ai-profile" data-route="ai-profile" class="ai-sidebar-user"><span class="ai-user-avatar">${esc(initial)}</span><span><strong>${esc(name)}</strong><small>${user ? 'Learner' : 'Guest learner'}</small></span>${icon('arrow', 14)}</a>
-      </aside>
-      <main class="ai-workspace-main"><header class="ai-workspace-topbar"><div class="ai-topbar-title"><a href="#/ai-conversations" data-route="ai-conversations" aria-label="AI Conversations home">AI Conversations</a><span>/</span><strong>${esc(title)}</strong></div><div class="ai-topbar-actions"><span class="ai-preview-status"><i></i> Practice preview</span><a href="#/ai-profile" data-route="ai-profile" class="ai-topbar-avatar" aria-label="Open profile">${esc(initial)}</a></div></header>
-        <div class="ai-workspace-content">${content}</div>
-      </main>
+  function renderAiChatDrawer(view) {
+    const links = AI_CHAT_VIEWS.map((item) => `<a class="aic-drawer-link ${item.id === view ? 'is-active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.icon, 18)}<span>${item.label}</span></a>`).join('');
+    return `<div class="aic-drawer" id="aic-drawer" hidden>
+      <button class="aic-drawer-scrim" type="button" data-action="aic-close-menu" aria-label="Close menu" tabindex="-1"></button>
+      <div class="aic-drawer-panel" role="dialog" aria-label="AI Conversation menu">
+        <div class="aic-drawer-head">
+          <span class="aic-eyebrow"><span></span> AI Conversation</span>
+          <button class="aic-icon-button" type="button" data-action="aic-close-menu" aria-label="Close menu">${icon('close', 18)}</button>
+        </div>
+        <nav class="aic-drawer-nav" aria-label="AI Conversation sections">${links}</nav>
+        <a class="aic-drawer-link aic-drawer-home" href="#/index" data-route="index">${icon('home', 18)}<span>Back to Idilewa</span></a>
+      </div>
     </div>`;
   }
 
-  function renderAiPageHeading(eyebrow, title, description, actions = '') {
-    return `<header class="ai-page-heading"><div><span class="ai-eyebrow">${esc(eyebrow)}</span><h1>${esc(title)}</h1><p>${esc(description)}</p></div>${actions ? `<div class="ai-page-heading-actions">${actions}</div>` : ''}</header>`;
-  }
-
-  function renderAiDashboard() {
-    const records = getAiConversationRecords();
-    const profile = getProfileDetails();
-    const name = profile.name || getCurrentUser()?.name || 'Sarah';
-    const totalMessages = records.reduce((sum, item) => sum + item.messages.filter((message) => message.role === 'learner').length, 0);
-    const languages = AI_CONVERSATION_LANGUAGES.map((language) => `<button class="ai-language-card" type="button" data-action="ai-select-language" data-language="${language.id}"><span class="ai-language-flag">${language.flag}</span><strong>${esc(language.name)}</strong><small>${esc(language.meaning)}</small><span class="ai-language-card-arrow">${icon('arrow', 15)}</span></button>`).join('');
-    const recent = records.slice().sort((a, b) => b.updatedAt - a.updatedAt).slice(0, 3);
-    const recentMarkup = recent.length
-      ? recent.map((item) => `<article class="ai-recent-card"><span class="ai-recent-avatar">${getAiConversationLanguage(item.language).flag}</span><div><strong>${esc(item.title)}</strong><small>${esc(getAiConversationLanguage(item.language).name)} · ${item.messages.filter((message) => message.role === 'learner').length} messages</small></div><a class="ai-button ai-button-outline ai-button-small" href="#/ai-everyday?lang=${item.language}" data-route="ai-everyday" data-lang="${item.language}">Continue</a></article>`).join('')
-      : '<p class="ai-empty-inline">Your practice sessions will appear here when you begin.</p>';
-    return renderAiWorkspace('ai-dashboard', 'Dashboard', `
-      ${renderAiPageHeading('Your learning space', `Welcome back, ${name.split(' ')[0]}.`, 'Choose a language and start a friendly conversation.', `<a class="ai-button ai-button-green" href="#/ai-chat" data-route="ai-chat">${icon('plus', 16)} New Conversation</a>`)}
-      <section class="ai-stat-grid" aria-label="Conversation overview"><article class="ai-stat-card"><span>${icon('people', 17)} Total Conversations</span><strong>${records.length}</strong><small>Saved on this device</small></article><article class="ai-stat-card"><span>${icon('sparkles', 17)} Practice Prompts</span><strong>${totalMessages}</strong><small>Messages you have tried</small></article><article class="ai-stat-card"><span>${icon('globe', 17)} Languages</span><strong>${new Set(records.map((item) => item.language)).size || 0}</strong><small>Languages explored</small></article><article class="ai-stat-card"><span>${icon('calendar', 17)} Learning streak</span><strong>${records.length ? 'Keep going' : 'Start today'}</strong><small>A little practice adds up</small></article></section>
-      <section class="ai-dashboard-section"><div class="ai-section-title"><div><span class="ai-eyebrow">Pick a language</span><h2>Where shall we begin?</h2></div><a href="#/ai-chat" data-route="ai-chat" class="ai-text-link">All languages ${icon('arrow', 14)}</a></div><div class="ai-language-grid">${languages}</div></section>
-      <section class="ai-dashboard-section ai-dashboard-lower"><div class="ai-recent-panel"><div class="ai-section-title"><div><span class="ai-eyebrow">Keep your momentum</span><h2>Continue your conversation</h2></div><a href="#/ai-history" data-route="ai-history" class="ai-text-link">View history ${icon('arrow', 14)}</a></div>${recentMarkup}</div><aside class="ai-quick-practice"><span class="ai-quick-practice-icon">${icon('mic', 21)}</span><span class="ai-eyebrow">A little speaking practice</span><h2>Try a voice prompt</h2><p>Listen to a greeting, record your voice and review the transcript.</p><a class="ai-button ai-button-green" href="#/ai-voice" data-route="ai-voice">Open Voice Practice ${icon('arrow', 14)}</a></aside></section>
-      <p class="ai-local-note">${icon('lock', 14)} Conversation history stays in this browser. Messages are sent to Plotweaver for translation; do not enter personal information.</p>`);
-  }
-
-  function renderAiChatChooser() {
-    const cards = AI_CONVERSATION_LANGUAGES.map((language) => `<button type="button" class="ai-chooser-card" data-action="ai-select-language" data-language="${language.id}"><span class="ai-language-flag">${language.flag}</span><span class="ai-chooser-card-copy"><strong>${esc(language.name)}</strong><small>${esc(language.meaning)} · Everyday conversation</small></span>${icon('arrow', 16)}</button>`).join('');
-    return renderAiWorkspace('ai-chat', 'AI Conversation', `
-      ${renderAiPageHeading('Speak with confidence', 'What would you like to practise?', 'Choose a language to start an everyday conversation.')}
-      <section class="ai-chooser-panel"><div class="ai-section-title"><div><span class="ai-eyebrow">Available languages</span><h2>Choose your conversation</h2></div></div><div class="ai-chooser-list">${cards}</div></section>
-      <section class="ai-scenario-panel"><div class="ai-scenario-icon">${icon('sparkles', 20)}</div><div><strong>Everyday Life</strong><p>Practise greetings, introductions and simple daily conversations.</p></div><span class="ai-scenario-tag">Guided practice</span></section>`);
-  }
-
-  function renderAiEveryday(params = {}) {
-    const languageId = AI_CONVERSATION_LANGUAGES.some((item) => item.id === params.lang) ? params.lang : aiConversationLanguage;
-    aiConversationLanguage = languageId;
-    const language = getAiConversationLanguage();
-    const record = getAiCurrentConversation();
-    const messages = record?.messages?.length ? record.messages : [
-      { role: 'assistant', text: `Welcome! Let's practise a greeting in ${language.name}. You can say “${language.greeting}” to start.`, at: Date.now() }
+  function renderAiChatTabs(view) {
+    const items = [
+      { route: 'index', label: 'Home', icon: 'home', view: '' },
+      { route: 'voice_lessons', label: 'Learn', icon: 'book', view: '' },
+      { route: 'ai-conversations', label: 'AI Chat', icon: 'message', view: 'conversation' },
+      { route: 'ai-voice', label: 'Practise', icon: 'mic', view: 'practice' },
+      { route: 'oral', label: 'Library', icon: 'headphones', view: '' }
     ];
-    const bubbles = messages.map((message) => `<article class="ai-chat-message ai-chat-message-${message.role}"><span class="ai-message-avatar">${message.role === 'assistant' ? icon('sparkles', 15) : esc((getProfileDetails().name || 'S').trim().charAt(0).toUpperCase())}</span><div class="ai-message-body"><small>${message.role === 'assistant' ? 'Idilewa practice partner' : 'You'} · ${new Date(message.at).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}</small><p>${esc(message.text)}</p></div></article>`).join('');
-    const prompts = [
-      `How do I say “good morning” in ${language.name}?`,
-      `Let’s practise a greeting in ${language.name}.`,
-      `What is a polite way to introduce myself?`
-    ].map((prompt) => `<button type="button" class="ai-prompt-chip" data-action="ai-fill-prompt" data-prompt="${esc(prompt)}">${esc(prompt)}</button>`).join('');
-    return renderAiWorkspace('ai-everyday', 'Everyday Life', `
-      ${renderAiPageHeading('Conversation practice', 'Everyday Life', `Practise simple, useful phrases in ${language.name}.`, `<label class="ai-language-select-label"><span class="sr-only">Conversation language</span><select id="ai-language-select" aria-label="Conversation language">${AI_CONVERSATION_LANGUAGES.map((item) => `<option value="${item.id}" ${item.id === language.id ? 'selected' : ''}>${item.flag} ${esc(item.name)}</option>`).join('')}</select></label>`)}
-      <div class="ai-conversation-layout"><section class="ai-conversation-card"><header class="ai-conversation-card-head"><div class="ai-chat-partner"><span class="ai-partner-avatar">${icon('sparkles', 18)}</span><div><strong>AI Language Practice</strong><small><i></i> Live translation · ${esc(language.name)}</small></div></div><a href="#/ai-history" data-route="ai-history" class="ai-icon-link" aria-label="View conversation history">${icon('clock', 17)}</a></header>
-        <div class="ai-conversation-messages" id="ai-conversation-messages" aria-live="polite">${bubbles}</div>
-        <div class="ai-prompt-row" aria-label="Suggested prompts">${prompts}</div>
-        <form class="ai-message-form" data-form="ai-conversation" aria-busy="${aiConversationPending}"><label class="sr-only" for="ai-message-input">Write a message in English to translate</label><input id="ai-message-input" name="message" maxlength="500" autocomplete="off" placeholder="Write a message in English…" required /><button class="ai-send-button" type="submit" aria-label="Send message" ${aiConversationPending ? 'disabled' : ''}>${aiConversationPending ? icon('clock', 17) : icon('send', 17)}</button></form>
-        <p class="ai-conversation-status" id="ai-conversation-status" role="status" aria-live="polite" ${aiConversationPending ? '' : 'hidden'}>${aiConversationPending ? 'Translating your message…' : ''}</p>
-        <p class="ai-conversation-disclaimer">${icon('info', 13)} Your message is sent to Plotweaver for translation into ${esc(language.name)}. Avoid personal or sensitive information.</p>
-      </section><aside class="ai-conversation-aside"><div class="ai-aside-progress"><span class="ai-eyebrow">Today’s practice</span><strong>${record?.messages.filter((message) => message.role === 'learner').length || 0} <small>messages</small></strong><div><span></span></div><small>Keep going at your own pace</small></div><div class="ai-phrase-card"><span class="ai-eyebrow">Try this phrase</span><strong lang="${language.speech}">${esc(language.greeting)}</strong><p>${esc(language.meaning)}</p><button type="button" class="ai-text-link" data-action="ai-play-phrase">${icon('volume', 15)} Listen</button></div><a href="#/ai-voice?lang=${language.id}" data-route="ai-voice" data-lang="${language.id}" class="ai-voice-shortcut">${icon('mic', 18)} Try voice practice ${icon('arrow', 14)}</a></aside></div>`);
+    return `<nav class="aic-tabs" aria-label="Idilewa sections">${items.map((item) => {
+      const active = Boolean(item.view) && item.view === view;
+      return `<a class="aic-tab ${active ? 'is-active' : ''}" href="#/${item.route}" data-route="${item.route}"${active ? ' aria-current="page"' : ''}>${icon(item.icon, 20)}<span>${item.label}</span></a>`;
+    }).join('')}</nav>`;
   }
 
-  function renderAiVoice(params = {}) {
-    if (AI_CONVERSATION_LANGUAGES.some((item) => item.id === params.lang)) aiConversationLanguage = params.lang;
-    const language = getAiConversationLanguage();
-    const phraseOptions = [
-      { text: language.greeting, meaning: language.meaning },
-      { text: language.id === 'yoruba' ? 'Báwo ni?' : language.id === 'igbo' ? 'Kedu?' : language.id === 'hausa' ? 'Yaya dai?' : 'Hujambo?', meaning: 'How are you?' },
-      { text: language.id === 'yoruba' ? 'Ó dàbọ̀' : language.id === 'igbo' ? 'Ka ọ dị' : language.id === 'hausa' ? 'Sai anjima' : 'Kwaheri', meaning: 'Goodbye' }
-    ];
-    const phrase = phraseOptions[aiVoicePhraseIndex % phraseOptions.length];
-    return renderAiWorkspace('ai-voice', 'Voice Practice', `
-      ${renderAiPageHeading('Listen · speak · grow', 'Voice Practice', `Practise a phrase aloud in ${language.name}.`, `<label class="ai-language-select-label"><span class="sr-only">Practice language</span><select id="ai-language-select" aria-label="Practice language">${AI_CONVERSATION_LANGUAGES.map((item) => `<option value="${item.id}" ${item.id === language.id ? 'selected' : ''}>${item.flag} ${esc(item.name)}</option>`).join('')}</select></label>`)}
-      <section class="ai-voice-layout"><article class="ai-voice-card"><span class="ai-voice-step">Your phrase · ${esc(language.name)}</span><div class="ai-voice-mic-orb">${icon('mic', 28)}</div><strong lang="${language.speech}">${esc(phrase.text)}</strong><p>${esc(phrase.meaning)}</p><div class="ai-voice-wave" aria-hidden="true">${Array.from({ length: 25 }, (_, index) => `<i style="--bar:${10 + ((index * 17 + 13) % 32)}px"></i>`).join('')}</div>
-        <button type="button" class="ai-button ai-button-outline" data-action="ai-play-phrase">${icon('volume', 16)} Listen to phrase</button>
-        <div class="ai-record-controls">${aiVoiceRecorder?.state === 'recording' ? `<button type="button" class="ai-button ai-button-stop" data-action="ai-record-stop">${icon('pause', 15)} Stop recording</button>` : `<button type="button" class="ai-button ai-button-green" data-action="ai-record-start" ${aiVoiceTranscriptionPending ? 'disabled' : ''}>${icon('mic', 16)} ${aiVoiceTranscriptionPending ? 'Transcribing…' : 'Record your voice'}</button>`}<button type="button" class="ai-button ai-button-quiet" data-action="ai-next-phrase">Next phrase ${icon('arrow', 14)}</button></div>
-        <label class="ai-record-consent"><input id="ai-voice-consent" type="checkbox" /><span>I understand my recording is sent to Idilewa’s voice service for transcription. It is not saved as a voice score.</span></label>
-        ${aiVoiceTranscript ? `<div class="ai-transcript-result" role="status"><span class="ai-eyebrow">Your transcription</span><p>${esc(aiVoiceTranscript)}</p></div>` : ''}
-        <p class="ai-voice-status" aria-live="polite">${aiVoiceTranscriptionPending ? 'Transcribing your recording…' : 'Your microphone is only used after you choose to record.'}</p>
-      </article><aside class="ai-voice-feedback"><span class="ai-eyebrow">Practice guide</span><h2>Try it at your own pace</h2><ul><li>${icon('check', 15)} Listen to the phrase first</li><li>${icon('check', 15)} Speak clearly into your device</li><li>${icon('check', 15)} Review the transcription</li></ul><p>We show the words the service heard; we do not assign an accuracy score.</p><a href="#/ai-everyday?lang=${language.id}" data-route="ai-everyday" data-lang="${language.id}" class="ai-button ai-button-outline">Back to conversation</a></aside></section>`);
+  function renderAiChatShell(view, content) {
+    const { name } = aiChatProfile();
+    const links = AI_CHAT_VIEWS.map((item) => `<a class="aic-sidebar-link ${item.id === view ? 'is-active' : ''}" href="#/${item.route}" data-route="${item.route}"${item.id === view ? ' aria-current="page"' : ''}>${icon(item.icon, 18)}<span>${item.label}</span></a>`).join('');
+    return `<div class="aic" data-view="${esc(view)}">
+      <aside class="aic-sidebar" aria-label="AI Conversation sections">
+        <a class="aic-sidebar-brand" href="#/ai-conversations" data-route="ai-conversations" aria-label="Idilewa AI Conversation home">${brandLogo('Idilewa')}</a>
+        <span class="aic-sidebar-label">AI Conversation</span>
+        <nav class="aic-sidebar-nav">${links}</nav>
+        <a class="aic-sidebar-user" href="#/profile" data-route="profile"><span class="aic-avatar">${aiChatAvatarMarkup()}</span><span class="aic-sidebar-user-copy"><strong>${esc(name)}</strong><small>${getCurrentUser() ? 'Learner' : 'Guest learner'}</small></span>${icon('arrow', 14)}</a>
+      </aside>
+      <div class="aic-shell">
+        ${renderAiChatTopbar()}
+        ${renderAiChatDrawer(view)}
+        <div class="aic-main" id="aic-main" tabindex="-1">${content}</div>
+        ${renderAiChatTabs(view)}
+      </div>
+    </div>`;
   }
-
-  function renderAiHistory() {
-    const records = getAiConversationRecords().slice().sort((a, b) => b.updatedAt - a.updatedAt);
-    const content = records.length
-      ? `<div class="ai-history-list">${records.map((item) => `<article class="ai-history-card"><span class="ai-history-flag">${getAiConversationLanguage(item.language).flag}</span><div class="ai-history-copy"><strong>${esc(item.title)}</strong><small>${esc(getAiConversationLanguage(item.language).name)} · ${new Date(item.updatedAt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' })} · ${item.messages.filter((message) => message.role === 'learner').length} messages</small><p>${esc(item.messages.filter((message) => message.role === 'learner').at(-1)?.text || 'Conversation started')}</p></div><a href="#/ai-everyday?lang=${item.language}" data-route="ai-everyday" data-lang="${item.language}" class="ai-button ai-button-outline ai-button-small">Continue</a><button type="button" class="ai-icon-link ai-delete-item" data-action="ai-delete-conversation" data-id="${esc(item.id)}" aria-label="Delete ${esc(item.title)}">${icon('close', 16)}</button></article>`).join('')}</div>`
-      : `<div class="ai-empty-state"><span>${icon('clock', 24)}</span><h2>No conversations yet</h2><p>Start a short practice session and it will appear here on this device.</p><a class="ai-button ai-button-green" href="#/ai-chat" data-route="ai-chat">Start a conversation ${icon('arrow', 14)}</a></div>`;
-    return renderAiWorkspace('ai-history', 'My Conversation History', `${renderAiPageHeading('Your practice', 'My Conversation History', 'Pick up where you left off. This history stays in this browser.', records.length ? '<button type="button" class="ai-button ai-button-outline" data-action="ai-clear-history">Clear history</button>' : '')}${content}`);
-  }
-
-  function renderAiAnalytics() {
-    const records = getAiConversationRecords();
-    const messages = records.reduce((sum, item) => sum + item.messages.filter((message) => message.role === 'learner').length, 0);
-    const minutes = Math.ceil(messages * 1.5);
-    const languageBars = AI_CONVERSATION_LANGUAGES.map((language, index) => {
-      const count = records.filter((item) => item.language === language.id).reduce((sum, item) => sum + item.messages.filter((message) => message.role === 'learner').length, 0);
-      const width = messages ? Math.max(4, Math.round((count / messages) * 100)) : 4;
-      return `<div class="ai-analytics-language"><span>${language.flag} ${esc(language.name)}</span><div><i style="width:${width}%"></i></div><small>${count}</small></div>`;
-    }).join('');
-    return renderAiWorkspace('ai-analytics', 'Learning Analytics', `
-      ${renderAiPageHeading('Your progress', 'Learning Analytics', 'A simple view of the practice you have done in this browser.')}
-      <section class="ai-analytics-stats"><article class="ai-analytics-stat"><span>${icon('sparkles', 17)} Total Conversations</span><strong>${records.length}</strong><small>Saved practice sessions</small></article><article class="ai-analytics-stat"><span>${icon('clock', 17)} Estimated Practice</span><strong>${minutes} min</strong><small>Approx. 1.5 min per sent prompt</small></article><article class="ai-analytics-stat"><span>${icon('send', 17)} Messages Practised</span><strong>${messages}</strong><small>Your sent practice messages</small></article><article class="ai-analytics-stat"><span>${icon('globe', 17)} Languages</span><strong>${new Set(records.map((item) => item.language)).size}</strong><small>Languages explored</small></article></section>
-      <section class="ai-analytics-grid"><article class="ai-analytics-panel"><div class="ai-section-title"><div><span class="ai-eyebrow">Your activity</span><h2>Practice overview</h2></div><span class="ai-chart-period">All time · this browser</span></div><div class="ai-chart-empty">${messages ? `<div class="ai-chart-bars">${[0, 1, 2, 3, 4, 5, 6].map((index) => `<span style="--bar-height:${Math.min(96, 20 + ((messages * (index + 2)) % 75))}%"><i></i></span>`).join('')}</div><div class="ai-chart-labels"><span>Session 1</span><span>Session 4</span><span>Session 7</span></div>` : `<span class="ai-chart-placeholder">${icon('layers', 22)}</span><p>Your activity chart will grow as you practise.</p>`}</div></article><article class="ai-analytics-panel"><div class="ai-section-title"><div><span class="ai-eyebrow">Your learning trend</span><h2>Languages explored</h2></div></div><div class="ai-language-breakdown">${languageBars}</div></article></section>
-      <p class="ai-local-note">${icon('info', 14)} These totals are calculated from browser history. Estimated time and sample practice prompts are not formal learning scores.</p>`);
-  }
-
-  function renderAiProfile() {
-    const profile = getProfileDetails();
-    const name = profile.name || getCurrentUser()?.name || 'Learner';
-    const initial = name.trim().charAt(0).toUpperCase() || 'L';
-    return renderAiWorkspace('ai-profile', 'My Profile', `
-      ${renderAiPageHeading('Account details', 'My Profile', 'Manage your learning details and conversation preferences.')}
-      <section class="ai-profile-layout"><aside class="ai-profile-card"><span class="ai-profile-avatar">${esc(initial)}</span><span class="ai-eyebrow">Learner profile</span><h2>${esc(name)}</h2><p>${esc(profile.email || 'Learning as a guest')}</p><span class="ai-profile-tag">${esc(getAiConversationLanguage(AI_CONVERSATION_LANGUAGES.some((item) => item.id === profile.language) ? profile.language : 'yoruba').name)}</span><p class="ai-profile-account-state">${getCurrentUser() ? 'Signed in to your Idilewa account' : 'Guest profile · saved on this device'}</p>${getCurrentUser() ? '<button type="button" class="ai-button ai-button-outline" data-action="profile-sign-out">Sign out</button>' : '<a class="ai-button ai-button-outline" href="#/ai-login?next=ai-profile" data-route="ai-login" data-next="ai-profile">Sign in</a>'}</aside>
-      <form class="ai-profile-form" data-form="profile-settings"><span class="ai-eyebrow">Profile information</span><h2>About you</h2><label>Full name<input name="name" maxlength="60" required value="${esc(profile.name)}" placeholder="What should we call you?" /></label><label>Email address<input type="email" value="${esc(profile.email)}" readonly placeholder="Sign in to connect your account" /></label><label>Short bio<textarea name="bio" rows="3" maxlength="500" placeholder="A little about you…">${esc(profile.bio)}</textarea></label><label>Learning goal<textarea name="goal" rows="2" maxlength="240" placeholder="What would you like to practise?">${esc(profile.goal)}</textarea></label><div class="ai-profile-row"><label>Learning language<select name="language">${LANGUAGES.map((item) => `<option value="${item.id}" ${profile.language === item.id ? 'selected' : ''}>${esc(item.name)}</option>`).join('')}</select></label><label>Experience level<select name="level">${[['beginner','Beginning'],['intermediate','Growing'],['advanced','Confident']].map(([value,label]) => `<option value="${value}" ${profile.level === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label></div><button type="submit" class="ai-button ai-button-green">${icon('check', 15)} Save profile</button></form></section>`);
-  }
-
-  function renderAiMessages() {
-    return renderAiWorkspace('ai-messages', 'Messages', `
-      ${renderAiPageHeading('Stay connected', 'Messages', 'A place for important updates about your learning.')}
-      <section class="ai-empty-state"><span>${icon('send', 24)}</span><h2>You’re all caught up</h2><p>There are no messages in this browser preview. For help, reach the Idilewa team.</p><a href="#/contact" data-route="contact" class="ai-button ai-button-outline">Contact Idilewa ${icon('arrow', 14)}</a></section>`);
-  }
-
-  function renderAiSettings() {
-    const language = getAiConversationLanguage();
-    return renderAiWorkspace('ai-settings', 'Settings', `
-      ${renderAiPageHeading('Your preferences', 'Settings', 'Choose how your conversation practice works.')}
-      <section class="ai-settings-card"><div class="ai-setting-row"><div><strong>Practice language</strong><p>Choose the language used for your next conversation.</p></div><label><span class="sr-only">Practice language</span><select id="ai-language-select" aria-label="Practice language">${AI_CONVERSATION_LANGUAGES.map((item) => `<option value="${item.id}" ${item.id === language.id ? 'selected' : ''}>${item.flag} ${esc(item.name)}</option>`).join('')}</select></label></div>
-      <div class="ai-setting-row"><div><strong>Read sample replies aloud</strong><p>Use your device speech service when a guided reply appears.</p></div><button type="button" class="ai-toggle ${aiAutoSpeak ? 'is-on' : ''}" role="switch" aria-checked="${aiAutoSpeak}" aria-label="Read sample replies aloud" data-action="ai-toggle-auto-speak"><span></span></button></div>
-      <div class="ai-setting-row"><div><strong>Conversation history</strong><p>Saved locally in this browser. You can remove it whenever you like.</p></div><button type="button" class="ai-button ai-button-outline" data-action="ai-clear-history">Clear history</button></div>
-      <div class="ai-settings-privacy">${icon('lock', 15)} The chat preview does not contact a live AI service. Never add personal or sensitive information.</div></section>`);
-  }
-
   const PARENT_PORTAL_LINKS = [
     { route: 'parent-dashboard', label: 'Dashboard', icon: 'home' },
     { route: 'parent-children', label: 'My Children', icon: 'people' },
@@ -5775,69 +4654,249 @@ import {
     }
   }
 
-  function renderAiConversationsPage(page, params) {
-    if (page === 'ai-conversations') return renderAiEveryday(params);
+  function aiChatStage() {
+    if (!['welcome', 'language', 'topic', 'chat'].includes(aiChatState.step)) return 'welcome';
+    if (aiChatState.step === 'chat' && !aiChatState.topic) return aiChatState.language ? 'topic' : 'language';
+    if (aiChatState.step === 'topic' && !aiChatState.language) return 'language';
+    return aiChatState.step;
+  }
+
+  function renderAiConversationStage() {
+    const stage = aiChatStage();
+    if (stage === 'welcome') return renderAiChatWelcome();
+    if (stage === 'language') return renderAiChatLanguageStep();
+    if (stage === 'topic') return renderAiChatTopicStep();
+    return renderAiChatConversation();
+  }
+
+  function renderAiChatWelcome() {
+    return `<section class="aic-stage aic-welcome">
+      <figure class="aic-welcome-art"><img src="${imageUrl('african-kids-friends.jpg')}" alt="Two African children sharing a tablet outside" /></figure>
+      <div class="aic-welcome-copy">
+        <h1>Welcome to<br />AI Conversation</h1>
+        <p>Speak, Learn and Practise in African Languages. Pick a language, choose a topic and talk with a friendly practice partner.</p>
+        <button class="aic-button aic-button-primary" type="button" data-action="aic-start">Start Conversation ${icon('arrow', 17)}</button>
+        <span class="aic-welcome-note">${icon('lock', 13)} Your practice is saved on this device only.</span>
+      </div>
+    </section>`;
+  }
+
+  function renderAiChatLanguageStep() {
+    const options = AI_CHAT_LANGUAGES.map((language) => {
+      const selected = language.id === aiChatState.language;
+      return `<button class="aic-option ${selected ? 'is-selected' : ''}" type="button" data-action="aic-choose-language" data-language="${language.id}" aria-pressed="${selected}">
+        <span class="aic-option-badge">${esc(language.short)}</span>
+        <span class="aic-option-copy"><strong>${esc(language.name)}</strong><small>${esc(language.hello)} · ${esc(language.helloEn)}</small></span>
+        <span class="aic-radio" aria-hidden="true"></span>
+      </button>`;
+    }).join('');
+    return `<section class="aic-stage aic-step">
+      <div class="aic-step-head"><button class="aic-back" type="button" data-action="aic-back" aria-label="Go back">${icon('arrow', 17)}</button><span class="aic-step-index">Step 1 of 2</span></div>
+      <h1>Choose a Language</h1>
+      <p class="aic-step-note">Pick the language you would like to practise today.</p>
+      <div class="aic-options">${options}</div>
+    </section>`;
+  }
+
+  function renderAiChatTopicStep() {
+    const language = aiChatLanguage();
+    const options = AI_CHAT_TOPICS.map((topic) => {
+      const selected = topic.id === aiChatState.topic;
+      return `<button class="aic-option aic-option-topic ${selected ? 'is-selected' : ''}" type="button" data-action="aic-choose-topic" data-topic="${topic.id}" aria-pressed="${selected}">
+        <span class="aic-option-icon">${icon(topic.icon, 18)}</span>
+        <span class="aic-option-copy"><strong>${esc(topic.name)}</strong><small>${esc(topic.blurb)}</small></span>
+        <span class="aic-option-chevron">${icon('chevronRight', 16)}</span>
+      </button>`;
+    }).join('');
+    return `<section class="aic-stage aic-step">
+      <div class="aic-step-head"><button class="aic-back" type="button" data-action="aic-back" aria-label="Go back">${icon('arrow', 17)}</button><span class="aic-step-index">Step 2 of 2</span></div>
+      <h1>Choose a Topic</h1>
+      <p class="aic-step-note">${language ? `${esc(language.name)} · ` : ''}What would you like to talk about?</p>
+      <div class="aic-options">${options}</div>
+    </section>`;
+  }
+
+  function renderAiChatMessage(message) {
+    const gloss = message.gloss && aiChatState.showGloss ? `<small class="aic-gloss">${esc(message.gloss)}</small>` : '';
+    if (message.role === 'learner') {
+      return `<div class="aic-msg aic-msg-learner">
+        <div class="aic-bubble">${esc(message.text)}${gloss}</div>
+        <span class="aic-msg-avatar">${aiChatAvatarMarkup()}</span>
+      </div>`;
+    }
+    return `<div class="aic-msg aic-msg-partner">
+      <span class="aic-msg-avatar aic-msg-avatar-partner">${icon('message', 15)}</span>
+      <div class="aic-msg-body">
+        <div class="aic-bubble">${esc(message.text)}${gloss}</div>
+        <div class="aic-msg-tools">
+          <button class="aic-msg-tool" type="button" data-action="aic-speak" data-text="${esc(message.text)}" aria-label="Listen to this phrase">${icon('volume', 14)}</button>
+          <button class="aic-msg-tool" type="button" data-action="aic-save-phrase" data-text="${esc(message.text)}" data-gloss="${esc(message.gloss || '')}" aria-label="Save this phrase">${icon('bookmark', 14)}</button>
+        </div>
+      </div>
+    </div>`;
+  }
+
+  function renderAiChatConversation() {
+    const language = aiChatLanguage();
+    const topic = aiChatTopic();
+    const dialogue = aiChatDialogue();
+    const thread = aiChatThread();
+    const scripted = dialogue[aiChatExchangeIndex()] || null;
+    const messages = thread.messages.length
+      ? thread.messages.map(renderAiChatMessage).join('')
+      : renderAiChatMessage({ role: 'assistant', text: dialogue[0]?.ask || language.close, gloss: dialogue[0]?.askEn || language.closeEn });
+    const chips = scripted
+      ? `<div class="aic-chips"><button class="aic-chip" type="button" data-action="aic-quick-reply" data-reply="${esc(scripted.reply)}" data-gloss="${esc(scripted.replyEn)}">${esc(scripted.reply)}</button></div>`
+      : '';
+    const recording = aiVoiceRecorder?.state === 'recording';
+    return `<section class="aic-stage aic-chat">
+      <div class="aic-chat-head">
+        <button class="aic-back" type="button" data-action="aic-back" aria-label="Go back to topics">${icon('arrow', 17)}</button>
+        <div class="aic-chat-identity"><strong>${esc(language.name)} Conversation</strong><small>${esc(topic.name)}</small></div>
+        <button class="aic-icon-button" type="button" data-action="aic-change-topic" aria-label="Change topic">${icon('filter', 18)}</button>
+      </div>
+      <div class="aic-thread" id="aic-thread" role="log" aria-live="polite">${messages}${chips}</div>
+      <div class="aic-toolbar">
+        <button class="aic-tool ${aiChatState.showGloss ? 'is-on' : ''}" type="button" data-action="aic-toggle-gloss" aria-pressed="${aiChatState.showGloss}">${icon('translate', 15)}<span>Translate</span></button>
+        <button class="aic-tool" type="button" data-action="aic-slow-speak">${icon('volume', 15)}<span>Slow &amp; clear</span></button>
+        <button class="aic-tool" type="button" data-action="aic-add-word">${icon('plus', 15)}<span>Add word</span></button>
+        <button class="aic-tool" type="button" data-action="aic-end-session">${icon('check', 15)}<span>End session</span></button>
+      </div>
+      <form class="aic-composer${aiChatDraft ? ' is-typing' : ''}" data-form="ai-chat" novalidate>
+        <button class="aic-composer-media" type="button" data-action="aic-picture" aria-label="Add a picture">${icon('image', 19)}</button>
+        <label class="aic-composer-field"><span class="sr-only">Your reply in ${esc(language.name)}</span>
+          <input id="ai-chat-input" name="message" type="text" autocomplete="off" maxlength="300" placeholder="Type your message..." value="${esc(aiChatDraft)}" />
+        </label>
+        <button class="aic-composer-mic aic-composer-record" type="button" data-action="aic-record" data-target="chat" aria-label="${recording ? 'Stop recording' : 'Speak your reply'}">${icon(recording ? 'pause' : 'mic', 18)}</button>
+        <button class="aic-composer-mic aic-composer-send" type="submit" aria-label="Send your reply">${icon('send', 18)}</button>
+      </form>
+    </section>`;
+  }
+
+  function renderAiConversationsPage(page, params = {}) {
     if (page === 'ai-login') return renderAiAuth('login');
     if (page === 'ai-signup') return renderAiAuth('signup');
-    if (page === 'ai-dashboard') return renderAiDashboard();
-    if (page === 'ai-chat') return renderAiChatChooser();
-    if (page === 'ai-everyday') return renderAiEveryday(params);
-    if (page === 'ai-voice') return renderAiVoice(params);
-    if (page === 'ai-history') return renderAiHistory();
-    if (page === 'ai-analytics') return renderAiAnalytics();
-    if (page === 'ai-profile') return renderAiProfile();
-    if (page === 'ai-messages') return renderAiMessages();
-    return renderAiSettings();
+    if (params.lang && AI_CHAT_LANGUAGES.some((item) => item.id === params.lang) && params.lang !== aiChatState.language) {
+      aiChatState.language = params.lang;
+      if (aiChatState.step === 'welcome') aiChatState.step = 'topic';
+      saveAiChatState();
+    }
+    const view = AI_CHAT_VIEW_BY_PAGE[page] || 'conversation';
+    if (view === 'translate') return renderAiChatShell(view, renderAiTranslatePanel());
+    if (view === 'practice') return renderAiChatShell(view, renderAiPracticePanel());
+    if (view === 'history') return renderAiChatShell(view, renderAiHistoryPanel());
+    if (view === 'saved') return renderAiChatShell(view, renderAiSavedPanel());
+    return renderAiChatShell(view, renderAiConversationStage());
   }
 
-  async function startAiVoiceRecording() {
-    if (!document.getElementById('ai-voice-consent')?.checked) {
-      showToast('Please review and accept the transcription notice before recording.', 'error');
-      return;
-    }
-    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
-      showToast('Voice recording is not available in this browser.', 'error');
-      return;
-    }
-    try {
-      aiVoiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      aiVoiceChunks = [];
-      aiVoiceTranscriptionRequested = false;
-      aiVoiceRecorder = new MediaRecorder(aiVoiceStream);
-      aiVoiceRecorder.addEventListener('dataavailable', (event) => {
-        if (event.data.size) aiVoiceChunks.push(event.data);
-      });
-      aiVoiceRecorder.addEventListener('stop', () => {
-        const stream = aiVoiceStream;
-        aiVoiceStream = null;
-        stream?.getTracks().forEach((track) => track.stop());
-        const recording = new Blob(aiVoiceChunks, { type: aiVoiceRecorder?.mimeType || 'audio/webm' });
-        aiVoiceChunks = [];
-        aiVoiceRecorder = null;
-        if (!aiVoiceTranscriptionRequested || parseLocation().page !== 'ai-voice' || !recording.size) return;
-        aiVoiceTranscriptionPending = true;
-        render();
-        void transcribeWithPlotweaver(recording, getAiConversationLanguage().speech)
-          .then((result) => {
-            aiVoiceTranscript = result.text;
-            showToast('Your voice transcription is ready.');
-          })
-          .catch((error) => showToast(error instanceof Error ? error.message : 'Your recording could not be transcribed.', 'error'))
-          .finally(() => {
-            aiVoiceTranscriptionPending = false;
-            if (parseLocation().page === 'ai-voice') render();
-          });
-      }, { once: true });
-      aiVoiceRecorder.start();
-      render();
-    } catch (error) {
-      aiVoiceStream?.getTracks().forEach((track) => track.stop());
-      aiVoiceStream = null;
-      aiVoiceRecorder = null;
-      showToast(error instanceof Error ? error.message : 'Microphone access was not available.', 'error');
-    }
+  function renderAiTranslatePanel() {
+    const language = aiChatLanguage() || AI_CHAT_LANGUAGES[0];
+    const translation = aiChatState.translation;
+    const translationLanguage = translation
+      ? AI_CHAT_LANGUAGES.find((item) => item.id === translation.language)?.name || language.name
+      : '';
+    const result = translation
+      ? `<article class="aic-result">
+          <span class="aic-eyebrow"><span></span> ${esc(translationLanguage)}</span>
+          <p class="aic-result-source">${esc(translation.source)}</p>
+          <p class="aic-result-target">${esc(translation.translated)}</p>
+          <div class="aic-result-actions">
+            <button class="aic-tool" type="button" data-action="aic-speak" data-text="${esc(translation.translated)}">${icon('volume', 15)}<span>Listen</span></button>
+            <button class="aic-tool" type="button" data-action="aic-slow-speak" data-text="${esc(translation.translated)}">${icon('headphones', 15)}<span>Slow</span></button>
+            <button class="aic-tool" type="button" data-action="aic-save-phrase" data-text="${esc(translation.translated)}" data-gloss="${esc(translation.source)}">${icon('bookmark', 15)}<span>Save</span></button>
+            <button class="aic-tool" type="button" data-action="aic-copy" data-text="${esc(translation.translated)}">${icon('copy', 15)}<span>Copy</span></button>
+          </div>
+        </article>`
+      : `<article class="aic-result aic-result-empty">${icon('translate', 22)}<p>Your translation appears here with listen, slow playback and a save option.</p></article>`;
+    return `<section class="aic-stage aic-panel">
+      <h1>Translate &amp; Listen</h1>
+      <p class="aic-step-note">Type a sentence in English. Idilewa translates it into your practice language and reads it aloud.</p>
+      <form class="aic-form" data-form="ai-translate">
+        <label class="aic-field"><span>English text</span>
+          <textarea name="text" rows="3" maxlength="400" required placeholder="Good morning, how are you?"></textarea>
+        </label>
+        <label class="aic-field"><span>Translate into</span>
+          <select name="language" id="ai-translate-language">${AI_CHAT_LANGUAGES.map((item) => `<option value="${item.id}" ${item.id === language.id ? 'selected' : ''}>${esc(item.name)}</option>`).join('')}</select>
+        </label>
+        <button class="aic-button aic-button-primary" type="submit"${aiChatPending ? ' disabled' : ''}>${aiChatPending ? 'Translating…' : `Translate ${icon('arrow', 16)}`}</button>
+      </form>
+      ${result}
+    </section>`;
   }
 
+  function renderAiPracticePanel() {
+    const language = aiChatLanguage() || AI_CHAT_LANGUAGES[0];
+    const dialogue = aiChatDialogue();
+    const pool = dialogue.length ? dialogue : [{ ask: language.hello, askEn: language.helloEn }];
+    const phrase = pool[aiPracticeIndex % pool.length];
+    const recording = aiVoiceRecorder?.state === 'recording';
+    const transcript = aiVoiceTranscript
+      ? `<article class="aic-transcript"><span class="aic-eyebrow"><span></span> What we heard</span><p>${esc(aiVoiceTranscript)}</p></article>`
+      : '';
+    return `<section class="aic-stage aic-panel">
+      <h1>Record &amp; Practise</h1>
+      <p class="aic-step-note">Say the phrase aloud. Idilewa writes down what it hears so you can compare your pronunciation.</p>
+      <article class="aic-practice-card">
+        <span class="aic-step-index">Phrase ${(aiPracticeIndex % pool.length) + 1} of ${pool.length} · ${esc(language.name)}</span>
+        <strong>${esc(phrase.ask)}</strong>
+        <small>${esc(phrase.askEn)}</small>
+        <div class="aic-result-actions">
+          <button class="aic-tool" type="button" data-action="aic-speak" data-text="${esc(phrase.ask)}">${icon('volume', 15)}<span>Listen</span></button>
+          <button class="aic-tool" type="button" data-action="aic-slow-speak" data-text="${esc(phrase.ask)}">${icon('headphones', 15)}<span>Slow</span></button>
+          <button class="aic-tool" type="button" data-action="aic-next-phrase">${icon('arrow', 15)}<span>Next phrase</span></button>
+        </div>
+      </article>
+      <button class="aic-record${recording ? ' is-recording' : ''}" type="button" data-action="aic-record" data-target="practice">
+        ${icon(recording ? 'pause' : 'mic', 22)}
+        <span>${recording ? 'Stop recording' : aiVoiceTranscriptionPending ? 'Writing it down…' : 'Record your voice'}</span>
+      </button>
+      ${transcript}
+    </section>`;
+  }
+
+  function renderAiHistoryPanel() {
+    const entries = Object.entries(aiChatState.threads)
+      .filter(([, thread]) => thread.messages.length)
+      .sort((first, second) => second[1].updatedAt - first[1].updatedAt);
+    const list = entries.map(([key, thread]) => {
+      const [languageId, topicId] = key.split(':');
+      const language = AI_CHAT_LANGUAGES.find((item) => item.id === languageId);
+      const topic = AI_CHAT_TOPICS.find((item) => item.id === topicId);
+      const last = thread.messages[thread.messages.length - 1];
+      return `<article class="aic-history-item">
+        <div class="aic-history-copy"><strong>${esc(language?.name || 'Language')} · ${esc(topic?.name || 'Topic')}</strong><small>${esc(last?.text || '')}</small></div>
+        <div class="aic-result-actions">
+          <button class="aic-tool" type="button" data-action="aic-resume" data-language="${esc(languageId)}" data-topic="${esc(topicId)}">${icon('play', 14)}<span>Continue</span></button>
+          <button class="aic-tool" type="button" data-action="aic-delete-thread" data-key="${esc(key)}" aria-label="Delete this conversation">${icon('close', 14)}</button>
+        </div>
+      </article>`;
+    }).join('');
+    return `<section class="aic-stage aic-panel">
+      <h1>My Conversations</h1>
+      <p class="aic-step-note">Every conversation you practise is saved in this browser.</p>
+      ${entries.length
+        ? `<div class="aic-list">${list}</div><button class="aic-button aic-button-quiet" type="button" data-action="aic-clear-history">Clear all conversations</button>`
+        : `<article class="aic-empty">${icon('message', 22)}<strong>No conversations yet</strong><p>Start a conversation and it will be listed here.</p><a class="aic-button aic-button-primary" href="#/ai-conversations" data-route="ai-conversations">Start a conversation ${icon('arrow', 16)}</a></article>`}
+    </section>`;
+  }
+
+  function renderAiSavedPanel() {
+    const saved = aiChatState.saved;
+    const list = saved.map((item, index) => `<article class="aic-history-item">
+      <div class="aic-history-copy"><strong>${esc(item.text)}</strong><small>${esc(item.gloss || AI_CHAT_LANGUAGES.find((language) => language.id === item.language)?.name || '')}</small></div>
+      <div class="aic-result-actions">
+        <button class="aic-tool" type="button" data-action="aic-speak" data-text="${esc(item.text)}">${icon('volume', 14)}<span>Listen</span></button>
+        <button class="aic-tool" type="button" data-action="aic-remove-saved" data-index="${index}" aria-label="Remove this phrase">${icon('close', 14)}</button>
+      </div>
+    </article>`).join('');
+    return `<section class="aic-stage aic-panel">
+      <h1>Saved Phrases</h1>
+      <p class="aic-step-note">Phrases you keep while practising are stored on this device.</p>
+      ${saved.length
+        ? `<div class="aic-list">${list}</div>`
+        : `<article class="aic-empty">${icon('bookmark', 22)}<strong>No saved phrases yet</strong><p>Tap the bookmark on any reply to keep it here.</p><a class="aic-button aic-button-primary" href="#/ai-conversations" data-route="ai-conversations">Open AI Conversation ${icon('arrow', 16)}</a></article>`}
+    </section>`;
+  }
   function renderContact() {
     const supportEmail = 'idilewa2026@gmail.com';
     return `<div class="container route-page information-page">
@@ -6945,7 +6004,9 @@ import {
       case 'ai-analytics':
       case 'ai-profile':
       case 'ai-messages':
-      case 'ai-settings': return renderAiConversationsPage(page, params);
+      case 'ai-settings':
+      case 'ai-translate':
+      case 'ai-saved': return renderAiConversationsPage(page, params);
       case 'families':
       case 'parent-login':
       case 'parent-signup':
@@ -6956,7 +6017,7 @@ import {
       case 'parent-settings':
       case 'parent-welcome': return renderParentPortal(page, params);
       case 'learn':
-      case 'curriculum': return renderCurriculum();
+      case 'curriculum': return renderLanguages();
       case 'languages': return renderLanguages();
       case 'course': return renderCourse(params);
       case 'lesson': return renderLesson(params);
@@ -6970,7 +6031,7 @@ import {
       case 'owe_detail': return renderOweDetail();
       case 'owe_story': return renderOweStory();
       case 'owe_reflection': return renderOweReflection();
-      case 'payment': return renderPayment(params);
+      case 'payment': return renderPricing();
       case 'connect_teachers': return renderConnectTeachers();
       case 'connect_students': return renderConnectStudents();
       case 'voices': return renderVoices();
@@ -7804,21 +6865,6 @@ import {
   function handleAction(action, el) {
     const lang = el.dataset.lang;
     switch (action) {
-      case 'payment-channel':
-        if (['card', 'transfer', 'momo', 'ussd'].includes(el.dataset.channel || '')) {
-          activePaymentChannel = el.dataset.channel;
-          render();
-        }
-        break;
-      case 'payment-copy-account':
-        showToast('KoraPay transfer details are not configured. Do not send funds to an account from this preview.', 'error');
-        break;
-      case 'payment-momo-select':
-        if (['momo', 'mpesa'].includes(el.dataset.wallet || '')) {
-          activePaymentWallet = el.dataset.wallet;
-          render();
-        }
-        break;
       case 'mentor-select-slot':
         selectedMentorBooking = {
           ...selectedMentorBooking,
@@ -7838,7 +6884,8 @@ import {
       case 'mentor-book':
         if (el.dataset.mentor && MENTOR_PREVIEWS.some((mentor) => mentor.id === el.dataset.mentor)) {
           selectedMentorBooking = { ...selectedMentorBooking, mentorId: el.dataset.mentor };
-          navigate('payment', { mentorId: el.dataset.mentor, day: selectedMentorBooking.day, time: selectedMentorBooking.time });
+          navigate('contact', { topic: 'mentor-booking', mentorId: el.dataset.mentor, day: selectedMentorBooking.day, time: selectedMentorBooking.time });
+          showToast('Booking requests open once secure checkout is enabled. Tell us your preferred slot.');
         }
         break;
       case 'tutor-toggle-password': {
@@ -7863,51 +6910,6 @@ import {
         }
         break;
       }
-      case 'ai-select-language': {
-        const selected = AI_CONVERSATION_LANGUAGES.find((item) => item.id === el.dataset.language);
-        if (!selected) break;
-        aiConversationLanguage = selected.id;
-        navigate('ai-everyday', { lang: selected.id });
-        break;
-      }
-      case 'ai-fill-prompt': {
-        const input = document.getElementById('ai-message-input');
-        if (input) {
-          input.value = el.dataset.prompt || '';
-          input.focus();
-        }
-        break;
-      }
-      case 'ai-play-phrase': {
-        const language = getAiConversationLanguage();
-        const phrase = document.querySelector('.ai-voice-card > strong')?.textContent
-          || document.querySelector('.ai-phrase-card > strong')?.textContent
-          || language.greeting;
-        void playPlotweaverSpeech(phrase, language.speech)
-          .catch((error) => showToast(error instanceof Error ? error.message : 'The sample phrase could not be played.', 'error'));
-        break;
-      }
-      case 'ai-next-phrase':
-        aiVoicePhraseIndex += 1;
-        aiVoiceTranscript = '';
-        render();
-        break;
-      case 'ai-record-start':
-        void startAiVoiceRecording();
-        break;
-      case 'ai-record-stop':
-        if (aiVoiceRecorder?.state === 'recording') {
-          aiVoiceTranscriptionRequested = true;
-          aiVoiceTranscriptionPending = true;
-          aiVoiceRecorder.stop();
-          render();
-        }
-        break;
-      case 'ai-toggle-auto-speak':
-        aiAutoSpeak = !aiAutoSpeak;
-        render();
-        showToast(aiAutoSpeak ? 'Guided replies will be read aloud on this device.' : 'Read-aloud is turned off.');
-        break;
       case 'parent-refresh':
         parentDashboardData = null;
         parentDashboardError = '';
@@ -7950,28 +6952,180 @@ import {
         });
         break;
       }
-      case 'ai-delete-conversation': {
-        const recordId = el.dataset.id;
-        if (!recordId || !window.confirm('Delete this conversation from this browser?')) break;
-        aiConversationRecords = getAiConversationRecords().filter((item) => item.id !== recordId);
-        if (!saveAiConversationRecords()) {
-          showToast('This conversation could not be removed from browser storage.', 'error');
-          break;
-        }
-        render();
-        showToast('Conversation removed from this browser.');
+      case 'aic-open-menu': {
+        const drawer = document.getElementById('aic-drawer');
+        if (!drawer) break;
+        drawer.hidden = false;
+        el.setAttribute('aria-expanded', 'true');
+        drawer.querySelector('.aic-drawer-link')?.focus();
         break;
       }
-      case 'ai-clear-history':
-        if (!getAiConversationRecords().length || !window.confirm('Clear all conversation history saved in this browser?')) break;
-        aiConversationRecords = [];
-        if (!saveAiConversationRecords()) {
-          showToast('Conversation history could not be cleared from browser storage.', 'error');
+      case 'aic-close-menu': {
+        const drawer = document.getElementById('aic-drawer');
+        if (!drawer) break;
+        drawer.hidden = true;
+        const toggle = document.querySelector('[data-action="aic-open-menu"]');
+        if (toggle) {
+          toggle.setAttribute('aria-expanded', 'false');
+          toggle.focus();
+        }
+        break;
+      }
+      case 'aic-notifications':
+        showToast('You have no new notifications. Keep practising to build your streak.');
+        break;
+      case 'aic-start':
+        aiChatState.step = 'language';
+        saveAiChatState();
+        render();
+        break;
+      case 'aic-back':
+        if (aiChatState.step === 'chat') aiChatState.step = 'topic';
+        else if (aiChatState.step === 'topic') aiChatState.step = 'language';
+        else aiChatState.step = 'welcome';
+        saveAiChatState();
+        render();
+        break;
+      case 'aic-choose-language': {
+        const selected = AI_CHAT_LANGUAGES.find((item) => item.id === el.dataset.language);
+        if (!selected) break;
+        aiChatState.language = selected.id;
+        aiChatState.step = 'topic';
+        aiVoiceTranscript = '';
+        saveAiChatState();
+        render();
+        void aiChatSpeak(selected.hello);
+        break;
+      }
+      case 'aic-choose-topic': {
+        const topic = AI_CHAT_TOPICS.find((item) => item.id === el.dataset.topic);
+        if (!topic || !aiChatState.language) break;
+        aiChatState.topic = topic.id;
+        aiChatState.step = 'chat';
+        aiPracticeIndex = 0;
+        aiChatStartConversation();
+        render();
+        const opener = aiChatThread().messages[0];
+        if (opener) void aiChatSpeak(opener.text);
+        break;
+      }
+      case 'aic-change-topic':
+        aiChatState.step = 'topic';
+        saveAiChatState();
+        render();
+        break;
+      case 'aic-quick-reply': {
+        const reply = el.dataset.reply || '';
+        if (!reply || !aiChatSendMessage(reply)) break;
+        render();
+        const last = aiChatLastAssistantMessage();
+        if (last) void aiChatSpeak(last.text);
+        break;
+      }
+      case 'aic-speak': {
+        const text = el.dataset.text || aiChatLastAssistantMessage()?.text || '';
+        void aiChatSpeak(text);
+        break;
+      }
+      case 'aic-slow-speak': {
+        const text = el.dataset.text || aiChatLastAssistantMessage()?.text || '';
+        void aiChatSpeak(text, { slow: true });
+        break;
+      }
+      case 'aic-save-phrase': {
+        const text = el.dataset.text || aiChatLastAssistantMessage()?.text || '';
+        if (!text) break;
+        if (aiChatSavePhrase(text, el.dataset.gloss || '')) showToast('Phrase saved to your list.', 'success');
+        else showToast('That phrase is already in your saved list.', 'error');
+        break;
+      }
+      case 'aic-toggle-gloss':
+        aiChatState.showGloss = !aiChatState.showGloss;
+        saveAiChatState();
+        render();
+        break;
+      case 'aic-add-word': {
+        const input = document.getElementById('ai-chat-input');
+        const word = String(input?.value || '').trim() || aiChatLastAssistantMessage()?.text || '';
+        if (!word) {
+          showToast('Type or choose a phrase before saving it.', 'error');
           break;
         }
-        render();
-        showToast('Conversation history cleared from this browser.');
+        if (aiChatSavePhrase(word, '')) showToast('Added to your saved phrases.', 'success');
+        else showToast('That phrase is already saved.', 'error');
         break;
+      }
+      case 'aic-end-session':
+        aiChatState.step = 'topic';
+        aiChatDraft = '';
+        saveAiChatState();
+        render();
+        showToast('Session ended. Well done today!');
+        break;
+      case 'aic-picture':
+        showToast('Picture prompts are coming soon. Keep practising with your voice.');
+        break;
+      case 'aic-copy': {
+        const text = el.dataset.text || '';
+        if (!text) break;
+        if (navigator.clipboard?.writeText) {
+          void navigator.clipboard.writeText(text)
+            .then(() => showToast('Copied to your clipboard.'))
+            .catch(() => showToast('Copying is not available in this browser.', 'error'));
+        } else showToast('Copying is not available in this browser.', 'error');
+        break;
+      }
+      case 'aic-record':
+        if (aiVoiceRecorder?.state === 'recording') stopAiVoiceRecording();
+        else void startAiVoiceRecording(el.dataset.target === 'chat' ? 'chat' : 'practice');
+        break;
+      case 'aic-next-phrase':
+        aiPracticeIndex += 1;
+        aiVoiceTranscript = '';
+        render();
+        break;
+      case 'aic-resume': {
+        const language = AI_CHAT_LANGUAGES.find((item) => item.id === el.dataset.language);
+        const topic = AI_CHAT_TOPICS.find((item) => item.id === el.dataset.topic);
+        if (!language || !topic) break;
+        aiChatState.language = language.id;
+        aiChatState.topic = topic.id;
+        aiChatState.step = 'chat';
+        aiPracticeIndex = 0;
+        saveAiChatState();
+        navigate('ai-conversations');
+        break;
+      }
+      case 'aic-delete-thread': {
+        const key = el.dataset.key || '';
+        if (!key || !aiChatState.threads[key]) break;
+        if (!window.confirm('Delete this conversation from this device?')) break;
+        delete aiChatState.threads[key];
+        saveAiChatState();
+        render();
+        showToast('Conversation deleted.');
+        break;
+      }
+      case 'aic-clear-history':
+        if (!Object.keys(aiChatState.threads).length) {
+          showToast('There are no saved conversations yet.', 'error');
+          break;
+        }
+        if (!window.confirm('Clear every conversation saved in this browser?')) break;
+        aiChatState.threads = {};
+        saveAiChatState();
+        render();
+        showToast('Conversation history cleared.');
+        break;
+      case 'aic-remove-saved': {
+        const index = Number(el.dataset.index);
+        if (!Number.isInteger(index) || !aiChatState.saved[index]) break;
+        aiChatState.saved.splice(index, 1);
+        saveAiChatState();
+        render();
+        showToast('Phrase removed from your list.');
+        break;
+      }
       case 'toggle-menu': toggleMobileMenu(); break;
       case 'open-search': openSearch(); break;
       case 'close-modal': closeModal(); break;
@@ -8777,13 +7931,6 @@ import {
         );
         break;
       }
-      case 'coding-jump-band': {
-        const bandId = el.dataset.band || el.dataset['band'];
-        if (bandId === 'code-ide') { navigate('coding'); return; }
-        const target = document.getElementById(bandId);
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        break;
-      }
       case 'voice-select-language': {
         const language = el.dataset.language;
         if (!TRAINER_CURRICULUM[language]) break;
@@ -8797,49 +7944,6 @@ import {
       case 'voice-lessons-jump': {
         const targetId = ['voice-clone-tools', 'trainerStudio'].includes(el.dataset.target) ? el.dataset.target : 'trainerStudio';
         document.getElementById(targetId)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        break;
-      }
-      case 'coding-filter-band': {
-        state.coding.filter = el.dataset.band || el.dataset['band'] || 'all';
-        saveState();
-        render();
-        const freeSec = document.getElementById('free-lessons');
-        if (freeSec) freeSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        break;
-      }
-      case 'coding-filter-category': {
-        state.coding.category = el.dataset.category || el.dataset['category'] || 'all';
-        saveState();
-        render();
-        break;
-      }
-      case 'coding-explore-grade': {
-        const gradeId = el.dataset.grade || el.dataset['grade'];
-        openCurriculumModal(gradeId);
-        break;
-      }
-      case 'coding-start-lesson': {
-        const lessonId = el.dataset.lessonId || el.dataset['lesson-id'] || el.dataset['lessonId'];
-        openFreeLessonModal(lessonId);
-        break;
-      }
-      case 'coding-complete-free-lesson': {
-        const lessonId = el.dataset.lessonId || el.dataset['lesson-id'] || el.dataset['lessonId'];
-        if (lessonId && !state.coding.completedLessons.includes(lessonId)) {
-          state.coding.completedLessons.push(lessonId);
-          state.coding.points += 15;
-          const today = new Date().toISOString().slice(0, 10);
-          if (state.coding.lastPracticeDate !== today) {
-            const previous = new Date(`${state.coding.lastPracticeDate || '1970-01-01'}T00:00:00Z`);
-            const yesterday = new Date(`${today}T00:00:00Z`);
-            yesterday.setUTCDate(yesterday.getUTCDate() - 1);
-            state.coding.streak = previous.toISOString().slice(0, 10) === yesterday.toISOString().slice(0, 10) ? state.coding.streak + 1 : 1;
-            state.coding.lastPracticeDate = today;
-          }
-          saveState();
-          showToast('Lesson completed! +15 Maker XP awarded to your profile.', 'success');
-          openFreeLessonModal(lessonId);
-        }
         break;
       }
       case 'close-modal-and-jump': {
@@ -8891,17 +7995,6 @@ import {
 
   document.addEventListener('change', (event) => {
     const el = event.target;
-    if (el.matches('#ai-language-select')) {
-      const selected = AI_CONVERSATION_LANGUAGES.find((item) => item.id === el.value);
-      if (!selected) return;
-      aiConversationLanguage = selected.id;
-      aiVoicePhraseIndex = 0;
-      aiVoiceTranscript = '';
-      if (parseLocation().page === 'ai-everyday') navigate('ai-everyday', { lang: selected.id });
-      else if (parseLocation().page === 'ai-voice') navigate('ai-voice', { lang: selected.id });
-      else render();
-      return;
-    }
     if (el.matches('.translation-speed-select select')) {
       handleAction('translation-speech-speed', el);
       return;
@@ -9015,15 +8108,6 @@ import {
       saveState(); render();
       const next = document.getElementById('codingSearch');
       if (next) { next.focus(); try { next.setSelectionRange(cursor, cursor); } catch (_) { /* search inputs vary */ } }
-    }
-    if (event.target && event.target.id === 'lessonSearchInput') {
-      const value = event.target.value;
-      state.coding.lessonSearch = value;
-      const grid = document.getElementById('freeLessonsGrid');
-      const countEl = document.getElementById('freeLessonsCount');
-      const filtered = filterFreeLessons();
-      if (grid) grid.innerHTML = renderFreeLessonCards(filtered);
-      if (countEl) countEl.textContent = `Showing ${filtered.length} of ${C4K_FREE_LESSONS.length} free STEM lessons`;
     }
   });
 
@@ -9244,74 +8328,52 @@ import {
       } catch (error) {
         showToast(error instanceof Error ? error.message : 'Your availability could not be saved.', 'error');
       }
-    } else if (type === 'ai-conversation') {
-      const message = String(data.get('message') || '').trim().slice(0, 500);
+    } else if (type === 'ai-chat') {
+      const message = String(data.get('message') || '').trim();
       if (!message) {
-        showToast('Write a short practice message first.', 'error');
+        showToast('Write a short message first.', 'error');
         return;
       }
-      if (aiConversationPending) return;
-      const language = getAiConversationLanguage();
-      const submitButton = form.querySelector('button[type="submit"]');
-      const status = document.getElementById('ai-conversation-status');
-      aiConversationPending = true;
-      form.setAttribute('aria-busy', 'true');
-      if (submitButton) submitButton.disabled = true;
-      if (status) {
-        status.hidden = false;
-        status.textContent = 'Translating your message…';
-        status.setAttribute('role', 'status');
+      if (!aiChatSendMessage(message)) {
+        showToast('Choose a language and topic before sending a message.', 'error');
+        return;
       }
+      render();
+      document.getElementById('ai-chat-input')?.focus();
+      const lastReply = aiChatLastAssistantMessage();
+      if (lastReply) void aiChatSpeak(lastReply.text);
+    } else if (type === 'ai-translate') {
+      const text = String(data.get('text') || '').trim().slice(0, 400);
+      const language = AI_CHAT_LANGUAGES.find((item) => item.id === data.get('language'))
+        || aiChatLanguage()
+        || AI_CHAT_LANGUAGES[0];
+      if (!text) {
+        showToast('Type an English sentence to translate.', 'error');
+        return;
+      }
+      if (aiChatPending) return;
+      const translateButton = form.querySelector('button[type="submit"]');
+      let translated = false;
+      aiChatPending = true;
+      if (translateButton) translateButton.disabled = true;
       try {
-        const translation = await translateWithPlotweaver({
-          text: message,
-          sourceLanguage: 'en',
-          targetLanguage: language.speech
-        });
-        const reply = `In ${language.name}, you can say: “${translation.translated_text}”`;
-        const records = getAiConversationRecords();
-        const id = `everyday-${language.id}`;
-        const record = records.find((item) => item.id === id) || {
-          id,
-          language: language.id,
-          title: 'Everyday Life',
-          updatedAt: Date.now(),
-          messages: [{ role: 'assistant', text: `Welcome! Let's practise a greeting in ${language.name}. You can say “${language.greeting}” to start.`, at: Date.now() }]
-        };
-        record.messages.push(
-          { role: 'learner', text: message, at: Date.now() },
-          { role: 'assistant', text: reply, at: Date.now() }
-        );
-        record.messages = record.messages.slice(-40);
-        record.updatedAt = Date.now();
-        aiConversationRecords = [record, ...records.filter((item) => item.id !== id)].slice(0, 30);
-        const saved = saveAiConversationRecords();
-        aiConversationPending = false;
-        form.reset();
-        const currentLocation = parseLocation();
-        if (currentLocation.page === 'ai-everyday' && getAiConversationLanguage().id === language.id) render();
-        if (!saved) showToast('Translation completed, but this conversation could not be saved in browser history.', 'error');
-        else showToast('Translation added to your conversation.');
-        if (aiAutoSpeak) {
-          void speakWithDeviceVoice(translation.translated_text, language.speech)
-            .catch((error) => showToast(error instanceof Error ? error.message : 'Read-aloud is not available.', 'error'));
-        }
+        const result = await translateWithPlotweaver({ text, sourceLanguage: 'en', targetLanguage: language.speech });
+        const output = String(result.translated_text || '').trim();
+        if (!output) throw new Error('That sentence could not be translated. Please try again.');
+        if (!aiChatState.language) aiChatState.language = language.id;
+        aiChatState.translation = { source: text, translated: output, language: language.id };
+        saveAiChatState();
+        translated = true;
+        showToast('Translation ready. Tap Listen to hear it.');
       } catch (error) {
-        const messageText = error instanceof Error ? error.message : 'Your message could not be translated.';
-        if (status) {
-          status.hidden = false;
-          status.textContent = messageText;
-          status.setAttribute('role', 'alert');
-        }
-        showToast(messageText, 'error');
+        showToast(error instanceof Error ? error.message : 'That sentence could not be translated.', 'error');
       } finally {
-        aiConversationPending = false;
-        if (form.isConnected) {
-          form.setAttribute('aria-busy', 'false');
-          if (submitButton) submitButton.disabled = false;
+        aiChatPending = false;
+        if (parseLocation().page === 'ai-translate') {
+          if (translated) render();
+          else if (translateButton?.isConnected) translateButton.disabled = false;
         }
       }
-      return;
     } else if (type === 'plotweaver-voice-clone') {
       const submitButton = form.querySelector('button[type="submit"]');
       const file = data.get('file');
@@ -9464,12 +8526,6 @@ import {
         } catch (error) {
           showToast(error instanceof Error ? error.message : 'Your code attempt could not be saved to your account.', 'error');
         }
-      }
-    } else if (type === 'coding-subscribe') {
-      const email = String(data.get('email') || '').trim();
-      if (email) {
-        form.reset();
-        showToast(`🎉 Thank you for subscribing (${email})! You will receive Code for Kids STEM updates.`, 'success');
       }
     } else if (type === 'lesson-response') {
       const response = String(data.get('response') || '').trim();
