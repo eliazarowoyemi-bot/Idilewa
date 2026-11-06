@@ -6908,7 +6908,6 @@ import {
     return 'Status unavailable';
   }
 
-
   function renderPage(page, params) {
     switch (page) {
       case 'tutor':
