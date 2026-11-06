@@ -15,7 +15,7 @@ test('homepage follows the Family Living View mobile reference', () => {
   assert.match(homeSource, /Start Learning/);
   assert.match(homeSource, /Code for Kids/);
   assert.match(homeSource, /routeLink\('kids', `Code for Kids/);
-  assert.match(homeSource, /AI Conversation/);
+  assert.doesNotMatch(homeSource, /AI Conversation/);
   assert.match(homeSource, /\$\{renderHomeAppPreview\(\)\}/);
   assert.match(homeSource, /class="container landing-pathways"/);
   for (const route of ['voice-translation', 'voice-text-to-speech', 'voice-speech-to-text', 'voice-cloning']) {
@@ -37,41 +37,39 @@ test('main and expanded mobile navigation omit retired pages', () => {
   assert.ok(navSource, 'main navigation list should exist');
   const navLabels = [...navSource.matchAll(/label: '([^']+)'/g)].map((match) => match[1]);
 
-  assert.deepEqual(navLabels, ['Home', 'Voice Lessons', 'AI Conversations', 'For Tutors']);
+  assert.deepEqual(navLabels, ['Home', 'Voice Lessons', 'For Tutors']);
   assert.doesNotMatch(navSource, /Curriculum|STEM Studio|Payment/);
-  assert.match(navSource, /\{ label: 'AI Conversations', route: 'ai-conversations', group: 'ai-conversations' \}/);
   const mobileItems = [...mobileNavSource.matchAll(/\{ route: '([^']+)', label: '([^']+)'/g)].map((match) => [match[1], match[2]]);
-  assert.deepEqual(mobileItems, [['index', 'Home'], ['voice_lessons', 'Voice'], ['ai-conversations', 'AI Chat'], ['profile', 'Profile']]);
+  assert.deepEqual(mobileItems, [['index', 'Home'], ['voice_lessons', 'Voice'], ['profile', 'Profile']]);
   assert.match(mobileNavSource, /page === 'trainer' \|\| page === 'voice_lessons' \|\| page\.startsWith\('voice-'\)/);
-  assert.match(mobileNavSource, /\?\s*aiWorkspace/);
+  assert.doesNotMatch(mobileNavSource, /aiWorkspace|ai-conversations/);
   assert.match(mobileNavSource, /class="mobile-tab mobile-navigation-item \$\{active \? 'active' : ''\}"/);
   assert.match(mobileNavSource, /mobileNav\.className = 'mobile-nav mobile-bottom-navigation'/);
   assert.match(mobileNavSource, /currentUser\?\.role === 'educator'/);
-  assert.match(styleSource, /\.mobile-bottom-navigation \{[\s\S]*?grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);[\s\S]*?align-items: center;/);
+  assert.match(styleSource, /\.mobile-bottom-navigation \{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\);[\s\S]*?align-items: center;/);
   assert.match(styleSource, /\.mobile-navigation-item \{[\s\S]*?align-items: center;[\s\S]*?text-align: center;/);
-  assert.match(styleSource, /body\.has-mobile-bottom-navigation:not\(\[data-page\^="ai-"\]\) #main/);
+  assert.match(styleSource, /body\.has-mobile-bottom-navigation #main/);
   assert.match(appSource, /const REMOVED_ROUTES = new Set\(\[[\s\S]*?'world'[\s\S]*?'coding', 'coding-studio'/);
   assert.match(appSource, /const REMOVED_ROUTES = new Set\(\[[\s\S]*?'curriculum', 'learn', 'payment'/);
   assert.doesNotMatch(appSource, /route: 'world'|label: 'Explore'|function renderCulturalWorld|initCulturalWorld|cultural-zone|cultural-world-replacement/);
   assert.match(appSource, /const MENU_NAV = \[\.\.\.NAV,/);
 });
 
-test('every story card opens its own bilingual reader with previous and next navigation', () => {
-  assert.match(appSource, /const STORY_READINGS = \[/);
-  assert.equal((appSource.match(/id: '(?:story-travelled|garden-words|little-builders)'/g) || []).length, 3);
-  assert.match(appSource, /data-route="ere_game" data-story="\$\{story\.id\}"/);
-  assert.match(appSource, /English translation/);
-  assert.match(appSource, /lang="yo"/);
-  assert.match(appSource, /Previous story/);
-  assert.match(appSource, /Next story/);
-  assert.match(appSource, /data-key="\$\{story\.id\}"/);
+test('removed page families are absent while the retained learning destinations remain', () => {
+  const routes = appSource.match(/const ROUTES = \[([\s\S]*?)\n  \];/)?.[1];
+  assert.ok(routes, 'application routes should exist');
+  assert.doesNotMatch(routes, /ai-|['"]ere(?:_game)?['"]/);
+  assert.doesNotMatch(appSource, /ai-conversations|AI Chat|AI Conversations|AI_CHAT_|aic-|STORY_READINGS|renderStoryGame/);
+  assert.match(appSource, /route: 'oral'/);
+  assert.match(appSource, /route: 'voice_lessons'/);
 });
 
-test('reference homepage and story navigation have responsive layouts', () => {
+test('reference homepage and mobile navigation have responsive layouts', () => {
   assert.match(styleSource, /@media \(max-width: 620px\)[\s\S]*?\.home-reference-page \.hero-grid \{/);
   assert.match(styleSource, /\.home-reference-actions\s*\{/);
   assert.match(styleSource, /\.home-app-layout\s*\{/);
-  assert.match(styleSource, /\.story-navigation-link \{[\s\S]*?min-height: 44px/);
+  assert.match(styleSource, /\.mobile-bottom-navigation \{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
+  assert.doesNotMatch(styleSource, /\.aic-|\.ai-auth-page|\.ai-workspace/);
 });
 
 test('homepage omits the extra promotional sections outside the supplied reference', () => {

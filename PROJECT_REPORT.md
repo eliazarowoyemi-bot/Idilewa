@@ -62,11 +62,11 @@ Language learning can become detached from the family, community, history, and e
 7. **Reflect and continue.** Learners can save sample stories, write a proverb reflection, view progress, and revisit course or culture routes.
 8. **Connect with an educator (intended flow).** A child requests family approval; a guardian completes the consent flow and may approve a specific tutor; the child verifies a code; the tutor validates the matching code before seeing an anonymous assignment. In the current demo, these checks are local browser checks and do not establish real identity or secure authorization.
 
-The primary navigation exposes Home, Learn, Voice Trainer, Read & listen, Code, Stories, and About. Additional routes are reachable through in-page links, the platform directory, and the footer.
+The desktop header exposes Home, Voice Lessons, and For Tutors; the mobile bottom navigation exposes Home, Voice, and Profile. Additional routes are reachable through the menu, in-page links, and the footer.
 
 ## 4. Complete Page Inventory
 
-The Vite configuration includes **30 HTML entry files**. Most files are small shells that load the same stylesheet and `app.js`; actual page content is rendered by the shared application based on the URL hash. Retired routes redirect to the Family homepage, and unknown hashes also resolve to Home. Page descriptions below reflect the code in the route renderer, not a claim that every proposed production service is live.
+The Vite configuration includes **28 HTML entry files**. Most files are small shells that load the same stylesheet and `app.js`; actual page content is rendered by the shared application based on the URL hash. Retired routes redirect to the Family homepage, and unknown hashes also resolve to Home. Page descriptions below reflect the code in the route renderer, not a claim that every proposed production service is live.
 
 ### A. Home, discovery, and learning
 
@@ -92,12 +92,10 @@ The Vite configuration includes **30 HTML entry files**. Most files are small sh
 
 The trainer UI includes six language choices (Yorùbá, Igbo, Hausa, Kiswahili, isiZulu, and Twi/Akan), beginner/intermediate/advanced tiers, a 60-lesson framing, phrase text and phonetic display, tone/syllable buttons, playback speed selection, lesson navigation, score summaries, and a certificate-progress concept. Current lesson data and scoring are client-side demo data. Any "AI" or native-fluency marketing language should be treated as aspiration, not validation of a production speech model or human-reviewed score.
 
-### C. Stories and living culture
+### C. Oral traditions and living culture
 
 | Entry / route | Purpose and current experience |
 |---|---|
-| `ere.html` / `ere` | Story shelf with a small set of reading/listening concepts, story cards, save controls, and a link to the story activity. Stories are positioned as shared family experiences. |
-| `ere_game.html` / `ere_game` | Story-time activity for "The story that travelled." Includes read/listen controls, short story text, an oral-sharing/attribution reminder, and a comprehension reflection. |
 | `oral.html` / `oral` | Gateway to oral traditions. Introduces voice practice, Oríkì, Òwe, and stories/songs; directs learners to the voice library and community/keepers pages. |
 | `oral_genre.html` / `oral_genre` | Guided genre index linking to voice training, Oríkì, Òwe, folktales, and spoken word. Explicitly frames its introductions as starting points and calls for consent, context, and attribution. |
 | `oriki.html` / `oriki` | Guided introduction to Yorùbá Oríkì as praise poetry and remembrance. Encourages attention to rhythm, speaker, addressee, local context, and asking before repeating. |
@@ -141,7 +139,7 @@ The shared CSS tokens are defined near the top of `styles.css`. The visual direc
 
 Other recurring design choices:
 
-- Deep forest and vibrant leaf greens establish a shared identity across the core site, AI Conversations, family/tutor portals, and language learning.
+- Deep forest and vibrant leaf greens establish a shared identity across the core site, family/tutor portals, and language learning.
 - White text on primary action buttons uses the deep-forest shade for legible contrast; vibrant leaf green remains the supporting interactive accent.
 - The CSS defines soft green-tinted shadows, a 1200px content width, 22px and 30px radius tokens, and shared button, card, pill, section, and navigation styles.
 - A light translucent sticky header, breadcrumbs, clear active navigation, compact uppercase section labels, rounded buttons, stepper flows, and repeated card patterns establish a common interaction language.

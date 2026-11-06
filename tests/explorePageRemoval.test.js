@@ -22,6 +22,15 @@ test('retired pages and unknown routes redirect to the Family homepage', async (
     assert.doesNotMatch(viteConfig, new RegExp(`'${route}'`));
     await assert.rejects(access(new URL(`../${route}.html`, import.meta.url)), { code: 'ENOENT' });
   }
+  for (const route of ['ere', 'ere_game', 'ai-conversations', 'ai-login', 'ai-signup', 'ai-dashboard', 'ai-chat', 'ai-voice', 'ai-history', 'ai-translate', 'ai-saved']) {
+    assert.doesNotMatch(routes, new RegExp(`['"]${route}['"]`), `${route} should not be an active route`);
+    assert.doesNotMatch(nav, new RegExp(`['"]${route}['"]`), `${route} should not be in the main navigation`);
+    assert.doesNotMatch(viteConfig, new RegExp(`'${route}'`), `${route} should not have a build entry`);
+  }
+  for (const route of ['ere', 'ere_game']) {
+    await assert.rejects(access(new URL(`../${route}.html`, import.meta.url)), { code: 'ENOENT' });
+  }
+  assert.doesNotMatch(appSource, /ai-conversations|AI Chat|AI Conversations|ai-dashboard|ai-login|ai-signup|ere_game|STORY_READINGS/);
   assert.doesNotMatch(appSource, /function renderDirectory|function renderBase|function renderLibrary|function renderTileGame|TILE_WORDS/);
   assert.doesNotMatch(nav, /world|Explore|Library|Tile game/);
   assert.match(appSource, /page: REMOVED_ROUTES\.has\(page\) \|\| !ROUTES\.includes\(page\) \? 'index' : page/);

@@ -12,7 +12,7 @@ Culture is treated as **living knowledge carried by people** across generations�
 The experience unifies:
 - **Language Discovery:** Foundation learning for Yorùbá, Igbo, Hausa, and Kiswahili, alongside planned paths for Twi, Wolof, isiZulu, and Fulfulde.
 - **African Voice Trainer & Sound Studio:** 60 structured lessons across Beginner, Intermediate, and Advanced tiers, Do-Re-Mi tone melodies, and phonetic visualizers.
-- **Living Stories & Oral Traditions:** Òwe (proverbs), Oríkì (praise poetry & remembrance), Ifá educational overviews, and intergenerational family stories.
+- **Living Oral Traditions:** Òwe (proverbs), Oríkì (praise poetry & remembrance), Ifá educational overviews, and cultural introductions.
 - **Code for Kids (K–8 STEM):** Indigenous coding environment (*ÈdèKoodu*) with turtle graphics, bilingual keyword maps, and grade-band curriculums.
 - **Family & Educator Stewardship:** Parent/guardian consent demonstrations and tutor discovery with privacy-conscious safeguarding.
 
@@ -51,11 +51,10 @@ The application incorporates a restrained, performant Three.js 3D engine integra
      - **Pillar 01 (Èdè):** Language & Everyday Speech
      - **Pillar 02 (Ohùn):** Voice & Tonal Melody Studio
      - **Pillar 03 (Òwe & Oríkì):** Oral Traditions & Attributed Wisdom
-     - **Pillar 04 (Ìtàn):** Stories That Travel & Family Reading
-     - **Pillar 05 (Koodu):** Indigenous STEM & Code for Kids
+     - **Pillar 04 (Koodu):** Indigenous STEM & Code for Kids
 3. **Route 3D Stages:**
    - **Coding (`#/coding`):** 3D Yoruba Hologram Matrix Cube & Rotating Glyphs (`init3DCodingCanvas`).
-   - **Stories (`#/ere`, `#/oral`):** 3D Sacred Story Drum, Cowrie Shell & Magic Story Orb (`init3DStoryCanvas`).
+   - **Oral traditions (`#/oral`):** cultural context, proverbs, and praise poetry.
    - **Auth & Consent (`#/login`, `#/consent`):** 3D Sacred Shield & Gateway Key (`init3DAuthCanvas`).
    - **Audio Studio (`#/trainer`):** 3D Waveform Audio Visualizer (`init3DAudioVisualizer`).
 4. **Interactive 3D Perspective Card Tilt (`init3DTiltEngine`):**
@@ -102,9 +101,7 @@ The HTML entries declared in the active `vite.config.js` are supported:
 | | `#/voice_lessons` (`voice_lessons.html`) | Route alias & standalone shell resolving to the Voice Trainer studio. |
 | | `#/voices` (`voices.html`) | Sample greeting library for Yorùbá, Igbo, Hausa, and Swahili with Plotweaver speech audio where supported. |
 | | `#/voice-translation`, `#/voice-text-to-speech`, `#/voice-speech-to-text`, `#/voice-cloning` | Dedicated Plotweaver-backed language tools linked from the homepage. |
-| **AI Conversations** | `#/ai-conversations` | Opens directly into guest-ready language practice; text is sent to Plotweaver for translation, and chat history stays in the current browser. |
-| **Culture & Stories** | `#/ere` (`ere.html`) | Living story shelf featuring shared family tales and save controls. |
-| | `#/ere_game` (`ere_game.html`) | “The story that travelled” interactive reading and comprehension reflection. |
+| **Culture & Oral Traditions** | `#/oral` (`oral.html`) | Oral traditions gateway introducing Oríkì, Òwe, spoken word, and song. |
 | | `#/oral` (`oral.html`) | Oral traditions gateway (Oríkì, Òwe, spoken word, and song). |
 | | `#/oral_genre` (`oral_genre.html`) | Guided genre index linking attribution, speaker context, and consent. |
 | | `#/oriki` (`oriki.html`) | Yorùbá praise poetry & remembrance, exploring rhythm, speaker, and permission. |

@@ -98,16 +98,13 @@ import {
     'voice_lessons',
     'voice-language', 'voice-grade', 'voice-audio', 'voice-practice',
     'voice-text-to-speech', 'voice-cloning', 'voice-speech-to-text', 'voice-translation',
-    'ai-conversations', 'ai-login', 'ai-signup', 'ai-dashboard', 'ai-chat', 'ai-everyday',
-    'ai-voice', 'ai-history', 'ai-analytics', 'ai-profile', 'ai-messages', 'ai-settings',
-    'ai-translate', 'ai-saved',
     'families', 'parent-login', 'parent-signup', 'parent-dashboard', 'parent-children',
     'parent-progress', 'parent-messages', 'parent-settings', 'parent-welcome',
     'tutor', 'tutor-login', 'tutor-signup', 'tutor-dashboard', 'tutor-find-child', 'tutor-students',
     'tutor-consent', 'tutor-lesson', 'tutor-messages', 'tutor-profile', 'tutor-availability', 'tutor-settings',
     'mentors',
     'index', 'about', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
-    'ere', 'ere_game', 'keepers',
+    'keepers',
     'kids', 'languages', 'lesson', 'login', 'oral', 'oral_genre', 'oriki', 'owe',
     'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'pricing', 'profile',
     'voices'
@@ -253,7 +250,7 @@ import {
       cards: [
         { title: 'Language lives in community', text: 'Learning grows through everyday words, family stories and the voices of people who carry them.', icon: 'people', route: 'families', tone: 'mint' },
         { title: 'Culture belongs in the classroom', text: 'Proverbs, oral traditions and cultural context sit beside language practice—not on the sidelines.', icon: 'book', route: 'oral', tone: 'peach' },
-        { title: 'Practice real conversations', text: 'Guided everyday dialogue helps learners speak with confidence and warmth.', icon: 'message', route: 'ai-conversations', tone: 'blue' }
+        { title: 'Practice speaking', text: 'Guided voice lessons help learners build confidence and warmth.', icon: 'mic', route: 'voice_lessons', tone: 'blue' }
       ]
     },
     kids: {
@@ -265,8 +262,7 @@ import {
       cta: 'Start a kid-friendly path', ctaRoute: 'languages',
       cards: [
         { title: 'Words you can use today', text: 'Learn friendly greetings and everyday phrases with clear audio prompts.', icon: 'volume', route: 'course', tone: 'mint' },
-        { title: 'Stories made to share', text: 'Read or listen together, then answer a short question about what happened.', icon: 'book', route: 'ere', tone: 'peach' },
-        { title: 'Create with stories', text: 'Read, listen and retell stories with words from the language you are learning.', icon: 'book', route: 'ere', tone: 'yellow' }
+        { title: 'Learn together', text: 'Explore language, culture and creative challenges as a family.', icon: 'book', route: 'oral', tone: 'peach' }
       ]
     },
     keepers: {
@@ -287,14 +283,12 @@ import {
   const NAV = [
     { label: 'Home', route: 'index', group: 'home' },
     { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' },
-    { label: 'AI Conversations', route: 'ai-conversations', group: 'ai-conversations' },
     { label: 'For Tutors', route: 'tutor', group: 'tutor' }
   ];
   const MENU_NAV = [...NAV,
     { label: 'Mentors', route: 'mentors', group: 'mentors' },
     { label: 'For Parents', route: 'families', group: 'families' },
     { label: 'Read & listen', route: 'oral', group: 'read' },
-    { label: 'Stories', route: 'ere', group: 'stories' },
     { label: 'About', route: 'about', group: 'about' }
   ];
 
@@ -308,18 +302,6 @@ import {
     'parent-messages': 'families',
     'parent-settings': 'families',
     'parent-welcome': 'families',
-    'ai-conversations': 'ai-conversations',
-    'ai-login': 'ai-conversations',
-    'ai-signup': 'ai-conversations',
-    'ai-dashboard': 'ai-conversations',
-    'ai-chat': 'ai-conversations',
-    'ai-everyday': 'ai-conversations',
-    'ai-voice': 'ai-conversations',
-    'ai-history': 'ai-conversations',
-    'ai-analytics': 'ai-conversations',
-    'ai-profile': 'ai-conversations',
-    'ai-messages': 'ai-conversations',
-    'ai-settings': 'ai-conversations',
     tutor: 'tutor',
     mentors: 'mentors',
     'tutor-login': 'tutor',
@@ -338,7 +320,6 @@ import {
     oral: 'read', oral_genre: 'read', oriki: 'read', owe: 'read', owe_add: 'read',
     owe_detail: 'read', owe_story: 'read', owe_reflection: 'read', voices: 'read',
     connect_students: 'about', connect_teachers: 'about', consent: 'about', contact: 'about', privacy: 'about',
-    ere: 'stories', ere_game: 'stories',
     about: 'about',
     keepers: 'culture'
   };
@@ -354,7 +335,7 @@ import {
     'voice-speech-to-text': 'Speech to Text',
     'voice-translation': 'Translation',
   });
-  LABELS.ere = 'Stories'; LABELS.ere_game = 'Story game'; LABELS.ifa_odu = 'Odu culture note';
+  LABELS.ifa_odu = 'Odu culture note';
   LABELS.owe = 'Owe';
   LABELS.owe_add = 'Share a proverb';
   LABELS.owe_detail = 'Owe'; LABELS.owe_story = 'Owe'; LABELS.owe_reflection = 'Owe';
@@ -366,18 +347,6 @@ import {
   LABELS.game = 'Tile game';
   LABELS.trainer = 'Voice Lessons';
   LABELS.voice_lessons = 'Voice Lessons';
-  LABELS['ai-conversations'] = 'AI Conversations';
-  LABELS['ai-login'] = 'AI Conversations sign in';
-  LABELS['ai-signup'] = 'AI Conversations account';
-  LABELS['ai-dashboard'] = 'Conversation dashboard';
-  LABELS['ai-chat'] = 'Choose a conversation';
-  LABELS['ai-everyday'] = 'Everyday Life';
-  LABELS['ai-voice'] = 'Voice Practice';
-  LABELS['ai-history'] = 'Conversation History';
-  LABELS['ai-analytics'] = 'Learning Analytics';
-  LABELS['ai-profile'] = 'My Profile';
-  LABELS['ai-messages'] = 'Messages';
-  LABELS['ai-settings'] = 'Settings';
   Object.assign(LABELS, {
     families: 'For Parents',
     'parent-login': 'Parent Login',
@@ -614,10 +583,6 @@ import {
     const [path, query = ''] = hash.split('?');
     let page = path.split('/')[0] || 'index';
     const params = Object.fromEntries(new URLSearchParams(query));
-    if (page === 'ai-children') {
-      page = 'ai-dashboard';
-      history.replaceState(null, '', `${window.location.pathname}${window.location.search}#/ai-dashboard`);
-    }
     if (OWE_ROUTE_SECTIONS[page]) {
       params.section = params.section || OWE_ROUTE_SECTIONS[page];
       page = 'owe';
@@ -669,7 +634,7 @@ import {
   }
 
   function renderHeader(page) {
-    if (page === 'login' || page.startsWith('ai-') || page.startsWith('tutor') || page.startsWith('parent') || page === 'families') {
+    if (page === 'login' || page.startsWith('tutor') || page.startsWith('parent') || page === 'families') {
       document.getElementById('site-header').innerHTML = '';
       return;
     }
@@ -694,9 +659,7 @@ import {
       ? `<a class="header-profile ${page === 'profile' ? 'active' : ''}" href="#/profile" data-route="profile" aria-label="Open profile"${page === 'profile' ? ' aria-current="page"' : ''}><span class="header-avatar">${profileAvatar}</span><span class="header-profile-label">${esc(currentUser.name || 'Profile')}</span></a><button class="header-signout" type="button" data-action="account-sign-out">Sign out</button>`
       : `${routeLink('login', 'Log in', 'header-signin', 'data-mode="signin"')}${routeLink('login', 'Get started', 'button button-primary header-cta', 'data-mode="signup"')}`;
     const mobileShortcuts = [
-      { route: 'profile', label: 'Profile', ico: 'user' },
-      { route: 'ai-conversations', label: 'AI Chat', ico: 'sparkles' },
-      { route: 'trainer', label: 'Voice Lessons', ico: 'mic' }
+      { route: 'profile', label: 'Profile', ico: 'user' }
     ].map((item) => `<a class="mobile-menu-link ${page === item.route ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.ico, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('');
     const menu = MENU_NAV.map((item) => {
       const iconName = item.href ? 'code' : item.group === 'home' ? 'home' : item.group === 'trainer' ? 'mic' : item.group === 'learn' ? 'book' : item.group === 'read' ? 'headphones' : item.group === 'code' ? 'code' : item.group === 'stories' ? 'quote' : item.group === 'community' ? 'people' : 'sparkles';
@@ -736,11 +699,10 @@ import {
   function renderMobileNav(page) {
     const currentUser = getCurrentUser();
     const familyDashboard = currentUser?.role === 'parent' && page === 'parent-dashboard';
-    const aiWorkspace = page.startsWith('ai-') && !['ai-login', 'ai-signup'].includes(page);
     const mobileNav = document.getElementById('mobile-nav');
     mobileNav.className = 'mobile-nav mobile-bottom-navigation';
     mobileNav.setAttribute('aria-label', 'Primary navigation');
-    if (page === 'login' || (page.startsWith('ai-') && !aiWorkspace) ||
+    if (page === 'login' ||
       page.startsWith('tutor') || page === 'families' ||
       (page.startsWith('parent') && !familyDashboard) || (currentUser?.role === 'parent' && !familyDashboard) || currentUser?.role === 'educator') {
       mobileNav.replaceChildren();
@@ -753,7 +715,6 @@ import {
     const items = [
       { route: 'index', label: 'Home', ico: 'home' },
       { route: 'voice_lessons', label: 'Voice', ico: 'mic' },
-      { route: 'ai-conversations', label: 'AI Chat', ico: 'sparkles' },
       { route: 'profile', label: 'Profile', ico: 'user' }
     ];
     mobileNav.innerHTML = items.map((item) => {
@@ -761,9 +722,7 @@ import {
         ? page === 'index' || familyDashboard
         : item.route === 'voice_lessons'
           ? page === 'trainer' || page === 'voice_lessons' || page.startsWith('voice-')
-          : item.route === 'ai-conversations'
-            ? aiWorkspace
-            : page === item.route;
+          : page === item.route;
       return `<a href="#/${item.route}" data-route="${item.route}" class="mobile-tab mobile-navigation-item ${active ? 'active' : ''}"${active ? ' aria-current="page"' : ''}>${icon(item.ico, 20)}<span>${item.label}</span></a>`;
     }).join('');
   }
@@ -782,7 +741,7 @@ import {
           </div>
         </section>
         <nav class="footer-directory" aria-label="Footer navigation">
-          <section class="footer-links"><h2>Quick links</h2>${routeLink('index', 'Home')}${routeLink('languages', 'Languages')}${routeLink('trainer', 'Voice lessons')}${routeLink('ai-conversations', 'AI conversations')}${routeLink('ere', 'Stories')}</section>
+          <section class="footer-links"><h2>Quick links</h2>${routeLink('index', 'Home')}${routeLink('languages', 'Languages')}${routeLink('trainer', 'Voice lessons')}${routeLink('oral', 'Oral traditions')}</section>
           <section class="footer-links"><h2>Information</h2>${routeLink('about', 'About Idilewa')}${routeLink('families', 'Parent portal')}${routeLink('privacy', 'Privacy policy')}</section>
         </nav>
       </div>
@@ -809,20 +768,16 @@ import {
   function renderHomeAppPreview() {
     const previews = [
       { title: 'Hear a greeting', label: 'Yorùbá · Language', copy: 'Start with a phrase, then listen for the tones that shape its meaning.', image: 'page-languages-1.jpg', route: 'languages', action: 'Explore languages' },
-      { title: 'Practise a conversation', label: 'AI Conversations', copy: 'Rehearse everyday, market and travel dialogue with gentle spoken replies.', image: 'listening-reader.jpg', route: 'ai-conversations', action: 'Start practising' },
-      { title: 'Find a story', label: 'Stories · Culture', copy: 'Read, listen and explore folktales, traditions and riddles.', image: 'story-grandmother.jpg', route: 'ere', action: 'Explore stories' },
       { title: 'Practice a sound', label: 'Voice Lessons', copy: 'Build confidence with vowels, consonants and guided speaking practice.', image: 'listening-reader.jpg', route: 'voice_lessons', action: 'Start a lesson' }
     ];
     const phonePreviews = [
       { type: 'language', glyph: 'Ẹ', label: 'YORÙBÁ · FIRST WORDS', title: 'Ẹ káàárọ̀', copy: 'Good morning', action: 'Listen', text: 'Ẹ káàárọ̀' },
-      { type: 'code', glyph: 'Ìj', label: 'AI · CONVERSATION', title: 'Kí ni orúkọ rẹ?', copy: 'Practise a greeting reply.', action: 'Practise', text: 'Kí ni orúkọ rẹ?' },
-      { type: 'story', glyph: 'Ìt', label: 'STORIES · LISTEN', title: 'A story travels', copy: 'Read, listen and share together.', action: 'Discover', text: '' },
       { type: 'voice', glyph: 'Ohùn', label: 'VOICE LESSONS', title: 'Sound foundations', copy: 'Practice vowels, consonants and tones.', action: 'Practice', text: '' }
     ];
     const renderPhoneSlide = (item, index, duplicate = false) => `<article class="android-preview-slide ${duplicate ? 'is-clone' : ''}" ${duplicate ? 'aria-hidden="true"' : ''}><div class="android-slide-visual android-slide-${item.type}"><span>${item.glyph}</span><small>0${index + 1}</small></div><small class="android-slide-label">${item.label}</small><strong>${item.title}</strong><span class="android-slide-copy">${item.copy}</span>${item.text ? `<button type="button" aria-label="Play ${item.title}" ${duplicate ? 'tabindex="-1"' : ''} data-action="play-audio" data-text="${esc(item.text)}">${icon('play', 12)} ${item.action}</button>` : `<span class="android-slide-action">${item.action} ${icon('arrow', 12)}</span>`}</article>`;
     const renderPreviewCard = (item, index, duplicate = false) => `<article class="home-app-slide" ${duplicate ? 'aria-hidden="true"' : ''}><img src="./assets/${item.image}" alt="${duplicate ? '' : esc(item.title + ' preview')}" loading="lazy" /><div class="home-app-slide-copy"><span>${item.label}</span><h4>${item.title}</h4><p>${item.copy}</p>${routeLink(item.route, `${item.action} ${icon('arrow', 14)}`, 'text-link', duplicate ? 'tabindex="-1"' : '')}</div><span class="home-app-slide-number">0${index + 1}</span></article>`;
     return `<section class="home-app-section home-ribbon-section" aria-labelledby="home-app-title"><div class="container home-app-layout">
-      <div class="home-app-device-column"><div class="home-app-heading"><span class="section-kicker">A little Idilewa in your pocket</span><h2 id="home-app-title">Learning that moves with you.</h2><p>Explore languages, stories and creative practice from one welcoming home.</p></div>
+      <div class="home-app-device-column"><div class="home-app-heading"><span class="section-kicker">A little Idilewa in your pocket</span><h2 id="home-app-title">Learning that moves with you.</h2><p>Explore languages and creative practice from one welcoming home.</p></div>
         <div class="android-device" aria-label="Android phone preview of the Idilewa learning app"><div class="android-device-side"></div><div class="android-device-screen"><div class="android-status"><span>9:41</span><span>● ● ▰</span></div><div class="android-appbar">${brandLogo()}<span>${icon('user', 15)}</span></div><div class="android-welcome"><small>Ẹ káàárọ̀, learner</small><strong>What would you like to explore?</strong></div><div class="android-preview-viewport" id="android-preview-viewport" aria-label="Automatically swiping Idilewa learning previews"><div class="android-preview-track">${phonePreviews.map((item, index) => renderPhoneSlide(item, index)).join('')}${renderPhoneSlide(phonePreviews[0], 0, true)}</div></div><div class="android-bottom-nav"><span>${icon('home', 14)}Home</span><span>${icon('book', 14)}Learn</span><span>${icon('user', 14)}Profile</span></div></div></div>
       </div>
       <div class="home-app-swipe-area"><div class="home-app-swipe-heading"><div><span class="section-kicker">Look around</span><h3>One space. Many ways to grow.</h3></div></div>
@@ -848,7 +803,6 @@ import {
             <div class="hero-actions home-reference-actions">
               ${routeLink('voice-language', `Start Learning ${icon('arrow', 17)}`, 'button button-primary')}
               ${routeLink('kids', `Code for Kids ${icon('code', 17)}`, 'button button-outline')}
-              ${routeLink('ai-conversations', `AI Conversation ${icon('sparkles', 17)}`, 'button button-primary')}
             </div>
             <div class="hero-social-proof home-reference-proof"><span class="home-reference-proof-mark">${icon('globe', 19)}</span><span>Culture, creativity and learning<br />for every generation.</span></div>
           </div>
@@ -877,16 +831,13 @@ import {
 
   function renderFullHome() {
     const featureCards = [
-      { title: 'AI Conversation Practice', desc: 'Rehearse everyday Yorùbá, Igbo, Hausa, Swahili and Pidgin dialogue with a partner that speaks and listens.', icon: 'message', route: 'ai-conversations', tone: 'blue', tag: 'Practice', image: 'listening-reader.jpg' },
       { title: 'Voice Lessons', desc: 'Start with Yorùbá sounds, then practice pitch and pronunciation across African languages.', icon: 'mic', route: 'voice_lessons', tone: 'mint', tag: 'Interactive Audio Lessons', image: 'listening-reader.jpg' },
       { title: 'Read & listen', desc: 'Hear words, voices and ideas.', icon: 'headphones', route: 'voices', tone: 'mint', tag: 'Audio & text', image: 'listening-reader.jpg' },
-      { title: 'Stories & culture', desc: 'Discover stories, people and traditions.', icon: 'book', route: 'ere', tone: 'pink', tag: 'Explore', image: 'story-grandmother.jpg' },
       { title: 'Connect with Students', desc: 'A respectful space for educators to meet learners.', icon: 'people', route: 'connect_students', tone: 'peach', tag: 'For educators', image: 'african-kids-friends.jpg' },
       { title: 'Connect with Teachers', desc: 'Browse educator profiles, learning hours and experience.', icon: 'school', route: 'connect_teachers', tone: 'lilac', tag: 'For learners', image: 'yoruba-educator-man.jpg' }
     ];
     const books = [
       { title: 'A Morning Greeting', label: 'Yorùbá · Beginner', bg: 'cover-green', shape: 'È', route: 'course' },
-      { title: 'Stories We Share', label: 'Story · Read & listen', bg: 'cover-blue', shape: '♫', route: 'ere' },
       { title: 'Wisdom We Carry', label: 'Culture · Short read', bg: 'cover-pink', shape: '“', route: 'oral' }
     ];
     return `
@@ -898,7 +849,6 @@ import {
             <p class="hero-mantra">Learn. Speak. Code. Create. Belong.</p>
             <p class="hero-lede">A joyful place to learn a language, hear the stories behind it and imagine what you can create next.</p>
             <div class="hero-actions">
-              ${routeLink('ai-conversations', `Start AI conversation practice ${icon('arrow', 17)}`, 'button button-primary')}
               ${routeLink('voice_lessons', `${icon('layers', 16)} Explore voice lessons`, 'button button-accent')}
               ${routeLink('about', `${icon('play', 15)} Our story`, 'button button-outline')}
             </div>
@@ -1012,50 +962,11 @@ import {
             </div>
           </div>
 
-          <!-- Pillar 4: Storytelling -->
-          <div class="journey-card-3d tone-pink">
-            <div class="journey-card-header">
-              <div class="journey-3d-step-badge">Pillar 04 · Ìtàn</div>
-              <span class="journey-3d-glyph">📖</span>
-            </div>
-            <div class="journey-3d-content">
-              <h3>Stories That Travel</h3>
-              <p>Intergenerational storytelling, family picture books, and audio-first reading with comprehension checks.</p>
-              <ul class="journey-highlights" aria-label="Key features">
-                <li><span>✓</span> Illustrated Folktales &amp; Audiobooks</li>
-                <li><span>✓</span> Bilingual Read-Along with Highlighting</li>
-                <li><span>✓</span> Comprehension Quizzes &amp; Word Games</li>
-              </ul>
-            </div>
-            <div class="journey-card-action">
-              ${routeLink('ere', `Read &amp; Listen Stories ${icon('arrow', 15)}`, 'button button-primary')}
-            </div>
-          </div>
-
-          <!-- Pillar 5: AI Conversation Practice -->
-          <div class="journey-card-3d tone-blue">
-            <div class="journey-card-header">
-              <div class="journey-3d-step-badge">Pillar 05 · Ìjíròrò</div>
-              <span class="journey-3d-glyph">🗣</span>
-            </div>
-            <div class="journey-3d-content">
-              <h3>Guided AI Conversation</h3>
-              <p>Practise everyday, market, travel, school and storytelling conversations with a patient partner that speaks and listens.</p>
-              <ul class="journey-highlights" aria-label="Key features">
-                <li><span>✓</span> 5 languages · 6 conversation topics</li>
-                <li><span>✓</span> Listen, repeat and save key phrases</li>
-                <li><span>✓</span> Your progress stays on your own device</li>
-              </ul>
-            </div>
-            <div class="journey-card-action">
-              ${routeLink('ai-conversations', `Start practising ${icon('arrow', 15)}`, 'button button-primary')}
-            </div>
-          </div>
         </div>
       </section>
 
       <section class="container section section-start home-ribbon-section">
-        <div class="section-heading"><div><span class="section-kicker">A world of ways to learn</span><h2>Learn a little. Carry a lot.</h2><p>Choose a path that feels like you. There is always room to explore.</p></div>${routeLink('ai-conversations', 'Practise a conversation ' + icon('arrow', 15), 'text-link desktop-only')}</div>
+        <div class="section-heading"><div><span class="section-kicker">A world of ways to learn</span><h2>Learn a little. Carry a lot.</h2><p>Choose a path that feels like you. There is always room to explore.</p></div></div>
         <div class="feature-grid">${featureCards.map((card) => `<a class="feature-card tone-${card.tone}" href="#/${card.route}" data-route="${card.route}"><span class="feature-card-portrait"><img src="./assets/${card.image}" alt="${card.imageAlt ? esc(card.imageAlt) : ''}" ${card.imageAlt ? '' : 'aria-hidden="true"'} loading="lazy" /></span><div class="feature-card-top"><span class="feature-icon">${icon(card.icon, 23)}</span><span class="feature-tag">${card.tag}</span></div><h3>${card.title}</h3><p>${card.desc}</p><span class="card-arrow">${icon('arrow', 17)}</span></a>`).join('')}</div>
       </section>
 
@@ -1142,13 +1053,8 @@ import {
       </section>
 
       <section class="container section explore-section home-ribbon-section">
-        <div class="section-heading"><div><span class="section-kicker">Picked for curious minds</span><h2>Explore books & little discoveries</h2><p>Read, listen and find a new doorway into language and culture.</p></div>${routeLink('ere', 'Visit the library ' + icon('arrow', 15), 'text-link')}</div>
+        <div class="section-heading"><div><span class="section-kicker">Picked for curious minds</span><h2>Explore books & little discoveries</h2><p>Read, listen and find a new doorway into language and culture.</p></div></div>
         <div class="book-grid">${books.map((book, i) => `<a href="#/${book.route}" data-route="${book.route}" class="book-card"><div class="book-cover ${book.bg}"><span class="book-cover-mark">${book.shape}</span><span class="book-sun"></span><span class="book-hill book-hill-one"></span><span class="book-hill book-hill-two"></span><span class="book-cover-index">0${i + 1}</span></div><strong>${book.title}</strong><small>${book.label}</small></a>`).join('')}</div>
-      </section>
-
-      <section class="container story-feature section home-ribbon-section">
-        <div class="story-feature-image"><img src="./assets/story-grandmother.jpg" alt="A grandmother sharing a story with two children" loading="lazy" /><span class="image-caption">Stories are a way of remembering together.</span></div>
-        <div class="story-feature-copy"><span class="section-kicker">Read · listen · remember</span><h2>Every story carries<br /><span>a little piece of us.</span></h2><p>Meet the voices behind a story. Listen in your language, notice a new phrase and bring the conversation home.</p><div class="story-feature-points"><span>${icon('headphones', 17)} Audio-first stories</span><span>${icon('people', 17)} Made for sharing</span></div>${routeLink('ere', `Explore stories ${icon('arrow', 16)}`, 'button button-primary')}</div>
       </section>
 
       <section class="container section audience-section home-ribbon-section">
@@ -1172,7 +1078,6 @@ import {
     const pathways = [
       { icon: 'book', title: 'Learn', copy: 'African languages', route: 'voice-language' },
       { icon: 'volume', title: 'Listen', copy: 'Stories & audiobooks', route: 'voices' },
-      { icon: 'message', title: 'Practise', copy: 'Everyday conversations', route: 'ai-conversations' },
       { icon: 'people', title: 'Join', copy: 'A global community', route: 'connect_students' }
     ];
     return `<div class="landing-home">
@@ -1241,8 +1146,8 @@ import {
           </section>
 
           <section class="landing-story-card">
-            <img src="/assets/story-grandmother.jpg" alt="A grandmother sharing a story with children" loading="lazy" />
-            <div><span class="section-kicker">Stories that carry us</span><h2>Learn from the voices around you.</h2><p>Explore stories, sayings and traditions passed from one generation to the next.</p>${routeLink('ere', `Explore stories ${icon('arrow', 14)}`, 'text-link')}</div>
+            <img src="/assets/story-grandmother.jpg" alt="A grandmother sharing cultural knowledge with children" loading="lazy" />
+            <div><span class="section-kicker">Culture that carries us</span><h2>Learn from the voices around you.</h2><p>Explore sayings and traditions passed from one generation to the next.</p>${routeLink('oral', `Explore oral traditions ${icon('arrow', 14)}`, 'text-link')}</div>
           </section>
         </main>
 
@@ -3173,91 +3078,6 @@ import {
     '</section>';
   }
 
-  const STORY_READINGS = [
-    {
-      id: 'story-travelled',
-      title: 'The story that travelled',
-      desc: 'A family story told, remembered and shared again.',
-      image: 'story-grandmother.jpg',
-      tag: 'Oral tradition',
-      lang: 'Yorùbá · English',
-      subhead: 'An original family learning story about listening, memory and sharing.',
-      paragraphs: [
-        ['Ní ìrọ̀lẹ́ ọjọ́ kan, ìyá àgbà bẹ̀rẹ̀ sí í sọ ìtàn kan nínú ọgbà. Àwọn ọmọ sún mọ́ ọn bí àwọn ọ̀rọ̀ àkọ́kọ́ ṣe wọ inú ìdákẹ́jẹ̀.', 'One evening, a grandmother began a story in the garden. The children leaned closer as the first words settled into the quiet.'],
-        ['Nígbà tí ìtàn náà parí, ọ̀kan nínú àwọn ọmọ béèrè pé kí wọ́n tún sọ ọ́. Nígbà kejì, wọ́n tẹ́tí sí ohun kékeré kan tí wọn kò kíyè sí tẹ́lẹ̀, wọ́n sì fi kún bí wọ́n ṣe tún sọ ìtàn náà.', 'When the story ended, one child asked to hear it again. The next time, they listened for a detail they had missed and carried it into their own retelling.'],
-        ['Ní òwúrọ̀, ìtàn náà ti dé ọ̀dọ̀ àwọn ẹlòmíràn. Ó ṣì jẹ́ ìtàn kan náà, ó sì gba ohùn tuntun láàyè.', 'By morning, the story had travelled. It was still familiar, and it had room for a new voice.']
-      ],
-      question: 'What helped the story travel?',
-      answers: [
-        ['Someone listened and shared it with care.', true],
-        ['The children forgot the details.', false],
-        ['The garden grew the story by itself.', false]
-      ]
-    },
-    {
-      id: 'garden-words',
-      title: 'Words from the garden',
-      desc: 'Notice new words as a small garden begins to grow.',
-      image: 'yoruba-kids-culture.jpg',
-      tag: 'Read together',
-      lang: 'Yorùbá · English',
-      subhead: 'An original beginner story about patience, plants and learning new words.',
-      paragraphs: [
-        ['Àwọn ọ̀rẹ́ méjì gbìn irúgbìn sínú ọgbà kékeré kan. Wọ́n yan àkókò láti máa fún un ní omi.', 'Two friends planted seeds in a little garden. They chose a time each day to water them.'],
-        ['Ní gbogbo ọjọ́, wọ́n máa ń ṣàkíyèsí àwọn ewé tuntun. Wọ́n kọ ọ̀rọ̀ tuntun kan sílẹ̀ fún ohun tí wọ́n rí.', 'Each day, they looked for new leaves. They wrote down a new word for something they noticed.'],
-        ['Lẹ́yìn ọ̀pọ̀ ọjọ́, àwọn ewé túbọ̀ pọ̀ sí i. Àwọn ọ̀rẹ́ náà rí i pé sùúrù àti ìtọ́jú ń ran ọgbà àti ọgbọ́n lọ́wọ́ láti dàgbà.', 'After many days, more leaves appeared. The friends saw that patience and care help both gardens and knowledge grow.']
-      ],
-      question: 'What did the friends do each day?',
-      answers: [
-        ['They watered the seeds and noticed new leaves.', true],
-        ['They moved to a different garden.', false],
-        ['They stopped looking at the plants.', false]
-      ]
-    },
-    {
-      id: 'little-builders',
-      title: 'A team of little builders',
-      desc: 'Follow two friends as they solve a puzzle with code.',
-      image: 'code-kids.jpg',
-      tag: 'Code & create',
-      lang: 'Yorùbá · English',
-      subhead: 'An original story about two friends solving a problem together.',
-      paragraphs: [
-        ['Àwọn ọ̀rẹ́ méjì fẹ́ kí robọ́ọ̀tì kékeré kan dé ọ̀dọ̀ igi kan. Wọ́n ṣètò àwọn àṣẹ kóòdù láti tọ́ ọ sí ọ̀nà tó tọ́.', 'Two friends wanted a small robot to reach a tree. They arranged code instructions to guide it along the right path.'],
-        ['Ní ìgbà àkọ́kọ́, robọ́ọ̀tì náà yí sí ọ̀nà tí kò tọ́. Àwọn ọ̀rẹ́ náà wo àwọn àṣẹ náà papọ̀, wọ́n sì tún ọ̀kan ṣe.', 'At first, the robot turned the wrong way. The friends checked the instructions together and changed one of them.'],
-        ['Nígbà tí wọ́n tún gbìyànjú, robọ́ọ̀tì náà dé ibi tí wọ́n fẹ́. Wọ́n yọ̀ pé ìfọwọ́sowọ́pọ̀ ràn wọ́n lọ́wọ́ láti yanjú ìṣòro náà.', 'When they tried again, the robot reached its goal. They were glad that working together helped them solve the problem.']
-      ],
-      question: 'How did the friends help the robot reach the tree?',
-      answers: [
-        ['They checked and changed one instruction together.', true],
-        ['They left the robot without instructions.', false],
-        ['They asked the robot to grow wings.', false]
-      ]
-    }
-  ];
-
-  function renderStories() {
-    return `<div class="container route-page stories-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>Stories</strong></div><section class="stories-hero"><div><span class="section-kicker">Stories & imagination</span><h1>Some things are best<br /><em>shared as a story.</em></h1><p>Read, listen and notice the words, voices and moments that bring a story to life.</p>${routeLink('ere_game', `Try a story ${icon('arrow', 15)}`, 'button button-primary', `data-story="${STORY_READINGS[0].id}"`)}${aiHelperButton('story')}</div><div class="stories-hero-image"><img src="./assets/story-grandmother.jpg" alt="A grandmother sharing a story with two children" /><span class="story-image-chip">${icon('headphones', 16)} Listen together</span></div></section>${renderStepper(['Choose a story', 'Read', 'Listen', 'Reflect'], 0)}<div class="stories-topline"><div><span class="section-kicker">The story shelf</span><h2>Pick up where curiosity takes you.</h2></div><div class="story-filter">${icon('filter', 15)} Stories for everyone</div></div><div class="story-grid">${STORY_READINGS.map((story, index) => `<article class="story-card"><a class="story-card-image story-card-art story-card-art-${index + 1}" href="#/ere_game?story=${story.id}" data-route="ere_game" data-story="${story.id}" aria-label="Open story: ${esc(story.title)}"><span class="story-card-art-icon" aria-hidden="true">${icon(index === 0 ? 'book' : index === 1 ? 'quote' : 'music', 34)}</span><span class="story-card-tag">${story.tag}</span><span class="story-card-number">0${index + 1}</span></a><div class="story-card-body"><span class="story-language">${story.lang}</span><h3>${story.title}</h3><p>${story.desc}</p><div class="story-card-actions"><a class="text-link" href="#/ere_game?story=${story.id}" data-route="ere_game" data-story="${story.id}">Read & listen ${icon('arrow', 14)}</a><button class="save-button ${state.saved.includes(story.title) ? 'is-saved' : ''}" aria-label="Save ${esc(story.title)}" data-action="save-item" data-item="${esc(story.title)}">${icon('bookmark', 17)}</button></div></div></article>`).join('')}</div><section class="stories-bottom"><div><span class="section-kicker">More than a story</span><h2>Explore the voices behind the words.</h2><p>Discover oral genres, proverbs and language audio.</p></div><div class="stories-bottom-links">${routeLink('oral', 'Oral traditions ' + icon('arrow', 14), 'button button-outline')}${routeLink('voices', 'Voice library ' + icon('arrow', 14), 'button button-soft')}</div></section></div>`;
-  }
-
-  function renderStoryGame(params = {}) {
-    const requestedIndex = STORY_READINGS.findIndex((story) => story.id === params.story);
-    const storyIndex = requestedIndex < 0 ? 0 : requestedIndex;
-    const story = STORY_READINGS[storyIndex];
-    const result = state.quizResults[`story:${story.id}`] || '';
-    const previousStory = STORY_READINGS[storyIndex - 1];
-    const nextStory = STORY_READINGS[storyIndex + 1];
-    const storyNavigationLink = (item, label, disabled = false) => disabled
-      ? `<span class="story-navigation-link is-disabled" aria-disabled="true">${icon('arrow', 15)}<span>${label}</span></span>`
-      : `<a class="story-navigation-link" href="#/ere_game?story=${item.id}" data-route="ere_game" data-story="${item.id}" aria-label="${label}: ${esc(item.title)}">${icon('arrow', 15)}<span>${label}</span></a>`;
-    return `<div class="container route-page story-game-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span>${routeLink('ere', 'Stories')}<span>/</span><strong>${esc(story.title)}</strong></div><section class="story-game-layout"><div class="story-game-image"><img src="./assets/${story.image}" alt="${esc(story.title)} story illustration" /><span class="story-audio-pill">${icon('volume', 15)} Read aloud together</span></div><div class="story-reading"><span class="section-kicker">Original Idilewa learning story · ${storyIndex + 1} of ${STORY_READINGS.length}</span><h1>${esc(story.title)}</h1><p class="story-subhead">${esc(story.subhead)}</p><button class="listen-inline" data-action="play-audio" data-language="en-US" data-text="${esc(story.paragraphs.map((paragraph) => paragraph[1]).join(' '))}">${icon('play', 14)} Listen to the English translation</button><div class="story-text">${story.paragraphs.map(([yoruba, english]) => `<section class="story-paragraph-pair"><div><span class="story-translation-label" lang="yo">Yorùbá</span><p lang="yo">${esc(yoruba)}</p></div><div><span class="story-translation-label">English translation</span><p lang="en">${esc(english)}</p></div></section>`).join('')}</div><div class="story-credit-note">${icon('heart', 16)} This is an original Idilewa learning story, not a traditional folktale. The English translation is shown beside each Yorùbá passage.</div></div></section>${renderStepper(['Choose a story', 'Read', 'Listen', 'Reflect'], 3)}<nav class="story-navigation" aria-label="Story navigation">${storyNavigationLink(previousStory, 'Previous story', !previousStory)}${routeLink('ere', `${icon('book', 15)} All stories`, 'story-navigation-link')}${storyNavigationLink(nextStory, 'Next story', !nextStory)}</nav><section class="story-quiz"><div><span class="section-kicker">A little reflection</span><h2>${esc(story.question)}</h2><p>Choose the idea that best fits what you read.</p></div><div class="story-answer-list">${story.answers.map(([label, correct], index) => `<button class="story-answer ${result === 'correct' && correct ? 'answer-correct' : ''}" data-action="story-answer" data-key="${story.id}" data-correct="${correct}" ${result === 'correct' ? 'disabled' : ''}><span>${String.fromCharCode(65 + index)}</span>${esc(label)}${result === 'correct' && correct ? icon('check', 17) : icon('arrow', 15)}</button>`).join('')}</div>${result ? `<div class="answer-feedback ${result === 'correct' ? 'feedback-correct' : 'feedback-retry'}">${icon(result === 'correct' ? 'check' : 'refresh', 16)} ${result === 'correct' ? 'Lovely reading. Keep noticing how each story unfolds.' : 'Try again—look for what the characters did in the story.'}</div>` : ''}</section><div class="story-related">${routeLink('oral', 'Explore oral traditions ' + icon('arrow', 14), 'text-link')}${routeLink('ere', 'Back to stories ' + icon('arrow', 14), 'text-link')}${aiHelperButton('story')}</div></div>`;
-  }
-
-  function renderLegacyStoryGame() {
-    const result = state.quizResults['story:comprehension'] || '';
-    return `<div class="container route-page story-game-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span>${routeLink('ere', 'Stories')}<span>/</span><strong>Story time</strong></div><section class="story-game-layout"><div class="story-game-image"><img src="./assets/story-grandmother.jpg" alt="A grandmother sharing a story with two children" /><span class="story-audio-pill">${icon('volume', 15)} Read aloud together</span></div><div class="story-reading"><span class="section-kicker">A story for the whole family · 4 min</span><h1>The story that<br /><em>travelled.</em></h1><p class="story-subhead">A gentle listening story about how a tale can move from one person to another.</p><button class="listen-inline" data-action="play-audio" data-text="A story travels when someone listens, remembers and shares it with care.">${icon('play', 14)} Listen to this story <span>01:24</span></button><div class="story-text"><p>One evening, a grandmother began a story in the garden. The children leaned closer as the first words settled into the quiet.</p><p>When the story ended, one child asked to hear it again. The next time, they listened for a detail they had missed—and carried that detail into their own retelling.</p><p>By morning, the story had travelled. It was still familiar, and it had room for a new voice.</p></div><div class="story-credit-note">${icon('heart', 16)} Stories belong to the people and communities who share them. Listen with care, and ask before retelling.</div>\n    </section>${renderStepper(['Choose a story', 'Read', 'Listen', 'Reflect'], 3)}<section class="story-quiz"><div><span class="section-kicker">A little reflection</span><h2>What helped the story travel?</h2><p>Choose the idea that best fits what you heard.</p></div><div class="story-answer-list">${[['Someone listened and shared it with care.', true], ['The story was written down by a stranger.', false], ['The children forgot the details.', false]].map(([label, correct], i) => `<button class="story-answer ${result === 'correct' && correct ? 'answer-correct' : ''}" data-action="story-answer" data-key="comprehension" data-correct="${correct}" ${result === 'correct' ? 'disabled' : ''}><span>${String.fromCharCode(65 + i)}</span>${label}${result === 'correct' && correct ? icon('check', 17) : icon('arrow', 15)}</button>`).join('')}</div>${result ? `<div class="answer-feedback ${result === 'correct' ? 'feedback-correct' : 'feedback-retry'}">${icon(result === 'correct' ? 'check' : 'refresh', 16)} ${result === 'correct' ? 'Lovely listening. Stories grow when people share them with care.' : 'Think about what the children did after hearing the story.'}</div>` : ''}</section><div class="story-related">${routeLink('oral', 'Explore oral traditions ' + icon('arrow', 14), 'text-link')}${routeLink('ere', 'Back to stories ' + icon('arrow', 14), 'text-link')}${aiHelperButton('story')}</div></div>`;
-  }
-
   function renderOral() {
     const genres = [
       { title: 'Voice Lessons', titleSub: 'Sounds, speech & tone', copy: 'Foundational pronunciation and interactive audio lessons across African languages.', icon: 'mic', route: 'voice_lessons', tone: 'yellow' },
@@ -3273,7 +3093,6 @@ import {
       { route: 'trainer', title: 'Voice Trainer', subtitle: 'Live pitch & tone engine', icon: 'mic', tone: 'yellow', text: 'Interactive tone soundboards and voice recording across 60 lessons.' },
       { route: 'oriki', title: 'Oríkì', subtitle: 'Praise poetry & identity', icon: 'quote', tone: 'peach', text: 'Learn what praise poetry can express and how to listen for context.' },
       { route: 'owe', title: 'Òwe', subtitle: 'Proverbs & reflection', icon: 'sparkles', tone: 'mint', text: 'Explore short sayings and the ideas people carry through them.' },
-      { route: 'ere', title: 'Folktales', subtitle: 'Stories & imagination', icon: 'book', tone: 'blue', text: 'Read a family story and notice what travels between generations.' },
       { route: 'voices', title: 'Spoken word', subtitle: 'Voices & pronunciation', icon: 'headphones', tone: 'lilac', text: 'Hear words spoken and build confidence through listening.' }
     ];
     return `<div class="container route-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span>${routeLink('oral', 'Read & listen')}<span>/</span><strong>Genres</strong></div><section class="collection-hero simple-collection-hero"><span class="section-kicker">Oral forms · a guided introduction</span><h1>Many ways to tell<br /><em>what matters.</em></h1><p>Oral traditions are varied and living. Explore a form, listen for its context and follow the voice that leads you in.</p>${renderStepper(['Tradition', 'Genre', 'Example', 'Reflect'], 1)}</section><div class="section-heading collection-heading"><div><span class="section-kicker">Choose a genre</span><h2>Where would you like to begin?</h2></div>${aiHelperButton('oral')}</div><div class="oral-genre-grid">${cards.map((c) => `<a href="#/${c.route}" data-route="${c.route}" class="oral-genre-card tone-${c.tone}"><span class="oral-genre-icon">${icon(c.icon, 23)}</span><span class="oral-genre-sub">${c.subtitle}</span><h3>${c.title}</h3><p>${c.text}</p><span class="oral-genre-arrow">Explore ${icon('arrow', 15)}</span></a>`).join('')}</div><div class="content-note">${icon('shield', 17)} These introductions are a starting point. Community context, consent and attribution should guide how oral knowledge is shared.</div></div>`;
@@ -3508,7 +3327,7 @@ import {
     const percent = Math.min(100, Math.round((completedCount / 8) * 100));
     const lang = getLanguage(state.currentLang);
     const journeyStep = completedCount >= 8 ? 3 : state.streak >= 3 ? 2 : completedCount ? 1 : 0;
-    return `<div class="container route-page profile-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>My progress</strong></div>${renderStepper(['Choose a path', 'Practice a lesson', 'Build a streak', 'Celebrate progress'], journeyStep)}<section class="profile-welcome page-depth-reveal"><div class="profile-photo-wrap"><div class="profile-avatar">${profilePhoto ? `<img src="${esc(profilePhoto)}" alt="Your profile photo" />` : icon('user', 27)}</div><label class="profile-photo-button" for="profile-photo-input">${icon('edit', 15)} Choose photo</label><input id="profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp" /></div><div><span class="section-kicker">Your learning space · demo</span><h1>A good day to keep going.</h1><p>Your progress is saved in this browser for this prototype.</p><small class="profile-photo-note">Profile photos are resized and stored only in this browser on this device.</small></div><button class="button button-outline" data-route="login">${icon('user', 16)} Account settings</button></section><div class="profile-overview-grid"><article class="progress-main-card"><div class="progress-main-head"><div><span class="section-kicker">Current path</span><h2>${lang.name} · ${state.level.charAt(0).toUpperCase() + state.level.slice(1)}</h2><p>Keep building confidence, one small lesson at a time.</p></div><span class="progress-medallion">${icon('leaf', 23)}</span></div><div class="large-progress"><div><span style="width:${percent}%"></span></div><strong>${percent}%</strong></div><div class="progress-foot"><span>${completedCount} lessons completed</span>${routeLink('course', 'Continue learning ' + icon('arrow', 14), 'text-link')}</div></article><div class="stat-card stat-streak"><span>${icon('sparkles', 20)}</span><small>Learning streak</small><strong>${state.streak} <em>days</em></strong><p>Showing up is a win.</p></div><div class="stat-card stat-points"><span>${icon('star', 20)}</span><small>Practice points</small><strong>${state.points}</strong><p>Earned by trying new things.</p></div></div><div class="profile-lower-grid"><section class="profile-card"><div class="section-heading compact-heading"><div><span class="section-kicker">Your recent steps</span><h2>Learning timeline</h2></div>${routeLink('course', 'View path ' + icon('arrow', 14), 'text-link')}</div><div class="timeline-row"><span class="timeline-check">${icon('check', 15)}</span><div><strong>Start with a greeting</strong><small>${lang.name} · First lesson</small></div><span class="timeline-status">${state.completed.includes(`${lang.id}-greetings-intro`) ? 'Complete' : 'Ready'}</span></div><div class="timeline-row timeline-next"><span class="timeline-num">02</span><div><strong>People close to us</strong><small>Next module · Words for family</small></div><button class="text-link" data-action="open-module" data-module="family" data-lang="${lang.id}" data-level="${state.level}">Open ${icon('arrow', 14)}</button></div><div class="timeline-row timeline-next"><span class="timeline-num">03</span><div><strong>Stories & memory</strong><small>Explore a story and listen for new words</small></div>${routeLink('ere', 'Explore ' + icon('arrow', 14), 'text-link')}</div></section><aside class="profile-badges"><span class="section-kicker">Small things worth celebrating</span><h2>Your first badges</h2><div class="badge-list"><div class="badge-item"><span class="badge-icon badge-green">${icon('leaf', 18)}</span><div><strong>First steps</strong><small>Opened your learning path</small></div></div><div class="badge-item"><span class="badge-icon badge-yellow">${icon('volume', 18)}</span><div><strong>Good listener</strong><small>Practiced a spoken phrase</small></div></div><div class="badge-item badge-locked"><span class="badge-icon">${icon('trophy', 18)}</span><div><strong>Story keeper</strong><small>Complete a story activity</small></div></div></div></aside></div><div class="profile-privacy-note">${icon('lock', 16)} This demo keeps progress on this device. Production accounts require secure authentication and privacy review.</div></div>`;
+    return `<div class="container route-page profile-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>My progress</strong></div>${renderStepper(['Choose a path', 'Practice a lesson', 'Build a streak', 'Celebrate progress'], journeyStep)}<section class="profile-welcome page-depth-reveal"><div class="profile-photo-wrap"><div class="profile-avatar">${profilePhoto ? `<img src="${esc(profilePhoto)}" alt="Your profile photo" />` : icon('user', 27)}</div><label class="profile-photo-button" for="profile-photo-input">${icon('edit', 15)} Choose photo</label><input id="profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp" /></div><div><span class="section-kicker">Your learning space · demo</span><h1>A good day to keep going.</h1><p>Your progress is saved in this browser for this prototype.</p><small class="profile-photo-note">Profile photos are resized and stored only in this browser on this device.</small></div><button class="button button-outline" data-route="login">${icon('user', 16)} Account settings</button></section><div class="profile-overview-grid"><article class="progress-main-card"><div class="progress-main-head"><div><span class="section-kicker">Current path</span><h2>${lang.name} · ${state.level.charAt(0).toUpperCase() + state.level.slice(1)}</h2><p>Keep building confidence, one small lesson at a time.</p></div><span class="progress-medallion">${icon('leaf', 23)}</span></div><div class="large-progress"><div><span style="width:${percent}%"></span></div><strong>${percent}%</strong></div><div class="progress-foot"><span>${completedCount} lessons completed</span>${routeLink('course', 'Continue learning ' + icon('arrow', 14), 'text-link')}</div></article><div class="stat-card stat-streak"><span>${icon('sparkles', 20)}</span><small>Learning streak</small><strong>${state.streak} <em>days</em></strong><p>Showing up is a win.</p></div><div class="stat-card stat-points"><span>${icon('star', 20)}</span><small>Practice points</small><strong>${state.points}</strong><p>Earned by trying new things.</p></div></div><div class="profile-lower-grid"><section class="profile-card"><div class="section-heading compact-heading"><div><span class="section-kicker">Your recent steps</span><h2>Learning timeline</h2></div>${routeLink('course', 'View path ' + icon('arrow', 14), 'text-link')}</div><div class="timeline-row"><span class="timeline-check">${icon('check', 15)}</span><div><strong>Start with a greeting</strong><small>${lang.name} · First lesson</small></div><span class="timeline-status">${state.completed.includes(`${lang.id}-greetings-intro`) ? 'Complete' : 'Ready'}</span></div><div class="timeline-row timeline-next"><span class="timeline-num">02</span><div><strong>People close to us</strong><small>Next module · Words for family</small></div><button class="text-link" data-action="open-module" data-module="family" data-lang="${lang.id}" data-level="${state.level}">Open ${icon('arrow', 14)}</button></div><div class="timeline-row timeline-next"><span class="timeline-num">03</span><div><strong>Culture & memory</strong><small>Explore oral traditions and listen for new words</small></div>${routeLink('oral', 'Explore oral traditions ' + icon('arrow', 14), 'text-link')}</div></section><aside class="profile-badges"><span class="section-kicker">Small things worth celebrating</span><h2>Your first badges</h2><div class="badge-list"><div class="badge-item"><span class="badge-icon badge-green">${icon('leaf', 18)}</span><div><strong>First steps</strong><small>Opened your learning path</small></div></div><div class="badge-item"><span class="badge-icon badge-yellow">${icon('volume', 18)}</span><div><strong>Good listener</strong><small>Practiced a spoken phrase</small></div></div><div class="badge-item badge-locked"><span class="badge-icon">${icon('trophy', 18)}</span><div><strong>Culture keeper</strong><small>Explore oral traditions</small></div></div></div></aside></div><div class="profile-privacy-note">${icon('lock', 16)} This demo keeps progress on this device. Production accounts require secure authentication and privacy review.</div></div>`;
   }
 
   const PROFILE_DETAILS_KEY = 'idilewa-profile-details';
@@ -3848,572 +3667,6 @@ import {
      One guided journey: welcome → choose language → choose topic → chat.
      No live AI service is contacted; replies come from the local script below.
      ========================================================================== */
-  const AI_CHAT_STORAGE_KEY = 'idilewa-ai-chat-v1';
-
-  const AI_CHAT_LANGUAGES = [
-    { id: 'yoruba', name: 'Yorùbá', short: 'YO', speech: 'yo', locale: 'yo-NG', hello: 'Ẹ káàárọ̀', helloEn: 'Good morning', praise: 'Ó dára gan-an!', praiseEn: 'Well done!', close: 'Ó dàá! Kí ni o fẹ́ bá mi sọ lónìí?', closeEn: 'Alright! What would you like to talk to me about today?' },
-    { id: 'igbo', name: 'Igbo', short: 'IG', speech: 'ig', locale: 'ig-NG', hello: 'Ndewo', helloEn: 'Hello', praise: 'I mere nke ọma!', praiseEn: 'You did well!', close: 'Ọ dị mma! Gịnị ka ị chọrọ ịgwa m taa?', closeEn: 'Alright! What would you like to tell me today?' },
-    { id: 'hausa', name: 'Hausa', short: 'HA', speech: 'ha', locale: 'ha-NG', hello: 'Sannu', helloEn: 'Hello', praise: 'Ka yi kyau!', praiseEn: 'Well done!', close: 'To, madalla! Me kake so mu yi magana akai yau?', closeEn: 'Alright! What would you like us to talk about today?' },
-    { id: 'swahili', name: 'Swahili', short: 'SW', speech: 'sw', locale: 'sw-KE', hello: 'Habari', helloEn: 'Hello', praise: 'Vizuri sana!', praiseEn: 'Very good!', close: 'Sawa! Unataka tuzungumze nini leo?', closeEn: 'Alright! What would you like us to talk about today?' },
-    { id: 'pidgin', name: 'Nigerian Pidgin', short: 'PG', speech: 'en', locale: 'en-NG', hello: 'How you dey?', helloEn: 'How are you?', praise: 'You try well well!', praiseEn: 'You did really well!', close: 'Alright! Wetin you wan make we talk about today?', closeEn: 'Alright! What would you like to talk about today?' }
-  ];
-
-  const AI_CHAT_TOPICS = [
-    { id: 'everyday', name: 'Everyday Conversation', icon: 'message', blurb: 'Greetings and everyday small talk' },
-    { id: 'family', name: 'Family & Friends', icon: 'people', blurb: 'Talk about the people close to you' },
-    { id: 'school', name: 'At School', icon: 'school', blurb: 'Classroom words and school days' },
-    { id: 'market', name: 'Market & Shopping', icon: 'cart', blurb: 'Prices, produce and polite bargaining' },
-    { id: 'culture', name: 'Culture & Traditions', icon: 'globe', blurb: 'Places, proverbs and belonging' },
-    { id: 'storytelling', name: 'Storytelling', icon: 'quote', blurb: 'Ask for a story and talk about it' }
-  ];
-
-  const AI_CHAT_DIALOGUE = {
-    yoruba: {
-      everyday: [
-        { ask: 'Báwo ni ọ ṣe wà?', askEn: 'How are you?', reply: 'Mo wà dáadáa, ẹ ṣé.', replyEn: 'I am fine, thank you.' },
-        { ask: 'Kí ni orúkọ rẹ?', askEn: 'What is your name?', reply: 'Orúkọ mi ni Adé.', replyEn: 'My name is Ade.' },
-        { ask: 'Ẹ káàárọ̀. Ṣé o sùn dáadáa?', askEn: 'Good morning. Did you sleep well?', reply: 'Bẹ́ẹ̀ ni, mo sùn dáadáa.', replyEn: 'Yes, I slept well.' }
-      ],
-      family: [
-        { ask: 'Ṣé ẹbí rẹ wà nílé?', askEn: 'Is your family at home?', reply: 'Bẹ́ẹ̀ ni, wọ́n wà nílé.', replyEn: 'Yes, they are at home.' },
-        { ask: 'Kí ni orúkọ ìyá rẹ?', askEn: 'What is your mother’s name?', reply: 'Orúkọ ìyá mi ni Fọláṣadé.', replyEn: 'My mother’s name is Fọláṣadé.' },
-        { ask: 'Ẹ kú ìrọ̀lẹ́, ṣé àwọn ọmọ wà dáadáa?', askEn: 'Good afternoon, are the children well?', reply: 'Wọ́n wà dáadáa, ẹ ṣé.', replyEn: 'They are well, thank you.' }
-      ],
-      school: [
-        { ask: 'Ṣé o lọ sí ilé-ìwé lónìí?', askEn: 'Did you go to school today?', reply: 'Bẹ́ẹ̀ ni, mo lọ sí ilé-ìwé.', replyEn: 'Yes, I went to school.' },
-        { ask: 'Kí ni o kọ́ ní ilé-ìwé?', askEn: 'What did you learn at school?', reply: 'Mo kọ́ nípa ìṣirò.', replyEn: 'I learned about numbers.' },
-        { ask: 'Ṣé olùkọ́ rẹ dára?', askEn: 'Is your teacher kind?', reply: 'Bẹ́ẹ̀ ni, olùkọ́ mi dára.', replyEn: 'Yes, my teacher is kind.' }
-      ],
-      market: [
-        { ask: 'Èló ni èyí?', askEn: 'How much is this?', reply: 'Ó jẹ́ náírà àádọ́ta.', replyEn: 'It is fifty naira.' },
-        { ask: 'Ṣé ẹ ní ọ̀gẹ̀dẹ̀?', askEn: 'Do you have bananas?', reply: 'Bẹ́ẹ̀ ni, ọ̀gẹ̀dẹ̀ wà.', replyEn: 'Yes, there are bananas.' },
-        { ask: 'Kí ni o fẹ́ ra?', askEn: 'What would you like to buy?', reply: 'Mo fẹ́ ra tòmátì.', replyEn: 'I would like to buy tomatoes.' }
-      ],
-      culture: [
-        { ask: 'Kí ni orílẹ̀-èdè rẹ?', askEn: 'What is your country?', reply: 'Orílẹ̀-èdè mi ni Nàìjíríà.', replyEn: 'My country is Nigeria.' },
-        { ask: 'Níbo ni o ti wá?', askEn: 'Where are you from?', reply: 'Mo ti Ìbàdàn wá.', replyEn: 'I am from Ibadan.' },
-        { ask: 'Ṣé o mọ òwe Yorùbá kan?', askEn: 'Do you know a Yorùbá proverb?', reply: 'Bẹ́ẹ̀ ni: sùúrù ni baba ìwà.', replyEn: 'Yes: patience is the father of good character.' }
-      ],
-      storytelling: [
-        { ask: 'Ẹ jọ̀ọ́, sọ ìtàn kan fún mi.', askEn: 'Please tell me a story.', reply: 'Ìtàn kan wà nípa ìjàpá.', replyEn: 'There is a story about the tortoise.' },
-        { ask: 'Kí ni ìjàpá ṣe nínú ìtàn?', askEn: 'What did the tortoise do in the story?', reply: 'Ìjàpá jẹ́ olóye.', replyEn: 'The tortoise was wise.' },
-        { ask: 'Báwo ni ìtàn náà ṣe parí?', askEn: 'How did the story end?', reply: 'Ìtàn náà parí pẹ̀lú ẹ̀kọ́.', replyEn: 'The story ended with a lesson.' }
-      ]
-    },
-
-    igbo: {
-      everyday: [
-        { ask: 'Kedu ka ị mere?', askEn: 'How are you?', reply: 'Adị m mma, daalụ.', replyEn: 'I am fine, thank you.' },
-        { ask: 'Kedu aha gị?', askEn: 'What is your name?', reply: 'Aha m bụ Ada.', replyEn: 'My name is Ada.' },
-        { ask: 'Ụtụtụ ọma. Ị rahụrụ ụra ọma?', askEn: 'Good morning. Did you sleep well?', reply: 'Ee, ahụrụ m ụra ọma.', replyEn: 'Yes, I slept well.' }
-      ],
-      family: [
-        { ask: 'Ndị ezinụlọ gị ọ nọ n’ụlọ?', askEn: 'Is your family at home?', reply: 'Ee, ha nọ n’ụlọ.', replyEn: 'Yes, they are at home.' },
-        { ask: 'Kedu aha nne gị?', askEn: 'What is your mother’s name?', reply: 'Aha nne m bụ Ngozi.', replyEn: 'My mother’s name is Ngozi.' },
-        { ask: 'Kedu ka ụmụaka mere?', askEn: 'How are the children?', reply: 'Ha dị mma, daalụ.', replyEn: 'They are well, thank you.' }
-      ],
-      school: [
-        { ask: 'Ị gara ụlọ akwụkwọ taa?', askEn: 'Did you go to school today?', reply: 'Ee, m gara ụlọ akwụkwọ.', replyEn: 'Yes, I went to school.' },
-        { ask: 'Gịnị ka ị mụtara?', askEn: 'What did you learn?', reply: 'Amụtara m banyere ọnụọgụgụ.', replyEn: 'I learned about numbers.' },
-        { ask: 'Onye nkụzi gị ọ dị mma?', askEn: 'Is your teacher kind?', reply: 'Ee, onye nkụzi m dị mma.', replyEn: 'Yes, my teacher is kind.' }
-      ],
-      market: [
-        { ask: 'Ego ole bụ nke a?', askEn: 'How much is this?', reply: 'Ọ bụ naira iri ise.', replyEn: 'It is fifty naira.' },
-        { ask: 'Ị nwere unere?', askEn: 'Do you have bananas?', reply: 'Ee, unere dị.', replyEn: 'Yes, there are bananas.' },
-        { ask: 'Gịnị ka ị chọrọ ịzụ?', askEn: 'What would you like to buy?', reply: 'Achọrọ m ịzụ tomato.', replyEn: 'I would like to buy tomatoes.' }
-      ],
-      culture: [
-        { ask: 'Olee obodo gị?', askEn: 'What is your country?', reply: 'Obodo m bụ Naịjịrịa.', replyEn: 'My country is Nigeria.' },
-        { ask: 'Olee ebe ị si?', askEn: 'Where are you from?', reply: 'Esi m Enugwu.', replyEn: 'I am from Enugu.' },
-        { ask: 'Ị ma ilu Igbo?', askEn: 'Do you know an Igbo proverb?', reply: 'Ee: ofu osisi adịghị eme ọhịa.', replyEn: 'Yes: one tree does not make a forest.' }
-      ],
-      storytelling: [
-        { ask: 'Biko kọọrọ m akụkọ.', askEn: 'Please tell me a story.', reply: 'Akụkọ dị banyere mbe.', replyEn: 'There is a story about the tortoise.' },
-        { ask: 'Gịnị ka mbe mere?', askEn: 'What did the tortoise do?', reply: 'Mbe nwere amamihe.', replyEn: 'The tortoise was wise.' },
-        { ask: 'Kedu ka akụkọ ahụ si gwụ?', askEn: 'How did the story end?', reply: 'Akụkọ ahụ gwụrụ na nkuzi.', replyEn: 'The story ended with a lesson.' }
-      ]
-    },
-    hausa: {
-      everyday: [
-        { ask: 'Yaya kake?', askEn: 'How are you?', reply: 'Ina lafiya, na gode.', replyEn: 'I am fine, thank you.' },
-        { ask: 'Menene sunanka?', askEn: 'What is your name?', reply: 'Sunana Amina.', replyEn: 'My name is Amina.' },
-        { ask: 'Barka da safiya. Ka yi barci lafiya?', askEn: 'Good morning. Did you sleep well?', reply: 'Na yi barci lafiya.', replyEn: 'I slept well.' }
-      ],
-      family: [
-        { ask: 'Iyalinka suna gida?', askEn: 'Is your family at home?', reply: 'Iya, suna gida.', replyEn: 'Yes, they are at home.' },
-        { ask: 'Menene sunan mahaifiyarka?', askEn: 'What is your mother’s name?', reply: 'Sunan mahaifiyata Hauwa.', replyEn: 'My mother’s name is Hauwa.' },
-        { ask: 'Yara suna lafiya?', askEn: 'Are the children well?', reply: 'Suna lafiya, na gode.', replyEn: 'They are well, thank you.' }
-      ],
-      school: [
-        { ask: 'Ka je makaranta yau?', askEn: 'Did you go to school today?', reply: 'Iya, na je makaranta.', replyEn: 'Yes, I went to school.' },
-        { ask: 'Me ka koya a makaranta?', askEn: 'What did you learn at school?', reply: 'Na koyi game da lissafi.', replyEn: 'I learned about numbers.' },
-        { ask: 'Malaminka yana da kirki?', askEn: 'Is your teacher kind?', reply: 'Iya, malamina yana da kirki.', replyEn: 'Yes, my teacher is kind.' }
-      ],
-      market: [
-        { ask: 'Nawa ne wannan?', askEn: 'How much is this?', reply: 'Naira hamsin ne.', replyEn: 'It is fifty naira.' },
-        { ask: 'Kana da ayaba?', askEn: 'Do you have bananas?', reply: 'Iya, muna da ayaba.', replyEn: 'Yes, we have bananas.' },
-        { ask: 'Me kake son saya?', askEn: 'What would you like to buy?', reply: 'Ina son sayen tumatir.', replyEn: 'I would like to buy tomatoes.' }
-      ],
-      culture: [
-        { ask: 'Wace ƙasa ce tamu?', askEn: 'Which country are you from?', reply: 'Ƙasata ita ce Najeriya.', replyEn: 'My country is Nigeria.' },
-        { ask: 'Daga ina kake?', askEn: 'Where are you from?', reply: 'Na fito daga Kano.', replyEn: 'I am from Kano.' },
-        { ask: 'Ka san karin magana na Hausa?', askEn: 'Do you know a Hausa proverb?', reply: 'Iya: hakuri maganin duniya.', replyEn: 'Yes: patience is the medicine of the world.' }
-      ],
-      storytelling: [
-        { ask: 'Don Allah ba ni labari.', askEn: 'Please tell me a story.', reply: 'Akwai labari game da kunkuru.', replyEn: 'There is a story about the tortoise.' },
-        { ask: 'Me kunkuru ya yi?', askEn: 'What did the tortoise do?', reply: 'Kunkuru yana da wayo.', replyEn: 'The tortoise was clever.' },
-        { ask: 'Yaya labarin ya ƙare?', askEn: 'How did the story end?', reply: 'Labarin ya ƙare da darasi.', replyEn: 'The story ended with a lesson.' }
-      ]
-    },
-    swahili: {
-      everyday: [
-        { ask: 'Habari yako?', askEn: 'How are you?', reply: 'Nzuri, asante.', replyEn: 'I am fine, thank you.' },
-        { ask: 'Jina lako nani?', askEn: 'What is your name?', reply: 'Jina langu ni Zuri.', replyEn: 'My name is Zuri.' },
-        { ask: 'Habari za asubuhi. Umelala vizuri?', askEn: 'Good morning. Did you sleep well?', reply: 'Ndiyo, nimelala vizuri.', replyEn: 'Yes, I slept well.' }
-      ],
-      family: [
-        { ask: 'Familia yako iko nyumbani?', askEn: 'Is your family at home?', reply: 'Ndiyo, wako nyumbani.', replyEn: 'Yes, they are at home.' },
-        { ask: 'Jina la mama yako nani?', askEn: 'What is your mother’s name?', reply: 'Jina la mama yangu ni Asha.', replyEn: 'My mother’s name is Asha.' },
-        { ask: 'Watoto wako wazima?', askEn: 'Are the children well?', reply: 'Wazima, asante.', replyEn: 'They are well, thank you.' }
-      ],
-      school: [
-        { ask: 'Umekwenda shule leo?', askEn: 'Did you go to school today?', reply: 'Ndiyo, nimekwenda shule.', replyEn: 'Yes, I went to school.' },
-        { ask: 'Umejifunza nini?', askEn: 'What did you learn?', reply: 'Nimejifunza kuhusu hesabu.', replyEn: 'I learned about numbers.' },
-        { ask: 'Mwalimu wako ni mzuri?', askEn: 'Is your teacher kind?', reply: 'Ndiyo, mwalimu wangu ni mzuri.', replyEn: 'Yes, my teacher is kind.' }
-      ],
-      market: [
-        { ask: 'Hii ni bei gani?', askEn: 'How much is this?', reply: 'Ni shilingi hamsini.', replyEn: 'It is fifty shillings.' },
-        { ask: 'Una ndizi?', askEn: 'Do you have bananas?', reply: 'Ndiyo, tuna ndizi.', replyEn: 'Yes, we have bananas.' },
-        { ask: 'Unataka kununua nini?', askEn: 'What would you like to buy?', reply: 'Nataka kununua nyanya.', replyEn: 'I would like to buy tomatoes.' }
-      ],
-      culture: [
-        { ask: 'Wewe ni raia wa nchi gani?', askEn: 'Which country are you a citizen of?', reply: 'Mimi ni raia wa Kenya.', replyEn: 'I am a citizen of Kenya.' },
-        { ask: 'Unatoka wapi?', askEn: 'Where are you from?', reply: 'Ninatoka Mombasa.', replyEn: 'I am from Mombasa.' },
-        { ask: 'Unajua methali ya Kiswahili?', askEn: 'Do you know a Swahili proverb?', reply: 'Ndiyo: haraka haraka haina baraka.', replyEn: 'Yes: hurry has no blessing.' }
-      ],
-      storytelling: [
-        { ask: 'Tafadhali niambie hadithi.', askEn: 'Please tell me a story.', reply: 'Kuna hadithi kuhusu kobe.', replyEn: 'There is a story about the tortoise.' },
-        { ask: 'Kobe alifanya nini?', askEn: 'What did the tortoise do?', reply: 'Kobe alikuwa na busara.', replyEn: 'The tortoise was wise.' },
-        { ask: 'Hadithi iliishaje?', askEn: 'How did the story end?', reply: 'Hadithi iliisha na funzo.', replyEn: 'The story ended with a lesson.' }
-      ]
-    },
-
-
-    pidgin: {
-      everyday: [
-        { ask: 'How you dey?', askEn: 'How are you?', reply: 'I dey fine, thank you.', replyEn: 'I am fine, thank you.' },
-        { ask: 'Wetin be your name?', askEn: 'What is your name?', reply: 'My name na Emeka.', replyEn: 'My name is Emeka.' },
-        { ask: 'Good morning. You sleep well?', askEn: 'Good morning. Did you sleep well?', reply: 'Yes, I sleep well.', replyEn: 'Yes, I slept well.' }
-      ],
-      family: [
-        { ask: 'Your family dey house?', askEn: 'Is your family at home?', reply: 'Yes, dem dey house.', replyEn: 'Yes, they are at home.' },
-        { ask: 'Wetin be your mama name?', askEn: 'What is your mother’s name?', reply: 'My mama name na Ngozi.', replyEn: 'My mother’s name is Ngozi.' },
-        { ask: 'How the children dey?', askEn: 'How are the children?', reply: 'Dem dey fine, thank you.', replyEn: 'They are fine, thank you.' }
-      ],
-      school: [
-        { ask: 'You go school today?', askEn: 'Did you go to school today?', reply: 'Yes, I go school.', replyEn: 'Yes, I went to school.' },
-        { ask: 'Wetin you learn for school?', askEn: 'What did you learn at school?', reply: 'I learn about number.', replyEn: 'I learned about numbers.' },
-        { ask: 'Your teacher good?', askEn: 'Is your teacher kind?', reply: 'Yes, my teacher good.', replyEn: 'Yes, my teacher is kind.' }
-      ],
-      market: [
-        { ask: 'How much be this one?', askEn: 'How much is this?', reply: 'Na fifty naira.', replyEn: 'It is fifty naira.' },
-        { ask: 'You get banana?', askEn: 'Do you have bananas?', reply: 'Yes, banana dey.', replyEn: 'Yes, there are bananas.' },
-        { ask: 'Wetin you wan buy?', askEn: 'What would you like to buy?', reply: 'I wan buy tomato.', replyEn: 'I would like to buy tomatoes.' }
-      ],
-      culture: [
-        { ask: 'Which country you come from?', askEn: 'Which country are you from?', reply: 'My country na Nigeria.', replyEn: 'My country is Nigeria.' },
-        { ask: 'Where you come from?', askEn: 'Where are you from?', reply: 'I come from Lagos.', replyEn: 'I am from Lagos.' },
-        { ask: 'You sabi one Pidgin proverb?', askEn: 'Do you know a Pidgin proverb?', reply: 'Yes: small small na how monkey take chop banana.', replyEn: 'Yes: little by little is how the monkey eats a banana.' }
-      ],
-      storytelling: [
-        { ask: 'Abeg tell me story.', askEn: 'Please tell me a story.', reply: 'One story dey about tortoise.', replyEn: 'There is a story about the tortoise.' },
-        { ask: 'Wetin tortoise do?', askEn: 'What did the tortoise do?', reply: 'Tortoise wise well well.', replyEn: 'The tortoise was very wise.' },
-        { ask: 'How the story end?', askEn: 'How did the story end?', reply: 'The story end with lesson.', replyEn: 'The story ended with a lesson.' }
-      ]
-    }
-  };
-
-  const AI_CHAT_VIEWS = [
-    { id: 'conversation', route: 'ai-conversations', label: 'AI Conversation', icon: 'message' },
-    { id: 'translate', route: 'ai-translate', label: 'Translate & Listen', icon: 'translate' },
-    { id: 'practice', route: 'ai-voice', label: 'Record & Practise', icon: 'mic' },
-    { id: 'history', route: 'ai-history', label: 'My Conversations', icon: 'clock' },
-    { id: 'saved', route: 'ai-saved', label: 'Saved Phrases', icon: 'bookmark' }
-  ];
-  const AI_CHAT_VIEW_BY_PAGE = {
-    'ai-conversations': 'conversation',
-    'ai-dashboard': 'conversation',
-    'ai-chat': 'conversation',
-    'ai-everyday': 'conversation',
-    'ai-analytics': 'history',
-    'ai-messages': 'saved',
-    'ai-profile': 'saved',
-    'ai-settings': 'translate',
-    'ai-translate': 'translate',
-    'ai-voice': 'practice',
-    'ai-history': 'history',
-    'ai-saved': 'saved'
-  };
-
-  let aiAuthReturnRoute = 'ai-conversations';
-  let aiChatState = loadAiChatState();
-  let aiChatDraft = '';
-  let aiChatPending = false;
-  let aiChatLastSpoken = '';
-  let aiVoiceRecorder = null;
-  let aiVoiceStream = null;
-  let aiVoiceChunks = [];
-  let aiVoiceTarget = 'practice';
-  let aiVoiceTranscriptionPending = false;
-  let aiVoiceTranscriptionRequested = false;
-  let aiVoiceTranscript = '';
-  let aiPracticeIndex = 0;
-
-  function loadAiChatState() {
-    const fallback = { step: 'welcome', language: '', topic: '', showGloss: true, threads: {}, saved: [], translation: null };
-    let raw = null;
-    try { raw = JSON.parse(localStorage.getItem(AI_CHAT_STORAGE_KEY) || 'null'); } catch (error) {
-      console.warn('Saved AI conversation state could not be read.', error);
-    }
-    if (!raw || typeof raw !== 'object') return fallback;
-    const threads = {};
-    if (raw.threads && typeof raw.threads === 'object') {
-      Object.entries(raw.threads).forEach(([key, thread]) => {
-        const [languageId, topicId] = String(key).split(':');
-        if (!AI_CHAT_LANGUAGES.some((item) => item.id === languageId)) return;
-        if (!AI_CHAT_TOPICS.some((item) => item.id === topicId)) return;
-        if (!thread || !Array.isArray(thread.messages)) return;
-        threads[`${languageId}:${topicId}`] = {
-          updatedAt: Number(thread.updatedAt) || Date.now(),
-          messages: thread.messages
-            .filter((message) => message && ['learner', 'assistant'].includes(message.role) && typeof message.text === 'string')
-            .slice(-60)
-            .map((message) => ({
-              role: message.role,
-              text: message.text.slice(0, 500),
-              gloss: typeof message.gloss === 'string' ? message.gloss.slice(0, 500) : '',
-              at: Number(message.at) || Date.now()
-            }))
-        };
-      });
-    }
-    const saved = Array.isArray(raw.saved)
-      ? raw.saved.filter((item) => item && typeof item.text === 'string' && AI_CHAT_LANGUAGES.some((language) => language.id === item.language))
-        .map((item) => ({
-          text: item.text.slice(0, 500),
-          gloss: typeof item.gloss === 'string' ? item.gloss.slice(0, 500) : '',
-          language: item.language,
-          topic: AI_CHAT_TOPICS.some((topic) => topic.id === item.topic) ? item.topic : 'everyday',
-          at: Number(item.at) || Date.now()
-        })).slice(-60)
-      : [];
-    return {
-      step: ['welcome', 'language', 'topic', 'chat'].includes(raw.step) ? raw.step : 'welcome',
-      language: AI_CHAT_LANGUAGES.some((item) => item.id === raw.language) ? raw.language : '',
-      topic: AI_CHAT_TOPICS.some((item) => item.id === raw.topic) ? raw.topic : '',
-      showGloss: raw.showGloss !== false,
-      threads,
-      saved,
-      translation: raw.translation && typeof raw.translation.translated === 'string' ? raw.translation : null
-    };
-  }
-
-  function saveAiChatState() {
-    try {
-      localStorage.setItem(AI_CHAT_STORAGE_KEY, JSON.stringify(aiChatState));
-      return true;
-    } catch (error) {
-      console.error('Your conversation could not be saved in this browser.', error);
-      return false;
-    }
-  }
-
-  const aiChatLanguage = () => AI_CHAT_LANGUAGES.find((item) => item.id === aiChatState.language) || null;
-  const aiChatTopic = () => AI_CHAT_TOPICS.find((item) => item.id === aiChatState.topic) || null;
-  const aiChatThreadKey = () => `${aiChatState.language}:${aiChatState.topic}`;
-  const aiChatDialogue = () => AI_CHAT_DIALOGUE[aiChatState.language]?.[aiChatState.topic] || [];
-  const aiChatAccent = () => aiChatLanguage()?.speech || 'yo';
-  const aiChatLocale = () => aiChatLanguage()?.locale || 'yo-NG';
-
-  function aiChatThread() {
-    if (!aiChatState.language || !aiChatState.topic) return { messages: [], updatedAt: 0 };
-    const key = aiChatThreadKey();
-    if (!aiChatState.threads[key]) aiChatState.threads[key] = { messages: [], updatedAt: Date.now() };
-    return aiChatState.threads[key];
-  }
-
-  function aiChatExchangeIndex() {
-    return aiChatThread().messages.filter((message) => message.role === 'learner').length;
-  }
-
-  function aiChatStartConversation() {
-    const language = aiChatLanguage();
-    const topic = aiChatTopic();
-    const dialogue = aiChatDialogue();
-    if (!language || !topic || !dialogue.length) return false;
-    aiChatState.step = 'chat';
-    const key = aiChatThreadKey();
-    const thread = aiChatState.threads[key] || { messages: [], updatedAt: Date.now() };
-    if (!thread.messages.length) {
-      thread.messages = [{ role: 'assistant', text: dialogue[0].ask, gloss: dialogue[0].askEn, at: Date.now() }];
-    }
-    thread.updatedAt = Date.now();
-    aiChatState.threads[key] = thread;
-    aiPracticeIndex = 0;
-    return saveAiChatState();
-  }
-
-  function aiChatSendMessage(value) {
-    const message = String(value || '').trim().slice(0, 300);
-    if (!message) return false;
-    const language = aiChatLanguage();
-    const dialogue = aiChatDialogue();
-    if (!language || !dialogue.length) return false;
-    const thread = aiChatThread();
-    const index = thread.messages.filter((item) => item.role === 'learner').length;
-    const scripted = dialogue[index] || null;
-    const gloss = scripted && message.toLowerCase() === scripted.reply.toLowerCase() ? scripted.replyEn : '';
-    thread.messages.push({ role: 'learner', text: message, gloss, at: Date.now() });
-    const next = dialogue[index + 1] || null;
-    thread.messages.push(next
-      ? { role: 'assistant', text: next.ask, gloss: next.askEn, at: Date.now() }
-      : { role: 'assistant', text: language.close, gloss: language.closeEn, at: Date.now() });
-    thread.messages = thread.messages.slice(-60);
-    thread.updatedAt = Date.now();
-    aiChatState.threads[aiChatThreadKey()] = thread;
-    aiChatDraft = '';
-    saveAiChatState();
-    return true;
-  }
-
-  function aiChatSavePhrase(text, gloss) {
-    const phrase = String(text || '').trim().slice(0, 500);
-    if (!phrase || !aiChatState.language) return false;
-    if (aiChatState.saved.some((item) => item.text === phrase && item.language === aiChatState.language)) return false;
-    aiChatState.saved.unshift({
-      text: phrase,
-      gloss: String(gloss || '').trim().slice(0, 500),
-      language: aiChatState.language,
-      topic: aiChatState.topic || 'everyday',
-      at: Date.now()
-    });
-    aiChatState.saved = aiChatState.saved.slice(0, 60);
-    return saveAiChatState();
-  }
-
-  function aiChatSpeakSlow(text) {
-    const synth = window.speechSynthesis;
-    if (!synth || typeof window.SpeechSynthesisUtterance !== 'function') return aiChatSpeak(text);
-    try {
-      synth.cancel();
-      const utterance = new window.SpeechSynthesisUtterance(text);
-      utterance.lang = aiChatLocale();
-      utterance.rate = 0.65;
-      synth.speak(utterance);
-      return Promise.resolve('device');
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  function aiChatSpeak(text, { slow = false } = {}) {
-    const phrase = String(text || '').trim();
-    if (!phrase) return Promise.resolve('skipped');
-    aiChatLastSpoken = phrase;
-    return (slow ? aiChatSpeakSlow(phrase) : playPlotweaverSpeech(phrase, aiChatAccent()))
-      .catch((error) => {
-        showToast(error instanceof Error ? error.message : 'This phrase could not be read aloud.', 'error');
-        return 'error';
-      });
-  }
-
-  function aiChatLastAssistantMessage() {
-    const messages = aiChatThread().messages;
-    for (let index = messages.length - 1; index >= 0; index -= 1) {
-      if (messages[index].role === 'assistant') return messages[index];
-    }
-    return null;
-  }
-
-  async function startAiVoiceRecording(target = 'practice') {
-    if (aiVoiceRecorder?.state === 'recording') return;
-    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
-      showToast('Voice recording is not available in this browser.', 'error');
-      return;
-    }
-    aiVoiceTarget = target;
-    try {
-      aiVoiceStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      aiVoiceChunks = [];
-      aiVoiceTranscriptionRequested = false;
-      aiVoiceRecorder = new MediaRecorder(aiVoiceStream);
-      aiVoiceRecorder.addEventListener('dataavailable', (event) => {
-        if (event.data.size) aiVoiceChunks.push(event.data);
-      });
-      aiVoiceRecorder.addEventListener('stop', () => {
-        const stream = aiVoiceStream;
-        aiVoiceStream = null;
-        stream?.getTracks().forEach((track) => track.stop());
-        const recording = new Blob(aiVoiceChunks, { type: aiVoiceRecorder?.mimeType || 'audio/webm' });
-        aiVoiceChunks = [];
-        aiVoiceRecorder = null;
-        if (!aiVoiceTranscriptionRequested || !recording.size) {
-          render();
-          return;
-        }
-        aiVoiceTranscriptionPending = true;
-        render();
-        void transcribeWithPlotweaver(recording, aiChatAccent())
-          .then((result) => {
-            const text = String(result.text || '').trim().slice(0, 500);
-            if (!text) {
-              showToast('We could not hear that clearly. Please try again.', 'error');
-              return;
-            }
-            if (aiVoiceTarget === 'chat') {
-              aiChatDraft = text;
-              showToast('Your spoken reply is ready — check it and send.');
-            } else {
-              aiVoiceTranscript = text;
-              showToast('Your voice transcription is ready.');
-            }
-          })
-          .catch((error) => showToast(error instanceof Error ? error.message : 'Your recording could not be transcribed.', 'error'))
-          .finally(() => {
-            aiVoiceTranscriptionPending = false;
-            render();
-          });
-      }, { once: true });
-      aiVoiceRecorder.start();
-      render();
-      showToast('Recording… tap the microphone again to stop.');
-    } catch (error) {
-      aiVoiceStream?.getTracks().forEach((track) => track.stop());
-      aiVoiceStream = null;
-      aiVoiceRecorder = null;
-      showToast(error instanceof Error ? error.message : 'Microphone access was not available.', 'error');
-      render();
-    }
-  }
-
-  function stopAiVoiceRecording() {
-    if (aiVoiceRecorder?.state !== 'recording') return;
-    aiVoiceTranscriptionRequested = true;
-    aiVoiceTranscriptionPending = true;
-    aiVoiceRecorder.stop();
-    render();
-  }
-
-  function aiChatProfile() {
-    const profile = getProfileDetails();
-    const name = profile.name || getCurrentUser()?.name || 'Learner';
-    return { name, initial: name.trim().charAt(0).toUpperCase() || 'S' };
-  }
-
-  function aiChatAvatarMarkup() {
-    const { initial } = aiChatProfile();
-    return profilePhoto ? `<img src="${esc(profilePhoto)}" alt="" />` : esc(initial);
-  }
-  function renderAiBrand() {
-    return `<a class="ai-brand" href="#/ai-conversations" data-route="ai-conversations" aria-label="Idilewa AI Conversations home">${brandLogo('Idilewa · Language · Culture · Future')}</a>`;
-  }
-
-  function renderAiAuth(mode) {
-    const signup = mode === 'signup';
-    const title = signup ? 'Create Your Account' : 'Welcome Back';
-    const image = signup ? 'page-profile-1.jpg' : 'voice-lessons-welcome.jpg';
-    const alt = signup ? 'A learner enjoying a language activity at home' : 'Learners practising languages together';
-    return `<div class="ai-auth-page">
-      <header class="ai-auth-header">${renderAiBrand()}<a href="#/ai-conversations" data-route="ai-conversations">Back to AI Conversations</a></header>
-      <main class="ai-auth-layout">
-        <section class="ai-auth-card"><div class="ai-auth-mobile-brand">${renderAiBrand()}</div><span class="ai-eyebrow">Idilewa · AI Conversations</span><h1>${title}</h1><p>${signup ? 'Join Idilewa and keep building your language confidence.' : 'Sign in to continue your conversation journey.'}</p>
-          <form data-form="login" class="ai-auth-form">
-            <input type="hidden" name="accountType" value="adult" />
-            ${signup ? '<label>Full Name<input id="authName" name="name" autocomplete="name" maxlength="60" placeholder="Enter your full name" required /></label>' : ''}
-            <label>Email Address<input id="authEmail" name="email" type="email" autocomplete="email" placeholder="Enter your email" required /></label>
-            <label>Password<input id="authPassword" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" placeholder="${signup ? 'Create a password' : 'Enter your password'}" required /></label>
-            ${signup ? '<small class="ai-auth-password-note">Use 12 or more characters, including uppercase and lowercase letters, a number and a symbol.</small>' : '<div class="ai-auth-options"><label class="ai-check-label"><input type="checkbox" name="remember" /> Remember me</label><button type="button" class="ai-inline-button" data-action="request-password-reset">Forgot password?</button></div>'}
-            <p class="ai-auth-error" id="authInlineError" role="alert" hidden></p>
-            <button type="submit" class="ai-button ai-button-green ai-auth-submit">${signup ? 'Sign Up' : 'Login'} ${icon('arrow', 15)}</button>
-          </form>
-          <p class="ai-auth-switch">${signup ? 'Already have an account?' : 'Don’t have an account?'} <a href="#/ai-${signup ? 'login' : 'signup'}?next=ai-dashboard" data-route="ai-${signup ? 'login' : 'signup'}" data-next="ai-dashboard">${signup ? 'Login' : 'Sign up'}</a></p>
-          <small class="ai-auth-safe-note">${icon('lock', 13)} Your account is protected by Idilewa sign-in.</small>
-        </section>
-        <aside class="ai-auth-art"><img src="./assets/${image}" alt="${alt}" /><div class="ai-auth-art-overlay"></div><div class="ai-auth-art-message"><span class="ai-auth-speech">Hi! I’m your<br />language partner!</span><span class="ai-auth-art-icon">${icon('sparkles', 23)}</span><p>${signup ? 'Better conversations.<br /><strong>Brighter future.</strong>' : 'Natural conversations<br /><strong>at your pace.</strong>'}</p></div></aside>
-      </main>
-    </div>`;
-  }
-
-  function renderAiChatTopbar() {
-    return `<header class="aic-topbar">
-      <button class="aic-icon-button" type="button" data-action="aic-open-menu" aria-label="Open menu" aria-expanded="false" aria-controls="aic-drawer">${icon('menu', 21)}</button>
-      <a class="aic-brand" href="#/ai-conversations" data-route="ai-conversations" aria-label="Idilewa AI Conversation home">${brandLogo('Idilewa')}</a>
-      <div class="aic-topbar-actions">
-        <button class="aic-icon-button" type="button" data-action="aic-notifications" aria-label="Notifications">${icon('bell', 20)}</button>
-        <a class="aic-avatar" href="#/profile" data-route="profile" aria-label="Open your profile">${aiChatAvatarMarkup()}</a>
-      </div>
-    </header>`;
-  }
-
-  function renderAiChatDrawer(view) {
-    const links = AI_CHAT_VIEWS.map((item) => `<a class="aic-drawer-link ${item.id === view ? 'is-active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.icon, 18)}<span>${item.label}</span></a>`).join('');
-    return `<div class="aic-drawer" id="aic-drawer" hidden>
-      <button class="aic-drawer-scrim" type="button" data-action="aic-close-menu" aria-label="Close menu" tabindex="-1"></button>
-      <div class="aic-drawer-panel" role="dialog" aria-label="AI Conversation menu">
-        <div class="aic-drawer-head">
-          <span class="aic-eyebrow"><span></span> AI Conversation</span>
-          <button class="aic-icon-button" type="button" data-action="aic-close-menu" aria-label="Close menu">${icon('close', 18)}</button>
-        </div>
-        <nav class="aic-drawer-nav" aria-label="AI Conversation sections">${links}</nav>
-        <a class="aic-drawer-link aic-drawer-home" href="#/index" data-route="index">${icon('home', 18)}<span>Back to Idilewa</span></a>
-      </div>
-    </div>`;
-  }
-
-  function renderAiChatShell(view, content) {
-    const { name } = aiChatProfile();
-    const links = AI_CHAT_VIEWS.map((item) => `<a class="aic-sidebar-link ${item.id === view ? 'is-active' : ''}" href="#/${item.route}" data-route="${item.route}"${item.id === view ? ' aria-current="page"' : ''}>${icon(item.icon, 18)}<span>${item.label}</span></a>`).join('');
-    return `<div class="aic" data-view="${esc(view)}">
-      <aside class="aic-sidebar" aria-label="AI Conversation sections">
-        <a class="aic-sidebar-brand" href="#/ai-conversations" data-route="ai-conversations" aria-label="Idilewa AI Conversation home">${brandLogo('Idilewa')}</a>
-        <span class="aic-sidebar-label">AI Conversation</span>
-        <nav class="aic-sidebar-nav">${links}</nav>
-        <a class="aic-sidebar-user" href="#/profile" data-route="profile"><span class="aic-avatar">${aiChatAvatarMarkup()}</span><span class="aic-sidebar-user-copy"><strong>${esc(name)}</strong><small>${getCurrentUser() ? 'Learner' : 'Guest learner'}</small></span>${icon('arrow', 14)}</a>
-      </aside>
-      <div class="aic-shell">
-        ${renderAiChatTopbar()}
-        ${renderAiChatDrawer(view)}
-        <div class="aic-main" id="aic-main" tabindex="-1">${content}</div>
-      </div>
-    </div>`;
-  }
-  const PARENT_PORTAL_LINKS = [
-    { route: 'parent-dashboard', label: 'Dashboard', icon: 'home' },
-    { route: 'parent-children', label: 'My Children', icon: 'people' },
-    { route: 'parent-progress', label: 'Analytics', icon: 'layers' },
-    { route: 'parent-messages', label: 'Messages', icon: 'send' },
-    { route: 'parent-settings', label: 'Settings', icon: 'lock' }
-  ];
-  const PARENT_PREFERENCES_KEY = 'idilewa-parent-preferences';
-  let parentDashboardData = null;
-  let parentDashboardError = '';
-  let parentDashboardLoading = false;
-  let parentDashboardRequest = 0;
-
-  function getParentPreferences() {
-    try {
-      const saved = JSON.parse(localStorage.getItem(PARENT_PREFERENCES_KEY) || '{}');
-      return {
-        emailUpdates: saved.emailUpdates !== false,
-        learningReminders: saved.learningReminders !== false,
-        weeklySummary: saved.weeklySummary !== false
-      };
-    } catch (error) {
-      console.error('Could not read family portal preferences.', error);
-      return { emailUpdates: true, learningReminders: true, weeklySummary: true };
-    }
-  }
-
   function renderParentBrand(className = '') {
     return `<a class="family-brand ${className}" href="#/families" data-route="families" aria-label="Idilewa · Language · Culture · Future">${brandLogo('Idilewa · Language · Culture · Future')}</a>`;
   }
@@ -4662,249 +3915,6 @@ import {
     }
   }
 
-  function aiChatStage() {
-    if (!['welcome', 'language', 'topic', 'chat'].includes(aiChatState.step)) return 'welcome';
-    if (aiChatState.step === 'chat' && !aiChatState.topic) return aiChatState.language ? 'topic' : 'language';
-    if (aiChatState.step === 'topic' && !aiChatState.language) return 'language';
-    return aiChatState.step;
-  }
-
-  function renderAiConversationStage() {
-    const stage = aiChatStage();
-    if (stage === 'welcome') return renderAiChatWelcome();
-    if (stage === 'language') return renderAiChatLanguageStep();
-    if (stage === 'topic') return renderAiChatTopicStep();
-    return renderAiChatConversation();
-  }
-
-  function renderAiChatWelcome() {
-    return `<section class="aic-stage aic-welcome">
-      <figure class="aic-welcome-art"><img src="${imageUrl('african-kids-friends.jpg')}" alt="Two African children sharing a tablet outside" /></figure>
-      <div class="aic-welcome-copy">
-        <h1>Welcome to<br />AI Conversation</h1>
-        <p>Speak, Learn and Practise in African Languages. Pick a language, choose a topic and talk with a friendly practice partner.</p>
-        <button class="aic-button aic-button-primary" type="button" data-action="aic-start">Start Conversation ${icon('arrow', 17)}</button>
-        <span class="aic-welcome-note">${icon('lock', 13)} Your practice is saved on this device only.</span>
-      </div>
-    </section>`;
-  }
-
-  function renderAiChatLanguageStep() {
-    const options = AI_CHAT_LANGUAGES.map((language) => {
-      const selected = language.id === aiChatState.language;
-      return `<button class="aic-option ${selected ? 'is-selected' : ''}" type="button" data-action="aic-choose-language" data-language="${language.id}" aria-pressed="${selected}">
-        <span class="aic-option-badge">${esc(language.short)}</span>
-        <span class="aic-option-copy"><strong>${esc(language.name)}</strong><small>${esc(language.hello)} · ${esc(language.helloEn)}</small></span>
-        <span class="aic-radio" aria-hidden="true"></span>
-      </button>`;
-    }).join('');
-    return `<section class="aic-stage aic-step">
-      <div class="aic-step-head"><button class="aic-back" type="button" data-action="aic-back" aria-label="Go back">${icon('arrow', 17)}</button><span class="aic-step-index">Step 1 of 2</span></div>
-      <h1>Choose a Language</h1>
-      <p class="aic-step-note">Pick the language you would like to practise today.</p>
-      <div class="aic-options">${options}</div>
-    </section>`;
-  }
-
-  function renderAiChatTopicStep() {
-    const language = aiChatLanguage();
-    const options = AI_CHAT_TOPICS.map((topic) => {
-      const selected = topic.id === aiChatState.topic;
-      return `<button class="aic-option aic-option-topic ${selected ? 'is-selected' : ''}" type="button" data-action="aic-choose-topic" data-topic="${topic.id}" aria-pressed="${selected}">
-        <span class="aic-option-icon">${icon(topic.icon, 18)}</span>
-        <span class="aic-option-copy"><strong>${esc(topic.name)}</strong><small>${esc(topic.blurb)}</small></span>
-        <span class="aic-option-chevron">${icon('chevronRight', 16)}</span>
-      </button>`;
-    }).join('');
-    return `<section class="aic-stage aic-step">
-      <div class="aic-step-head"><button class="aic-back" type="button" data-action="aic-back" aria-label="Go back">${icon('arrow', 17)}</button><span class="aic-step-index">Step 2 of 2</span></div>
-      <h1>Choose a Topic</h1>
-      <p class="aic-step-note">${language ? `${esc(language.name)} · ` : ''}What would you like to talk about?</p>
-      <div class="aic-options">${options}</div>
-    </section>`;
-  }
-
-  function renderAiChatMessage(message) {
-    const gloss = message.gloss && aiChatState.showGloss ? `<small class="aic-gloss">${esc(message.gloss)}</small>` : '';
-    if (message.role === 'learner') {
-      return `<div class="aic-msg aic-msg-learner">
-        <div class="aic-bubble">${esc(message.text)}${gloss}</div>
-        <span class="aic-msg-avatar">${aiChatAvatarMarkup()}</span>
-      </div>`;
-    }
-    return `<div class="aic-msg aic-msg-partner">
-      <span class="aic-msg-avatar aic-msg-avatar-partner">${icon('message', 15)}</span>
-      <div class="aic-msg-body">
-        <div class="aic-bubble">${esc(message.text)}${gloss}</div>
-        <div class="aic-msg-tools">
-          <button class="aic-msg-tool" type="button" data-action="aic-speak" data-text="${esc(message.text)}" aria-label="Listen to this phrase">${icon('volume', 14)}</button>
-          <button class="aic-msg-tool" type="button" data-action="aic-save-phrase" data-text="${esc(message.text)}" data-gloss="${esc(message.gloss || '')}" aria-label="Save this phrase">${icon('bookmark', 14)}</button>
-        </div>
-      </div>
-    </div>`;
-  }
-
-  function renderAiChatConversation() {
-    const language = aiChatLanguage();
-    const topic = aiChatTopic();
-    const dialogue = aiChatDialogue();
-    const thread = aiChatThread();
-    const scripted = dialogue[aiChatExchangeIndex()] || null;
-    const messages = thread.messages.length
-      ? thread.messages.map(renderAiChatMessage).join('')
-      : renderAiChatMessage({ role: 'assistant', text: dialogue[0]?.ask || language.close, gloss: dialogue[0]?.askEn || language.closeEn });
-    const chips = scripted
-      ? `<div class="aic-chips"><button class="aic-chip" type="button" data-action="aic-quick-reply" data-reply="${esc(scripted.reply)}" data-gloss="${esc(scripted.replyEn)}">${esc(scripted.reply)}</button></div>`
-      : '';
-    const recording = aiVoiceRecorder?.state === 'recording';
-    return `<section class="aic-stage aic-chat">
-      <div class="aic-chat-head">
-        <button class="aic-back" type="button" data-action="aic-back" aria-label="Go back to topics">${icon('arrow', 17)}</button>
-        <div class="aic-chat-identity"><strong>${esc(language.name)} Conversation</strong><small>${esc(topic.name)}</small></div>
-        <button class="aic-icon-button" type="button" data-action="aic-change-topic" aria-label="Change topic">${icon('filter', 18)}</button>
-      </div>
-      <div class="aic-thread" id="aic-thread" role="log" aria-live="polite">${messages}${chips}</div>
-      <div class="aic-toolbar">
-        <button class="aic-tool ${aiChatState.showGloss ? 'is-on' : ''}" type="button" data-action="aic-toggle-gloss" aria-pressed="${aiChatState.showGloss}">${icon('translate', 15)}<span>Translate</span></button>
-        <button class="aic-tool" type="button" data-action="aic-slow-speak">${icon('volume', 15)}<span>Slow &amp; clear</span></button>
-        <button class="aic-tool" type="button" data-action="aic-add-word">${icon('plus', 15)}<span>Add word</span></button>
-        <button class="aic-tool" type="button" data-action="aic-end-session">${icon('check', 15)}<span>End session</span></button>
-      </div>
-      <form class="aic-composer${aiChatDraft ? ' is-typing' : ''}" data-form="ai-chat" novalidate>
-        <button class="aic-composer-media" type="button" data-action="aic-picture" aria-label="Add a picture">${icon('image', 19)}</button>
-        <label class="aic-composer-field"><span class="sr-only">Your reply in ${esc(language.name)}</span>
-          <input id="ai-chat-input" name="message" type="text" autocomplete="off" maxlength="300" placeholder="Type your message..." value="${esc(aiChatDraft)}" />
-        </label>
-        <button class="aic-composer-mic aic-composer-record" type="button" data-action="aic-record" data-target="chat" aria-label="${recording ? 'Stop recording' : 'Speak your reply'}">${icon(recording ? 'pause' : 'mic', 18)}</button>
-        <button class="aic-composer-mic aic-composer-send" type="submit" aria-label="Send your reply">${icon('send', 18)}</button>
-      </form>
-    </section>`;
-  }
-
-  function renderAiConversationsPage(page, params = {}) {
-    if (page === 'ai-login') return renderAiAuth('login');
-    if (page === 'ai-signup') return renderAiAuth('signup');
-    if (params.lang && AI_CHAT_LANGUAGES.some((item) => item.id === params.lang) && params.lang !== aiChatState.language) {
-      aiChatState.language = params.lang;
-      if (aiChatState.step === 'welcome') aiChatState.step = 'topic';
-      saveAiChatState();
-    }
-    const view = AI_CHAT_VIEW_BY_PAGE[page] || 'conversation';
-    if (view === 'translate') return renderAiChatShell(view, renderAiTranslatePanel());
-    if (view === 'practice') return renderAiChatShell(view, renderAiPracticePanel());
-    if (view === 'history') return renderAiChatShell(view, renderAiHistoryPanel());
-    if (view === 'saved') return renderAiChatShell(view, renderAiSavedPanel());
-    return renderAiChatShell(view, renderAiConversationStage());
-  }
-
-  function renderAiTranslatePanel() {
-    const language = aiChatLanguage() || AI_CHAT_LANGUAGES[0];
-    const translation = aiChatState.translation;
-    const translationLanguage = translation
-      ? AI_CHAT_LANGUAGES.find((item) => item.id === translation.language)?.name || language.name
-      : '';
-    const result = translation
-      ? `<article class="aic-result">
-          <span class="aic-eyebrow"><span></span> ${esc(translationLanguage)}</span>
-          <p class="aic-result-source">${esc(translation.source)}</p>
-          <p class="aic-result-target">${esc(translation.translated)}</p>
-          <div class="aic-result-actions">
-            <button class="aic-tool" type="button" data-action="aic-speak" data-text="${esc(translation.translated)}">${icon('volume', 15)}<span>Listen</span></button>
-            <button class="aic-tool" type="button" data-action="aic-slow-speak" data-text="${esc(translation.translated)}">${icon('headphones', 15)}<span>Slow</span></button>
-            <button class="aic-tool" type="button" data-action="aic-save-phrase" data-text="${esc(translation.translated)}" data-gloss="${esc(translation.source)}">${icon('bookmark', 15)}<span>Save</span></button>
-            <button class="aic-tool" type="button" data-action="aic-copy" data-text="${esc(translation.translated)}">${icon('copy', 15)}<span>Copy</span></button>
-          </div>
-        </article>`
-      : `<article class="aic-result aic-result-empty">${icon('translate', 22)}<p>Your translation appears here with listen, slow playback and a save option.</p></article>`;
-    return `<section class="aic-stage aic-panel">
-      <h1>Translate &amp; Listen</h1>
-      <p class="aic-step-note">Type a sentence in English. Idilewa translates it into your practice language and reads it aloud.</p>
-      <form class="aic-form" data-form="ai-translate">
-        <label class="aic-field"><span>English text</span>
-          <textarea name="text" rows="3" maxlength="400" required placeholder="Good morning, how are you?"></textarea>
-        </label>
-        <label class="aic-field"><span>Translate into</span>
-          <select name="language" id="ai-translate-language">${AI_CHAT_LANGUAGES.map((item) => `<option value="${item.id}" ${item.id === language.id ? 'selected' : ''}>${esc(item.name)}</option>`).join('')}</select>
-        </label>
-        <button class="aic-button aic-button-primary" type="submit"${aiChatPending ? ' disabled' : ''}>${aiChatPending ? 'Translating…' : `Translate ${icon('arrow', 16)}`}</button>
-      </form>
-      ${result}
-    </section>`;
-  }
-
-  function renderAiPracticePanel() {
-    const language = aiChatLanguage() || AI_CHAT_LANGUAGES[0];
-    const dialogue = aiChatDialogue();
-    const pool = dialogue.length ? dialogue : [{ ask: language.hello, askEn: language.helloEn }];
-    const phrase = pool[aiPracticeIndex % pool.length];
-    const recording = aiVoiceRecorder?.state === 'recording';
-    const transcript = aiVoiceTranscript
-      ? `<article class="aic-transcript"><span class="aic-eyebrow"><span></span> What we heard</span><p>${esc(aiVoiceTranscript)}</p></article>`
-      : '';
-    return `<section class="aic-stage aic-panel">
-      <h1>Record &amp; Practise</h1>
-      <p class="aic-step-note">Say the phrase aloud. Idilewa writes down what it hears so you can compare your pronunciation.</p>
-      <article class="aic-practice-card">
-        <span class="aic-step-index">Phrase ${(aiPracticeIndex % pool.length) + 1} of ${pool.length} · ${esc(language.name)}</span>
-        <strong>${esc(phrase.ask)}</strong>
-        <small>${esc(phrase.askEn)}</small>
-        <div class="aic-result-actions">
-          <button class="aic-tool" type="button" data-action="aic-speak" data-text="${esc(phrase.ask)}">${icon('volume', 15)}<span>Listen</span></button>
-          <button class="aic-tool" type="button" data-action="aic-slow-speak" data-text="${esc(phrase.ask)}">${icon('headphones', 15)}<span>Slow</span></button>
-          <button class="aic-tool" type="button" data-action="aic-next-phrase">${icon('arrow', 15)}<span>Next phrase</span></button>
-        </div>
-      </article>
-      <button class="aic-record${recording ? ' is-recording' : ''}" type="button" data-action="aic-record" data-target="practice">
-        ${icon(recording ? 'pause' : 'mic', 22)}
-        <span>${recording ? 'Stop recording' : aiVoiceTranscriptionPending ? 'Writing it down…' : 'Record your voice'}</span>
-      </button>
-      ${transcript}
-    </section>`;
-  }
-
-  function renderAiHistoryPanel() {
-    const entries = Object.entries(aiChatState.threads)
-      .filter(([, thread]) => thread.messages.length)
-      .sort((first, second) => second[1].updatedAt - first[1].updatedAt);
-    const list = entries.map(([key, thread]) => {
-      const [languageId, topicId] = key.split(':');
-      const language = AI_CHAT_LANGUAGES.find((item) => item.id === languageId);
-      const topic = AI_CHAT_TOPICS.find((item) => item.id === topicId);
-      const last = thread.messages[thread.messages.length - 1];
-      return `<article class="aic-history-item">
-        <div class="aic-history-copy"><strong>${esc(language?.name || 'Language')} · ${esc(topic?.name || 'Topic')}</strong><small>${esc(last?.text || '')}</small></div>
-        <div class="aic-result-actions">
-          <button class="aic-tool" type="button" data-action="aic-resume" data-language="${esc(languageId)}" data-topic="${esc(topicId)}">${icon('play', 14)}<span>Continue</span></button>
-          <button class="aic-tool" type="button" data-action="aic-delete-thread" data-key="${esc(key)}" aria-label="Delete this conversation">${icon('close', 14)}</button>
-        </div>
-      </article>`;
-    }).join('');
-    return `<section class="aic-stage aic-panel">
-      <h1>My Conversations</h1>
-      <p class="aic-step-note">Every conversation you practise is saved in this browser.</p>
-      ${entries.length
-        ? `<div class="aic-list">${list}</div><button class="aic-button aic-button-quiet" type="button" data-action="aic-clear-history">Clear all conversations</button>`
-        : `<article class="aic-empty">${icon('message', 22)}<strong>No conversations yet</strong><p>Start a conversation and it will be listed here.</p><a class="aic-button aic-button-primary" href="#/ai-conversations" data-route="ai-conversations">Start a conversation ${icon('arrow', 16)}</a></article>`}
-    </section>`;
-  }
-
-  function renderAiSavedPanel() {
-    const saved = aiChatState.saved;
-    const list = saved.map((item, index) => `<article class="aic-history-item">
-      <div class="aic-history-copy"><strong>${esc(item.text)}</strong><small>${esc(item.gloss || AI_CHAT_LANGUAGES.find((language) => language.id === item.language)?.name || '')}</small></div>
-      <div class="aic-result-actions">
-        <button class="aic-tool" type="button" data-action="aic-speak" data-text="${esc(item.text)}">${icon('volume', 14)}<span>Listen</span></button>
-        <button class="aic-tool" type="button" data-action="aic-remove-saved" data-index="${index}" aria-label="Remove this phrase">${icon('close', 14)}</button>
-      </div>
-    </article>`).join('');
-    return `<section class="aic-stage aic-panel">
-      <h1>Saved Phrases</h1>
-      <p class="aic-step-note">Phrases you keep while practising are stored on this device.</p>
-      ${saved.length
-        ? `<div class="aic-list">${list}</div>`
-        : `<article class="aic-empty">${icon('bookmark', 22)}<strong>No saved phrases yet</strong><p>Tap the bookmark on any reply to keep it here.</p><a class="aic-button aic-button-primary" href="#/ai-conversations" data-route="ai-conversations">Open AI Conversation ${icon('arrow', 16)}</a></article>`}
-    </section>`;
-  }
   function renderContact() {
     const supportEmail = 'idilewa2026@gmail.com';
     return `<div class="container route-page information-page">
@@ -6001,20 +5011,6 @@ import {
       case 'voice-speech-to-text':
       case 'voice-translation': return renderVoiceFeaturePage(page, params);
       case 'index': return renderHome();
-      case 'ai-conversations':
-      case 'ai-login':
-      case 'ai-signup':
-      case 'ai-dashboard':
-      case 'ai-chat':
-      case 'ai-everyday':
-      case 'ai-voice':
-      case 'ai-history':
-      case 'ai-analytics':
-      case 'ai-profile':
-      case 'ai-messages':
-      case 'ai-settings':
-      case 'ai-translate':
-      case 'ai-saved': return renderAiConversationsPage(page, params);
       case 'families':
       case 'parent-login':
       case 'parent-signup':
@@ -6029,8 +5025,6 @@ import {
       case 'languages': return renderLanguages();
       case 'course': return renderCourse(params);
       case 'lesson': return renderLesson(params);
-      case 'ere': return renderStories();
-      case 'ere_game': return renderStoryGame(params);
       case 'oral': return renderOral();
       case 'oral_genre': return renderOralGenre();
       case 'oriki': return renderOriki();
@@ -6080,7 +5074,7 @@ import {
     'page-connect_students-1.jpg', 'page-consent-1.jpg', 'page-oral-1.jpg',
     'page-owe-1.jpg', 'page-owe_detail-1.jpg', 'page-owe_story-1.jpg',
     'page-owe_reflection-1.jpg', 'page-owe_add-1.jpg', 'page-oral_genre-1.jpg',
-    'page-oriki-1.jpg', 'page-ere-1.jpg', 'page-ere_game-1.jpg', 'page-profile-1.jpg',
+    'page-oriki-1.jpg', 'page-profile-1.jpg',
     'page-pricing-1.jpg',
     'african-kids-friends.jpg', 'code-kids.jpg', 'hero-reader.jpg', 'listening-reader.jpg',
     'story-grandmother.jpg', 'yoruba-educator-man.jpg', 'yoruba-educator-woman.jpg', 'yoruba-kids-culture.jpg'
@@ -6109,7 +5103,6 @@ import {
     owe_story: 'A Nigerian child and grandmother tending a seedling in a landscaped garden',
     owe_reflection: 'A Nigerian child writing a thoughtful reflection in a bright, elegant home study',
     ere: 'A Nigerian parent and children sharing a storybook in an elegant family home',
-    ere_game: 'A parent and child enjoying an interactive story together on a tablet',
     tutor: 'A Nigerian language tutor in traditional agbada in a refined library',
     keepers: 'A Nigerian elder sharing knowledge with children in a beautiful courtyard',
     login: 'A child reading in a calm, sunlit family home',
@@ -6140,8 +5133,6 @@ import {
     'owe_add-1': 'A woman in burgundy aso-oke writing a proverb in a fine journal',
     'oral_genre-1': 'A Yoruba elder sharing a spoken story with children in a cultural salon',
     'oriki-1': 'A Yoruba praise poet performing for young listeners in an arts hall',
-    'ere-1': 'A Nigerian father and children sharing a picture book in a modern family home',
-    'ere_game-1': 'A child and parent answering an interactive story question on a tablet',
     'profile-1': 'A Nigerian girl celebrating a learning milestone in her home study'
   };
   const ROUTE_IMAGE_OVERRIDES = {
@@ -6248,22 +5239,6 @@ import {
       ['Open a lesson', 'Every lesson has a focus, a short task and an optional practice response.', 'Lesson focus · activity'],
       ['Save a small win', 'Practice and completion update local progress so the next step is easy to find.', 'Response · completion · progress'],
       ['Check language quality', 'Starter lesson outlines and glosses need fluent-speaker review before public teaching.', 'Educator review · content readiness']
-    ],
-    ere: [
-      ['Enter through a story', 'The shelf connects language, imagination and the people who carry stories between generations.', 'Story shelf · collection'],
-      ['Choose a reading object', 'Story cards identify a theme, audience, language or estimated reading time.', 'Story card · reading level'],
-      ['Read and listen', 'Open a story, follow the text and use the browser sample audio at a comfortable pace.', 'Text · listen control'],
-      ['Notice what travels', 'Look for a character choice, a remembered detail or a new voice in the retelling.', 'Character · detail · retelling'],
-      ['Check understanding', 'A short story game invites learners to use evidence from what they heard.', 'Comprehension question'],
-      ['Share with care', 'Stories belong to their communities; ask before retelling and explore oral forms or voices next.', 'Attribution · oral traditions']
-    ],
-    ere_game: [
-      ['Meet the story', 'Read a gentle family story about listening, remembering and sharing a detail.', 'Original learning story'],
-      ['Follow the narrative', 'Notice how the grandmother begins, how the children listen and what changes on a second telling.', 'Story events · characters'],
-      ['Use the listening object', 'Play the sample narration or read the text together; audio is a browser-based preview.', 'Text · sample audio'],
-      ['Consider ownership', 'The story page explains that oral traditions belong to the people and communities who share them.', 'Source · permission · attribution'],
-      ['Answer the check', 'Choose the idea best supported by the story and use the feedback to reconsider.', 'Comprehension quiz · feedback'],
-      ['Continue thoughtfully', 'Explore oral traditions, return to the story shelf or open the offline reflection helper.', 'Next route · offline helper']
     ],
     languages: [
       ['Compare available paths', 'Choose among Yorùbá, Igbo, Hausa and Kiswahili, with regional and native-name context.', 'Language · native name · region'],
@@ -6560,14 +5535,6 @@ import {
       return;
     }
     const { page, params } = location;
-    if (page === 'ai-login' || page === 'ai-signup') {
-      state.loginMode = page === 'ai-signup' ? 'signup' : 'signin';
-      aiAuthReturnRoute = params.next?.startsWith('ai-') && ROUTES.includes(params.next) ? params.next : 'ai-dashboard';
-    }
-    if (page !== 'ai-voice' && aiVoiceRecorder?.state === 'recording') {
-      aiVoiceTranscriptionRequested = false;
-      aiVoiceRecorder.stop();
-    }
     if (params.lang && LANGUAGES.some((l) => l.id === params.lang)) state.currentLang = params.lang;
     if (params.level && ['beginner', 'intermediate', 'advanced', 'growing', 'fluent'].includes(params.level)) state.level = normalizeCourseLevel(params.level);
     renderHeader(page);
@@ -6582,7 +5549,7 @@ import {
     const pageMarkup = assignUniqueRouteImages(page, renderPage(page, params))
       .replace(/(?:African )?Voice (?:African Language )?Trainer/gi, 'Voice Lessons')
       .replace(/Voice Studio/gi, 'Voice Lessons');
-    if (page.startsWith('ai-') || page.startsWith('tutor') || page.startsWith('parent') || page === 'families') {
+    if (page.startsWith('tutor') || page.startsWith('parent') || page === 'families') {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = pageMarkup;
     } else if (page === 'index') {
@@ -6631,7 +5598,7 @@ import {
         const audioCanvas = document.getElementById('waveformCanvas');
         if (audioCanvas) init3DAudioVisualizer(audioCanvas);
       }
-    } else if (page === 'ere' || page === 'oral') {
+    } else if (page === 'oral') {
       const storyCanvas = document.getElementById('story3DCanvasWrap');
       if (storyCanvas) init3DStoryCanvas(storyCanvas);
     }
@@ -6833,7 +5800,7 @@ import {
 
   function searchResults(query) {
     const q = query.trim().toLowerCase();
-    const list = q ? searchable.filter((item) => `${item.title} ${item.summary}`.toLowerCase().includes(q)).slice(0, 7) : searchable.filter((item) => ['languages', 'course', 'ere', 'coding', 'oral', 'about'].includes(item.route)).slice(0, 6);
+    const list = q ? searchable.filter((item) => `${item.title} ${item.summary}`.toLowerCase().includes(q)).slice(0, 7) : searchable.filter((item) => ['languages', 'course', 'coding', 'oral', 'about'].includes(item.route)).slice(0, 6);
     return list.length ? list.map((item) => `<button class="search-result" data-action="search-result" data-route="${item.route}"><span>${icon(item.route === 'coding' ? 'code' : item.route === 'languages' || item.route === 'course' ? 'globe' : 'book', 17)}</span><span><strong>${esc(item.title)}</strong><small>${esc(item.summary)}</small></span>${icon('arrow', 15)}</button>`).join('') : `<div class="search-empty">No match just yet. Try “language”, “story” or “code”.</div>`;
   }
 
@@ -6958,180 +5925,6 @@ import {
           showToast(error instanceof Error ? error.message : 'Consent could not be withdrawn.', 'error');
           if (el.isConnected) el.disabled = false;
         });
-        break;
-      }
-      case 'aic-open-menu': {
-        const drawer = document.getElementById('aic-drawer');
-        if (!drawer) break;
-        drawer.hidden = false;
-        el.setAttribute('aria-expanded', 'true');
-        drawer.querySelector('.aic-drawer-link')?.focus();
-        break;
-      }
-      case 'aic-close-menu': {
-        const drawer = document.getElementById('aic-drawer');
-        if (!drawer) break;
-        drawer.hidden = true;
-        const toggle = document.querySelector('[data-action="aic-open-menu"]');
-        if (toggle) {
-          toggle.setAttribute('aria-expanded', 'false');
-          toggle.focus();
-        }
-        break;
-      }
-      case 'aic-notifications':
-        showToast('You have no new notifications. Keep practising to build your streak.');
-        break;
-      case 'aic-start':
-        aiChatState.step = 'language';
-        saveAiChatState();
-        render();
-        break;
-      case 'aic-back':
-        if (aiChatState.step === 'chat') aiChatState.step = 'topic';
-        else if (aiChatState.step === 'topic') aiChatState.step = 'language';
-        else aiChatState.step = 'welcome';
-        saveAiChatState();
-        render();
-        break;
-      case 'aic-choose-language': {
-        const selected = AI_CHAT_LANGUAGES.find((item) => item.id === el.dataset.language);
-        if (!selected) break;
-        aiChatState.language = selected.id;
-        aiChatState.step = 'topic';
-        aiVoiceTranscript = '';
-        saveAiChatState();
-        render();
-        void aiChatSpeak(selected.hello);
-        break;
-      }
-      case 'aic-choose-topic': {
-        const topic = AI_CHAT_TOPICS.find((item) => item.id === el.dataset.topic);
-        if (!topic || !aiChatState.language) break;
-        aiChatState.topic = topic.id;
-        aiChatState.step = 'chat';
-        aiPracticeIndex = 0;
-        aiChatStartConversation();
-        render();
-        const opener = aiChatThread().messages[0];
-        if (opener) void aiChatSpeak(opener.text);
-        break;
-      }
-      case 'aic-change-topic':
-        aiChatState.step = 'topic';
-        saveAiChatState();
-        render();
-        break;
-      case 'aic-quick-reply': {
-        const reply = el.dataset.reply || '';
-        if (!reply || !aiChatSendMessage(reply)) break;
-        render();
-        const last = aiChatLastAssistantMessage();
-        if (last) void aiChatSpeak(last.text);
-        break;
-      }
-      case 'aic-speak': {
-        const text = el.dataset.text || aiChatLastAssistantMessage()?.text || '';
-        void aiChatSpeak(text);
-        break;
-      }
-      case 'aic-slow-speak': {
-        const text = el.dataset.text || aiChatLastAssistantMessage()?.text || '';
-        void aiChatSpeak(text, { slow: true });
-        break;
-      }
-      case 'aic-save-phrase': {
-        const text = el.dataset.text || aiChatLastAssistantMessage()?.text || '';
-        if (!text) break;
-        if (aiChatSavePhrase(text, el.dataset.gloss || '')) showToast('Phrase saved to your list.', 'success');
-        else showToast('That phrase is already in your saved list.', 'error');
-        break;
-      }
-      case 'aic-toggle-gloss':
-        aiChatState.showGloss = !aiChatState.showGloss;
-        saveAiChatState();
-        render();
-        break;
-      case 'aic-add-word': {
-        const input = document.getElementById('ai-chat-input');
-        const word = String(input?.value || '').trim() || aiChatLastAssistantMessage()?.text || '';
-        if (!word) {
-          showToast('Type or choose a phrase before saving it.', 'error');
-          break;
-        }
-        if (aiChatSavePhrase(word, '')) showToast('Added to your saved phrases.', 'success');
-        else showToast('That phrase is already saved.', 'error');
-        break;
-      }
-      case 'aic-end-session':
-        aiChatState.step = 'topic';
-        aiChatDraft = '';
-        saveAiChatState();
-        render();
-        showToast('Session ended. Well done today!');
-        break;
-      case 'aic-picture':
-        showToast('Picture prompts are coming soon. Keep practising with your voice.');
-        break;
-      case 'aic-copy': {
-        const text = el.dataset.text || '';
-        if (!text) break;
-        if (navigator.clipboard?.writeText) {
-          void navigator.clipboard.writeText(text)
-            .then(() => showToast('Copied to your clipboard.'))
-            .catch(() => showToast('Copying is not available in this browser.', 'error'));
-        } else showToast('Copying is not available in this browser.', 'error');
-        break;
-      }
-      case 'aic-record':
-        if (aiVoiceRecorder?.state === 'recording') stopAiVoiceRecording();
-        else void startAiVoiceRecording(el.dataset.target === 'chat' ? 'chat' : 'practice');
-        break;
-      case 'aic-next-phrase':
-        aiPracticeIndex += 1;
-        aiVoiceTranscript = '';
-        render();
-        break;
-      case 'aic-resume': {
-        const language = AI_CHAT_LANGUAGES.find((item) => item.id === el.dataset.language);
-        const topic = AI_CHAT_TOPICS.find((item) => item.id === el.dataset.topic);
-        if (!language || !topic) break;
-        aiChatState.language = language.id;
-        aiChatState.topic = topic.id;
-        aiChatState.step = 'chat';
-        aiPracticeIndex = 0;
-        saveAiChatState();
-        navigate('ai-conversations');
-        break;
-      }
-      case 'aic-delete-thread': {
-        const key = el.dataset.key || '';
-        if (!key || !aiChatState.threads[key]) break;
-        if (!window.confirm('Delete this conversation from this device?')) break;
-        delete aiChatState.threads[key];
-        saveAiChatState();
-        render();
-        showToast('Conversation deleted.');
-        break;
-      }
-      case 'aic-clear-history':
-        if (!Object.keys(aiChatState.threads).length) {
-          showToast('There are no saved conversations yet.', 'error');
-          break;
-        }
-        if (!window.confirm('Clear every conversation saved in this browser?')) break;
-        aiChatState.threads = {};
-        saveAiChatState();
-        render();
-        showToast('Conversation history cleared.');
-        break;
-      case 'aic-remove-saved': {
-        const index = Number(el.dataset.index);
-        if (!Number.isInteger(index) || !aiChatState.saved[index]) break;
-        aiChatState.saved.splice(index, 1);
-        saveAiChatState();
-        render();
-        showToast('Phrase removed from your list.');
         break;
       }
       case 'toggle-menu': toggleMobileMenu(); break;
@@ -7699,7 +6492,6 @@ import {
       case 'back-to-levels': navigate('course', { lang: lang || state.currentLang }); break;
       case 'answer': quizAction(el, 'lesson', 'Correct. +10 practice points.'); break;
       case 'code-answer': quizAction(el, 'code', 'Exactly. +10 practice points.'); break;
-      case 'story-answer': quizAction(el, 'story', 'Lovely listening. +10 practice points.'); break;
       case 'owe-meaning-answer': quizAction(el, 'owe-meaning', 'You understood the proverb’s meaning. +10 practice points.'); break;
       case 'owe-story-answer': quizAction(el, 'owe-story', 'Exactly. You noticed Dami’s steady care. +10 practice points.'); break;
       case 'complete-lesson': {
@@ -8336,52 +7128,6 @@ import {
       } catch (error) {
         showToast(error instanceof Error ? error.message : 'Your availability could not be saved.', 'error');
       }
-    } else if (type === 'ai-chat') {
-      const message = String(data.get('message') || '').trim();
-      if (!message) {
-        showToast('Write a short message first.', 'error');
-        return;
-      }
-      if (!aiChatSendMessage(message)) {
-        showToast('Choose a language and topic before sending a message.', 'error');
-        return;
-      }
-      render();
-      document.getElementById('ai-chat-input')?.focus();
-      const lastReply = aiChatLastAssistantMessage();
-      if (lastReply) void aiChatSpeak(lastReply.text);
-    } else if (type === 'ai-translate') {
-      const text = String(data.get('text') || '').trim().slice(0, 400);
-      const language = AI_CHAT_LANGUAGES.find((item) => item.id === data.get('language'))
-        || aiChatLanguage()
-        || AI_CHAT_LANGUAGES[0];
-      if (!text) {
-        showToast('Type an English sentence to translate.', 'error');
-        return;
-      }
-      if (aiChatPending) return;
-      const translateButton = form.querySelector('button[type="submit"]');
-      let translated = false;
-      aiChatPending = true;
-      if (translateButton) translateButton.disabled = true;
-      try {
-        const result = await translateWithPlotweaver({ text, sourceLanguage: 'en', targetLanguage: language.speech });
-        const output = String(result.translated_text || '').trim();
-        if (!output) throw new Error('That sentence could not be translated. Please try again.');
-        if (!aiChatState.language) aiChatState.language = language.id;
-        aiChatState.translation = { source: text, translated: output, language: language.id };
-        saveAiChatState();
-        translated = true;
-        showToast('Translation ready. Tap Listen to hear it.');
-      } catch (error) {
-        showToast(error instanceof Error ? error.message : 'That sentence could not be translated.', 'error');
-      } finally {
-        aiChatPending = false;
-        if (parseLocation().page === 'ai-translate') {
-          if (translated) render();
-          else if (translateButton?.isConnected) translateButton.disabled = false;
-        }
-      }
     } else if (type === 'plotweaver-voice-clone') {
       const submitButton = form.querySelector('button[type="submit"]');
       const file = data.get('file');
@@ -8445,7 +7191,7 @@ import {
         pendingSignin = null;
         passwordResetVerified = false;
         await syncAccountLessonProgress();
-        navigate(aiAuthReturnRoute || roleHomeRoute(getCurrentUser()?.role || state.authRole));
+        navigate(roleHomeRoute(getCurrentUser()?.role || state.authRole));
         try {
           await sendAuthActivityEmail('sign-in');
           showToast('Your password has been updated and you are signed in.', 'success');
@@ -8480,7 +7226,7 @@ import {
         }
         pendingSignin = null;
         await syncAccountLessonProgress();
-        navigate(aiAuthReturnRoute || roleHomeRoute(signedInRole));
+        navigate(roleHomeRoute(signedInRole));
         let activityEmailError = '';
         try {
           await sendAuthActivityEmail('sign-in');
@@ -8703,7 +7449,7 @@ import {
       );
       verifiedGuardianSignup = null;
       try { sessionStorage.removeItem('idilewa-guardian-signup'); } catch (_) {}
-      navigate(aiAuthReturnRoute || roleHomeRoute(signedInRole));
+      navigate(roleHomeRoute(signedInRole));
       if (['adult', 'child'].includes(signedInRole)) {
         const profile = getProfileDetails();
         if (!profile.bio || !profile.goal) window.setTimeout(openProfileCompletionPrompt, 120);
