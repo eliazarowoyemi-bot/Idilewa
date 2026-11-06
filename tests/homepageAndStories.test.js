@@ -37,7 +37,8 @@ test('main and expanded mobile navigation omit retired pages', () => {
   assert.ok(navSource, 'main navigation list should exist');
   const navLabels = [...navSource.matchAll(/label: '([^']+)'/g)].map((match) => match[1]);
 
-  assert.deepEqual(navLabels, ['Home', 'Voice Lessons', 'AI Conversations', 'For Tutors', 'Curriculum']);
+  assert.deepEqual(navLabels, ['Home', 'Voice Lessons', 'AI Conversations', 'For Tutors', 'Curriculum', 'STEM Studio']);
+  assert.match(navSource, /\{ label: 'STEM Studio', href: '\/studio', group: 'studio' \}/);
   const mobileItems = [...mobileNavSource.matchAll(/\{ route: '([^']+)', label: '([^']+)'/g)].map((match) => [match[1], match[2]]);
   assert.deepEqual(mobileItems, [['index', 'Home'], ['voice_lessons', 'Voice'], ['ai-conversations', 'AI Chat'], ['curriculum', 'Code'], ['profile', 'Profile']]);
   assert.match(appSource, /const REMOVED_ROUTES = new Set\(\[[\s\S]*?'world'[\s\S]*?'coding', 'coding-studio'/);

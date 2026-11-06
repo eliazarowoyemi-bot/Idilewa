@@ -298,7 +298,8 @@ import {
     { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' },
     { label: 'AI Conversations', route: 'ai-conversations', group: 'ai-conversations' },
     { label: 'For Tutors', route: 'tutor', group: 'tutor' },
-    { label: 'Curriculum', route: 'curriculum', group: 'curriculum' }
+    { label: 'Curriculum', route: 'curriculum', group: 'curriculum' },
+    { label: 'STEM Studio', href: '/studio', group: 'studio' }
   ];
   const MENU_NAV = [...NAV,
     { label: 'Mentors', route: 'mentors', group: 'mentors' },
@@ -689,7 +690,9 @@ import {
     }
     const currentUser = getCurrentUser();
     const currentGroup = NAV_GROUPS[page] || (page === 'index' ? 'home' : '');
-    const nav = NAV.map((item) => `<a class="nav-link ${currentGroup === item.group ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${item.label}</a>`).join('');
+    const nav = NAV.map((item) => (item.href
+      ? `<a class="nav-link ${currentGroup === item.group ? 'active' : ''}" href="${item.href}">${item.label}</a>`
+      : `<a class="nav-link ${currentGroup === item.group ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${item.label}</a>`)).join('');
     const avatarLabel = currentUser?.name?.trim()?.charAt(0)?.toUpperCase() || 'S';
     const profileAvatar = profilePhoto
       ? `<img src="${esc(profilePhoto)}" alt="" />`
@@ -701,8 +704,13 @@ import {
       { route: 'profile', label: 'Profile', ico: 'user' },
       { route: 'payment', label: 'Payment', ico: 'shield' }
     ].map((item) => `<a class="mobile-menu-link ${page === item.route ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.ico, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('');
-    const menu = MENU_NAV.map((item) => `<a class="mobile-menu-link ${currentGroup === item.group ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.group === 'home' ? 'home' : item.group === 'trainer' ? 'mic' : item.group === 'learn' ? 'book' : item.group === 'read' ? 'headphones' : item.group === 'code' ? 'code' : item.group === 'stories' ? 'quote' : item.group === 'community' ? 'people' : 'sparkles', 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('') +
-      mobileShortcuts;
+    const menu = MENU_NAV.map((item) => {
+      const iconName = item.href ? 'code' : item.group === 'home' ? 'home' : item.group === 'trainer' ? 'mic' : item.group === 'learn' ? 'book' : item.group === 'read' ? 'headphones' : item.group === 'code' ? 'code' : item.group === 'stories' ? 'quote' : item.group === 'community' ? 'people' : 'sparkles';
+      const active = currentGroup === item.group ? 'active' : '';
+      return item.href
+        ? `<a class="mobile-menu-link ${active}" href="${item.href}">${icon(iconName, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`
+        : `<a class="mobile-menu-link ${active}" href="#/${item.route}" data-route="${item.route}">${icon(iconName, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`;
+    }).join('') + mobileShortcuts;
     document.getElementById('mobile-menu')?.remove();
     document.getElementById('site-header').innerHTML = `
       ${page === 'index' ? `<div class="home-promo-strip"><span>A little every day brings you closer to your language.</span></div>` : ''}
@@ -6900,114 +6908,6 @@ import {
     return 'Status unavailable';
   }
 
-  function renderParentDashboardData(data) {
-    const children = Array.isArray(data.children) ? data.children : [];
-    const totalLessons = children.reduce((total, child) => total + child.completedLessons, 0);
-    const totalCoding = children.reduce((total, child) => total + child.codingSessions, 0);
-    const voiceScores = children.map((child) => child.averageVoiceScore).filter(Number.isFinite);
-    const averageVoice = voiceScores.length
-      ? `${Math.round(voiceScores.reduce((sum, score) => sum + score, 0) / voiceScores.length)}%`
-      : '—';
-    const stats = document.getElementById('parent-dashboard-stats');
-    const content = document.getElementById('parent-dashboard-content');
-    const requests = document.getElementById('parent-dashboard-connections');
-    if (stats) {
-      stats.innerHTML = [
-        renderMetricCard('Linked learners', children.length, 'Guardian-approved accounts'),
-        renderMetricCard('Lessons completed', totalLessons, 'Across linked children', 'is-mint'),
-        renderMetricCard('Coding sessions', totalCoding, 'Saved practice attempts', 'is-blue'),
-        renderMetricCard('Voice practice', averageVoice, 'Average score when available', 'is-peach'),
-      ].join('');
-    }
-    if (content) {
-      content.innerHTML = children.length ? `<div class="family-learner-grid">${children.map((child) => `
-        <article class="family-learner-card">
-          <div class="family-learner-card-head"><span class="family-learner-avatar">${icon('user', 20)}</span><div><span class="section-kicker">Approved learner</span><h3>${esc(child.name)}</h3></div></div>
-          <div class="family-learner-metrics"><span><strong>${child.completedLessons}</strong><small>lessons</small></span><span><strong>${child.codingSessions}</strong><small>coding sessions</small></span><span><strong>${child.voicePractices}</strong><small>voice practices</small></span></div>
-          <div class="family-learner-note"><span>${child.points} points</span><span>${child.streak} day streak</span>${child.averageVoiceScore === null ? '' : `<span>${child.averageVoiceScore}% voice average</span>`}</div>
-          <div class="family-activity-list"><strong>Recent learning</strong>${child.recentActivity.length ? child.recentActivity.map((item) => `<div><span>${esc(item.lessonType)} · ${esc(item.lessonId)}</span><small>${formatDashboardDate(item.completedAt)}</small></div>`).join('') : '<p>No saved lesson activity yet.</p>'}</div>
-        </article>`).join('')}</div>` : `<div class="dashboard-empty-state"><span>${icon('heart', 22)}</span><h3>Your family space is ready</h3><p>When a child completes guardian-approved sign-up using your verified email, their learning progress will appear here.</p></div>`;
-    }
-    if (requests) {
-      const connectionRequests = Array.isArray(data.connectionRequests) ? data.connectionRequests : [];
-      requests.innerHTML = connectionRequests.length ? `<div class="consent-request-list">${connectionRequests.map((request) => `
-        <article class="consent-request-row"><span class="consent-request-icon">${icon('school', 18)}</span><div><strong>${esc(request.educator)} · ${esc(request.learner)}</strong><small>Requested ${formatDashboardDate(request.requestedAt)}</small></div><span class="consent-status status-${esc(request.status)}">${esc(consentStatusLabel(request.status))}</span>${request.status === 'approved' ? `<button class="text-link consent-withdraw-button" type="button" data-action="withdraw-educator-consent" data-id="${esc(request.id)}">Withdraw consent</button>` : ''}</article>`).join('')}</div>` : '<p class="dashboard-empty-inline">No educator connection requests yet.</p>';
-    }
-  }
-
-  function renderEducatorDashboardData(data) {
-    const learners = Array.isArray(data.learners) ? data.learners : [];
-    const requests = Array.isArray(data.requests) ? data.requests : [];
-    const stats = document.getElementById('educator-dashboard-stats');
-    const content = document.getElementById('educator-dashboard-content');
-    if (stats) {
-      const totalLessons = learners.reduce((sum, learner) => sum + learner.completedLessons, 0);
-      stats.innerHTML = [
-        renderMetricCard('Approved learners', learners.length, 'Parent-consented connections'),
-        renderMetricCard('Lessons completed', totalLessons, 'Across approved learners', 'is-mint'),
-        renderMetricCard('Awaiting consent', requests.filter((request) => request.status === 'pending').length, 'No learner data shared yet', 'is-peach'),
-        renderMetricCard('Active teaching streaks', learners.filter((learner) => learner.streak > 0).length, 'Learners practicing recently', 'is-blue'),
-      ].join('');
-    }
-    if (content) {
-      content.innerHTML = requests.length ? `<div class="educator-learner-grid">${requests.map((request) => {
-        const approved = request.status === 'approved';
-        return `<article class="educator-learner-card"><div class="family-learner-card-head"><span class="family-learner-avatar">${icon(approved ? 'user' : 'lock', 20)}</span><div><span class="section-kicker">${esc(consentStatusLabel(request.status))}</span><h3>${esc(request.learner)}</h3></div></div><p>${approved ? `${request.completedLessons || 0} lessons · ${request.codingSessions || 0} coding sessions · ${request.voicePractices || 0} voice practices${request.averageVoiceScore === null ? '' : ` · ${request.averageVoiceScore}% voice average`}` : 'No learner progress is available through this connection.'}</p><small>Requested ${formatDashboardDate(request.requestedAt)}</small></article>`;
-      }).join('')}</div>` : `<div class="dashboard-empty-state"><span>${icon('school', 22)}</span><h3>No learner connections yet</h3><p>Submit a consent request above. The family will receive an Idilewa email and decide whether to share that learner’s progress.</p></div>`;
-    }
-  }
-
-  let adultDashboardLoadSequence = 0;
-  async function loadAdultDashboard() {
-    const sequence = ++adultDashboardLoadSequence;
-    const stats = document.getElementById('adult-dashboard-stats');
-    const activity = document.getElementById('adult-dashboard-activity');
-    try {
-      const user = getCurrentUser();
-      if (!user?.id) throw new Error('Sign in again to view your saved learning progress.');
-      const summary = await getAdultLearningSummary(user.id);
-      if (sequence !== adultDashboardLoadSequence || parseLocation().page !== 'adult') return;
-      if (stats) {
-        stats.innerHTML = [
-          renderMetricCard('Lessons completed', summary.completedLessons, 'Saved to your account', 'is-mint'),
-          renderMetricCard('Coding sessions', summary.codingSessions, 'Saved code exercises', 'is-blue'),
-          renderMetricCard('Voice practices', summary.voicePractices, 'Saved pronunciation practice', 'is-peach'),
-        ].join('');
-      }
-      if (activity) {
-        activity.innerHTML = summary.recentActivity.length
-          ? `<div class="family-activity-list"><strong>Recent learning</strong>${summary.recentActivity.map((item) => `<div><span>${esc(item.lessonId)}</span><small>${formatDashboardDate(item.completedAt)}</small></div>`).join('')}</div>`
-          : '<p class="dashboard-empty-inline">Your saved lesson activity will appear here as you learn.</p>';
-      }
-    } catch (error) {
-      if (sequence !== adultDashboardLoadSequence || parseLocation().page !== 'adult') return;
-      const message = error instanceof Error ? error.message : 'Your learning summary could not be loaded.';
-      if (stats) stats.innerHTML = `<div class="dashboard-error" role="alert">${esc(message)}</div>`;
-      if (activity) activity.innerHTML = '';
-    }
-  }
-
-  let dashboardLoadSequence = 0;
-  async function loadRoleDashboard(page) {
-    const sequence = ++dashboardLoadSequence;
-    const endpoint = page === 'parent_dashboard' ? '/api/dashboard/parent' : '/api/dashboard/educator';
-    try {
-      const data = await getRoleDashboard(endpoint);
-      if (sequence !== dashboardLoadSequence || parseLocation().page !== page) return;
-      if (page === 'parent_dashboard') renderParentDashboardData(data);
-      else renderEducatorDashboardData(data);
-    } catch (error) {
-      if (sequence !== dashboardLoadSequence || parseLocation().page !== page) return;
-      const message = error instanceof Error ? error.message : 'The dashboard could not be loaded.';
-      const targetIds = page === 'parent_dashboard'
-        ? ['parent-dashboard-stats', 'parent-dashboard-content', 'parent-dashboard-connections']
-        : ['educator-dashboard-stats', 'educator-dashboard-content'];
-      for (const id of targetIds) {
-        const target = document.getElementById(id);
-        if (target) target.innerHTML = `<div class="dashboard-error" role="alert">${esc(message)}</div>`;
-      }
-    }
-  }
 
   function renderPage(page, params) {
     switch (page) {
@@ -9638,7 +9538,8 @@ import {
         form.reset();
         if (feedback) feedback.textContent = result.message;
         showToast(result.message, 'success');
-        await loadRoleDashboard('educator_dashboard');
+        tutorDashboardDataPage = '';
+        await loadTutorPortalData();
       } catch (error) {
         const message = error instanceof Error ? error.message : 'The consent request could not be sent.';
         if (feedback) feedback.textContent = message;
