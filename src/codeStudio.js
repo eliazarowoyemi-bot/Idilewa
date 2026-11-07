@@ -45,6 +45,7 @@ let saveTimer;
 let canvaConfigured = false;
 let canvaPopup = null;
 let canvaPopupTimer = 0;
+let announcedGamePhase = null;
 
 function cloneDefaultProject() {
   return {
@@ -318,8 +319,17 @@ function updateGameReadout(state) {
     : state.phase === 'paused'
       ? 'Resume'
       : 'Play';
-  if (state.phase === 'complete') announcer.textContent = `${project.title} complete.`;
-  if (state.phase === 'over') announcer.textContent = `${project.title} game over.`;
+  if (state.phase !== announcedGamePhase) {
+    const announcements = {
+      ready: `${project.title} is ready to play.`,
+      running: `${project.title} started.`,
+      paused: `${project.title} paused.`,
+      complete: `${project.title} complete.`,
+      over: `${project.title} game over.`,
+    };
+    if (announcedGamePhase !== null) announcer.textContent = announcements[state.phase];
+    announcedGamePhase = state.phase;
+  }
 }
 
 function changeSettingsPanel(panel) {
