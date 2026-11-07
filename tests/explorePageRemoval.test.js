@@ -30,7 +30,7 @@ test('retired pages and unknown routes redirect to the Family homepage', async (
   for (const route of ['ere', 'ere_game']) {
     await assert.rejects(access(new URL(`../${route}.html`, import.meta.url)), { code: 'ENOENT' });
   }
-  assert.doesNotMatch(appSource, /ai-conversations|AI Chat|AI Conversations|ai-dashboard|ai-login|ai-signup|ere_game|STORY_READINGS/);
+  assert.doesNotMatch(appSource, /ai-conversations|AI Conversations|ai-dashboard|ai-login|ai-signup|ere_game|STORY_READINGS/);
   assert.doesNotMatch(appSource, /function renderDirectory|function renderBase|function renderLibrary|function renderTileGame|TILE_WORDS/);
   assert.doesNotMatch(nav, /world|Explore|Library|Tile game/);
   assert.match(appSource, /page: REMOVED_ROUTES\.has\(page\) \|\| !ROUTES\.includes\(page\) \? 'index' : page/);

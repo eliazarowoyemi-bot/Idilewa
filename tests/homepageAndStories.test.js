@@ -37,7 +37,7 @@ test('main and expanded mobile navigation omit retired pages', () => {
   assert.ok(navSource, 'main navigation list should exist');
   const navLabels = [...navSource.matchAll(/label: '([^']+)'/g)].map((match) => match[1]);
 
-  assert.deepEqual(navLabels, ['Home', 'Voice Lessons', 'For Tutors']);
+  assert.deepEqual(navLabels, ['Home', 'Voice Lessons', 'AI Conversation', 'For Tutors']);
   assert.doesNotMatch(navSource, /Curriculum|STEM Studio|Payment/);
   const mobileItems = [...mobileNavSource.matchAll(/\{ route: '([^']+)', label: '([^']+)'/g)].map((match) => [match[1], match[2]]);
   assert.deepEqual(mobileItems, [['index', 'Home'], ['voice_lessons', 'Voice'], ['profile', 'Profile']]);
@@ -58,8 +58,9 @@ test('main and expanded mobile navigation omit retired pages', () => {
 test('removed page families are absent while the retained learning destinations remain', () => {
   const routes = appSource.match(/const ROUTES = \[([\s\S]*?)\n  \];/)?.[1];
   assert.ok(routes, 'application routes should exist');
-  assert.doesNotMatch(routes, /ai-|['"]ere(?:_game)?['"]/);
-  assert.doesNotMatch(appSource, /ai-conversations|AI Chat|AI Conversations|AI_CHAT_|aic-|STORY_READINGS|renderStoryGame/);
+  assert.match(routes, /'ai-conversation'/);
+  assert.doesNotMatch(routes.replace(/'ai-conversation',?/g, ''), /ai-|['"]ere(?:_game)?['"]/);
+  assert.doesNotMatch(appSource, /ai-conversations|AI Conversations|AI_CHAT_|aic-|STORY_READINGS|renderStoryGame/);
   assert.match(appSource, /route: 'oral'/);
   assert.match(appSource, /route: 'voice_lessons'/);
 });
