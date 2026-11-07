@@ -3837,12 +3837,14 @@ import {
         </div>
       </header>
       <div class="aichat-scroll" id="aichat-scroll">
-        <div class="aichat-focus">
-          ${icon('people', 20)}
-          <select class="aichat-focus-select" aria-label="Language and conversation topic">${focusOptions}</select>
-          <span class="aichat-focus-chevron" aria-hidden="true">${icon('chevronDown', 18)}</span>
+        <div class="aichat-rail">
+          <div class="aichat-focus">
+            ${icon('people', 20)}
+            <select class="aichat-focus-select" aria-label="Language and conversation topic">${focusOptions}</select>
+            <span class="aichat-focus-chevron" aria-hidden="true">${icon('chevronDown', 18)}</span>
+          </div>
+          ${renderAiChatGuideCard()}
         </div>
-        ${renderAiChatGuideCard()}
         <div class="aichat-thread${aiConversation.showTranslation ? '' : ' aichat-thread-hide-translation'}" id="aichat-thread" role="log" aria-live="polite" aria-label="Conversation with ${esc(guide.name)}">${messages}</div>
       </div>
       <form class="aichat-composer" data-form="aichat-composer">
@@ -3854,9 +3856,49 @@ import {
     </div>`;
   }
 
+  function aiChatScrollContainers() {
+    return ['aichat-thread', 'aichat-scroll']
+      .map((id) => document.getElementById(id))
+      .filter((el) => {
+        if (!el) return false;
+        const overflowY = window.getComputedStyle(el).overflowY;
+        return (overflowY === 'auto' || overflowY === 'scroll') && el.scrollHeight > el.clientHeight + 2;
+      });
+  }
+
+  function aiChatScrollToLatest(behavior = 'smooth', options = {}) {
+    const includePage = options.includePage !== false;
+    aiChatScrollContainers().forEach((el) => {
+      if (!includePage && el.id === 'aichat-scroll') return;
+      el.scrollTo({ top: el.scrollHeight, behavior });
+    });
+    syncAiChatScrollEdges();
+  }
+
+  let aiChatEdgeSyncBound = false;
+
+  function syncAiChatScrollEdges() {
+    const thread = document.getElementById('aichat-thread');
+    if (thread) thread.classList.toggle('is-scrolled', thread.scrollTop > 4);
+    const page = document.getElementById('aichat-scroll');
+    if (!page) return;
+    const scrollable = page.scrollHeight > page.clientHeight + 2;
+    page.classList.toggle('has-more-above', scrollable && page.scrollTop > 4);
+    page.classList.toggle(
+      'has-more-below',
+      scrollable && page.scrollTop + page.clientHeight < page.scrollHeight - 6,
+    );
+  }
+
   function initializeAiConversation() {
-    const scroll = document.getElementById('aichat-scroll');
-    if (scroll) scroll.scrollTop = scroll.scrollHeight;
+    aiChatScrollContainers().forEach((el) => {
+      el.addEventListener('scroll', syncAiChatScrollEdges, { passive: true });
+    });
+    if (!aiChatEdgeSyncBound) {
+      aiChatEdgeSyncBound = true;
+      window.addEventListener('resize', syncAiChatScrollEdges, { passive: true });
+    }
+    aiChatScrollToLatest('auto', { includePage: window.innerWidth < 620 });
   }
 
   function closeAiChatPopovers() {
@@ -3908,8 +3950,7 @@ import {
     const wrapper = document.createElement('div');
     wrapper.innerHTML = message.role === 'guide' ? renderAiChatGuideMessage(message) : renderAiChatUserMessage(message);
     while (wrapper.firstElementChild) thread.appendChild(wrapper.firstElementChild);
-    const scroll = document.getElementById('aichat-scroll');
-    if (scroll) scroll.scrollTo({ top: scroll.scrollHeight, behavior: 'smooth' });
+    aiChatScrollToLatest('smooth');
   }
 
   function submitAiConversationMessage(form) {

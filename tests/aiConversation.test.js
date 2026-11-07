@@ -75,4 +75,23 @@ test('every AI chat control is wired through the shared action handler', () => {
 test('AI chat animation respects reduced motion preferences', () => {
   const reducedMotion = stylesSource.match(/@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\n\}/g) || [];
   assert.ok(reducedMotion.some((block) => /aichat/.test(block)), 'AI chat animations should be disabled for reduced motion');
+test('the AI conversation page reflows into a rail and thread workspace on wide screens', () => {
+  const tablet = stylesSource.match(/@media \(min-width: 620px\) \{[\s\S]*?\n\}/)?.[0] || '';
+  const desktop = stylesSource.match(/@media \(min-width: 1024px\) \{[\s\S]*?\n\}/)?.[0] || '';
+  assert.ok(tablet, 'a tablet breakpoint should keep the single-column shell');
+  assert.match(tablet, /\.aichat-page \{[\s\S]*?max-width: 780px;/);
+  assert.ok(desktop, 'a desktop breakpoint should own the workspace layout');
+  assert.match(desktop, /grid-template-areas:\s*\n\s*"head head"\s*\n\s*"nav\s+nav"\s*\n\s*"rail chat"\s*\n\s*"rail comp";/);
+  assert.match(desktop, /grid-template-columns: 400px minmax\(0, 1fr\);/);
+  assert.match(desktop, /\.aichat-scroll \{ display: contents; \}/);
+  assert.match(desktop, /\.aichat-rail \{[\s\S]*?overflow-y: auto;/);
+  assert.match(desktop, /\.aichat-thread \{[\s\S]*?overflow-y: auto;/);
+  assert.match(desktop, /\.aichat-tab \{[\s\S]*?flex-direction: row;/);
+  assert.match(appSource, /function aiChatScrollContainers\(\)/);
+  assert.match(appSource, /const overflowY = window\.getComputedStyle\(el\)\.overflowY;/);
+  assert.match(appSource, /thread\.classList\.toggle\('is-scrolled', thread\.scrollTop > 4\)/);
+  assert.match(stylesSource, /\.aichat-scroll\.has-more-below \{/);
+  assert.match(stylesSource, /\.aichat-thread\.is-scrolled \{/);
+});
+
 });
