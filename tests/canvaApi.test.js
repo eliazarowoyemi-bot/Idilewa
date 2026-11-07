@@ -1,10 +1,13 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import { deflateSync } from 'node:zlib';
 import { test } from 'node:test';
-import startCanva from '../api/canva/start.js';
-import canvaCallback from '../api/canva/callback.js';
-import canvaStatus from '../api/canva/status.js';
-import createCanvaDesign from '../api/canva/designs.js';
+import startCanva from '../lib/canva/start.js';
+import canvaCallback from '../lib/canva/callback.js';
+import canvaStatus from '../lib/canva/status.js';
+import createCanvaDesign from '../lib/canva/designs.js';
+import { handleCanvaRequest } from '../lib/canva/handler.js';
+import translateHandler from '../api/translate.js';
 
 const CANVA_ENV = {
   CANVA_CLIENT_ID: 'test-client-id',
@@ -12,6 +15,7 @@ const CANVA_ENV = {
   CANVA_REDIRECT_URI: 'https://www.idilewa.com/api/canva/callback',
   NODE_ENV: 'production',
 };
+const vercelConfig = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
 
 async function withCanvaEnv(action) {
   const previous = Object.fromEntries(
@@ -254,4 +258,42 @@ test('Canva status names missing setup variables without exposing values', async
       else process.env[key] = value;
     }
   }
+});
+
+test('Canva endpoints rewrite through the existing translation function', async () => {
+  const operations = ['status', 'start', 'callback', 'designs'];
+  for (const operation of operations) {
+    assert.ok(vercelConfig.rewrites.some(({ source, destination }) =>
+      source === `/api/canva/${operation}`
+      && destination === `/api/translate?service=canva&operation=${operation}`));
+  }
+
+  await withCanvaEnv(async () => {
+    const response = createResponse();
+    await translateHandler({
+      method: 'GET',
+      url: '/api/translate?service=canva&operation=status',
+      headers: {},
+    }, response);
+    assert.equal(response.statusCode, 200);
+    assert.equal(response.payload.configured, true);
+
+    const { cookieHeader, state } = await createAuthorization();
+    const callback = createResponse();
+    await translateHandler({
+      method: 'GET',
+      url: `/api/translate?service=canva&operation=callback&code=short-lived-code&state=${encodeURIComponent(state)}`,
+      headers: { cookie: cookieHeader },
+    }, callback);
+    assert.equal(callback.statusCode, 200);
+    assert.match(callback.body, /short-lived-code/);
+
+    const unknown = createResponse();
+    handleCanvaRequest({
+      method: 'GET',
+      url: '/api/translate?service=canva&operation=unknown',
+      headers: {},
+    }, unknown, 'unknown');
+    assert.equal(unknown.statusCode, 404);
+  });
 });

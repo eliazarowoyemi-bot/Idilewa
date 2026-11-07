@@ -66,6 +66,22 @@
   ],
   "rewrites": [
     {
+      "source": "/api/canva/status",
+      "destination": "/api/translate?service=canva&operation=status"
+    },
+    {
+      "source": "/api/canva/start",
+      "destination": "/api/translate?service=canva&operation=start"
+    },
+    {
+      "source": "/api/canva/callback",
+      "destination": "/api/translate?service=canva&operation=callback"
+    },
+    {
+      "source": "/api/canva/designs",
+      "destination": "/api/translate?service=canva&operation=designs"
+    },
+    {
       "source": "/api/chat",
       "destination": "/api/translate?service=chat"
     },

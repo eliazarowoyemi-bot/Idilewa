@@ -1,3 +1,5 @@
+import { handleCanvaRequest } from '../lib/canva/handler.js';
+
 const MAX_TEXT_LENGTH = 5_000;
 const LANGUAGE_CODE_PATTERN = /^[a-z]{2,3}(?:-[A-Za-z0-9]{2,8})*$/;
 const GOOGLE_TRANSLATE_URL = 'https://translation.googleapis.com/language/translate/v2';
@@ -327,8 +329,13 @@ async function handleAiChat(req, res) {
 }
 
 export default async function handler(req, res) {
-  if (new URL(req.url || '/', 'https://idilewa.local').searchParams.get('service') === 'chat') {
+  const requestUrl = new URL(req.url || '/', 'https://idilewa.local');
+  const service = requestUrl.searchParams.get('service');
+  if (service === 'chat') {
     return handleAiChat(req, res);
+  }
+  if (service === 'canva') {
+    return handleCanvaRequest(req, res, requestUrl.searchParams.get('operation'));
   }
 
   if (!['GET', 'POST'].includes(req.method)) {
