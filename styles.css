@@ -11873,14 +11873,17 @@ body[data-page="ai-conversation"] .main-content {
   font-size: 11px;
   line-height: 1.45;
 }
-.aichat-data-note {
-  grid-column: 1 / -1;
-  margin: 0;
-  padding: 0 8px;
-  color: #53675a;
-  font-size: 10px;
-  line-height: 1.35;
-  text-align: center;
+.aichat-status-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+  border: 0;
 }
 .aichat-pending {
   align-self: flex-start;
@@ -12246,7 +12249,6 @@ body[data-page="ai-conversation"] .main-content {
   .aichat-mic,
   .aichat-send { width: 58px; height: 58px; }
   .aichat-input { height: 58px; padding-inline: 20px; font-size: 18px; }
-  .aichat-data-note { font-size: 13px; }
   .aichat-settings-wrap { justify-self: end; }
   .aichat-header .aichat-settings-panel { top: calc(100% + 4px); right: 0; }
 }
@@ -12269,7 +12271,6 @@ body[data-page="ai-conversation"] .main-content {
   .aichat-mic,
   .aichat-send { width: 48px; height: 48px; }
   .aichat-input { height: 48px; font-size: 15px; }
-  .aichat-data-note { font-size: 11px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

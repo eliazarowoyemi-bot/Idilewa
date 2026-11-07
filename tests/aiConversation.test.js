@@ -46,6 +46,9 @@ test('the AI conversation screen renders the guide card, thread, composer, and t
   assert.match(appSource, /class="aichat-title">AI Conversation</);
   assert.match(appSource, /class="aichat-tabs aichat-tabs-desktop"/);
   assert.match(appSource, /class="aichat-tabs aichat-tabs-mobile"/);
+  assert.match(appSource, /id="aichat-audio-status" role="status"/);
+  assert.doesNotMatch(appSource, /Live replies use Gemini; voice input and translation use Plotweaver/);
+  assert.match(stylesSource, /\.aichat-status-sr-only\s*\{[\s\S]*?clip-path: inset\(50%\);/);
   assert.match(appSource, /data-form="aichat-composer"/);
   assert.match(appSource, /class="aichat-focus-select"/);
   assert.match(appSource, /class="aichat-input"/);

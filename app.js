@@ -3855,7 +3855,7 @@ import {
         <button type="button" class="aichat-mic" data-action="aichat-mic" aria-label="Speak your message">${icon('mic', 22)}</button>
         <input class="aichat-input" type="text" name="message" placeholder="Type or speak..." autocomplete="off" maxlength="300" aria-label="Type or speak your message" />
         <button type="submit" class="aichat-send" aria-label="Send message">${icon('send', 21)}</button>
-        <p class="aichat-data-note" id="aichat-audio-status" aria-live="polite">Live replies use Gemini; voice input and translation use Plotweaver. Avoid sharing personal details.</p>
+        <span class="aichat-status-sr-only" id="aichat-audio-status" role="status" aria-live="polite" aria-atomic="true"></span>
       </form>
       <nav class="aichat-tabs aichat-tabs-mobile" aria-label="Idilewa quick navigation">${tabs}</nav>
     </div>`;
