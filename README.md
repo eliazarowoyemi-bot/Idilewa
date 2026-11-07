@@ -13,7 +13,7 @@ The experience unifies:
 - **Language Discovery:** Foundation learning for Yorùbá, Igbo, Hausa, and Kiswahili, alongside planned paths for Twi, Wolof, isiZulu, and Fulfulde.
 - **African Voice Trainer & Sound Studio:** 60 structured lessons across Beginner, Intermediate, and Advanced tiers, Do-Re-Mi tone melodies, and phonetic visualizers.
 - **Living Oral Traditions:** Òwe (proverbs), Oríkì (praise poetry & remembrance), Ifá educational overviews, and cultural introductions.
-- **Code for Kids (K–8 STEM):** Indigenous coding environment (*ÈdèKoodu*) with turtle graphics, bilingual keyword maps, and grade-band curriculums.
+- **Code for Kids (K–8 STEM):** Age-banded lessons plus a game-building studio with playable starter games, editable rules and design/sound settings, and African-language instructions.
 - **Family & Educator Stewardship:** Parent/guardian consent demonstrations and tutor discovery with privacy-conscious safeguarding.
 
 ---
@@ -94,6 +94,7 @@ The HTML entries declared in the active `vite.config.js` are supported:
 | | `#/course` (`course.html`) | Language course tracks (3 levels, 4 modules per level, 5 lessons per module). |
 | | `#/lesson` (`lesson.html`) | Focused lesson practice, prompts, answer validation, and progress rewards. |
 | | `#/kids` (`kids.html`) | Child-centered learning portal with playful stories and coding. |
+| **Code Studio** | `code-studio.html` | Separate game-building workspace with playable Road Racer, Star Catcher, and Maze Runner projects; editable rules, design/sound settings, project import/export, and supported-language instruction translation. |
 | | `#/tutor` (`tutor.html`) | Tutor Portal with public introduction, educator sign-in/invitation signup, dashboard, learner connection requests, consent, lesson, messages, profile, availability, and settings interfaces. |
 | | `#/profile` (`profile.html`) | Learner progress dashboard, points, streaks, badges (stored in local browser state). |
 | | `#/login` (`login.html`) | Persona-based authentication (child, adult, parent, educator) with 3D shield and Supabase notice. |
@@ -156,7 +157,7 @@ Vite bundles the configured HTML entry points and compiles assets to the `dist/`
 
 ### IDE and authentication services
 
-The Code for Kids page provides age-banded coding and STEM lessons. Translation, text-to-speech, speech-to-text, and voice cloning use the server-side Plotweaver proxy when `PLOTWEAVER_API_KEY` (or the supported legacy `Idilewa` variable) is configured in the deployment environment. Live AI Conversation replies use the server-side `GEMINI_API_KEY`.
+The Code for Kids page provides age-banded coding and STEM lessons. The separate Code Studio (`/code-studio.html`) builds playable game projects and saves them in the current browser unless the learner exports a project file. Custom instruction translation uses the server-side Plotweaver proxy when `PLOTWEAVER_API_KEY` (or the supported legacy `Idilewa` variable) is configured. Canva Connect is optional: on an explicit learner action, it uploads the current game preview to the learner's Canva account and opens a new editable Canva design. The short-lived Canva authorization code and PKCE verifier are handled server-side; access tokens are not persisted by Idilewa.
 
 Configure these values in `.env.local` for the Vite client and in the deployment environment settings:
 
@@ -168,9 +169,12 @@ PLOTWEAVER_API_KEY=your-plotweaver-api-key
 GEMINI_API_KEY=your-google-gemini-api-key
 JUDGE0_URL=https://your-private-judge0-service.example
 JUDGE0_AUTH_TOKEN=your-private-runner-token
+CANVA_CLIENT_ID=your-canva-client-id
+CANVA_CLIENT_SECRET=your-canva-client-secret
+CANVA_REDIRECT_URI=https://www.idilewa.com/api/canva/callback
 ```
 
-`VITE_CONVEX_URL`, `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are public client configuration, not secrets. `PLOTWEAVER_API_KEY`, `GEMINI_API_KEY`, `JUDGE0_URL` and `JUDGE0_AUTH_TOKEN` are server-side configuration; never give them a `VITE_` prefix or place them in browser code. The client forwards the current Supabase access token to Convex and refreshes it when required. `convex/auth.config.ts` configures Convex to verify Idilewa Supabase tokens using the Supabase JWKS endpoint and ES256 signing key; do not copy a private JWT signing key into the app. For existing deployments, `SUPABASE_PUBLIC_URL` and `SUPABASE_ANON_KEY` are also supported by the Supabase client. Keep Judge0 private and configure execution time and memory limits.
+`VITE_CONVEX_URL`, `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are public client configuration, not secrets. `PLOTWEAVER_API_KEY`, `GEMINI_API_KEY`, `JUDGE0_URL`, `JUDGE0_AUTH_TOKEN`, and `CANVA_CLIENT_SECRET` are server-side configuration; never give them a `VITE_` prefix or place them in browser code. For Canva Connect, add `CANVA_CLIENT_ID`, `CANVA_CLIENT_SECRET`, and `CANVA_REDIRECT_URI` to Vercel, register the redirect URI exactly in the Canva developer app, and enable `asset:read`, `asset:write`, and `design:content:write`. The Canva button remains unavailable until those server variables are configured. The client forwards the current Supabase access token to Convex and refreshes it when required. `convex/auth.config.ts` configures Convex to verify Idilewa Supabase tokens using the Supabase JWKS endpoint and ES256 signing key; do not copy a private JWT signing key into the app. For existing deployments, `SUPABASE_PUBLIC_URL` and `SUPABASE_ANON_KEY` are also supported by the Supabase client. Keep Judge0 private and configure execution time and memory limits.
 
 Run `npx convex dev` in one terminal to deploy Convex functions and auth configuration to the configured development deployment, then run `npm run dev` in another terminal for the Vite app. The `convex/auth.whoami` query can be used to verify that a Supabase session is recognized by Convex. This auth bridge does not itself migrate Supabase tables or the existing Vercel API routes; keep those services active until their Convex replacements and data migration are separately implemented and validated.
 

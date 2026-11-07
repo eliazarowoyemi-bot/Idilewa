@@ -788,7 +788,7 @@ import {
     const pathways = [
       { icon: 'book', title: 'Learn', copy: 'African languages', route: 'voice-language' },
       { icon: 'volume', title: 'Listen', copy: 'Stories & audiobooks', route: 'voices' },
-      { icon: 'code', title: 'Code', copy: 'Build skills in your language', route: 'kids' },
+      { icon: 'code', title: 'Code', copy: 'Build games and learn by making', route: 'code-studio' },
       { icon: 'people', title: 'Join', copy: 'A global community', route: 'connect_students' }
     ];
     return `<div class="home-reference-page">
@@ -800,7 +800,7 @@ import {
             <p class="hero-lede">Learn African languages, hear our stories, build real skills and belong to a global community.</p>
             <div class="hero-actions home-reference-actions">
               ${routeLink('voice-language', `Start Learning ${icon('arrow', 17)}`, 'button button-primary')}
-              ${routeLink('kids', `Code for Kids ${icon('code', 17)}`, 'button button-outline')}
+              <a class="button button-outline" href="./code-studio.html">Code for Kids ${icon('code', 17)}</a>
             </div>
             <div class="hero-social-proof home-reference-proof"><span class="home-reference-proof-mark">${icon('globe', 19)}</span><span>Culture, creativity and learning<br />for every generation.</span></div>
           </div>
@@ -811,7 +811,7 @@ import {
       </section>
       ${renderHomeAppPreview()}
       <section class="container landing-pathways" aria-label="Explore Idilewa">
-        ${pathways.map((item) => `<a class="landing-pathway" href="#/${item.route}" data-route="${item.route}"><span>${icon(item.icon, 23)}</span><strong>${item.title}</strong><small>${item.copy}</small></a>`).join('')}
+        ${pathways.map((item) => `<a class="landing-pathway" href="${item.route === 'code-studio' ? './code-studio.html' : `#/${item.route}`}" ${item.route === 'code-studio' ? '' : `data-route="${item.route}"`}><span>${icon(item.icon, 23)}</span><strong>${item.title}</strong><small>${item.copy}</small></a>`).join('')}
       </section>
       <section class="container section" aria-labelledby="home-voice-tools-title">
         <div class="section-heading"><div><span class="section-kicker">AI-powered language tools</span><h2 id="home-voice-tools-title">Listen, translate and speak</h2><p>Open the dedicated tools for live text translation, speech and voice practice.</p></div></div>

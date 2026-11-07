@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ecfef1" />
+    <title>Code Studio | Idilewa</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./styles/code-studio.css" />
+  </head>
+  <body class="code-studio-page">
+    <a class="studio-skip-link" href="#studio-main">Skip to Code Studio</a>
+    <header class="studio-header">
+      <a class="studio-wordmark" href="./index.html" aria-label="Idilewa home">
+        <span>idilewa</span><span class="studio-wordmark-divider" aria-hidden="true"></span><span class="studio-wordmark-section">code studio</span>
+      </a>
+      <div class="studio-header-actions">
+        <span id="save-status" class="studio-save-status" role="status">Saved on this device</span>
+        <button id="save-project" class="studio-button studio-button-secondary" type="button">Save project</button>
+        <button id="import-project" class="studio-button studio-button-secondary" type="button">Import</button>
+        <button id="export-project" class="studio-button studio-button-primary" type="button">Export project</button>
+        <input id="project-file" class="studio-visually-hidden" type="file" accept="application/json,.json" />
+      </div>
+    </header>
+
+    <main id="studio-main" class="studio-main">
+      <section class="studio-intro" aria-labelledby="studio-title">
+        <div>
+          <h1 id="studio-title">Build a game that works.</h1>
+          <p>Choose a playable starting point, change the rules, then test it on the stage. Your project stays in this browser.</p>
+        </div>
+        <a class="studio-back-link" href="./index.html">Back to Idilewa</a>
+      </section>
+
+      <div class="studio-layout">
+        <aside class="studio-sidebar" aria-label="Game project controls">
+          <nav class="studio-tabs" role="tablist" aria-label="Project settings">
+            <button id="settings-tab-build" class="studio-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="settings-panel-build" data-settings-tab="build">Build</button>
+            <button id="settings-tab-design" class="studio-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-panel-design" data-settings-tab="design" tabindex="-1">Design</button>
+            <button id="settings-tab-sound" class="studio-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-panel-sound" data-settings-tab="sound" tabindex="-1">Sound</button>
+            <button id="settings-tab-language" class="studio-tab" type="button" role="tab" aria-selected="false" aria-controls="settings-panel-language" data-settings-tab="language" tabindex="-1">Language</button>
+          </nav>
+
+          <section id="settings-panel-build" class="studio-settings-panel" role="tabpanel" aria-labelledby="settings-tab-build" data-settings-panel="build">
+            <div class="studio-panel-heading">
+              <h2>Start with a game</h2>
+              <p>Each example already runs. Make it yours.</p>
+            </div>
+            <label class="studio-field">
+              <span>Starter game</span>
+              <select id="game-template">
+                <option value="race">Road racer</option>
+                <option value="catch">Star catcher</option>
+                <option value="maze">Maze runner</option>
+              </select>
+            </label>
+            <label class="studio-field">
+              <span>Project name</span>
+              <input id="project-name" type="text" maxlength="60" autocomplete="off" />
+            </label>
+            <div class="studio-block-heading">
+              <div>
+                <h3>Your game rules</h3>
+                <p>Turn rules on or off to change the game.</p>
+              </div>
+            </div>
+            <div id="block-stack" class="studio-block-stack" aria-label="Game rules"></div>
+            <div class="studio-add-block">
+              <label class="studio-field" for="block-picker">Add a rule</label>
+              <div class="studio-add-block-row">
+                <select id="block-picker" aria-label="Choose a rule to add">
+                  <option value="movement">Player controls</option>
+                  <option value="hazards">Game objects</option>
+                  <option value="score">Score points</option>
+                  <option value="sound">Play a sound</option>
+                </select>
+                <button id="add-block" class="studio-button studio-button-secondary" type="button">Add</button>
+              </div>
+            </div>
+          </section>
+
+          <section id="settings-panel-design" class="studio-settings-panel" role="tabpanel" aria-labelledby="settings-tab-design" data-settings-panel="design" hidden>
+            <div class="studio-panel-heading">
+              <h2>Shape the stage</h2>
+              <p>Change the game’s look without uploading artwork.</p>
+            </div>
+            <label class="studio-field">
+              <span>Game title</span>
+              <input id="game-title" type="text" maxlength="48" autocomplete="off" />
+            </label>
+            <label class="studio-field">
+              <span>Stage setting</span>
+              <select id="stage-theme">
+                <option value="night">Night track</option>
+                <option value="morning">Morning park</option>
+                <option value="canopy">Green canopy</option>
+              </select>
+            </label>
+            <label class="studio-field studio-color-field">
+              <span>Player color</span>
+              <input id="player-color" type="color" value="#f4b740" />
+            </label>
+            <label class="studio-field">
+              <span>Game speed <output id="speed-value" for="game-speed">1.0×</output></span>
+              <input id="game-speed" type="range" min="0.7" max="1.8" step="0.1" value="1" />
+            </label>
+            <p class="studio-hint">Try a change, then press Play to see how it feels.</p>
+          </section>
+
+          <section id="settings-panel-sound" class="studio-settings-panel" role="tabpanel" aria-labelledby="settings-tab-sound" data-settings-panel="sound" hidden>
+            <div class="studio-panel-heading">
+              <h2>Set the sound</h2>
+              <p>Optional synthesized tones; no sound plays unless enabled.</p>
+            </div>
+            <label class="studio-switch-field">
+              <span><strong>Sound effects</strong><small>Play a short tone for game events</small></span>
+              <input id="sound-enabled" type="checkbox" />
+            </label>
+            <label class="studio-field">
+              <span>Tone style</span>
+              <select id="sound-style">
+                <option value="warm">Warm</option>
+                <option value="clear">Clear</option>
+                <option value="soft">Soft</option>
+              </select>
+            </label>
+            <label class="studio-field">
+              <span>Volume <output id="volume-value" for="sound-volume">35%</output></span>
+              <input id="sound-volume" type="range" min="0" max="100" step="5" value="35" />
+            </label>
+            <label class="studio-field">
+              <span>Beat tempo <output id="tempo-value" for="sound-tempo">100 BPM</output></span>
+              <input id="sound-tempo" type="range" min="60" max="160" step="5" value="100" />
+            </label>
+            <button id="preview-sound" class="studio-button studio-button-secondary" type="button">Try a tone</button>
+            <p id="sound-status" class="studio-hint" role="status">Sound is off.</p>
+          </section>
+
+          <section id="settings-panel-language" class="studio-settings-panel" role="tabpanel" aria-labelledby="settings-tab-language" data-settings-panel="language" hidden>
+            <div class="studio-panel-heading">
+              <h2>Give your game a voice</h2>
+              <p>Translate the instruction shown on the game stage.</p>
+            </div>
+            <label class="studio-field">
+              <span>Translate English to</span>
+              <select id="target-language">
+                <option value="yo">Yorùbá</option>
+                <option value="ig">Igbo</option>
+                <option value="ha">Hausa</option>
+                <option value="pcm">Nigerian Pidgin</option>
+                <option value="sw">Kiswahili</option>
+              </select>
+            </label>
+            <label class="studio-field">
+              <span>Game instruction in English</span>
+              <textarea id="game-instruction" rows="3" maxlength="500">Use the left and right arrow keys to steer. Avoid traffic.</textarea>
+            </label>
+            <button id="translate-game-text" class="studio-button studio-button-primary" type="button">Translate instruction</button>
+            <p id="translation-status" class="studio-hint" role="status">Only this instruction is sent to Idilewa’s translation service when you translate.</p>
+            <label class="studio-field">
+              <span>Translation (review and edit before using)</span>
+              <textarea id="translated-instruction" rows="3" maxlength="500" placeholder="Your translation will appear here."></textarea>
+            </label>
+            <button id="apply-translation" class="studio-button studio-button-secondary" type="button">Use in game</button>
+            <p class="studio-hint">Machine translation can miss local meaning. Ask a fluent speaker to review it.</p>
+          </section>
+        </aside>
+
+        <section class="studio-workspace" aria-label="Game workspace">
+          <header class="studio-workspace-header">
+            <div>
+              <h2 id="workspace-project-title">Road Racer</h2>
+              <p id="workspace-project-description">Steer between lanes and make it to the finish.</p>
+            </div>
+            <div class="studio-workspace-actions">
+              <button id="run-game" class="studio-button studio-button-primary" type="button">
+                <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M6.5 4.8v10.4L15 10 6.5 4.8Z" fill="currentColor" /></svg>
+                <span>Play</span>
+              </button>
+              <button id="reset-game" class="studio-button studio-button-secondary" type="button">
+                <svg aria-hidden="true" viewBox="0 0 20 20"><path d="M4.2 9a5.9 5.9 0 1 1 .8 4.5M4.2 4.9V9h4.1" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.7" /></svg>
+                <span>Reset</span>
+              </button>
+            </div>
+          </header>
+
+          <nav class="studio-workspace-tabs" role="tablist" aria-label="Workspace view">
+            <button id="workspace-tab-stage" class="studio-workspace-tab is-active" type="button" role="tab" aria-selected="true" aria-controls="workspace-panel-stage" data-workspace-tab="stage">Game stage</button>
+            <button id="workspace-tab-code" class="studio-workspace-tab" type="button" role="tab" aria-selected="false" aria-controls="workspace-panel-code" data-workspace-tab="code" tabindex="-1">Project code</button>
+          </nav>
+
+          <section id="workspace-panel-stage" class="studio-stage-panel" role="tabpanel" aria-labelledby="workspace-tab-stage" data-workspace-panel="stage">
+            <div class="studio-stage-wrap">
+              <canvas id="game-stage" width="960" height="540" tabindex="0" aria-label="Playable Road Racer preview. Select the stage, then use the left and right arrow keys."></canvas>
+            </div>
+            <div class="studio-stage-footer">
+              <p id="game-status" class="studio-game-status" role="status" aria-live="polite">Ready to play</p>
+              <p id="game-score" class="studio-game-score">Score <strong>0</strong><span aria-hidden="true"> · </span>Lives <strong>3</strong></p>
+            </div>
+            <p id="game-instruction-preview" class="studio-game-instruction"></p>
+            <div class="studio-play-controls">
+              <p>Click the stage, then use the arrow keys. On touch screens, use these controls.</p>
+              <div class="studio-dpad" role="group" aria-label="Touch game controls">
+                <button type="button" data-direction="up" aria-label="Move up">
+                  <svg aria-hidden="true" viewBox="0 0 20 20"><path d="m4.5 12.5 5.5-5 5.5 5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" /></svg>
+                </button>
+                <button type="button" data-direction="left" aria-label="Move left">
+                  <svg aria-hidden="true" viewBox="0 0 20 20"><path d="m12.5 4.5-5 5.5 5 5.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" /></svg>
+                </button>
+                <button type="button" data-direction="down" aria-label="Move down">
+                  <svg aria-hidden="true" viewBox="0 0 20 20"><path d="m4.5 7.5 5.5 5 5.5-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" /></svg>
+                </button>
+                <button type="button" data-direction="right" aria-label="Move right">
+                  <svg aria-hidden="true" viewBox="0 0 20 20"><path d="m7.5 4.5 5 5.5-5 5.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" /></svg>
+                </button>
+              </div>
+            </div>
+            <div class="studio-canva-row">
+              <div>
+                <h3>Design game art in Canva</h3>
+                <p id="canva-status" role="status">Checking Canva connection…</p>
+                <small>Sign in to Canva when you request an artboard. The current game preview is uploaded as a starting image; the playable game stays here.</small>
+              </div>
+              <div class="studio-canva-actions">
+                <button id="open-canva" class="studio-button studio-button-secondary" type="button" disabled>Connect &amp; open Canva</button>
+              </div>
+            </div>
+          </section>
+
+          <section id="workspace-panel-code" class="studio-code-panel" role="tabpanel" aria-labelledby="workspace-tab-code" data-workspace-panel="code" hidden>
+            <div class="studio-code-heading">
+              <div>
+                <h3>Project settings</h3>
+                <p>This JSON describes the rules and settings used by the game preview.</p>
+              </div>
+              <button id="copy-project-code" class="studio-button studio-button-secondary" type="button">Copy settings</button>
+            </div>
+            <pre class="studio-code-output"><code id="project-code"></code></pre>
+            <p class="studio-hint">Change the blocks or design settings to update this project. The playable preview uses Idilewa’s game engine.</p>
+          </section>
+        </section>
+      </div>
+      <p id="studio-announcer" class="studio-visually-hidden" role="status" aria-live="polite"></p>
+    </main>
+    <script type="module" src="./src/codeStudio.js"></script>
+  </body>
+</html>

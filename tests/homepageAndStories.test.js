@@ -14,7 +14,7 @@ test('homepage follows the Family Living View mobile reference', () => {
   assert.match(homeSource, /Learn African languages, hear our stories, build real skills and belong to a global community/);
   assert.match(homeSource, /Start Learning/);
   assert.match(homeSource, /Code for Kids/);
-  assert.match(homeSource, /routeLink\('kids', `Code for Kids/);
+  assert.match(homeSource, /href="\.\/code-studio\.html">Code for Kids/);
   assert.doesNotMatch(homeSource, /AI Conversation/);
   assert.match(homeSource, /\$\{renderHomeAppPreview\(\)\}/);
   assert.match(homeSource, /class="container landing-pathways"/);
