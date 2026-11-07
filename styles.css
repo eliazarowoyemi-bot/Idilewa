@@ -12079,7 +12079,7 @@ body[data-page="ai-conversation"] .main-content {
    -------------------------------------------------------------------------- */
 @media (min-width: 1024px) {
   body[data-page="ai-conversation"] {
-    padding: 12px 0;
+    padding: 0;
     background:
       radial-gradient(1200px 720px at 6% -14%, #d3eeda, transparent 66%),
       radial-gradient(1100px 620px at 104% 112%, #e9f8d8, transparent 62%),
@@ -12088,6 +12088,7 @@ body[data-page="ai-conversation"] .main-content {
   body[data-page="ai-conversation"] #app.app-shell {
     width: 100%;
     max-width: none;
+    margin: 0;
   }
   .aichat-page {
     display: grid;
@@ -12097,11 +12098,11 @@ body[data-page="ai-conversation"] .main-content {
       "head head"
       "rail chat"
       "rail comp";
-    width: min(96%, 1800px);
-    max-width: 1800px;
-    height: calc(100svh - 24px);
-    min-height: min(680px, calc(100svh - 24px));
-    border-radius: 28px;
+    width: 100%;
+    max-width: none;
+    height: 100svh;
+    min-height: 100svh;
+    border-radius: 0;
   }
   .aichat-canvas {
     border-radius: 28px;

@@ -111,9 +111,9 @@ test('the AI conversation page reflows into a rail and thread workspace on wide 
   assert.match(appSource, /thread\.classList\.toggle\('is-scrolled', thread\.scrollTop > 4\)/);
   assert.match(stylesSource, /\.aichat-scroll\.has-more-below \{/);
   assert.match(stylesSource, /\.aichat-thread\.is-scrolled \{/);
-  assert.match(desktop, /width: min\(96%, 1800px\);/);
-  assert.match(desktop, /max-width: 1800px;/);
-  assert.match(desktop, /height: calc\(100svh - 24px\);/);
+  assert.match(desktop, /width: 100%;/);
+  assert.match(desktop, /max-width: none;/);
+  assert.match(desktop, /height: 100svh;/);
 });
 
 });
