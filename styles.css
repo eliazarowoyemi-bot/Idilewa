@@ -11346,6 +11346,10 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
    ========================================================================== */
 body[data-page="ai-conversation"] {
   background: #e8f7ee;
+  display: flex;
+  flex-direction: column;
+  height: 100svh;
+  min-height: 100svh;
   overflow: hidden;
 }
 body[data-page="ai-conversation"] .site-header,
@@ -11353,7 +11357,25 @@ body[data-page="ai-conversation"] .mobile-nav,
 body[data-page="ai-conversation"] .skip-link,
 body[data-page="ai-conversation"] .site-footer,
 body[data-page="ai-conversation"] .page-information-layers { display: none !important; }
-body[data-page="ai-conversation"] .main-content { padding: 0; min-height: 100svh; }
+body[data-page="ai-conversation"] #app.app-shell {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  width: 100%;
+  max-width: none;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+}
+body[data-page="ai-conversation"] .main-content {
+  display: flex;
+  flex: 1 1 auto;
+  width: 100%;
+  max-width: none;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+}
 
 .aichat-page {
   --aichat-surface: #eaf8f0;
@@ -11369,7 +11391,7 @@ body[data-page="ai-conversation"] .main-content { padding: 0; min-height: 100svh
   flex-direction: column;
   width: 100%;
   height: 100svh;
-  min-height: 100svh;
+  min-height: 0;
   margin: 0 auto;
   overflow: hidden;
   background: var(--aichat-surface);
@@ -11845,6 +11867,31 @@ body[data-page="ai-conversation"] .main-content { padding: 0; min-height: 100svh
   right: 0;
   width: 248px;
 }
+.aichat-privacy-note {
+  margin: 0 0 12px;
+  color: #53675a;
+  font-size: 11px;
+  line-height: 1.45;
+}
+.aichat-data-note {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 0 8px;
+  color: #53675a;
+  font-size: 10px;
+  line-height: 1.35;
+  text-align: center;
+}
+.aichat-pending {
+  align-self: flex-start;
+  margin: 0 0 4px 54px;
+  padding: 8px 12px;
+  border: 1px solid var(--aichat-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .72);
+  color: #53675a;
+  font-size: 12px;
+}
 .aichat-guide-menu {
   top: calc(100% + 8px);
   right: 0;
@@ -11950,6 +11997,10 @@ body[data-page="ai-conversation"] .main-content { padding: 0; min-height: 100svh
       radial-gradient(760px 460px at 104% 108%, #e7f7d7, transparent 58%),
       #e8f7ee;
   }
+  body[data-page="ai-conversation"] #app.app-shell {
+    width: min(100%, 780px);
+    max-width: 780px;
+  }
   .aichat-page {
     max-width: 780px;
     height: min(1000px, calc(100svh - 48px));
@@ -12030,6 +12081,10 @@ body[data-page="ai-conversation"] .main-content { padding: 0; min-height: 100svh
       radial-gradient(900px 560px at 104% 112%, #e9f8d8, transparent 58%),
       #e8f7ee;
   }
+  body[data-page="ai-conversation"] #app.app-shell {
+    width: min(100%, 1320px);
+    max-width: 1320px;
+  }
   .aichat-page {
     display: grid;
     grid-template-columns: 400px minmax(0, 1fr);
@@ -12040,8 +12095,8 @@ body[data-page="ai-conversation"] .main-content { padding: 0; min-height: 100svh
       "rail chat"
       "rail comp";
     width: 100%;
-    max-width: 1240px;
-    height: min(920px, calc(100svh - 72px));
+    max-width: 1320px;
+    height: min(820px, calc(100svh - 72px));
     border-radius: 28px;
   }
   .aichat-canvas { border-radius: 28px; }
@@ -12098,8 +12153,9 @@ body[data-page="ai-conversation"] .main-content { padding: 0; min-height: 100svh
   .aichat-focus { flex: 0 0 auto; height: 46px; margin: 0; padding: 0 18px; }
   .aichat-guide {
     flex: 1 1 auto;
+    min-height: 0;
     grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: minmax(140px, 1fr) auto;
+    grid-template-rows: minmax(0, 1fr) auto;
     gap: 0;
     margin: 0;
     padding: 9px;
@@ -12174,4 +12230,3 @@ body[data-page="ai-conversation"] .main-content { padding: 0; min-height: 100svh
 @media (prefers-reduced-motion: reduce) {
   .mobile-navigation-item { transition: none; }
 }
-

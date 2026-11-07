@@ -26,6 +26,7 @@ import {
   transcribeWithPlotweaver,
   translateWithPlotweaver
 } from './src/plotweaverClient.js';
+import { sendAiChatMessage } from './src/aiChatClient.js';
 import {
   NASAL_VOWELS,
   CONSONANTS,
@@ -3672,8 +3673,7 @@ import {
 
   /* ==========================================================================
      AI Conversation · Speak · Learn · Translate · Practise
-     One guided journey: welcome → choose language → choose topic → chat.
-     No live AI service is contacted; replies come from the local script below.
+     Guided language practice with Gemini replies and Plotweaver voice tools.
      ========================================================================== */
   const AICHAT_GUIDES = [
     {
@@ -3681,7 +3681,6 @@ import {
       name: 'Iya Aduke',
       photo: 'yoruba-educator-woman.jpg',
       alt: 'Ìyá Adúkẹ́, a Yorùbá conversation guide wearing a green gèlè and coral beads',
-      guideLabel: 'Yorùbá guide',
       tagline: "Let's learn Yorùbá together!",
     },
     {
@@ -3689,17 +3688,17 @@ import {
       name: 'Bàbá Tundé',
       photo: 'yoruba-educator-man.jpg',
       alt: 'Bàbá Tundé, a Yorùbá conversation guide dressed for a heritage story session',
-      guideLabel: 'Yorùbá guide',
       tagline: "Let's learn Yorùbá together!",
     },
   ];
 
-  const AICHAT_FOCUS_OPTIONS = [
-    'Yorùbá · Family & Friends',
-    'Igbo · Family & Friends',
-    'Hausa · Family & Friends',
-    'Kiswahili · Family & Friends',
+  const AICHAT_LANGUAGES = [
+    { label: 'Yorùbá · Family & Friends', name: 'Yorùbá', code: 'yo', locale: 'yo-NG' },
+    { label: 'Igbo · Family & Friends', name: 'Igbo', code: 'ig', locale: 'ig-NG' },
+    { label: 'Hausa · Family & Friends', name: 'Hausa', code: 'ha', locale: 'ha-NG' },
+    { label: 'Kiswahili · Family & Friends', name: 'Kiswahili', code: 'sw', locale: 'sw-KE' },
   ];
+  const AICHAT_FOCUS_OPTIONS = AICHAT_LANGUAGES.map(({ label }) => label);
 
   const AICHAT_PHRASE = 'Ó dáa! Kí ni ó fẹ́ bá mi sọ̀rọ̀ lónìí?';
   const AICHAT_TRANSLATION = 'Great! What would you like to talk about today?';
@@ -3707,15 +3706,8 @@ import {
   const AICHAT_SEED_MESSAGES = [
     { id: 'aichat-seed-1', role: 'user', text: 'Hello', time: '10:25' },
     { id: 'aichat-seed-2', role: 'guide', yoruba: AICHAT_PHRASE, english: AICHAT_TRANSLATION, time: '10:25', controls: true },
-    { id: 'aichat-seed-3', role: 'user', text: 'Mo fẹ ko komi ni iwe', time: '10:25' },
+    { id: 'aichat-seed-3', role: 'user', text: 'Mo fẹ́ kọ́ Yorùbá.', time: '10:25' },
     { id: 'aichat-seed-4', role: 'guide', yoruba: AICHAT_PHRASE, english: AICHAT_TRANSLATION, time: '10:25', controls: false },
-  ];
-
-  const AICHAT_REPLIES = [
-    { yoruba: AICHAT_PHRASE, english: AICHAT_TRANSLATION },
-    { yoruba: 'Ó dára gan-an! Ẹ jẹ́ ká tẹ̀síwájú.', english: 'Wonderful! Let us keep going.' },
-    { yoruba: 'Mo gbọ́ ọ dáadáa. Sọ ọ́ lẹ́ẹ̀kan sí i.', english: 'I hear you clearly. Say it once more.' },
-    { yoruba: 'Ẹ ṣé púpọ̀! Ẹ kọ́ ẹ̀kọ́ tuntun lónìí.', english: 'Thank you! You learned something new today.' },
   ];
 
   const AICHAT_TABS = [
@@ -3736,10 +3728,19 @@ import {
     sequence: AICHAT_SEED_MESSAGES.length,
     messages: AICHAT_SEED_MESSAGES.map((message) => ({ ...message })),
   };
-  let aiChatRecognition = null;
   let aiChatListening = false;
+  let aiChatStream = null;
+  let aiChatRecorder = null;
+  let aiChatRecordingChunks = [];
+  let aiChatRecordingTimer = null;
+  let aiChatRequestController = null;
+  let aiChatSpeechController = null;
+  let aiChatAudio = null;
+  let aiChatAudioUrl = null;
+  let aiChatPageActive = false;
 
   const aiChatGuide = () => AICHAT_GUIDES.find((guide) => guide.id === aiConversation.guideId) || AICHAT_GUIDES[0];
+  const aiChatLanguage = () => AICHAT_LANGUAGES.find(({ label }) => label === aiConversation.focus) || AICHAT_LANGUAGES[0];
 
   const aiChatWave = `<svg class="aichat-wave" viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 9v2M6 5.5v5M10 2.5v11M14 5v6M18 3.5v9M22 7v2"/></svg>`;
 
@@ -3761,6 +3762,7 @@ import {
 
   function renderAiChatGuideCard() {
     const guide = aiChatGuide();
+    const language = aiChatLanguage();
     return `<section class="aichat-guide" aria-label="Your language guide">
       <div class="aichat-guide-media">
         <img src="${imageUrl(guide.photo)}" alt="${esc(guide.alt)}" width="480" height="640" loading="eager" decoding="async" />
@@ -3770,7 +3772,7 @@ import {
           <h2>${esc(guide.name)}</h2>
           <span class="aichat-verified" role="img" aria-label="Verified guide">${icon('check', 13)}</span>
         </div>
-        <p class="aichat-guide-role"><em>${esc(guide.guideLabel)}</em>${aiChatWave}</p>
+        <p class="aichat-guide-role"><em>${esc(language.name)} guide</em>${aiChatWave}</p>
         <p class="aichat-guide-tagline">${esc(guide.tagline)}</p>
         <div class="aichat-guide-change-wrap">
           <button type="button" class="aichat-change-guide" data-action="aichat-change-guide" aria-expanded="false" aria-controls="aichat-guide-menu">${icon('refresh', 15)}<span>Change guide</span>${icon('chevronDown', 15)}</button>
@@ -3795,8 +3797,8 @@ import {
     return `<div class="aichat-row aichat-row-guide" data-message="${esc(message.id)}">
       <span class="aichat-avatar aichat-avatar-bot" aria-hidden="true">${icon('bot', 22)}</span>
       <div class="aichat-bubble aichat-bubble-guide">
-        <p class="aichat-yoruba" lang="yo">${esc(message.yoruba)}</p>
-        <p class="aichat-english"><span class="aichat-english-icon" aria-hidden="true">${icon('globe', 16)}</span><span>${esc(message.english)}</span></p>
+        <p class="aichat-yoruba" lang="${esc(message.languageCode || aiChatLanguage().code)}">${esc(message.yoruba)}</p>
+        ${message.english ? `<p class="aichat-english"><span class="aichat-english-icon" aria-hidden="true">${icon('globe', 16)}</span><span>${esc(message.english)}</span></p>` : ''}
         <span class="aichat-time">${esc(message.time)}</span>
       </div>
     </div>${message.controls ? renderAiChatControls() : ''}`;
@@ -3831,6 +3833,7 @@ import {
           <button type="button" class="aichat-iconbtn aichat-iconbtn-mint" data-action="aichat-settings" aria-expanded="false" aria-controls="aichat-settings" aria-label="Conversation settings">${icon('settings', 21)}</button>
           <div class="aichat-popover aichat-settings-panel" id="aichat-settings" hidden>
             <p class="aichat-popover-title">Conversation settings</p>
+            <p class="aichat-privacy-note">Live replies use Google Gemini. Voice and translation use Plotweaver. Avoid sharing personal details.</p>
             <div class="aichat-switch-row"><span>Show translation</span><button type="button" class="aichat-switch" role="switch" aria-checked="${aiConversation.showTranslation}" aria-label="Show translation" data-action="aichat-toggle-translation"></button></div>
             <div class="aichat-switch-row"><span>Auto-play replies</span><button type="button" class="aichat-switch" role="switch" aria-checked="${aiConversation.autoSpeak}" aria-label="Auto-play replies" data-action="aichat-toggle-autospeak"></button></div>
           </div>
@@ -3851,6 +3854,7 @@ import {
         <button type="button" class="aichat-mic" data-action="aichat-mic" aria-label="Speak your message">${icon('mic', 22)}</button>
         <input class="aichat-input" type="text" name="message" placeholder="Type or speak..." autocomplete="off" maxlength="300" aria-label="Type or speak your message" />
         <button type="submit" class="aichat-send" aria-label="Send message">${icon('send', 21)}</button>
+        <p class="aichat-data-note" id="aichat-audio-status" aria-live="polite">Live replies use Gemini; voice input and translation use Plotweaver. Avoid sharing personal details.</p>
       </form>
       <nav class="aichat-tabs" aria-label="Idilewa quick navigation">${tabs}</nav>
     </div>`;
@@ -3891,6 +3895,7 @@ import {
   }
 
   function initializeAiConversation() {
+    aiChatPageActive = true;
     aiChatScrollContainers().forEach((el) => {
       el.addEventListener('scroll', syncAiChatScrollEdges, { passive: true });
     });
@@ -3924,22 +3929,41 @@ import {
     return guideMessages[guideMessages.length - 1]?.yoruba || AICHAT_PHRASE;
   }
 
-  function aiChatSpeak(text) {
-    if (typeof window === 'undefined' || !window.speechSynthesis || typeof window.SpeechSynthesisUtterance !== 'function') {
-      showToast('Audio playback is not available in this browser.', 'error');
-      return false;
+  function releaseAiChatAudio() {
+    if (aiChatAudio) {
+      aiChatAudio.pause();
+      aiChatAudio.removeAttribute('src');
+      aiChatAudio.load();
+      aiChatAudio = null;
     }
+    if (aiChatAudioUrl) {
+      URL.revokeObjectURL(aiChatAudioUrl);
+      aiChatAudioUrl = null;
+    }
+  }
+
+  async function aiChatSpeak(text) {
+    aiChatSpeechController?.abort();
+    releaseAiChatAudio();
+    const controller = new AbortController();
+    aiChatSpeechController = controller;
     try {
-      window.speechSynthesis.cancel();
-      const utterance = new window.SpeechSynthesisUtterance(text);
-      utterance.lang = 'yo-NG';
-      utterance.rate = aiConversation.rate;
-      const yorubaVoice = window.speechSynthesis.getVoices().find((voice) => /^yo/i.test(voice.lang));
-      if (yorubaVoice) utterance.voice = yorubaVoice;
-      window.speechSynthesis.speak(utterance);
+      const audioBlob = await synthesizePlotweaverSpeech({
+        text,
+        language: aiChatLanguage().code,
+        signal: controller.signal,
+      });
+      if (controller.signal.aborted || !aiChatPageActive) return false;
+      aiChatAudioUrl = URL.createObjectURL(audioBlob);
+      aiChatAudio = new Audio(aiChatAudioUrl);
+      aiChatAudio.playbackRate = aiConversation.rate;
+      aiChatAudio.addEventListener('ended', releaseAiChatAudio, { once: true });
+      await aiChatAudio.play();
       return true;
     } catch (error) {
-      showToast('The guide voice could not start on this device.', 'error');
+      if (controller.signal.aborted) return false;
+      showToast(error instanceof Error ? error.message : 'Plotweaver could not play this reply.', 'error');
+      releaseAiChatAudio();
       return false;
     }
   }
@@ -3953,7 +3977,19 @@ import {
     aiChatScrollToLatest('smooth');
   }
 
-  function submitAiConversationMessage(form) {
+  function showAiChatReplyPending() {
+    const thread = document.getElementById('aichat-thread');
+    if (!thread) return null;
+    const status = document.createElement('p');
+    status.className = 'aichat-pending';
+    status.setAttribute('role', 'status');
+    status.textContent = 'Your guide is thinking…';
+    thread.append(status);
+    aiChatScrollToLatest('smooth');
+    return status;
+  }
+
+  async function submitAiConversationMessage(form) {
     const input = form.querySelector('.aichat-input');
     const text = (input?.value || '').replace(/\s+/g, ' ').trim();
     if (!text) {
@@ -3961,75 +3997,212 @@ import {
       input?.focus();
       return;
     }
-    input.value = '';
-    aiConversation.sequence += 1;
-    const message = { id: `aichat-${aiConversation.sequence}`, role: 'user', text: text.slice(0, 300), time: aiChatTimeStamp() };
-    aiConversation.messages.push(message);
-    appendAiChatMessage(message);
-    const reply = AICHAT_REPLIES[aiConversation.sequence % AICHAT_REPLIES.length];
-    window.setTimeout(() => {
-      if (document.body.dataset.page !== 'ai-conversation' || !document.getElementById('aichat-thread')) return;
+    const submitButton = form.querySelector('button[type="submit"]');
+    const pending = showAiChatReplyPending();
+    const controller = new AbortController();
+    aiChatRequestController?.abort();
+    aiChatRequestController = controller;
+    input.disabled = true;
+    if (submitButton) submitButton.disabled = true;
+    form.setAttribute('aria-busy', 'true');
+
+    const history = aiConversation.messages
+      .slice(-10)
+      .map((message) => ({
+        role: message.role === 'guide' ? 'model' : 'user',
+        text: message.role === 'guide' ? message.yoruba : message.text,
+      }));
+    history.push({ role: 'user', text });
+
+    try {
+      const result = await sendAiChatMessage({
+        language: aiChatLanguage().code,
+        messages: history,
+        signal: controller.signal,
+      });
+      if (controller.signal.aborted) return;
+      input.value = '';
+      aiConversation.sequence += 1;
+      const message = { id: `aichat-${aiConversation.sequence}`, role: 'user', text, time: aiChatTimeStamp() };
+      aiConversation.messages.push(message);
+      appendAiChatMessage(message);
       aiConversation.sequence += 1;
       const guideMessage = {
         id: `aichat-${aiConversation.sequence}`,
         role: 'guide',
-        yoruba: reply.yoruba,
-        english: reply.english,
+        yoruba: result.reply,
+        english: result.translation,
+        languageCode: aiChatLanguage().code,
         time: aiChatTimeStamp(),
         controls: false,
       };
       aiConversation.messages.push(guideMessage);
       appendAiChatMessage(guideMessage);
-      if (aiConversation.autoSpeak) aiChatSpeak(reply.yoruba);
-    }, 620);
-    input.focus();
+      if (aiConversation.autoSpeak) void aiChatSpeak(guideMessage.yoruba);
+    } catch (error) {
+      if (!controller.signal.aborted) {
+        showToast(error instanceof Error ? error.message : 'The AI conversation could not be completed.', 'error');
+      }
+    } finally {
+      pending?.remove();
+      if (aiChatRequestController === controller) aiChatRequestController = null;
+      if (input.isConnected) input.disabled = false;
+      if (submitButton?.isConnected) submitButton.disabled = false;
+      form.removeAttribute('aria-busy');
+      if (input.isConnected) input.focus();
+    }
   }
 
-  function startAiChatListening(trigger) {
+  async function startAiChatListening(trigger) {
     const input = document.querySelector('.aichat-input');
-    const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!Recognition) {
-      showToast('Voice input is not available in this browser — you can type your message instead.', 'error');
+    const status = document.getElementById('aichat-audio-status');
+    if (aiChatListening && aiChatRecorder?.state === 'recording') {
+      aiChatRecorder.stop();
+      if (status) status.textContent = 'Transcribing your recording with Plotweaver…';
+      trigger?.setAttribute('aria-label', 'Transcribing voice message');
+      trigger.disabled = true;
+      return;
+    }
+    if (!navigator.mediaDevices?.getUserMedia || typeof MediaRecorder === 'undefined') {
+      showToast('Voice recording is not available in this browser. You can type your message instead.', 'error');
       input?.focus();
       return;
     }
-    if (aiChatListening && aiChatRecognition) {
-      aiChatRecognition.stop();
-      return;
-    }
+
+    let stream;
     try {
-      const recognition = new Recognition();
-      aiChatRecognition = recognition;
-      recognition.lang = 'yo-NG';
-      recognition.interimResults = false;
-      recognition.maxAlternatives = 1;
+      stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      if (!aiChatPageActive) {
+        stream.getTracks().forEach((track) => track.stop());
+        return;
+      }
+      const preferredType = ['audio/webm;codecs=opus', 'audio/mp4', 'audio/ogg;codecs=opus']
+        .find((type) => MediaRecorder.isTypeSupported?.(type));
+      const recorder = new MediaRecorder(stream, preferredType ? { mimeType: preferredType } : undefined);
+      aiChatStream = stream;
+      aiChatRecorder = recorder;
+      aiChatRecordingChunks = [];
       aiChatListening = true;
       trigger?.classList.add('is-listening');
       trigger?.setAttribute('aria-pressed', 'true');
-      recognition.onresult = (event) => {
-        const transcript = event.results?.[0]?.[0]?.transcript?.trim() || '';
-        if (!transcript || !input) return;
-        input.value = transcript;
-        input.focus();
-        showToast('Voice captured — tap send to continue.', 'success');
-      };
-      recognition.onerror = () => {
-        showToast('Voice input stopped. You can type your message instead.', 'error');
-      };
-      recognition.onend = () => {
+      trigger?.setAttribute('aria-label', 'Stop recording');
+      if (status) status.textContent = 'Listening. Tap the microphone again to finish; audio is transcribed by Plotweaver.';
+      recorder.addEventListener('dataavailable', (event) => {
+        if (event.data.size) aiChatRecordingChunks.push(event.data);
+      });
+      recorder.addEventListener('stop', async () => {
+        aiChatStream?.getTracks().forEach((track) => track.stop());
+        aiChatStream = null;
+        aiChatRecorder = null;
         aiChatListening = false;
-        aiChatRecognition = null;
+        if (aiChatRecordingTimer) window.clearTimeout(aiChatRecordingTimer);
+        aiChatRecordingTimer = null;
         trigger?.classList.remove('is-listening');
         trigger?.setAttribute('aria-pressed', 'false');
-      };
-      recognition.start();
+        trigger?.setAttribute('aria-label', 'Speak your message');
+        if (trigger?.isConnected) trigger.disabled = false;
+        if (!aiChatPageActive) return;
+        const recording = new Blob(aiChatRecordingChunks, {
+          type: aiChatRecordingChunks[0]?.type || recorder.mimeType || 'audio/webm',
+        });
+        aiChatRecordingChunks = [];
+        if (!recording.size) {
+          showToast('No audio was recorded. Try again or type your message.', 'error');
+          return;
+        }
+        if (recording.size > 4 * 1024 * 1024) {
+          showToast('That recording is larger than 4 MB. Try a shorter voice message.', 'error');
+          return;
+        }
+        try {
+          if (status) status.textContent = 'Transcribing your recording with Plotweaver…';
+          const result = await transcribeWithPlotweaver(recording, aiChatLanguage().code);
+          if (!aiChatPageActive || !input?.isConnected) return;
+          input.value = result.text.slice(0, input.maxLength);
+          input.focus();
+          if (status) status.textContent = 'Transcript ready. Review it, then tap Send.';
+          showToast('Voice captured. Review your transcript before sending.', 'success');
+        } catch (error) {
+          if (status) status.textContent = error instanceof Error ? error.message : 'Plotweaver could not transcribe this recording.';
+          showToast(error instanceof Error ? error.message : 'Plotweaver could not transcribe this recording.', 'error');
+        }
+      });
+      recorder.start();
+      aiChatRecordingTimer = window.setTimeout(() => {
+        if (recorder.state === 'recording') {
+          recorder.stop();
+          if (status) status.textContent = 'Recording reached 15 seconds and is being transcribed.';
+        }
+      }, 15_000);
     } catch (error) {
       aiChatListening = false;
-      aiChatRecognition = null;
+      aiChatRecorder = null;
+      aiChatStream = null;
+      stream?.getTracks().forEach((track) => track.stop());
       trigger?.classList.remove('is-listening');
-      showToast('Voice input could not start on this device.', 'error');
+      trigger?.setAttribute('aria-pressed', 'false');
+      trigger?.setAttribute('aria-label', 'Speak your message');
+      showToast(error?.name === 'NotAllowedError'
+        ? 'Microphone access was denied. Allow access or type your message instead.'
+        : 'Voice recording could not start. Check your microphone and try again.', 'error');
       input?.focus();
     }
+  }
+
+  async function translateLatestAiChatReply() {
+    const message = [...aiConversation.messages].reverse().find((item) => item.role === 'guide');
+    if (!message) {
+      showToast('There is no guide reply to translate yet.', 'error');
+      return;
+    }
+    if (message.plotweaverTranslated) {
+      aiConversation.showTranslation = !aiConversation.showTranslation;
+      applyAiChatTranslationVisibility();
+      return;
+    }
+
+    const button = document.querySelector('[data-action="aichat-translate"]');
+    const thread = document.getElementById('aichat-thread');
+    if (button) button.disabled = true;
+    if (thread) thread.setAttribute('aria-busy', 'true');
+    try {
+      const result = await translateWithPlotweaver({
+        text: message.yoruba,
+        sourceLanguage: aiChatLanguage().code,
+        targetLanguage: 'en',
+      });
+      message.english = result.translated_text;
+      message.plotweaverTranslated = true;
+      aiConversation.showTranslation = true;
+      const row = [...document.querySelectorAll('.aichat-row-guide')]
+        .find((element) => element.dataset.message === message.id);
+      const translationText = row?.querySelector('.aichat-english span:last-child');
+      if (translationText) translationText.textContent = result.translated_text;
+      applyAiChatTranslationVisibility();
+      showToast('Reply translated with Plotweaver.', 'success');
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : 'Plotweaver could not translate this reply.', 'error');
+    } finally {
+      if (button?.isConnected) button.disabled = false;
+      if (thread?.isConnected) thread.removeAttribute('aria-busy');
+    }
+  }
+
+  function cleanupAiConversation() {
+    aiChatPageActive = false;
+    aiChatRequestController?.abort();
+    aiChatRequestController = null;
+    aiChatSpeechController?.abort();
+    aiChatSpeechController = null;
+    releaseAiChatAudio();
+    if (aiChatRecordingTimer) window.clearTimeout(aiChatRecordingTimer);
+    aiChatRecordingTimer = null;
+    if (aiChatRecorder?.state === 'recording') aiChatRecorder.stop();
+    aiChatStream?.getTracks().forEach((track) => track.stop());
+    aiChatStream = null;
+    aiChatRecorder = null;
+    aiChatListening = false;
+    aiChatRecordingChunks = [];
   }
 
   function handleAiConversationAction(action, el) {
@@ -4066,6 +4239,8 @@ import {
         break;
       }
       case 'aichat-translate':
+        void translateLatestAiChatReply();
+        break;
       case 'aichat-toggle-translation':
         aiConversation.showTranslation = !aiConversation.showTranslation;
         applyAiChatTranslationVisibility();
@@ -4077,15 +4252,13 @@ import {
         break;
       case 'aichat-listen':
       case 'aichat-replay':
-        aiChatSpeak(aiChatLatestPhrase());
+        void aiChatSpeak(aiChatLatestPhrase());
         break;
       case 'aichat-pause':
-        if (!window.speechSynthesis) {
-          showToast('Audio playback is not available in this browser.', 'error');
-          break;
-        }
-        if (window.speechSynthesis.speaking && !window.speechSynthesis.paused) window.speechSynthesis.pause();
-        else if (window.speechSynthesis.paused) window.speechSynthesis.resume();
+        if (aiChatAudio?.paused) aiChatAudio.play().catch(() => {
+          showToast('Plotweaver audio could not resume. Tap Listen to try again.', 'error');
+        });
+        else if (aiChatAudio) aiChatAudio.pause();
         else showToast('Tap Listen to hear the guide first.', 'error');
         break;
       case 'aichat-slow': {
@@ -4096,6 +4269,7 @@ import {
           const label = button.querySelector('[data-aichat-slow-label]');
           if (label) label.textContent = slowed ? 'Normal (1x)' : 'Slow (0.75x)';
         });
+        if (aiChatAudio) aiChatAudio.playbackRate = aiConversation.rate;
         showToast(slowed ? 'Guide playback slowed to 0.75x.' : 'Guide playback back to normal speed.', 'success');
         break;
       }
@@ -5979,6 +6153,7 @@ import {
     }
     const { page, params } = location;
     const outgoingPage = document.body.dataset.page || '';
+    if (outgoingPage === 'ai-conversation' && page !== 'ai-conversation') cleanupAiConversation();
     if (outgoingPage && outgoingPage !== page && page === 'ai-conversation') {
       aiConversation.returnRoute = outgoingPage;
     }

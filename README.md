@@ -73,6 +73,7 @@ The application is bundled with Vite as an ES module web application:
 - **`src/threeScene.js`:** Three.js 3D scene engine, orbit controls, audio visualizer, card tilt engine, and WebGL fallbacks.
 - **`src/translationEngine.js`:** Multi-language dictionary, word lexicons, and Web Audio API tone pitch synthesizer (`playTonePitch` for Dò-Re-Mí).
 - **`src/plotweaverClient.js` and `api/plotweaver/[...path].js`:** Browser client and server-side proxy for Plotweaver speech, voice discovery/cloning, translation, and transcription; the API key stays on the server.
+- **`src/aiChatClient.js` and `api/chat.js`:** Live, bilingual AI Conversation replies through a server-side Gemini endpoint; the API key stays on the server.
 - **`src/yorubaCodeEngine.js`:** *ÈdèKoodu* Yoruba coding keywords, curriculum lessons, transpiler, turtle graphics canvas, and safe sandbox executor (`executeYorubaCode`).
 - **`src/vowelsConsonantsData.js`:** Yoruba oral vowels, nasal vowels, consonants, and tone pitch reference guides with interactive soundboard.
 - **`src/supabaseClient.js`:** Supabase authentication and database persistence layer with local browser storage offline-first fallback.
@@ -122,10 +123,11 @@ The HTML entries declared in the active `vite.config.js` are supported:
 
 To ensure transparency and protect learner privacy:
 1. **Speech & Fluency:** Plotweaver provides text-to-speech and supported-language transcription. Transcription returns recognized text only; it does not evaluate pronunciation, tone, or fluency. Provider language coverage differs by service, so the interface loads available languages and does not promise support for every African language in every feature.
-2. **Authentication & Data Storage:** Sign-up, email-code verification, sign-in and sign-out use Supabase Auth when configured. Account metadata and learner-record APIs are available, but not every progress, code or voice interaction in the app is yet connected to remote storage; unconnected state remains browser-local. Remote account/database delivery has not been verified against the production project.
-3. **Child Safeguarding & Consent:** Child sign-up requires a guardian email approval request and one-time code through the Vercel API. The educator path requires a server-verified, single-use invitation. Both paths remain unavailable until their database migration and server email settings are configured. This workflow does not replace legal identity verification or educator background checks; live tutoring remains disabled.
-4. **Payments & Subscriptions:** Pricing cards are preview concepts only. No live financial transactions or payment gateways are configured.
-5. **Cultural Attribution:** Proverbs, Oríkì, and Ifá introductions are educational overviews and explicitly emphasize community permission, speaker context, and oral attribution.
+2. **AI Conversation:** Replies use Google Gemini and require the server-side `GEMINI_API_KEY`. Conversation text is sent to Google for a response; do not share personal or identifying information. Plotweaver powers requested speech, transcription, and supported-language translations.
+3. **Authentication & Data Storage:** Sign-up, email-code verification, sign-in and sign-out use Supabase Auth when configured. Account metadata and learner-record APIs are available, but not every progress, code or voice interaction in the app is yet connected to remote storage; unconnected state remains browser-local. Remote account/database delivery has not been verified against the production project.
+4. **Child Safeguarding & Consent:** Child sign-up requires a guardian email approval request and one-time code through the Vercel API. The educator path requires a server-verified, single-use invitation. Both paths remain unavailable until their database migration and server email settings are configured. This workflow does not replace legal identity verification or educator background checks; live tutoring remains disabled.
+5. **Payments & Subscriptions:** Pricing cards are preview concepts only. No live financial transactions or payment gateways are configured.
+6. **Cultural Attribution:** Proverbs, Oríkì, and Ifá introductions are educational overviews and explicitly emphasize community permission, speaker context, and oral attribution.
 
 ---
 
@@ -154,7 +156,7 @@ Vite bundles the configured HTML entry points and compiles assets to the `dist/`
 
 ### IDE and authentication services
 
-The Code for Kids page provides age-banded coding and STEM lessons. Translation, text-to-speech, speech-to-text, and voice cloning use the server-side Plotweaver proxy when `PLOTWEAVER_API_KEY` (or the supported legacy `Idilewa` variable) is configured in the deployment environment.
+The Code for Kids page provides age-banded coding and STEM lessons. Translation, text-to-speech, speech-to-text, and voice cloning use the server-side Plotweaver proxy when `PLOTWEAVER_API_KEY` (or the supported legacy `Idilewa` variable) is configured in the deployment environment. Live AI Conversation replies use the server-side `GEMINI_API_KEY`.
 
 Configure these values in `.env.local` for the Vite client and in the deployment environment settings:
 
@@ -162,11 +164,13 @@ Configure these values in `.env.local` for the Vite client and in the deployment
 VITE_CONVEX_URL=https://your-deployment.convex.cloud
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-public-key
+PLOTWEAVER_API_KEY=your-plotweaver-api-key
+GEMINI_API_KEY=your-google-gemini-api-key
 JUDGE0_URL=https://your-private-judge0-service.example
 JUDGE0_AUTH_TOKEN=your-private-runner-token
 ```
 
-`VITE_CONVEX_URL`, `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are public client configuration, not secrets. The client forwards the current Supabase access token to Convex and refreshes it when required. `convex/auth.config.ts` configures Convex to verify Idilewa Supabase tokens using the Supabase JWKS endpoint and ES256 signing key; do not copy a private JWT signing key into the app. For existing deployments, `SUPABASE_PUBLIC_URL` and `SUPABASE_ANON_KEY` are also supported by the Supabase client. `JUDGE0_URL` and `JUDGE0_AUTH_TOKEN` are server-side secrets and must never use the `VITE_` prefix or be placed in browser code. Keep Judge0 private and configure execution time and memory limits.
+`VITE_CONVEX_URL`, `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are public client configuration, not secrets. `PLOTWEAVER_API_KEY`, `GEMINI_API_KEY`, `JUDGE0_URL` and `JUDGE0_AUTH_TOKEN` are server-side configuration; never give them a `VITE_` prefix or place them in browser code. The client forwards the current Supabase access token to Convex and refreshes it when required. `convex/auth.config.ts` configures Convex to verify Idilewa Supabase tokens using the Supabase JWKS endpoint and ES256 signing key; do not copy a private JWT signing key into the app. For existing deployments, `SUPABASE_PUBLIC_URL` and `SUPABASE_ANON_KEY` are also supported by the Supabase client. Keep Judge0 private and configure execution time and memory limits.
 
 Run `npx convex dev` in one terminal to deploy Convex functions and auth configuration to the configured development deployment, then run `npm run dev` in another terminal for the Vite app. The `convex/auth.whoami` query can be used to verify that a Supabase session is recognized by Convex. This auth bridge does not itself migrate Supabase tables or the existing Vercel API routes; keep those services active until their Convex replacements and data migration are separately implemented and validated.
 
@@ -212,7 +216,7 @@ The voice studio uses its curated phrasebook for exact English-to-language match
 
 ### Plotweaver voice services
 
-The `/api/plotweaver/*` Vercel function keeps the API key server-side and proxies language/voice discovery, speech generation, translation, transcription and voice cloning. For local API testing use `vercel dev`; Vite's static development server cannot execute Vercel functions. The voice library, lesson vowels/consonants, lesson playback, free-text speech generator, phrase translation/dictation and recorded lesson transcription use this proxy. Yorùbá vowel-sequence playback selects a recommended native Yorùbá voice from Plotweaver and does not substitute device speech if that voice is unavailable. Generated audio and recordings are not stored by Idilewa; recordings are sent to Plotweaver for the requested transcription or voice-clone operation.
+The `/api/plotweaver/*` Vercel function keeps the API key server-side and proxies language/voice discovery, speech generation, translation, transcription and voice cloning. The AI Conversation uses Plotweaver for reply audio, voice transcription, and on-demand translation, alongside Gemini for conversational replies. For local API testing use `vercel dev`; Vite's static development server cannot execute Vercel functions. The voice library, lesson vowels/consonants, lesson playback, free-text speech generator, phrase translation/dictation and recorded lesson transcription use this proxy. Yorùbá vowel-sequence playback selects a recommended native Yorùbá voice from Plotweaver and does not substitute device speech if that voice is unavailable. Generated audio and recordings are not stored by Idilewa; recordings are sent to Plotweaver for the requested transcription or voice-clone operation.
 
 Voice cloning requires an explicit ownership/permission confirmation and a clean 4–8 second clip. The public application limits uploads to 4 MB to fit serverless request-size limits; non-Nigerian voice samples require an exact transcript. Created voice IDs are saved only in the current browser’s local state; the public API does not expose clone enumeration or deletion. Plotweaver usage may incur charges, so configure provider-side usage limits and monitor consumption. The API endpoint is public; CORS only governs browser access and is not authentication. Do not upload a child’s or another person’s voice without their informed permission. Set `IDILEWA_ALLOWED_ORIGINS` to the exact GitHub Pages frontend origin if using a separate static site; keep API and frontend on the same trusted deployment where possible.
 

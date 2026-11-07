@@ -72,6 +72,16 @@ test('every AI chat control is wired through the shared action handler', () => {
   assert.match(appSource, /closest\('\.aichat-popover, \[data-action="aichat-settings"\], \[data-action="aichat-change-guide"\]'\)/);
 });
 
+test('AI chat uses server-side Gemini and Plotweaver services instead of canned replies', () => {
+  assert.match(appSource, /import \{ sendAiChatMessage \} from '\.\/src\/aiChatClient\.js'/);
+  assert.match(appSource, /sendAiChatMessage\(\{[\s\S]*?language: aiChatLanguage\(\)\.code/);
+  assert.match(appSource, /synthesizePlotweaverSpeech\(\{/);
+  assert.match(appSource, /transcribeWithPlotweaver\(recording, aiChatLanguage\(\)\.code\)/);
+  assert.match(appSource, /translateWithPlotweaver\(\{/);
+  assert.doesNotMatch(appSource, /const AICHAT_REPLIES =/);
+  assert.match(appSource, /Live replies use Google Gemini/);
+});
+
 test('AI chat animation respects reduced motion preferences', () => {
   const reducedMotion = stylesSource.match(/@media \(prefers-reduced-motion: reduce\) \{[\s\S]*?\n\}/g) || [];
   assert.ok(reducedMotion.some((block) => /aichat/.test(block)), 'AI chat animations should be disabled for reduced motion');
@@ -92,6 +102,8 @@ test('the AI conversation page reflows into a rail and thread workspace on wide 
   assert.match(appSource, /thread\.classList\.toggle\('is-scrolled', thread\.scrollTop > 4\)/);
   assert.match(stylesSource, /\.aichat-scroll\.has-more-below \{/);
   assert.match(stylesSource, /\.aichat-thread\.is-scrolled \{/);
+  assert.match(stylesSource, /body\[data-page="ai-conversation"\] #app\.app-shell \{[\s\S]*?width: min\(100%, 1320px\);/);
+  assert.match(desktop, /height: min\(820px, calc\(100svh - 72px\)\);/);
 });
 
 });
