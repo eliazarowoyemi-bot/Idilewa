@@ -47,7 +47,7 @@ test('the AI conversation screen renders the guide card, thread, composer, and t
   assert.match(appSource, /class="aichat-tabs aichat-tabs-desktop"/);
   assert.match(appSource, /class="aichat-tabs aichat-tabs-mobile"/);
   assert.match(appSource, /id="aichat-audio-status" role="status"/);
-  assert.doesNotMatch(appSource, /Live replies use Gemini; voice input and translation use Plotweaver/);
+  assert.doesNotMatch(appSource, /Live replies use Google Gemini|Live replies use Gemini|voice input and translation use Plotweaver|Avoid sharing personal details/);
   assert.match(stylesSource, /\.aichat-status-sr-only\s*\{[\s\S]*?clip-path: inset\(50%\);/);
   assert.match(appSource, /data-form="aichat-composer"/);
   assert.match(appSource, /class="aichat-focus-select"/);
@@ -84,7 +84,7 @@ test('AI chat uses server-side Gemini and Plotweaver services instead of canned 
   assert.match(appSource, /transcribeWithPlotweaver\(recording, aiChatLanguage\(\)\.code\)/);
   assert.match(appSource, /translateWithPlotweaver\(\{/);
   assert.doesNotMatch(appSource, /const AICHAT_REPLIES =/);
-  assert.match(appSource, /Live replies use Google Gemini/);
+  assert.doesNotMatch(appSource, /Live replies use Google Gemini|Live replies use Gemini|Avoid sharing personal details/);
   assert.match(appSource, /yoruba: 'Ó dáàlẹ̀! Ẹ jẹ́ ká bẹ̀rẹ̀ lónìí\.'/);
   assert.match(appSource, /english: 'Great! Let’s get started today\.'/);
 });

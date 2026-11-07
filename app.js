@@ -3834,7 +3834,6 @@ import {
           <button type="button" class="aichat-iconbtn aichat-iconbtn-mint" data-action="aichat-settings" aria-expanded="false" aria-controls="aichat-settings" aria-label="Conversation settings">${icon('settings', 21)}</button>
           <div class="aichat-popover aichat-settings-panel" id="aichat-settings" hidden>
             <p class="aichat-popover-title">Conversation settings</p>
-            <p class="aichat-privacy-note">Live replies use Google Gemini. Voice and translation use Plotweaver. Avoid sharing personal details.</p>
             <div class="aichat-switch-row"><span>Show translation</span><button type="button" class="aichat-switch" role="switch" aria-checked="${aiConversation.showTranslation}" aria-label="Show translation" data-action="aichat-toggle-translation"></button></div>
             <div class="aichat-switch-row"><span>Auto-play replies</span><button type="button" class="aichat-switch" role="switch" aria-checked="${aiConversation.autoSpeak}" aria-label="Auto-play replies" data-action="aichat-toggle-autospeak"></button></div>
           </div>
