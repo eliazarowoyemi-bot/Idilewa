@@ -11811,7 +11811,7 @@ body[data-page="ai-conversation"] .main-content {
   position: relative;
   z-index: 4;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 2px;
   padding: 5px 8px calc(6px + env(safe-area-inset-bottom));
   border-top: 1px solid #e7f1ea;
@@ -12079,7 +12079,7 @@ body[data-page="ai-conversation"] .main-content {
    -------------------------------------------------------------------------- */
 @media (min-width: 1024px) {
   body[data-page="ai-conversation"] {
-    padding: 0;
+    padding: clamp(16px, 2.2vw, 32px);
     background:
       radial-gradient(1200px 720px at 6% -14%, #d3eeda, transparent 66%),
       radial-gradient(1100px 620px at 104% 112%, #e9f8d8, transparent 62%),
@@ -12087,25 +12087,27 @@ body[data-page="ai-conversation"] .main-content {
   }
   body[data-page="ai-conversation"] #app.app-shell {
     width: 100%;
-    max-width: none;
-    margin: 0;
+    max-width: 1680px;
+    min-height: 0;
+    margin: 0 auto;
   }
   .aichat-page {
     display: grid;
-    grid-template-columns: minmax(300px, 32%) minmax(0, 1fr);
+    grid-template-columns: minmax(320px, 30%) minmax(0, 1fr);
     grid-template-rows: 76px minmax(0, 1fr);
     grid-template-areas:
       "head head"
       "rail chat"
       "rail comp";
     width: 100%;
-    max-width: none;
-    height: 100svh;
-    min-height: 100svh;
-    border-radius: 0;
+    max-width: 1680px;
+    height: 100%;
+    min-height: 0;
+    border-radius: 32px;
+    box-shadow: 0 30px 72px rgba(12, 52, 32, .2);
   }
   .aichat-canvas {
-    border-radius: 28px;
+    border-radius: 32px;
     background:
       radial-gradient(circle at 8% 12%, rgba(196, 232, 207, .46), transparent 34%),
       radial-gradient(circle at 97% 88%, rgba(189, 229, 200, .38), transparent 38%);
@@ -12114,8 +12116,8 @@ body[data-page="ai-conversation"] .main-content {
   .aichat-header {
     grid-area: head;
     grid-template-columns: 44px auto minmax(0, 1fr) 44px;
-    gap: clamp(8px, 1.1vw, 18px);
-    padding: 10px clamp(14px, 1.5vw, 28px);
+    gap: clamp(10px, 1.3vw, 20px);
+    padding: 12px clamp(18px, 2vw, 36px);
   }
   .aichat-title {
     text-align: left;
@@ -12128,10 +12130,10 @@ body[data-page="ai-conversation"] .main-content {
 
   .aichat-tabs-desktop {
     display: grid;
-    grid-template-columns: repeat(5, max-content);
+    grid-template-columns: repeat(4, max-content);
     justify-content: center;
     align-items: center;
-    gap: clamp(4px, .55vw, 10px);
+    gap: clamp(8px, .8vw, 14px);
     min-width: 0;
     padding: 0;
     border: 0;
@@ -12166,12 +12168,12 @@ body[data-page="ai-conversation"] .main-content {
     grid-area: rail;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
     min-height: 0;
-    margin: 0 8px 0 0;
-    padding: 12px;
+    margin: 8px 12px 8px 8px;
+    padding: 18px;
     border: 1px solid rgba(215, 233, 221, .9);
-    border-radius: 24px;
+    border-radius: 26px;
     background: rgba(255, 255, 255, .46);
     overflow: visible;
   }
@@ -12213,12 +12215,12 @@ body[data-page="ai-conversation"] .main-content {
   .aichat-thread {
     grid-area: chat;
     min-height: 0;
-    margin: 0;
-    padding: clamp(14px, 1.4vw, 24px) clamp(14px, 1.5vw, 24px);
-    gap: 12px;
+    margin: 8px 8px 0 0;
+    padding: clamp(18px, 1.8vw, 30px) clamp(20px, 2vw, 34px);
+    gap: 16px;
     border: 1px solid rgba(215, 233, 221, .9);
     border-bottom: 0;
-    border-radius: 24px 24px 0 0;
+    border-radius: 26px 26px 0 0;
     background: rgba(255, 255, 255, .34);
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -12239,11 +12241,11 @@ body[data-page="ai-conversation"] .main-content {
     grid-area: comp;
     grid-template-columns: 58px minmax(0, 1fr) 58px;
     gap: 12px;
-    margin: 0;
-    padding: 10px clamp(14px, 1.5vw, 24px) 12px;
+    margin: 0 8px 8px 0;
+    padding: 14px clamp(20px, 2vw, 34px);
     border: 1px solid rgba(215, 233, 221, .9);
     border-top: 0;
-    border-radius: 0 0 24px 24px;
+    border-radius: 0 0 26px 26px;
     background: rgba(255, 255, 255, .82);
     box-shadow: 0 8px 22px rgba(20, 74, 44, .08);
   }
@@ -12259,13 +12261,13 @@ body[data-page="ai-conversation"] .main-content {
   .aichat-title { font-size: 21px; }
   .aichat-tab { min-height: 40px; gap: 5px; padding-inline: 8px; }
   .aichat-tab .icon { width: 18px; height: 18px; }
-  .aichat-rail { padding: 10px; }
+  .aichat-rail { padding: 16px; }
   .aichat-focus { padding-inline: 12px; }
   .aichat-focus-select { font-size: 13px; }
   .aichat-guide-copy { padding-inline: 4px; }
   .aichat-guide-change-wrap { min-width: 0; }
   .aichat-change-guide { max-width: 100%; }
-  .aichat-thread { padding: 14px; }
+  .aichat-thread { padding: 18px; }
   .aichat-controls { flex-wrap: wrap; }
   .aichat-chip { min-height: 38px; padding-inline: 12px; }
   .aichat-composer { grid-template-columns: 48px minmax(0, 1fr) 48px; gap: 8px; padding-inline: 12px; }

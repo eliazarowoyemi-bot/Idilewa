@@ -41,7 +41,7 @@ test('main and expanded mobile navigation omit retired pages', () => {
   assert.doesNotMatch(navSource, /Curriculum|STEM Studio|Payment/);
   const mobileItems = [...mobileNavSource.matchAll(/\{ route: '([^']+)', label: '([^']+)'/g)].map((match) => [match[1], match[2]]);
   assert.deepEqual(mobileItems, [['index', 'Home'], ['voice_lessons', 'Voice'], ['profile', 'Profile']]);
-  assert.match(mobileNavSource, /page === 'trainer' \|\| page === 'voice_lessons' \|\| page\.startsWith\('voice-'\)/);
+  assert.match(mobileNavSource, /page === 'voice_lessons' \|\| page\.startsWith\('voice-'\)/);
   assert.doesNotMatch(mobileNavSource, /aiWorkspace|ai-conversations/);
   assert.match(mobileNavSource, /class="mobile-tab mobile-navigation-item \$\{active \? 'active' : ''\}"/);
   assert.match(mobileNavSource, /mobileNav\.className = 'mobile-nav mobile-bottom-navigation'/);

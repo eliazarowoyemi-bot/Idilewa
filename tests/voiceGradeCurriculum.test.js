@@ -96,37 +96,34 @@ test('voice feature pages each receive 50 guided lessons per language', () => {
   assert.match(appSource, /data-action="plotweaver-speak-text"/);
 });
 
-test('Voice Lessons opens a compact navigation hub and keeps detailed practice on its own route', () => {
+test('the retired Trainer page redirects to Voice Lessons and remaining lesson paths stay available', async () => {
   const voiceLessonsHome = appSource.slice(
     appSource.indexOf('function renderVoiceLessonsHome()'),
     appSource.indexOf('function renderVoiceLessonsDashboard()')
   );
-  const trainerPage = appSource.slice(
-    appSource.indexOf('function renderTrainer(params)'),
-    appSource.indexOf('function formatDashboardDate')
+  const routes = appSource.match(/const ROUTES = \[([\s\S]*?)\n  \];/)?.[1] || '';
+  const locationParser = appSource.slice(
+    appSource.indexOf('function parseLocation()'),
+    appSource.indexOf('function navigate(')
   );
+  const pageRouter = appSource.slice(
+    appSource.indexOf('function renderPage('),
+    appSource.indexOf('function renderHomePreviewMotion(')
+  );
+  const trainerShell = await readFile(new URL('../trainer.html', import.meta.url), 'utf8');
 
+  assert.doesNotMatch(routes, /trainer/);
+  assert.match(locationParser, /if \(page === 'trainer'\) \{\s*page = 'voice_lessons';/);
+  assert.match(locationParser, /#\/voice_lessons/);
+  assert.match(trainerShell, /data-default-route="voice_lessons"/);
   assert.match(appSource, /case 'voice_lessons': return renderVoiceLessonsHome\(\);/);
-  assert.match(appSource, /case 'trainer': return renderTrainer\(params\);/);
+  assert.doesNotMatch(pageRouter, /case 'trainer': return renderTrainer/);
   assert.match(voiceLessonsHome, /renderVoiceLessonsDashboard\(\)/);
   assert.doesNotMatch(voiceLessonsHome, /voice-foundations|trainerStudio|trainer-hero/);
   assert.match(appSource, /voice-lessons-welcome\.jpg/);
   assert.match(appSource, /Start a guided lesson/);
   assert.doesNotMatch(voiceLessonsHome, /Explore sound foundations/);
-  assert.doesNotMatch(trainerPage, /renderVoiceLessonsDashboard\(\)/);
-  assert.match(trainerPage, /Back to Voice Lessons/);
-  assert.match(trainerPage, /voice-foundations/);
-  assert.match(trainerPage, /Choose what to try next/);
-  assert.match(trainerPage, /Start a guided lesson/);
-  assert.match(trainerPage, /Practice a phrase/);
-  assert.match(trainerPage, /<details class="voice-trainer-expanded">/);
-  assert.match(trainerPage, /<summary><span>More practice options<\/span>/);
-  assert.match(trainerPage, /trainer-hero/);
-  const foundationSection = trainerPage.slice(
-    trainerPage.indexOf('<section class="voice-foundations"'),
-    trainerPage.indexOf('<section class="voice-foundations-next"')
-  );
-  assert.doesNotMatch(foundationSection, /renderVoiceCloneTools/);
+  assert.doesNotMatch(appSource, /routeLink\('trainer'|route: 'trainer'/);
 });
 
 test('choosing a voice lesson language opens lessons directly with back and lesson navigation', () => {

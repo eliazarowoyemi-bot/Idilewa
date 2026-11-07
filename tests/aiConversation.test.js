@@ -46,6 +46,13 @@ test('the AI conversation screen renders the guide card, thread, composer, and t
   assert.match(appSource, /class="aichat-title">AI Conversation</);
   assert.match(appSource, /class="aichat-tabs aichat-tabs-desktop"/);
   assert.match(appSource, /class="aichat-tabs aichat-tabs-mobile"/);
+  const tabs = appSource.match(/const AICHAT_TABS = \[([\s\S]*?)\n  \];/)?.[1] || '';
+  assert.match(tabs, /label: 'Home'/);
+  assert.match(tabs, /label: 'Learn'/);
+  assert.match(tabs, /label: 'AI Chat'/);
+  assert.match(tabs, /label: 'Library'/);
+  assert.doesNotMatch(tabs, /Practice|trainer/);
+  assert.match(stylesSource, /\.aichat-tabs\s*\{[\s\S]*?grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);/);
   assert.match(appSource, /id="aichat-audio-status" role="status"/);
   assert.doesNotMatch(appSource, /Live replies use Google Gemini|Live replies use Gemini|voice input and translation use Plotweaver|Avoid sharing personal details/);
   assert.match(stylesSource, /\.aichat-status-sr-only\s*\{[\s\S]*?clip-path: inset\(50%\);/);
@@ -99,12 +106,15 @@ test('the AI conversation page reflows into a rail and thread workspace on wide 
   assert.match(tablet, /\.aichat-page \{[\s\S]*?max-width: 780px;/);
   assert.ok(desktop, 'a desktop breakpoint should own the workspace layout');
   assert.match(desktop, /grid-template-areas:\s*\n\s*"head head"\s*\n\s*"rail chat"\s*\n\s*"rail comp";/);
-  assert.match(desktop, /grid-template-columns: minmax\(300px, 32%\) minmax\(0, 1fr\);/);
+  assert.match(desktop, /grid-template-columns: minmax\(320px, 30%\) minmax\(0, 1fr\);/);
   assert.match(desktop, /\.aichat-scroll \{ display: contents; \}/);
   assert.match(desktop, /\.aichat-thread \{[\s\S]*?overflow-y: auto;/);
   assert.match(desktop, /\.aichat-tab \{[\s\S]*?flex-direction: row;/);
   assert.match(desktop, /\.aichat-tabs-desktop \{[\s\S]*?display: grid;/);
+  assert.match(desktop, /grid-template-columns: repeat\(4, max-content\)/);
   assert.match(desktop, /\.aichat-tabs-mobile \{ display: none; \}/);
+  assert.match(desktop, /padding: clamp\(16px, 2\.2vw, 32px\)/);
+  assert.match(desktop, /border-radius: 32px;/);
   assert.match(desktop, /background: var\(--aichat-green-deep\);[\s\S]*?color: #fff;/);
   assert.match(appSource, /function aiChatScrollContainers\(\)/);
   assert.match(appSource, /const overflowY = window\.getComputedStyle\(el\)\.overflowY;/);
@@ -112,12 +122,12 @@ test('the AI conversation page reflows into a rail and thread workspace on wide 
   assert.match(stylesSource, /\.aichat-scroll\.has-more-below \{/);
   assert.match(stylesSource, /\.aichat-thread\.is-scrolled \{/);
   assert.match(desktop, /width: 100%;/);
-  assert.match(desktop, /max-width: none;/);
-  assert.match(desktop, /height: 100svh;/);
-  assert.match(desktop, /\.aichat-thread \{[\s\S]*?padding: clamp\(14px, 1\.4vw, 24px\) clamp\(14px, 1\.5vw, 24px\);/);
+  assert.match(desktop, /max-width: 1680px;/);
+  assert.match(desktop, /height: 100%;/);
+  assert.match(desktop, /\.aichat-thread \{[\s\S]*?padding: clamp\(18px, 1\.8vw, 30px\) clamp\(20px, 2vw, 34px\);/);
   assert.match(desktop, /\.aichat-bubble-guide \{ max-width: min\(84%, 820px\);/);
   assert.match(desktop, /\.aichat-bubble-user \{ max-width: min\(74%, 640px\);/);
-  assert.match(stylesSource, /\.aichat-thread \{ padding: 14px; \}/);
+  assert.match(stylesSource, /\.aichat-thread \{ padding: 18px; \}/);
   assert.match(stylesSource, /\.aichat-composer \{ grid-template-columns: 48px minmax\(0, 1fr\) 48px; gap: 8px; padding-inline: 12px; \}/);
 });
 
