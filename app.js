@@ -3707,7 +3707,7 @@ import {
     { id: 'aichat-seed-1', role: 'user', text: 'Hello', time: '10:25' },
     { id: 'aichat-seed-2', role: 'guide', yoruba: AICHAT_PHRASE, english: AICHAT_TRANSLATION, time: '10:25', controls: true },
     { id: 'aichat-seed-3', role: 'user', text: 'Mo fẹ́ kọ́ Yorùbá.', time: '10:25' },
-    { id: 'aichat-seed-4', role: 'guide', yoruba: AICHAT_PHRASE, english: AICHAT_TRANSLATION, time: '10:25', controls: false },
+    { id: 'aichat-seed-4', role: 'guide', yoruba: 'Ó dáàlẹ̀! Ẹ jẹ́ ká bẹ̀rẹ̀ lónìí.', english: 'Great! Let’s get started today.', time: '10:25', controls: false },
   ];
 
   const AICHAT_TABS = [
@@ -3829,6 +3829,7 @@ import {
       <header class="aichat-header">
         <button type="button" class="aichat-iconbtn" data-action="aichat-back" aria-label="Go back">${icon('arrowLeft', 23)}</button>
         <h1 class="aichat-title">AI Conversation</h1>
+        <nav class="aichat-tabs aichat-tabs-desktop" aria-label="Idilewa desktop navigation">${tabs}</nav>
         <div class="aichat-settings-wrap">
           <button type="button" class="aichat-iconbtn aichat-iconbtn-mint" data-action="aichat-settings" aria-expanded="false" aria-controls="aichat-settings" aria-label="Conversation settings">${icon('settings', 21)}</button>
           <div class="aichat-popover aichat-settings-panel" id="aichat-settings" hidden>
@@ -3856,7 +3857,7 @@ import {
         <button type="submit" class="aichat-send" aria-label="Send message">${icon('send', 21)}</button>
         <p class="aichat-data-note" id="aichat-audio-status" aria-live="polite">Live replies use Gemini; voice input and translation use Plotweaver. Avoid sharing personal details.</p>
       </form>
-      <nav class="aichat-tabs" aria-label="Idilewa quick navigation">${tabs}</nav>
+      <nav class="aichat-tabs aichat-tabs-mobile" aria-label="Idilewa quick navigation">${tabs}</nav>
     </div>`;
   }
 
