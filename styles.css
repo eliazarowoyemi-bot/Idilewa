@@ -12214,8 +12214,8 @@ body[data-page="ai-conversation"] .main-content {
     grid-area: chat;
     min-height: 0;
     margin: 0;
-    padding: clamp(18px, 2vw, 32px) clamp(18px, 2vw, 34px);
-    gap: 14px;
+    padding: clamp(14px, 1.4vw, 24px) clamp(14px, 1.5vw, 24px);
+    gap: 12px;
     border: 1px solid rgba(215, 233, 221, .9);
     border-bottom: 0;
     border-radius: 24px 24px 0 0;
@@ -12230,8 +12230,8 @@ body[data-page="ai-conversation"] .main-content {
     -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 22px);
     mask-image: linear-gradient(to bottom, transparent 0, #000 22px);
   }
-  .aichat-bubble-guide { max-width: min(78%, 680px); padding: 14px 19px 11px; border-radius: 22px 22px 22px 8px; }
-  .aichat-bubble-user { max-width: min(65%, 540px); padding: 13px 21px; }
+  .aichat-bubble-guide { max-width: min(84%, 820px); padding: 14px 19px 11px; border-radius: 22px 22px 22px 8px; }
+  .aichat-bubble-user { max-width: min(74%, 640px); padding: 13px 21px; }
   .aichat-controls { margin: 0 0 6px 58px; gap: 8px; }
   .aichat-chip { min-height: 42px; padding: 0 17px; }
 
@@ -12240,7 +12240,7 @@ body[data-page="ai-conversation"] .main-content {
     grid-template-columns: 58px minmax(0, 1fr) 58px;
     gap: 12px;
     margin: 0;
-    padding: 10px clamp(18px, 2vw, 32px) 12px;
+    padding: 10px clamp(14px, 1.5vw, 24px) 12px;
     border: 1px solid rgba(215, 233, 221, .9);
     border-top: 0;
     border-radius: 0 0 24px 24px;
@@ -12265,10 +12265,10 @@ body[data-page="ai-conversation"] .main-content {
   .aichat-guide-copy { padding-inline: 4px; }
   .aichat-guide-change-wrap { min-width: 0; }
   .aichat-change-guide { max-width: 100%; }
-  .aichat-thread { padding: 18px; }
+  .aichat-thread { padding: 14px; }
   .aichat-controls { flex-wrap: wrap; }
   .aichat-chip { min-height: 38px; padding-inline: 12px; }
-  .aichat-composer { grid-template-columns: 48px minmax(0, 1fr) 48px; gap: 8px; padding-inline: 16px; }
+  .aichat-composer { grid-template-columns: 48px minmax(0, 1fr) 48px; gap: 8px; padding-inline: 12px; }
   .aichat-mic,
   .aichat-send { width: 48px; height: 48px; }
   .aichat-input { height: 48px; font-size: 15px; }

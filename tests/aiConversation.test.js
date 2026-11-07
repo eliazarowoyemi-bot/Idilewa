@@ -114,6 +114,11 @@ test('the AI conversation page reflows into a rail and thread workspace on wide 
   assert.match(desktop, /width: 100%;/);
   assert.match(desktop, /max-width: none;/);
   assert.match(desktop, /height: 100svh;/);
+  assert.match(desktop, /\.aichat-thread \{[\s\S]*?padding: clamp\(14px, 1\.4vw, 24px\) clamp\(14px, 1\.5vw, 24px\);/);
+  assert.match(desktop, /\.aichat-bubble-guide \{ max-width: min\(84%, 820px\);/);
+  assert.match(desktop, /\.aichat-bubble-user \{ max-width: min\(74%, 640px\);/);
+  assert.match(stylesSource, /\.aichat-thread \{ padding: 14px; \}/);
+  assert.match(stylesSource, /\.aichat-composer \{ grid-template-columns: 48px minmax\(0, 1fr\) 48px; gap: 8px; padding-inline: 12px; \}/);
 });
 
 });
