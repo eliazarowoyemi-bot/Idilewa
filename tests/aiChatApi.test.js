@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import chatHandler from '../api/chat.js';
+import translateHandler from '../api/translate.js';
+
+const vercelConfig = JSON.parse(await readFile(new URL('../vercel.json', import.meta.url), 'utf8'));
 
 function createResponse() {
   return {
@@ -38,7 +41,7 @@ async function withMocks({ apiKey = 'test-gemini-key', fetchMock, run }) {
 }
 
 function request({ method = 'POST', body, headers = {} } = {}) {
-  return { method, body, headers };
+  return { method, url: '/api/translate?service=chat', body, headers };
 }
 
 function geminiResponse(reply = 'Ẹ káàárọ̀.', translation = 'Good morning.') {
@@ -53,6 +56,11 @@ function geminiResponse(reply = 'Ẹ káàárọ̀.', translation = 'Good mornin
   }));
 }
 
+test('AI chat is routed through the shared serverless translation function', () => {
+  assert.ok(vercelConfig.rewrites.some(({ source, destination }) =>
+    source === '/api/chat' && destination === '/api/translate?service=chat'));
+});
+
 test('AI chat rejects unsupported methods and reports missing server configuration', async () => {
   await withMocks({
     apiKey: null,
@@ -61,12 +69,12 @@ test('AI chat rejects unsupported methods and reports missing server configurati
     },
     run: async () => {
       const method = createResponse();
-      await chatHandler(request({ method: 'GET' }), method);
+      await translateHandler(request({ method: 'GET' }), method);
       assert.equal(method.statusCode, 405);
       assert.equal(method.headers.Allow, 'POST');
 
       const unconfigured = createResponse();
-      await chatHandler(request({ body: { language: 'yo', messages: [{ role: 'user', text: 'Hello' }] } }), unconfigured);
+      await translateHandler(request({ body: { language: 'yo', messages: [{ role: 'user', text: 'Hello' }] } }), unconfigured);
       assert.equal(unconfigured.statusCode, 503);
       assert.match(unconfigured.body.error, /not configured/i);
     },
@@ -91,12 +99,12 @@ test('AI chat validates language, history, message shape, and request size befor
 
       for (const [body, expectedStatus] of invalidRequests) {
         const response = createResponse();
-        await chatHandler(request({ body }), response);
+        await translateHandler(request({ body }), response);
         assert.equal(response.statusCode, expectedStatus);
       }
 
       const oversized = createResponse();
-      await chatHandler(request({
+      await translateHandler(request({
         body: { language: 'yo', messages: [{ role: 'user', text: 'Hello' }] },
         headers: { 'content-length': '12000' },
       }), oversized);
@@ -120,7 +128,7 @@ test('AI chat keeps the Gemini key in a header and returns a bounded bilingual r
     },
     run: async () => {
       const response = createResponse();
-      await chatHandler(request({
+      await translateHandler(request({
         body: {
           language: 'yo',
           messages: [
@@ -150,7 +158,7 @@ test('AI chat sanitizes provider and malformed-response errors', async () => {
     }), { status: 429 }),
     run: async () => {
       const rateLimited = createResponse();
-      await chatHandler(request({
+      await translateHandler(request({
         body: { language: 'yo', messages: [{ role: 'user', text: 'Hello' }] },
       }), rateLimited);
       assert.equal(rateLimited.statusCode, 429);
@@ -165,7 +173,7 @@ test('AI chat sanitizes provider and malformed-response errors', async () => {
     }), { status: 400 }),
     run: async () => {
       const invalidKey = createResponse();
-      await chatHandler(request({
+      await translateHandler(request({
         body: { language: 'yo', messages: [{ role: 'user', text: 'Hello' }] },
       }), invalidKey);
       assert.equal(invalidKey.statusCode, 503);
@@ -180,7 +188,7 @@ test('AI chat sanitizes provider and malformed-response errors', async () => {
     })),
     run: async () => {
       const invalid = createResponse();
-      await chatHandler(request({
+      await translateHandler(request({
         body: { language: 'yo', messages: [{ role: 'user', text: 'Hello' }] },
       }), invalid);
       assert.equal(invalid.statusCode, 502);

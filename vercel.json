@@ -66,6 +66,10 @@
   ],
   "rewrites": [
     {
+      "source": "/api/chat",
+      "destination": "/api/translate?service=chat"
+    },
+    {
       "source": "/api/code/languages",
       "destination": "/api/code/run?operation=languages"
     }

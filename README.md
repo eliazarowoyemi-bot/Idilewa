@@ -73,7 +73,7 @@ The application is bundled with Vite as an ES module web application:
 - **`src/threeScene.js`:** Three.js 3D scene engine, orbit controls, audio visualizer, card tilt engine, and WebGL fallbacks.
 - **`src/translationEngine.js`:** Multi-language dictionary, word lexicons, and Web Audio API tone pitch synthesizer (`playTonePitch` for Dò-Re-Mí).
 - **`src/plotweaverClient.js` and `api/plotweaver/[...path].js`:** Browser client and server-side proxy for Plotweaver speech, voice discovery/cloning, translation, and transcription; the API key stays on the server.
-- **`src/aiChatClient.js` and `api/chat.js`:** Live, bilingual AI Conversation replies through a server-side Gemini endpoint; the API key stays on the server.
+- **`src/aiChatClient.js`, `api/translate.js` and `vercel.json`:** Live, bilingual AI Conversation replies through the shared serverless translation function’s `/api/chat` rewrite; the Gemini key stays on the server.
 - **`src/yorubaCodeEngine.js`:** *ÈdèKoodu* Yoruba coding keywords, curriculum lessons, transpiler, turtle graphics canvas, and safe sandbox executor (`executeYorubaCode`).
 - **`src/vowelsConsonantsData.js`:** Yoruba oral vowels, nasal vowels, consonants, and tone pitch reference guides with interactive soundboard.
 - **`src/supabaseClient.js`:** Supabase authentication and database persistence layer with local browser storage offline-first fallback.
