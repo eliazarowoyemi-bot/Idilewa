@@ -77,6 +77,18 @@ test('all four supported languages provide distinct lesson content for every gra
   }
 });
 
+test('voice curriculum does not contain generated placeholder translations', () => {
+  const curriculumMatch = appSource.match(/const TRAINER_CURRICULUM = (\{[\s\S]*?\});/);
+  assert.ok(curriculumMatch, 'Voice lesson curriculum data should be present');
+  const curricula = JSON.parse(curriculumMatch[1]);
+  const translations = Object.values(curricula)
+    .flatMap((language) => Object.values(language).flat())
+    .filter((lesson) => lesson.translation)
+    .map((lesson) => lesson.translation);
+
+  assert.deepEqual(translations, []);
+});
+
 test('voice feature pages expose every authored lesson with no artificial lesson cap', () => {
   const curriculumMatch = appSource.match(/const TRAINER_CURRICULUM = (\{[\s\S]*?\});/);
   assert.ok(curriculumMatch, 'Voice lesson curriculum data should be present');
