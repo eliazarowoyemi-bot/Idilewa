@@ -43,15 +43,15 @@ test('the AI conversation screen renders the guide card, thread, composer, and t
     assert.match(appSource, new RegExp(`class="${className}`), `${className} markup should exist`);
     assert.match(stylesSource, new RegExp(`\\.${className}\\b`), `${className} styles should exist`);
   }
-  assert.match(appSource, /class="aichat-title">AI Conversation</);
+  assert.match(appSource, /class="aichat-title">Translation Practice</);
   assert.match(appSource, /class="aichat-tabs aichat-tabs-desktop"/);
   assert.match(appSource, /class="aichat-tabs aichat-tabs-mobile"/);
   const tabs = appSource.match(/const AICHAT_TABS = \[([\s\S]*?)\n  \];/)?.[1] || '';
   assert.match(tabs, /label: 'Home'/);
   assert.match(tabs, /label: 'Learn'/);
-  assert.match(tabs, /label: 'AI Chat'/);
+  assert.match(tabs, /label: 'Practice'/);
   assert.match(tabs, /label: 'Library'/);
-  assert.doesNotMatch(tabs, /Practice|trainer/);
+  assert.doesNotMatch(tabs, /AI Chat|trainer/);
   assert.match(stylesSource, /\.aichat-tabs\s*\{[\s\S]*?grid-template-columns: repeat\(4, minmax\(0, 1fr\)\);/);
   assert.match(appSource, /id="aichat-audio-status" role="status"/);
   assert.doesNotMatch(appSource, /Live replies use Google Gemini|Live replies use Gemini|voice input and translation use Plotweaver|Avoid sharing personal details/);
@@ -59,7 +59,7 @@ test('the AI conversation screen renders the guide card, thread, composer, and t
   assert.match(appSource, /data-form="aichat-composer"/);
   assert.match(appSource, /class="aichat-focus-select"/);
   assert.match(appSource, /class="aichat-input"/);
-  assert.match(appSource, /label: 'AI Chat', ico: 'message', active: true/);
+  assert.match(appSource, /label: 'Practice', ico: 'message', active: true/);
   assert.match(appSource, /<a class="aichat-tab" href="#\/\$\{tab\.route\}" data-route="\$\{tab\.route\}">/);
 });
 
@@ -84,16 +84,15 @@ test('every AI chat control is wired through the shared action handler', () => {
   assert.match(appSource, /closest\('\.aichat-popover, \[data-action="aichat-settings"\], \[data-action="aichat-change-guide"\]'\)/);
 });
 
-test('AI chat uses server-side Gemini and Plotweaver services instead of canned replies', () => {
+test('translation practice uses the Plotweaver proxy for text and voice services', () => {
   assert.match(appSource, /import \{ sendAiChatMessage \} from '\.\/src\/aiChatClient\.js'/);
   assert.match(appSource, /sendAiChatMessage\(\{[\s\S]*?language: aiChatLanguage\(\)\.code/);
   assert.match(appSource, /synthesizePlotweaverSpeech\(\{/);
   assert.match(appSource, /transcribeWithPlotweaver\(recording, aiChatLanguage\(\)\.code\)/);
   assert.match(appSource, /translateWithPlotweaver\(\{/);
-  assert.doesNotMatch(appSource, /const AICHAT_REPLIES =/);
-  assert.doesNotMatch(appSource, /Live replies use Google Gemini|Live replies use Gemini|Avoid sharing personal details/);
-  assert.match(appSource, /yoruba: 'Ó dáàlẹ̀! Ẹ jẹ́ ká bẹ̀rẹ̀ lónìí\.'/);
-  assert.match(appSource, /english: 'Great! Let’s get started today\.'/);
+  assert.match(appSource, /placeholder="Type an English phrase to translate/);
+  assert.match(appSource, /Plotweaver translates phrases; it does not generate open-ended chat replies\./);
+  assert.doesNotMatch(appSource, /AICHAT_SEED_MESSAGES|Google Gemini|GEMINI_API_KEY/);
 });
 
 test('AI chat animation respects reduced motion preferences', () => {

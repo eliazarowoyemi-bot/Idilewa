@@ -10,12 +10,6 @@ export const VOICE_GRADE_PATHS = [
   { id: 'grade-8', name: 'Grade 8', ages: 'Ages 13–14', level: 'advanced', focus: 'Analyse philosophical themes, blessings and cultural context.', challenge: 'Present a nuanced interpretation.' }
 ];
 
-export const VOICE_FEATURE_LESSON_COUNT = 50;
-
-export function getVoiceFeatureLessonSlice(lessons) {
-  return lessons.slice(0, VOICE_FEATURE_LESSON_COUNT);
-}
-
 export function getVoiceGradePath(gradeId) {
   return VOICE_GRADE_PATHS.find((grade) => grade.id === gradeId) || null;
 }

@@ -11636,6 +11636,19 @@ body[data-page="ai-conversation"] .main-content {
   gap: 5px;
   padding: 2px 16px 2px;
 }
+.aichat-empty-state {
+  align-self: center;
+  max-width: 34rem;
+  margin: auto;
+  padding: 16px 20px;
+  border: 1px solid #d5e9db;
+  border-radius: 18px;
+  background: var(--aichat-mint);
+  color: #116b3c;
+  font-size: 14px;
+  line-height: 1.55;
+  text-align: center;
+}
 .aichat-row {
   display: flex;
   align-items: flex-end;

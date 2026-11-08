@@ -67,10 +67,8 @@ import {
   saveCodeSubmission
 } from './src/supabaseClient.js';
 import {
-  getVoiceFeatureLessonSlice,
   getVoiceGradeLessonSlice,
   getVoiceGradePath,
-  VOICE_FEATURE_LESSON_COUNT,
   VOICE_GRADE_PATHS
 } from './src/voiceGradeCurriculum.js';
 
@@ -276,7 +274,7 @@ import {
   const NAV = [
     { label: 'Home', route: 'index', group: 'home' },
     { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' },
-    { label: 'AI Conversation', route: 'ai-conversation', group: 'conversation' },
+    { label: 'Translation Practice', route: 'ai-conversation', group: 'conversation' },
     { label: 'For Tutors', route: 'tutor', group: 'tutor' }
   ];
   const MENU_NAV = [...NAV,
@@ -321,7 +319,7 @@ import {
   const LABELS = Object.fromEntries(ROUTES.map((r) => [r, r === 'index' ? 'Home' : r.replaceAll('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())]));
   Object.assign(LABELS, {
     'voice-language': 'Choose a voice lesson language',
-    'ai-conversation': 'AI Conversation',
+    'ai-conversation': 'Translation Practice',
     'voice-grade': 'Choose a voice lesson grade',
     'voice-audio': 'Voice audio lessons',
     'voice-practice': 'Voice lesson practice',
@@ -2962,7 +2960,7 @@ import {
     const practiceLessons = gradePath && gradePath.level === lessonLevel ? gradeLessons : lessons;
     const featureLessonPages = ['voice-text-to-speech', 'voice-speech-to-text', 'voice-translation', 'voice-cloning'];
     const featureLessons = featureLessonPages.includes(page)
-      ? getVoiceFeatureLessonSlice(Object.values(langData).flat())
+      ? Object.values(langData).flat()
       : [];
     const requestedFeatureLesson = Number.parseInt(params.lesson || '1', 10);
     const featureLessonNumber = Number.isInteger(requestedFeatureLesson)
@@ -3028,7 +3026,7 @@ import {
     const lessonNavigation = isFeatureLessonPage
       ? renderVoiceFeatureLessonNavigation(page, selectedLanguage, featureLessonNumber, featureLessons.length)
       : '';
-    const titleText = isFeatureLessonPage ? `${title} · Lesson ${featureLessonNumber} of ${VOICE_FEATURE_LESSON_COUNT}` : title;
+    const titleText = isFeatureLessonPage ? `${title} · Lesson ${featureLessonNumber} of ${featureLessons.length}` : title;
     const pageClass = page === 'voice-translation' ? 'voice-feature-page translation-page' : 'voice-feature-page';
     return `<div class="container route-page ${pageClass}"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span>${routeLink('voice_lessons', 'Voice Lessons')}<span>/</span><strong>${esc(title)}</strong></div><section class="voice-feature-header"><div><span class="section-kicker">${esc(kicker)} · Voice Lessons</span><h1>${esc(titleText)}</h1><p>${esc(description)}</p></div>${routeLink('voice_lessons', `${icon('arrow', 14, 'voice-arrow-back')} All Voice Lessons`, 'button button-outline')}</section>${lessonNavigation}<section class="voice-feature-content">${content}</section>${lessonNavigation}</div>`;
   }
@@ -3652,8 +3650,8 @@ import {
   }
 
   /* ==========================================================================
-     AI Conversation · Speak · Learn · Translate · Practise
-     Guided language practice with Gemini replies and Plotweaver voice tools.
+     Translation Practice · Speak · Learn · Translate · Practise
+     Phrase translation with Plotweaver voice tools.
      ========================================================================== */
   const AICHAT_GUIDES = [
     {
@@ -3661,14 +3659,14 @@ import {
       name: 'Iya Aduke',
       photo: 'yoruba-educator-woman.jpg',
       alt: 'Ìyá Adúkẹ́, a Yorùbá conversation guide wearing a green gèlè and coral beads',
-      tagline: "Let's learn Yorùbá together!",
+      tagline: 'Practise one phrase at a time.',
     },
     {
       id: 'baba-tunde',
       name: 'Bàbá Tundé',
       photo: 'yoruba-educator-man.jpg',
       alt: 'Bàbá Tundé, a Yorùbá conversation guide dressed for a heritage story session',
-      tagline: "Let's learn Yorùbá together!",
+      tagline: 'Practise one phrase at a time.',
     },
   ];
 
@@ -3676,24 +3674,13 @@ import {
     { label: 'Yorùbá · Family & Friends', name: 'Yorùbá', code: 'yo', locale: 'yo-NG' },
     { label: 'Igbo · Family & Friends', name: 'Igbo', code: 'ig', locale: 'ig-NG' },
     { label: 'Hausa · Family & Friends', name: 'Hausa', code: 'ha', locale: 'ha-NG' },
-    { label: 'Kiswahili · Family & Friends', name: 'Kiswahili', code: 'sw', locale: 'sw-KE' },
   ];
   const AICHAT_FOCUS_OPTIONS = AICHAT_LANGUAGES.map(({ label }) => label);
-
-  const AICHAT_PHRASE = 'Ó dáa! Kí ni ó fẹ́ bá mi sọ̀rọ̀ lónìí?';
-  const AICHAT_TRANSLATION = 'Great! What would you like to talk about today?';
-
-  const AICHAT_SEED_MESSAGES = [
-    { id: 'aichat-seed-1', role: 'user', text: 'Hello', time: '10:25' },
-    { id: 'aichat-seed-2', role: 'guide', yoruba: AICHAT_PHRASE, english: AICHAT_TRANSLATION, time: '10:25', controls: true },
-    { id: 'aichat-seed-3', role: 'user', text: 'Mo fẹ́ kọ́ Yorùbá.', time: '10:25' },
-    { id: 'aichat-seed-4', role: 'guide', yoruba: 'Ó dáàlẹ̀! Ẹ jẹ́ ká bẹ̀rẹ̀ lónìí.', english: 'Great! Let’s get started today.', time: '10:25', controls: false },
-  ];
 
   const AICHAT_TABS = [
     { label: 'Home', ico: 'home', route: 'index' },
     { label: 'Learn', ico: 'book', route: 'voice_lessons' },
-    { label: 'AI Chat', ico: 'message', active: true },
+    { label: 'Practice', ico: 'message', active: true },
     { label: 'Library', ico: 'library', route: 'oral' },
   ];
 
@@ -3704,8 +3691,8 @@ import {
     autoSpeak: false,
     rate: 1,
     returnRoute: 'index',
-    sequence: AICHAT_SEED_MESSAGES.length,
-    messages: AICHAT_SEED_MESSAGES.map((message) => ({ ...message })),
+    sequence: 0,
+    messages: [],
   };
   let aiChatListening = false;
   let aiChatStream = null;
@@ -3802,12 +3789,12 @@ import {
     }).join('');
     const messages = aiConversation.messages
       .map((message) => (message.role === 'guide' ? renderAiChatGuideMessage(message) : renderAiChatUserMessage(message)))
-      .join('');
+      .join('') || `<p class="aichat-empty-state">Type an English phrase below to see it translated into ${esc(aiChatLanguage().name)}. Plotweaver translates phrases; it does not generate open-ended chat replies.</p>`;
     return `<div class="aichat-page">
       <div class="aichat-canvas" aria-hidden="true"></div>
       <header class="aichat-header">
         <button type="button" class="aichat-iconbtn" data-action="aichat-back" aria-label="Go back">${icon('arrowLeft', 23)}</button>
-        <h1 class="aichat-title">AI Conversation</h1>
+        <h1 class="aichat-title">Translation Practice</h1>
         <nav class="aichat-tabs aichat-tabs-desktop" aria-label="Idilewa desktop navigation">${tabs}</nav>
         <div class="aichat-settings-wrap">
           <button type="button" class="aichat-iconbtn aichat-iconbtn-mint" data-action="aichat-settings" aria-expanded="false" aria-controls="aichat-settings" aria-label="Conversation settings">${icon('settings', 21)}</button>
@@ -3822,7 +3809,7 @@ import {
         <div class="aichat-rail">
           <div class="aichat-focus">
             ${icon('people', 20)}
-            <select class="aichat-focus-select" aria-label="Language and conversation topic">${focusOptions}</select>
+            <select class="aichat-focus-select" aria-label="Language to translate into">${focusOptions}</select>
             <span class="aichat-focus-chevron" aria-hidden="true">${icon('chevronDown', 18)}</span>
           </div>
           ${renderAiChatGuideCard()}
@@ -3831,7 +3818,7 @@ import {
       </div>
       <form class="aichat-composer" data-form="aichat-composer">
         <button type="button" class="aichat-mic" data-action="aichat-mic" aria-label="Speak your message">${icon('mic', 22)}</button>
-        <input class="aichat-input" type="text" name="message" placeholder="Type or speak..." autocomplete="off" maxlength="300" aria-label="Type or speak your message" />
+        <input class="aichat-input" type="text" name="message" placeholder="Type an English phrase to translate..." autocomplete="off" maxlength="300" aria-label="Type an English phrase to translate" />
         <button type="submit" class="aichat-send" aria-label="Send message">${icon('send', 21)}</button>
         <span class="aichat-status-sr-only" id="aichat-audio-status" role="status" aria-live="polite" aria-atomic="true"></span>
       </form>
@@ -3905,7 +3892,7 @@ import {
 
   function aiChatLatestPhrase() {
     const guideMessages = aiConversation.messages.filter((message) => message.role === 'guide');
-    return guideMessages[guideMessages.length - 1]?.yoruba || AICHAT_PHRASE;
+    return guideMessages[guideMessages.length - 1]?.yoruba || '';
   }
 
   function releaseAiChatAudio() {
@@ -3922,6 +3909,10 @@ import {
   }
 
   async function aiChatSpeak(text) {
+    if (!text.trim()) {
+      showToast('Translate a phrase before playing audio.', 'error');
+      return false;
+    }
     aiChatSpeechController?.abort();
     releaseAiChatAudio();
     const controller = new AbortController();
@@ -3959,10 +3950,11 @@ import {
   function showAiChatReplyPending() {
     const thread = document.getElementById('aichat-thread');
     if (!thread) return null;
+    thread.querySelector('.aichat-empty-state')?.remove();
     const status = document.createElement('p');
     status.className = 'aichat-pending';
     status.setAttribute('role', 'status');
-    status.textContent = 'Your guide is thinking…';
+    status.textContent = 'Translating your phrase…';
     thread.append(status);
     aiChatScrollToLatest('smooth');
     return status;
@@ -4014,6 +4006,7 @@ import {
         languageCode: aiChatLanguage().code,
         time: aiChatTimeStamp(),
         controls: false,
+        plotweaverTranslated: true,
       };
       aiConversation.messages.push(guideMessage);
       appendAiChatMessage(guideMessage);
@@ -7369,7 +7362,9 @@ import {
     const el = event.target;
     if (el.matches('.aichat-focus-select')) {
       aiConversation.focus = el.value;
-      showToast(`Practising ${el.value}.`, 'success');
+      aiConversation.messages = [];
+      render();
+      showToast(`Ready to translate English into ${aiChatLanguage().name}.`, 'success');
       return;
     }
     if (el.matches('.translation-speed-select select')) {

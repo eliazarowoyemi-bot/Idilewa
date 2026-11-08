@@ -2,10 +2,8 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import {
-  getVoiceFeatureLessonSlice,
   getVoiceGradeLessonSlice,
   getVoiceGradePath,
-  VOICE_FEATURE_LESSON_COUNT,
   VOICE_GRADE_PATHS
 } from '../src/voiceGradeCurriculum.js';
 
@@ -79,18 +77,24 @@ test('all four supported languages provide distinct lesson content for every gra
   }
 });
 
-test('voice feature pages each receive 50 guided lessons per language', () => {
+test('voice feature pages expose every authored lesson with no artificial lesson cap', () => {
   const curriculumMatch = appSource.match(/const TRAINER_CURRICULUM = (\{[\s\S]*?\});/);
   assert.ok(curriculumMatch, 'Voice lesson curriculum data should be present');
   const curricula = JSON.parse(curriculumMatch[1]);
 
   for (const language of ['yoruba', 'igbo', 'hausa', 'swahili']) {
-    const lessons = getVoiceFeatureLessonSlice(Object.values(curricula[language]).flat());
-    assert.equal(lessons.length, VOICE_FEATURE_LESSON_COUNT, `${language} should have 50 feature lessons`);
-    assert.equal(new Set(lessons.map((lesson) => lesson.id)).size, VOICE_FEATURE_LESSON_COUNT);
+    const lessons = Object.values(curricula[language]).flat();
+    const authoredLessonCount = Object.values(curricula[language])
+      .reduce((total, levelLessons) => total + levelLessons.length, 0);
+    assert.ok(lessons.length > 50, `${language} should expose lessons beyond the old 50-lesson cap`);
+    assert.equal(lessons.length, authoredLessonCount, `${language} should expose every authored lesson`);
+    assert.equal(new Set(lessons.map((lesson) => lesson.id)).size, authoredLessonCount);
   }
 
   assert.match(appSource, /renderVoiceFeatureLessonNavigation/);
+  assert.match(appSource, /Object\.values\(langData\)\.flat\(\)/);
+  assert.match(appSource, /Lesson \$\{featureLessonNumber\} of \$\{featureLessons\.length\}/);
+  assert.doesNotMatch(appSource, /VOICE_FEATURE_LESSON_COUNT/);
   assert.match(appSource, /'voice-text-to-speech', 'voice-speech-to-text', 'voice-translation', 'voice-cloning'/);
   assert.match(appSource, /data-action="start-voice-transcription"/);
   assert.match(appSource, /data-action="plotweaver-speak-text"/);

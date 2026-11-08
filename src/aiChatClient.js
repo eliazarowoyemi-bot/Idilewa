@@ -1,28 +1,25 @@
+import { translateWithPlotweaver } from './plotweaverClient.js';
+
+const SUPPORTED_CHAT_LANGUAGES = new Set(['yo', 'ig', 'ha']);
+
 export async function sendAiChatMessage({ language, messages, signal }) {
-  const response = await fetch('/api/chat', {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ language, messages }),
+  if (!SUPPORTED_CHAT_LANGUAGES.has(language)) {
+    throw new Error('Choose Yorùbá, Igbo, or Hausa for translation practice.');
+  }
+  const latestMessage = [...messages].reverse().find((message) => message.role === 'user');
+  if (typeof latestMessage?.text !== 'string' || !latestMessage.text.trim()) {
+    throw new Error('Type an English phrase before requesting a translation.');
+  }
+
+  const result = await translateWithPlotweaver({
+    text: latestMessage.text.trim(),
+    sourceLanguage: 'en',
+    targetLanguage: language,
     signal,
   });
-
-  let result;
-  try {
-    result = await response.json();
-  } catch {
-    result = null;
-  }
-  if (!response.ok) {
-    throw new Error(result?.error || `AI conversation request failed (${response.status}).`);
-  }
-  if (typeof result?.reply !== 'string'
-    || !result.reply.trim()
-    || typeof result.translation !== 'string'
-    || !result.translation.trim()) {
-    throw new Error('The AI conversation service returned an invalid reply.');
-  }
-  return result;
+  return {
+    reply: result.translated_text,
+    translation: latestMessage.text.trim(),
+    provider: 'Plotweaver',
+  };
 }

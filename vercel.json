@@ -82,10 +82,6 @@
       "destination": "/api/translate?service=canva&operation=designs"
     },
     {
-      "source": "/api/chat",
-      "destination": "/api/translate?service=chat"
-    },
-    {
       "source": "/api/code/languages",
       "destination": "/api/code/run?operation=languages"
     }

@@ -37,7 +37,7 @@ test('main and expanded mobile navigation omit retired pages', () => {
   assert.ok(navSource, 'main navigation list should exist');
   const navLabels = [...navSource.matchAll(/label: '([^']+)'/g)].map((match) => match[1]);
 
-  assert.deepEqual(navLabels, ['Home', 'Voice Lessons', 'AI Conversation', 'For Tutors']);
+  assert.deepEqual(navLabels, ['Home', 'Voice Lessons', 'Translation Practice', 'For Tutors']);
   assert.doesNotMatch(navSource, /Curriculum|STEM Studio|Payment/);
   const mobileItems = [...mobileNavSource.matchAll(/\{ route: '([^']+)', label: '([^']+)'/g)].map((match) => [match[1], match[2]]);
   assert.deepEqual(mobileItems, [['index', 'Home'], ['voice_lessons', 'Voice'], ['profile', 'Profile']]);
