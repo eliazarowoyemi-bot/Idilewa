@@ -1679,9 +1679,7 @@ import {
         if (status) status.textContent = 'No audio was recorded. Try again or type your phrase.';
         if (button.isConnected) {
           button.disabled = false;
-          button.innerHTML = button.classList.contains('translation-practice-button')
-            ? `${icon('mic', 17)}<span><strong>Record &amp; Practice</strong><small>Speak and compare</small></span>`
-            : icon('mic', 18);
+          button.innerHTML = icon('mic', 18);
         }
         return;
       }
@@ -1707,9 +1705,7 @@ import {
       } finally {
         if (button.isConnected) {
           button.disabled = false;
-          button.innerHTML = button.classList.contains('translation-practice-button')
-            ? `${icon('mic', 17)}<span><strong>Record &amp; Practice</strong><small>Speak and compare</small></span>`
-            : icon('mic', 18);
+          button.innerHTML = icon('mic', 18);
         }
       }
     }, { once: true });
@@ -2888,11 +2884,6 @@ import {
         <small id="voice-translation-transliteration" class="translation-inline-status" aria-live="polite"></small>
         <small id="voice-translation-provider-status" class="translation-inline-status" aria-live="polite">Loading supported languages…</small>
       </section>
-      <div class="translation-studio-actions">
-        <button class="translation-practice-button" type="button" data-action="start-voice-transcription">${icon('mic', 17)}<span><strong>Record &amp; Practice</strong><small>Speak and compare</small></span></button>
-        <button type="button" data-action="save-translation-to-library">${icon('star', 18)}<span><strong>Save to Library</strong><small>Keep for later</small></span></button>
-        <button type="button" data-action="add-translation-to-lesson">${icon('book', 18)}<span><strong>Add to Lesson</strong><small>Practice with exercises</small></span></button>
-      </div>
       <header class="translation-studio-hero">
         <div class="translation-studio-hero-copy">
           <span class="translation-studio-mark">${icon('volume', 19)}</span>
@@ -6879,37 +6870,6 @@ import {
         if (selector) selector.value = String(requestedSpeed);
         const status = document.getElementById('voice-translation-provider-status');
         if (status) status.textContent = `Speech speed set to ${requestedSpeed.toFixed(2)}x.`;
-        break;
-      }
-      case 'save-translation-to-library':
-      case 'add-translation-to-lesson': {
-        const input = document.getElementById('voice-translation-input');
-        const output = document.getElementById('voice-translation-result');
-        const sourceLanguage = document.getElementById('voice-translation-source-language')?.value || 'en';
-        const targetLanguage = document.getElementById('voice-translation-language')?.value || 'yo';
-        const source = input?.value.trim() || '';
-        const translated = output?.dataset.translation || '';
-        if (!source || !translated) {
-          showToast('Translate a phrase before saving it.', 'error');
-          break;
-        }
-        const entry = {
-          id: `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
-          source: source.slice(0, 500),
-          translated: translated.slice(0, 2_000),
-          sourceLanguage,
-          targetLanguage,
-          languageName: translationLanguageName(targetLanguage),
-        };
-        if (action === 'save-translation-to-library') {
-          state.savedTranslations = [entry, ...state.savedTranslations].slice(0, 50);
-          saveState();
-          showToast('Translation saved to your Library on this device.', 'success');
-        } else {
-          state.translationLessons = [entry, ...state.translationLessons].slice(0, 50);
-          saveState();
-          showToast('Translation added to your Voice Lessons practice list.', 'success');
-        }
         break;
       }
       case 'open-saved-translation': {

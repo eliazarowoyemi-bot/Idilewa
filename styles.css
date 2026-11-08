@@ -7838,13 +7838,6 @@ body[data-page="coding"] .coding-page.ide-fullscreen-page.ide-page-root { width:
 .translation-speed-select { cursor: default; }
 .translation-speed-select select { min-width: 40px; border: 0; background: transparent; color: inherit; font: inherit; font-size: 10px; }
 .translation-inline-status { display: block; margin-top: 7px; color: #69766d; font-size: 10px; line-height: 1.45; }
-.translation-studio-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 12px; }
-.translation-studio-actions > button { display: flex; min-width: 0; min-height: 51px; align-items: center; justify-content: center; gap: 9px; padding: 8px 10px; border: 1px solid #e3e5dd; border-radius: 10px; background: #fff; color: #765f27; font: inherit; cursor: pointer; }
-.translation-studio-actions > button:first-child { border-color: #ecd9e8; background: #fcf4fa; color: #8a4d76; }
-.translation-studio-actions > button:last-child { color: #397449; }
-.translation-studio-actions > button > span { display: grid; gap: 2px; text-align: left; }
-.translation-studio-actions strong { font-size: 10px; }
-.translation-studio-actions small { color: #768078; font-size: 9px; }
 .translation-saved-lessons { margin: 0 0 18px; padding: 16px; border: 1px solid #e3eae1; border-radius: 14px; background: #fff; }
 .translation-saved-lessons h2 { margin: 5px 0 12px; color: #293d30; font-size: 18px; }
 .translation-saved-lessons > div { display: grid; gap: 8px; }
@@ -7883,7 +7876,6 @@ body[data-page="coding"] .coding-page.ide-fullscreen-page.ide-page-root { width:
   .curriculum-dashboard-bottom { grid-template-columns: 1fr; }
   .translation-studio-compose { grid-template-columns: minmax(0, 1fr); gap: 8px; margin-top: 12px; }
   .translation-swap { justify-self: center; transform: rotate(90deg); }
-  .translation-studio-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .voice-feature-header { align-items: flex-start; flex-direction: column; padding: 22px; }
   .voice-feature-choice-grid, .voice-audio-lesson-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .voice-feature-content { padding: 16px; }
@@ -7899,8 +7891,6 @@ body[data-page="coding"] .coding-page.ide-fullscreen-page.ide-page-root { width:
   .translation-language-options button { min-height: 36px; }
   .translation-result-panel { margin-top: 10px; padding: 12px; }
   .translation-playback-controls > button, .translation-speed-select { min-height: 35px; padding-inline: 9px; }
-  .translation-studio-actions { grid-template-columns: minmax(0, 1fr); gap: 7px; margin-top: 9px; }
-  .translation-studio-actions > button { justify-content: flex-start; min-height: 48px; padding-inline: 13px; }
   .translation-saved-lessons article { align-items: flex-start; flex-direction: column; }
   .translation-saved-lessons article button { width: 100%; }
   .curriculum-dashboard { gap: 12px; padding-top: 10px; }
