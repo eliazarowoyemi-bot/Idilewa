@@ -2851,13 +2851,6 @@ import {
     const targetName = translationLanguageName(targetLanguage);
     const translatedText = lesson ? '' : selectedTranslation?.translated || 'Ẹ káàárọ̀, báwo ni?';
     return `<div class="translation-studio">
-      <header class="translation-studio-hero">
-        <div class="translation-studio-hero-copy">
-          <span class="translation-studio-mark">${icon('volume', 19)}</span>
-          <div><h1>AI Translate &amp; Listen Studio</h1><p>Type, translate, record and build your vocabulary in Yorùbá, Igbo, Hausa and more.</p></div>
-        </div>
-        <img src="./assets/code-kids.jpg" alt="Two children learning together on a laptop" />
-      </header>
       <div class="translation-studio-compose">
         <section class="translation-compose-panel" aria-labelledby="translation-write-title">
           <h2 id="translation-write-title"><span>1</span> Write or paste your text</h2>
@@ -2900,6 +2893,13 @@ import {
         <button type="button" data-action="save-translation-to-library">${icon('star', 18)}<span><strong>Save to Library</strong><small>Keep for later</small></span></button>
         <button type="button" data-action="add-translation-to-lesson">${icon('book', 18)}<span><strong>Add to Lesson</strong><small>Practice with exercises</small></span></button>
       </div>
+      <header class="translation-studio-hero">
+        <div class="translation-studio-hero-copy">
+          <span class="translation-studio-mark">${icon('volume', 19)}</span>
+          <div><h1>AI Translate &amp; Listen Studio</h1><p>Type, translate, record and build your vocabulary in Yorùbá, Igbo, Hausa and more.</p></div>
+        </div>
+        <img src="./assets/code-kids.jpg" alt="Two children learning together on a laptop" />
+      </header>
     </div>`;
   }
 
