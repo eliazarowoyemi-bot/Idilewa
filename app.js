@@ -2855,7 +2855,7 @@ import {
           <label class="sr-only" for="voice-translation-input">Text to translate</label>
           <textarea id="voice-translation-input" rows="3" maxlength="500" placeholder="Write or paste your text here…">${esc(sourceText)}</textarea>
           <div class="translation-input-footer"><small><span id="voice-translation-character-count">${sourceText.length}</span>/500</small><button type="button" class="translation-clear-button" data-action="clear-voice-translation">Clear</button><button type="button" class="translation-mic-button" aria-label="Record and practice" data-action="start-voice-transcription">${icon('mic', 18)}</button></div>
-          ${showDictation ? '<small id="voice-transcription-status" class="translation-inline-status" aria-live="polite">Record &amp; Practice with your microphone.</small>' : ''}
+          ${showDictation ? '<small id="voice-transcription-status" class="translation-inline-status" aria-live="polite">Microphone access is requested only when you start recording.</small>' : ''}
         </section>
         <span class="translation-swap" aria-hidden="true">${icon('refresh', 18)}</span>
         <section class="translation-target-panel" aria-labelledby="translation-target-title">
