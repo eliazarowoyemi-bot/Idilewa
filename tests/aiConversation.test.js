@@ -122,10 +122,14 @@ test('the AI conversation page reflows into a rail and thread workspace on wide 
   const tablet = stylesSource.match(/@media \(min-width: 620px\) \{[\s\S]*?\n\}/)?.[0] || '';
   const desktop = stylesSource.match(/@media \(min-width: 1024px\) \{[\s\S]*?\n\}/)?.[0] || '';
   assert.ok(tablet, 'a tablet breakpoint should keep the single-column shell');
-  assert.match(tablet, /\.aichat-page \{[\s\S]*?max-width: 780px;/);
+  assert.match(tablet, /\.aichat-page \{[\s\S]*?max-width: 960px;/);
+  assert.match(stylesSource, /\.aichat-iconbtn \{[\s\S]*?width: 44px;[\s\S]*?height: 44px;/);
+  assert.match(stylesSource, /\.aichat-focus \{[\s\S]*?height: 44px;/);
+  assert.match(stylesSource, /\.aichat-tab \{[\s\S]*?min-height: 44px;/);
   assert.ok(desktop, 'a desktop breakpoint should own the workspace layout');
   assert.match(desktop, /grid-template-areas:\s*\n\s*"head head"\s*\n\s*"rail chat"\s*\n\s*"rail comp";/);
   assert.match(desktop, /grid-template-columns: minmax\(320px, 30%\) minmax\(0, 1fr\);/);
+  assert.match(desktop, /\.aichat-guide-media \{ height: min\(48vh, 30vw, 440px\);/);
   assert.match(desktop, /\.aichat-scroll \{ display: contents; \}/);
   assert.match(desktop, /\.aichat-thread \{[\s\S]*?overflow-y: auto;/);
   assert.match(desktop, /\.aichat-tab \{[\s\S]*?flex-direction: row;/);

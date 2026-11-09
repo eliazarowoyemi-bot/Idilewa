@@ -11423,8 +11423,8 @@ body[data-page="ai-conversation"] .main-content {
   color: #0b1f14;
 }
 .aichat-iconbtn {
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -11477,9 +11477,9 @@ body[data-page="ai-conversation"] .main-content {
   display: flex;
   align-items: center;
   gap: 9px;
-  margin: 0 16px 6px;
+  margin: 0 16px 8px;
   padding: 0 16px;
-  height: 34px;
+  height: 44px;
   border-radius: 999px;
   background: var(--aichat-mint-strong);
   color: #10361f;
@@ -11857,6 +11857,7 @@ body[data-page="ai-conversation"] .main-content {
   flex-direction: column;
   align-items: center;
   gap: 3px;
+  min-height: 44px;
   padding: 5px 2px 6px;
   border: 0;
   border-radius: 14px;
@@ -12035,11 +12036,11 @@ body[data-page="ai-conversation"] .main-content {
       #e8f7ee;
   }
   body[data-page="ai-conversation"] #app.app-shell {
-    width: min(100%, 780px);
-    max-width: 780px;
+    width: min(100%, 960px);
+    max-width: 960px;
   }
   .aichat-page {
-    max-width: 780px;
+    max-width: 960px;
     height: min(1000px, calc(100svh - 48px));
     min-height: 0;
     border-radius: 30px;
@@ -12232,7 +12233,7 @@ body[data-page="ai-conversation"] .main-content {
     box-shadow: none;
   }
   .aichat-guide::after { display: none; }
-  .aichat-guide-media { height: min(48vh, 30vw); min-height: 0; border-radius: 18px; }
+  .aichat-guide-media { height: min(48vh, 30vw, 440px); min-height: 0; border-radius: 18px; }
   .aichat-guide-media img { object-position: 50% 20%; }
   .aichat-guide-copy { display: flex; flex-direction: column; align-self: stretch; align-items: flex-start; min-height: 0; padding: 8px 8px 4px; }
   .aichat-guide-name h2 { font-size: clamp(24px, 2vw, 32px); }
