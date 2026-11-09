@@ -2904,6 +2904,17 @@ import {
     return String(title || fallback).replace(/^lesson\s+\d+(?:\s+of\s+\d+)?\s*(?::|[-–—]\s*)?/i, '').trim() || fallback;
   }
 
+  function renderVoiceFeatureLessonNavigation(page, language, lessonIndex, lessons) {
+    if (!lessons.length) return '';
+    const previousIndex = (lessonIndex - 1 + lessons.length) % lessons.length;
+    const nextIndex = (lessonIndex + 1) % lessons.length;
+    const route = (index) => `#/${page}?lang=${encodeURIComponent(language)}&lesson=${index + 1}`;
+    return `<nav class="voice-feature-lesson-navigation" aria-label="Lesson navigation">
+      <a class="button button-outline" href="${route(previousIndex)}">${icon('arrow', 15, 'voice-arrow-back')} Previous lesson</a>
+      <a class="button button-primary" href="${route(nextIndex)}">Next lesson ${icon('arrow', 15)}</a>
+    </nav>`;
+  }
+
   function renderVoicePracticeLessonNavigation(language, level, gradePath, lessons, activeLesson) {
     const currentIndex = lessons.findIndex((lesson) => lesson.id === activeLesson.id);
     const previousLesson = lessons[(currentIndex - 1 + lessons.length) % lessons.length];
@@ -2949,10 +2960,11 @@ import {
       ? Object.values(langData).flat()
       : [];
     const requestedFeatureLesson = Number.parseInt(params.lesson || '1', 10);
-    const featureLessonNumber = Number.isInteger(requestedFeatureLesson)
-      ? Math.min(Math.max(requestedFeatureLesson, 1), featureLessons.length || 1)
-      : 1;
-    const featureLesson = featureLessons[featureLessonNumber - 1] || null;
+    const requestedFeatureLessonIndex = Number.isInteger(requestedFeatureLesson) ? requestedFeatureLesson - 1 : 0;
+    const featureLessonIndex = featureLessons.length
+      ? ((requestedFeatureLessonIndex % featureLessons.length) + featureLessons.length) % featureLessons.length
+      : 0;
+    const featureLesson = featureLessons[featureLessonIndex] || null;
     const selectedLessonId = Number(params.lesson) || state.trainer.activeLessonId || lessons[0]?.id || 1;
     const activeLesson = practiceLessons.find((lesson) => lesson.id === selectedLessonId) || practiceLessons[0];
     const hasEnglishTranslation = Boolean(activeLesson?.translation);
@@ -3004,11 +3016,15 @@ import {
       const languageCodes = { yoruba: 'yo', igbo: 'ig', hausa: 'ha', swahili: 'sw' };
       content = `<div class="voice-feature-lesson-prompt"><h2>${esc(voiceLessonDisplayTitle(featureLesson, 'Speak and transcribe'))}</h2><p>Say any phrase clearly, then compare your transcription with the sample.</p><strong lang="${selectedLanguage === 'yoruba' ? 'yo' : selectedLanguage === 'igbo' ? 'ig' : selectedLanguage === 'hausa' ? 'ha' : 'sw'}">${esc(featureLesson?.phrase || '')}</strong>${featureLesson?.translation ? `<small>${esc(featureLesson.translation)}</small>` : ''}</div><div class="voice-feature-tool"><label class="curriculum-tool-label" for="voice-translation-input">Your recording transcription</label><textarea id="voice-translation-input" rows="5" maxlength="1000" placeholder="Your recognized words will appear here"></textarea><label class="curriculum-tool-label" for="voice-translation-source-language">Spoken language</label><select id="voice-translation-source-language"><option value="${languageCodes[selectedLanguage] || 'yo'}">${esc(langName)}</option></select><button class="button button-primary" type="button" data-action="start-voice-transcription">${icon('mic', 15)} Start recording</button><small id="voice-transcription-status" class="curriculum-tool-status" aria-live="polite">Microphone permission is requested only when you begin recording.</small></div>`;
     } else if (page === 'voice-translation') {
-      content = `${renderVoiceTranslationTool({ language: selectedLanguage })}`;
+      const languageCodes = { yoruba: 'yo', igbo: 'ig', hausa: 'ha', swahili: 'sw' };
+      content = `<div class="voice-feature-lesson-prompt"><h2>${esc(voiceLessonDisplayTitle(featureLesson, 'Translate a phrase'))}</h2><p>Explore this phrase, or enter any English phrase below to translate it.</p><strong lang="${languageCodes[selectedLanguage] || 'yo'}">${esc(featureLesson?.phrase || '')}</strong></div>${renderVoiceTranslationTool({ language: selectedLanguage })}`;
     }
 
+    const lessonNavigation = featureLessonPages.includes(page)
+      ? renderVoiceFeatureLessonNavigation(page, selectedLanguage, featureLessonIndex, featureLessons)
+      : '';
     const pageClass = page === 'voice-translation' ? 'voice-feature-page translation-page' : 'voice-feature-page';
-    return `<div class="container route-page ${pageClass}"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span>${routeLink('voice_lessons', 'Voice Lessons')}<span>/</span><strong>${esc(title)}</strong></div><section class="voice-feature-header"><div><span class="section-kicker">${esc(kicker)} · Voice Lessons</span><h1>${esc(title)}</h1><p>${esc(description)}</p></div>${routeLink('voice_lessons', `${icon('arrow', 14, 'voice-arrow-back')} All Voice Lessons`, 'button button-outline')}</section><section class="voice-feature-content">${content}</section></div>`;
+    return `<div class="container route-page ${pageClass}"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span>${routeLink('voice_lessons', 'Voice Lessons')}<span>/</span><strong>${esc(title)}</strong></div><section class="voice-feature-header"><div><span class="section-kicker">${esc(kicker)} · Voice Lessons</span><h1>${esc(title)}</h1><p>${esc(description)}</p></div>${routeLink('voice_lessons', `${icon('arrow', 14, 'voice-arrow-back')} All Voice Lessons`, 'button button-outline')}</section><section class="voice-feature-content">${lessonNavigation}${content}</section></div>`;
   }
 
   function renderVoiceLessonsHome() {

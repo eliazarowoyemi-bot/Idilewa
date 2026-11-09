@@ -104,11 +104,17 @@ test('voice tools have no visible lesson counter and practice navigation can con
   }
 
   assert.match(appSource, /renderVoicePracticeLessonNavigation/);
+  assert.match(appSource, /function renderVoiceFeatureLessonNavigation/);
+  assert.match(appSource, /Previous lesson/);
+  assert.match(appSource, /Next lesson/);
+  assert.match(appSource, /const previousIndex = \(lessonIndex - 1 \+ lessons\.length\) % lessons\.length/);
+  assert.match(appSource, /const nextIndex = \(lessonIndex \+ 1\) % lessons\.length/);
   assert.match(appSource, /Object\.values\(langData\)\.flat\(\)/);
   assert.doesNotMatch(appSource, /Lesson \$\{featureLessonNumber\} of \$\{featureLessons\.length\}/);
   assert.doesNotMatch(appSource, /60 (?:Audio )?Lessons|60 lessons/);
   assert.doesNotMatch(appSource, /Course complete/);
   assert.match(appSource, /voiceLessonDisplayTitle\(featureLesson,/);
+  assert.match(appSource, /Explore this phrase, or enter any English phrase below to translate it\./);
   assert.match(appSource, /replace\(\/\^lesson\\s\+\\d\+/);
   assert.match(appSource, /lessons\[\(currentIndex \+ 1\) % lessons\.length\]/);
   assert.match(appSource, /lessons\[\(currentIndex - 1 \+ lessons\.length\) % lessons\.length\]/);
