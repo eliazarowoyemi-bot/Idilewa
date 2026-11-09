@@ -12739,6 +12739,8 @@ body.academy-reference-shell ::selection { background: #c9eed2; color: #075e2b; 
 @media (max-width: 420px) {
   .academy-reference-page { width: calc(100% - 24px); }
   .academy-reference-shell .header-inner.academy-reference-header { width: calc(100% - 24px); }
+  body.academy-reference-shell #mobile-menu .mobile-menu-list { grid-template-columns: minmax(0, 1fr); }
+  body.academy-reference-shell #mobile-menu .mobile-menu-link > span { min-width: 0; overflow-wrap: anywhere; }
   .academy-hero-copy { padding: 28px 18px 18px; }
   .academy-hero h1 { font-size: clamp(34px, 10.25vw, 40px); }
   .academy-language-card { padding: 12px; }
