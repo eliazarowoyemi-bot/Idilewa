@@ -8,7 +8,7 @@ export const AI_CONVERSATION_LANGUAGES = Object.freeze([
     teacher: {
       name: 'Iya Aduke',
       title: 'Olùkọ́ èdè Yorùbá',
-      image: 'yoruba-educator-woman.jpg',
+      image: 'teacher-guides/yoruba-iya-aduke.png',
       imageAlt: 'Iya Aduke, a Yorùbá conversation guide in traditional attire',
       description: 'Ẹ káàbọ̀! Jẹ́ ká kọ́ Yorùbá pọ̀, ọ̀rọ̀ kan lẹ́ẹ̀kọ̀ọ̀kan.',
     },
@@ -31,7 +31,7 @@ export const AI_CONVERSATION_LANGUAGES = Object.freeze([
     teacher: {
       name: 'Ngozi Nwosu',
       title: 'Nkụzi Asụsụ Igbo',
-      image: 'teacher-guides/igbo-ngozi-nwosu.jpg',
+      image: 'teacher-guides/igbo-ngozi-nwosu.png',
       imageAlt: 'Ngozi Nwosu, an Igbo-speaking conversation guide in Igbo traditional attire',
       description: 'Nnọọ! Ka anyị mụta Igbo ọnụ, otu ahịrịokwu n’otu oge.',
     },
@@ -54,7 +54,7 @@ export const AI_CONVERSATION_LANGUAGES = Object.freeze([
     teacher: {
       name: 'Aisha Muhammad',
       title: 'Malamar harshen Hausa',
-      image: 'teacher-guides/hausa-aisha-muhammad.jpg',
+      image: 'teacher-guides/hausa-aisha-muhammad.png',
       imageAlt: 'Aisha Muhammad, a Hausa-speaking conversation guide in traditional Hausa attire',
       description: 'Sannu! Mu koyi Hausa tare, jumla ɗaya a lokaci guda.',
     },
@@ -77,7 +77,7 @@ export const AI_CONVERSATION_LANGUAGES = Object.freeze([
     teacher: {
       name: 'Amina Juma',
       title: 'Mwalimu wa Kiswahili',
-      image: 'teacher-guides/swahili-amina-juma.jpg',
+      image: 'teacher-guides/swahili-amina-juma.png',
       imageAlt: 'Amina Juma, a Swahili-speaking conversation guide in East African attire',
       description: 'Karibu! Tujifunze Kiswahili pamoja, sentensi moja kwa wakati.',
     },

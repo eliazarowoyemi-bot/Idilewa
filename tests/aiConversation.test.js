@@ -72,10 +72,18 @@ test('each supported language has a dedicated guide and mapped portrait asset', 
   assert.equal(AI_CONVERSATION_LANGUAGES[1].teacher.name, 'Ngozi Nwosu');
   assert.equal(AI_CONVERSATION_LANGUAGES[2].teacher.name, 'Aisha Muhammad');
   assert.equal(AI_CONVERSATION_LANGUAGES[3].teacher.name, 'Amina Juma');
-  await access(new URL('../public/assets/yoruba-educator-woman.jpg', import.meta.url));
-  assert.match(AI_CONVERSATION_LANGUAGES[1].teacher.image, /^teacher-guides\/igbo-/);
-  assert.match(AI_CONVERSATION_LANGUAGES[2].teacher.image, /^teacher-guides\/hausa-/);
-  assert.match(AI_CONVERSATION_LANGUAGES[3].teacher.image, /^teacher-guides\/swahili-/);
+  assert.deepEqual(
+    portraitPaths,
+    [
+      'teacher-guides/yoruba-iya-aduke.png',
+      'teacher-guides/igbo-ngozi-nwosu.png',
+      'teacher-guides/hausa-aisha-muhammad.png',
+      'teacher-guides/swahili-amina-juma.png',
+    ],
+  );
+  await Promise.all(portraitPaths.map((image) => (
+    access(new URL(`../public/assets/${image}`, import.meta.url))
+  )));
 });
 
 test('every AI chat control is wired through the shared action handler', () => {
