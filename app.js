@@ -121,10 +121,10 @@ import {
   };
 
   const LANGUAGES = [
-    { id: 'yoruba', name: 'Yorùbá', native: 'Èdè Yorùbá', greeting: 'Ẹ káàárọ̀', hello: 'Báwo ni?', translation: 'Good morning', glyph: 'È', region: 'Nigeria · Benin · Togo', tint: 'mint', lessons: '60 lessons · 3 levels' },
-    { id: 'igbo', name: 'Igbo', native: 'Asụsụ Igbo', greeting: 'Ndewo', hello: 'Kedu?', translation: 'Hello', glyph: 'Ị', region: 'South-eastern Nigeria', tint: 'peach', lessons: '60 lessons · 3 levels' },
-    { id: 'hausa', name: 'Hausa', native: 'Harshen Hausa', greeting: 'Sannu', hello: 'Yaya dai?', translation: 'Hello', glyph: 'H', region: 'West & Central Africa', tint: 'blue', lessons: '60 lessons · 3 levels' },
-    { id: 'swahili', name: 'Swahili', native: 'Kiswahili', greeting: 'Habari', hello: 'Hujambo?', translation: 'How are you?', glyph: 'S', region: 'East Africa', tint: 'lilac', lessons: '60 lessons · 3 levels' }
+    { id: 'yoruba', name: 'Yorùbá', native: 'Èdè Yorùbá', greeting: 'Ẹ káàárọ̀', hello: 'Báwo ni?', translation: 'Good morning', glyph: 'È', region: 'Nigeria · Benin · Togo', tint: 'mint', lessons: 'Practice at your own pace' },
+    { id: 'igbo', name: 'Igbo', native: 'Asụsụ Igbo', greeting: 'Ndewo', hello: 'Kedu?', translation: 'Hello', glyph: 'Ị', region: 'South-eastern Nigeria', tint: 'peach', lessons: 'Practice at your own pace' },
+    { id: 'hausa', name: 'Hausa', native: 'Harshen Hausa', greeting: 'Sannu', hello: 'Yaya dai?', translation: 'Hello', glyph: 'H', region: 'West & Central Africa', tint: 'blue', lessons: 'Practice at your own pace' },
+    { id: 'swahili', name: 'Swahili', native: 'Kiswahili', greeting: 'Habari', hello: 'Hujambo?', translation: 'How are you?', glyph: 'S', region: 'East Africa', tint: 'lilac', lessons: 'Practice at your own pace' }
   ];
 
   const SOON_LANGUAGES = [
@@ -209,14 +209,14 @@ import {
     voice_lessons: {
       title: 'Master African Tonal Pitch with Interactive Voice Practice.',
       eyebrow: 'Voice Lessons',
-      desc: 'Interactive speech studio with pitch detection, tone melody soundboards, and voice synthesis across 6 African languages and 60 lessons.',
+      desc: 'Interactive speech studio with pitch detection, tone melody soundboards, and voice synthesis across African languages.',
       icon: 'mic', image: 'listening-reader.jpg', imageAlt: 'A learner practicing voice pronunciation with interactive audio',
       active: 0, flow: ['Select Language', 'Hear Native Tones', 'Record & Analyze', 'Earn Certificate'],
       cta: 'Open Voice Lessons', ctaRoute: 'voice_lessons',
       cards: [
         { title: 'Tonal Pitch Melody', text: 'Hear high, mid, and low tonal frequencies with dynamic soundboard keys.', icon: 'music', route: 'voice_lessons', tone: 'mint' },
         { title: 'Speech Evaluation', text: 'Practice pronunciation, rhythm, and clarity with feedback.', icon: 'mic', route: 'voice_lessons', tone: 'yellow' },
-        { title: '60 Audio Lessons', text: 'Start with Yoruba sounds, then explore beginner, intermediate, and advanced lessons.', icon: 'book', route: 'voice_lessons', tone: 'blue' }
+        { title: 'Guided Audio Lessons', text: 'Start with Yoruba sounds, then explore beginner, intermediate, and advanced lessons.', icon: 'book', route: 'voice_lessons', tone: 'blue' }
       ]
     },
     adult: {
@@ -859,7 +859,7 @@ import {
                 <h2 id="home-voice-promo-title">Speak African languages with <em>native tonal fluency.</em></h2>
                 <p>Our interactive Voice Lessons help you listen and practise speaking across Yorùbá, Igbo, Hausa, Kiswahili, isiZulu and Twi.</p>
                 <div class="home-voice-promo-highlights">
-                  <span><span>${icon('volume', 14)}</span><strong>60 Audio Lessons</strong><small>3 progressive tiers</small></span>
+                  <span><span>${icon('volume', 14)}</span><strong>Guided Audio Lessons</strong><small>Practice at your own pace</small></span>
                   <span><span>${icon('music', 14)}</span><strong>Dó-Re-Mí Melodies</strong><small>Interactive pitch keys</small></span>
                   <span><span>${icon('mic', 14)}</span><strong>Live Mic Practice</strong><small>Record and transcribe</small></span>
                 </div>
@@ -927,11 +927,11 @@ import {
             </div>
             <div class="journey-3d-content">
               <h3>Voice &amp; Tonal Melody</h3>
-              <p>Hear and practice Dó-Re-Mí tones with our interactive syllable pitch soundboard and 60 audio lessons.</p>
+              <p>Hear and practice Dó-Re-Mí tones with our interactive syllable pitch soundboard and guided audio lessons.</p>
               <ul class="journey-highlights" aria-label="Key features">
                 <li><span>✓</span> Real-Time Pitch Detection &amp; Scoring</li>
                 <li><span>✓</span> High, Mid &amp; Low Tone Marks</li>
-                <li><span>✓</span> 60 Audio Lessons Across 6 Dialects</li>
+                <li><span>✓</span> Guided Audio Lessons Across African Languages</li>
               </ul>
             </div>
             <div class="journey-card-action">
@@ -998,8 +998,8 @@ import {
               <div class="trainer-highlight-item">
                 <span class="highlight-icon">${icon('volume', 18)}</span>
                 <div>
-                  <strong>60 Audio Lessons</strong>
-                  <small>3 progressive tiers</small>
+                  <strong>Guided Audio Lessons</strong>
+                  <small>Practice at your own pace</small>
                 </div>
               </div>
               <div class="trainer-highlight-item">
@@ -1219,7 +1219,7 @@ import {
         <div class="callout-content">
           <span class="callout-kicker">NEW INTERACTIVE VOICE STUDIO</span>
           <h3>Practice Real-Time Tonal Pronunciation & Pitch Melody</h3>
-          <p>Train with 60 audio lessons across 6 African languages. Get instant speech analysis and fluency score feedback.</p>
+          <p>Practice across African languages. Get instant speech analysis and fluency score feedback.</p>
         </div>
         ${routeLink('voice_lessons', `Open Voice Lessons ${icon('arrow', 15)}`, 'button button-primary')}
       </section>
@@ -2899,40 +2899,23 @@ import {
     return ({ en: 'English', yo: 'Yorùbá', ig: 'Igbo', ha: 'Hausa', sw: 'Swahili' })[code] || 'Yorùbá';
   }
 
-  function renderVoiceFeatureLessonNavigation(page, language, lessonNumber, lessonCount) {
-    const route = `#/${page}?lang=${encodeURIComponent(language)}&lesson=`;
-    const previous = lessonNumber > 1
-      ? `<a class="button button-outline" href="${route}${lessonNumber - 1}">${icon('arrow', 14, 'voice-arrow-back')} Back</a>`
-      : `<button class="button button-outline" type="button" disabled>${icon('arrow', 14, 'voice-arrow-back')} Back</button>`;
-    const next = lessonNumber < lessonCount
-      ? `<a class="button button-primary" href="${route}${lessonNumber + 1}">Next lesson ${icon('arrow', 14)}</a>`
-      : `<button class="button button-primary" type="button" disabled>Course complete ${icon('arrow', 14)}</button>`;
-    const progress = Math.round((lessonNumber / lessonCount) * 100);
-    return `<div class="voice-feature-lesson-progress">
-      <div><span>Lesson ${String(lessonNumber).padStart(2, '0')} of ${lessonCount}</span><span>${progress}%</span></div>
-      <progress value="${lessonNumber}" max="${lessonCount}" aria-label="Lesson ${lessonNumber} of ${lessonCount}"></progress>
-    </div>
-    <nav class="voice-feature-lesson-navigation" aria-label="Lesson navigation">
-      ${previous}
-      ${routeLink('voice_lessons', 'All voice tools', 'button button-outline')}
-      ${next}
-    </nav>`;
+  function voiceLessonDisplayTitle(lesson, fallback) {
+    const title = lesson?.title || lesson?.phrase || fallback;
+    return String(title || fallback).replace(/^lesson\s+\d+(?:\s+of\s+\d+)?\s*(?::|[-–—]\s*)?/i, '').trim() || fallback;
   }
 
   function renderVoicePracticeLessonNavigation(language, level, gradePath, lessons, activeLesson) {
     const currentIndex = lessons.findIndex((lesson) => lesson.id === activeLesson.id);
+    const previousLesson = lessons[(currentIndex - 1 + lessons.length) % lessons.length];
+    const nextLesson = lessons[(currentIndex + 1) % lessons.length];
     const lessonRoute = (lesson) => {
       const params = new URLSearchParams({ lang: language, level, lesson: String(lesson.id) });
       if (gradePath) params.set('grade', gradePath.id);
       return `#/voice-practice?${params}`;
     };
     const routeAttributes = (lesson) => `data-route="voice-practice" data-lang="${language}" data-level="${level}" data-lesson="${lesson.id}"${gradePath ? ` data-grade="${gradePath.id}"` : ''}`;
-    const previous = currentIndex > 0
-      ? `<a class="button button-outline" href="${lessonRoute(lessons[currentIndex - 1])}" ${routeAttributes(lessons[currentIndex - 1])}>${icon('arrow', 15, 'voice-arrow-back')} Previous lesson</a>`
-      : `<button class="button button-outline" type="button" disabled>${icon('arrow', 15, 'voice-arrow-back')} Previous lesson</button>`;
-    const next = currentIndex < lessons.length - 1
-      ? `<a class="button button-primary" href="${lessonRoute(lessons[currentIndex + 1])}" ${routeAttributes(lessons[currentIndex + 1])}>Next lesson ${icon('arrow', 15)}</a>`
-      : `<button class="button button-primary" type="button" disabled>Course complete ${icon('arrow', 15)}</button>`;
+    const previous = `<a class="button button-outline" href="${lessonRoute(previousLesson)}" ${routeAttributes(previousLesson)}>${icon('arrow', 15, 'voice-arrow-back')} Previous</a>`;
+    const next = `<a class="button button-primary" href="${lessonRoute(nextLesson)}" ${routeAttributes(nextLesson)}>Next ${icon('arrow', 15)}</a>`;
     const audioParams = new URLSearchParams({ lang: language, level });
     if (gradePath) audioParams.set('grade', gradePath.id);
     return `<nav class="voice-practice-lesson-navigation" aria-label="Lesson navigation">
@@ -2977,7 +2960,7 @@ import {
       'voice-language': ['Choose your language', 'Choose a language to personalize your listening and speaking practice.', 'Language'],
       'voice-grade': ['Choose your grade', `Select a learning level for ${langName} lessons.`, 'Subjects & grades'],
       'voice-audio': ['Explore audio lessons', `Choose a ${langName} lesson and practise at your own pace.`, 'Audio lessons'],
-      'voice-practice': [activeLesson?.title || `Lesson ${selectedLessonId}`, `Listen, practise the phrase and record your voice in ${langName}.`, 'Practice'],
+      'voice-practice': [voiceLessonDisplayTitle(activeLesson, 'Speaking practice'), `Listen, practise the phrase and record your voice in ${langName}.`, 'Practice'],
       'voice-text-to-speech': ['Text to Speech', 'Write a phrase and hear it spoken in your chosen language.', 'Speak'],
       'voice-cloning': ['Voice Cloning', 'Create a voice only when you own the recording or have the speaker’s informed permission.', 'Create'],
       'voice-speech-to-text': ['Speech to Text', 'Record a phrase and turn your speech into text.', 'Transcribe'],
@@ -3003,34 +2986,29 @@ import {
         : '';
       const levelFilter = gradePath ? '' : `<label>Level<select data-action="voice-feature-level">${['beginner', 'intermediate', 'advanced'].map((level) => `<option value="${level}" ${lessonLevel === level ? 'selected' : ''}>${level.charAt(0).toUpperCase() + level.slice(1)}</option>`).join('')}</select></label>`;
       content = `${gradeContext}<div class="voice-feature-filters">${languageFilter}${levelFilter}</div>
-        <div class="voice-audio-lesson-grid">${gradeLessons.map((lesson) => `<article class="voice-audio-lesson-card"><span class="section-kicker">${gradePath ? `${esc(gradePath.name)} · ` : ''}Lesson ${String(lesson.id).padStart(2, '0')} · ${esc(lesson.category || 'Speaking practice')}</span><h2>${esc(lesson.title || lesson.phrase)}</h2>${lesson.translation ? `<p>${esc(lesson.translation)}</p>` : ''}<button type="button" class="button button-primary" data-route="voice-practice" data-lang="${selectedLanguage}" data-level="${lessonLevel}" data-grade="${gradePath?.id || ''}" data-lesson="${lesson.id}">${icon('play', 14)} Start lesson</button></article>`).join('')}</div>`;
+        <div class="voice-audio-lesson-grid">${gradeLessons.map((lesson) => `<article class="voice-audio-lesson-card"><span class="section-kicker">${gradePath ? `${esc(gradePath.name)} · ` : ''}${esc(lesson.category || 'Speaking practice')}</span><h2>${esc(voiceLessonDisplayTitle(lesson, 'Speaking practice'))}</h2>${lesson.translation ? `<p>${esc(lesson.translation)}</p>` : ''}<button type="button" class="button button-primary" data-route="voice-practice" data-lang="${selectedLanguage}" data-level="${lessonLevel}" data-grade="${gradePath?.id || ''}" data-lesson="${lesson.id}">${icon('play', 14)} Start practice</button></article>`).join('')}</div>`;
     } else if (page === 'voice-practice' && activeLesson) {
       const isRecording = Boolean(state.trainer.isRecording);
       const transcription = voiceTranscriptionResult?.lessonId === activeLesson.id ? voiceTranscriptionResult.text : '';
       const phraseMeaning = hasEnglishTranslation
         ? `<p class="voice-practice-translation"><span>English translation</span>${esc(activeLesson.translation)}</p>`
         : `<p>${esc(activeLesson.phonetic || '')}</p>`;
-      content = `${renderVoicePracticeLessonNavigation(selectedLanguage, lessonLevel, gradePath, practiceLessons, activeLesson)}<article class="voice-practice-card"><div class="voice-practice-meta"><span class="section-kicker">${gradePath ? `${gradePath.name} · ` : ''}${langName} · ${lessonLevel} · Lesson ${String(activeLesson.id).padStart(2, '0')}</span><h2>${esc(activeLesson.phrase)}</h2>${phraseMeaning}</div><div class="voice-practice-syllables">${(activeLesson.syllables || []).map((syllable) => `<button type="button" class="syllable-sound-pill tone-${esc(syllable.tone)}" data-action="trainer-play-syllable" data-freq="${syllable.freq}" data-tone="${esc(syllable.tone)}" data-syllable="${esc(syllable.text)}">${esc(syllable.text)} · ${esc(syllable.pitch)}</button>`).join('')}</div><div class="voice-practice-actions"><button type="button" class="button button-outline" data-action="trainer-play-native" data-lesson-id="${activeLesson.id}">${icon('volume', 15)} Listen</button>${isRecording ? `<button type="button" class="button button-primary" data-action="trainer-stop-record" data-lesson-id="${activeLesson.id}">Stop recording</button>` : `<button type="button" class="button button-primary" data-action="trainer-start-record" data-lesson-id="${activeLesson.id}">${icon('mic', 15)} Record yourself</button>`}</div><canvas id="waveformCanvas" class="voice-practice-waveform" width="640" height="90" aria-label="Recording waveform"></canvas><p class="voice-transcription-status" aria-live="polite">${isRecording ? 'Recording… speak clearly, then stop.' : transcription ? `Your transcription: ${esc(transcription)}` : 'Your recording is sent to Idilewa for transcription. It is not saved as a voice score.'}</p></article>${renderVoicePracticeLessonNavigation(selectedLanguage, lessonLevel, gradePath, practiceLessons, activeLesson)}`;
+      content = `${renderVoicePracticeLessonNavigation(selectedLanguage, lessonLevel, gradePath, practiceLessons, activeLesson)}<article class="voice-practice-card"><div class="voice-practice-meta"><span class="section-kicker">${gradePath ? `${gradePath.name} · ` : ''}${langName} · ${lessonLevel}</span><h2>${esc(activeLesson.phrase)}</h2>${phraseMeaning}</div><div class="voice-practice-syllables">${(activeLesson.syllables || []).map((syllable) => `<button type="button" class="syllable-sound-pill tone-${esc(syllable.tone)}" data-action="trainer-play-syllable" data-freq="${syllable.freq}" data-tone="${esc(syllable.tone)}" data-syllable="${esc(syllable.text)}">${esc(syllable.text)} · ${esc(syllable.pitch)}</button>`).join('')}</div><div class="voice-practice-actions"><button type="button" class="button button-outline" data-action="trainer-play-native" data-lesson-id="${activeLesson.id}">${icon('volume', 15)} Listen</button>${isRecording ? `<button type="button" class="button button-primary" data-action="trainer-stop-record" data-lesson-id="${activeLesson.id}">Stop recording</button>` : `<button type="button" class="button button-primary" data-action="trainer-start-record" data-lesson-id="${activeLesson.id}">${icon('mic', 15)} Record yourself</button>`}</div><canvas id="waveformCanvas" class="voice-practice-waveform" width="640" height="90" aria-label="Recording waveform"></canvas><p class="voice-transcription-status" aria-live="polite">${isRecording ? 'Recording… speak clearly, then stop.' : transcription ? `Your transcription: ${esc(transcription)}` : 'Your recording is sent to Idilewa for transcription. It is not saved as a voice score.'}</p></article>${renderVoicePracticeLessonNavigation(selectedLanguage, lessonLevel, gradePath, practiceLessons, activeLesson)}`;
     } else if (page === 'voice-text-to-speech') {
       const languageCodes = { yoruba: 'yo', igbo: 'ig', hausa: 'ha', swahili: 'sw' };
-      content = `<div class="voice-feature-lesson-prompt"><span class="section-kicker">Lesson ${String(featureLessonNumber).padStart(2, '0')}</span><h2>${esc(featureLesson?.title || featureLesson?.phrase || 'Speak and listen')}</h2>${featureLesson?.translation ? `<p>${esc(featureLesson.translation)}</p>` : ''}<small>Listen to the phrase, repeat it aloud, and notice its rhythm.</small></div><div class="voice-feature-tool"><label class="curriculum-tool-label" for="plotweaver-speech-text">Your phrase</label><textarea id="plotweaver-speech-text" rows="4" maxlength="1000" placeholder="Type a phrase to hear…">${esc(featureLesson?.phrase || '')}</textarea><label class="curriculum-tool-label" for="plotweaver-speech-language">Speech language</label><select id="plotweaver-speech-language"><option value="${languageCodes[selectedLanguage] || 'yo'}">${esc(langName)}</option></select><button class="button button-primary" type="button" data-action="plotweaver-speak-text">${icon('volume', 15)} Listen</button><small id="plotweaver-speech-status" class="curriculum-tool-status" aria-live="polite">Audio is generated on request and is not saved.</small></div>`;
+      content = `<div class="voice-feature-lesson-prompt"><h2>${esc(voiceLessonDisplayTitle(featureLesson, 'Speak and listen'))}</h2>${featureLesson?.translation ? `<p>${esc(featureLesson.translation)}</p>` : ''}<small>Listen to the phrase, repeat it aloud, and notice its rhythm. You can also enter any phrase below.</small></div><div class="voice-feature-tool"><label class="curriculum-tool-label" for="plotweaver-speech-text">Your phrase</label><textarea id="plotweaver-speech-text" rows="4" maxlength="1000" placeholder="Type a phrase to hear…">${esc(featureLesson?.phrase || '')}</textarea><label class="curriculum-tool-label" for="plotweaver-speech-language">Speech language</label><select id="plotweaver-speech-language"><option value="${languageCodes[selectedLanguage] || 'yo'}">${esc(langName)}</option></select><button class="button button-primary" type="button" data-action="plotweaver-speak-text">${icon('volume', 15)} Listen</button><small id="plotweaver-speech-status" class="curriculum-tool-status" aria-live="polite">Use the tool whenever you like. Audio is generated on request and is not saved.</small></div>`;
     } else if (page === 'voice-cloning') {
       const languageCodes = { yoruba: 'yo', igbo: 'ig', hausa: 'ha', swahili: 'sw' };
-      content = `<div class="voice-feature-lesson-prompt"><span class="section-kicker">Lesson ${String(featureLessonNumber).padStart(2, '0')}</span><h2>${esc(featureLesson?.title || featureLesson?.phrase || 'Practice with a voice')}</h2><p>Choose an Idilewa voice or a clone you are permitted to use, then listen and repeat.</p><strong lang="${languageCodes[selectedLanguage] || 'yo'}">${esc(featureLesson?.phrase || '')}</strong>${featureLesson?.translation ? `<small>${esc(featureLesson.translation)}</small>` : ''}</div><div class="voice-feature-tool"><label class="curriculum-tool-label" for="plotweaver-speech-text">Practice phrase</label><textarea id="plotweaver-speech-text" rows="3" maxlength="1000">${esc(featureLesson?.phrase || '')}</textarea><label class="curriculum-tool-label" for="plotweaver-speech-language">Speech language</label><select id="plotweaver-speech-language"><option value="${languageCodes[selectedLanguage] || 'yo'}">${esc(langName)}</option></select><button class="button button-primary" type="button" data-action="plotweaver-speak-text">${icon('volume', 15)} Listen with selected voice</button><small id="plotweaver-speech-status" class="curriculum-tool-status" aria-live="polite">Audio is generated on request and is not saved.</small></div>${renderVoiceCloneTools()}`;
+      content = `<div class="voice-feature-lesson-prompt"><h2>${esc(voiceLessonDisplayTitle(featureLesson, 'Practice with a voice'))}</h2><p>Choose an Idilewa voice or a clone you are permitted to use, then listen and repeat.</p><strong lang="${languageCodes[selectedLanguage] || 'yo'}">${esc(featureLesson?.phrase || '')}</strong>${featureLesson?.translation ? `<small>${esc(featureLesson.translation)}</small>` : ''}</div><div class="voice-feature-tool"><label class="curriculum-tool-label" for="plotweaver-speech-text">Practice phrase</label><textarea id="plotweaver-speech-text" rows="3" maxlength="1000">${esc(featureLesson?.phrase || '')}</textarea><label class="curriculum-tool-label" for="plotweaver-speech-language">Speech language</label><select id="plotweaver-speech-language"><option value="${languageCodes[selectedLanguage] || 'yo'}">${esc(langName)}</option></select><button class="button button-primary" type="button" data-action="plotweaver-speak-text">${icon('volume', 15)} Listen with selected voice</button><small id="plotweaver-speech-status" class="curriculum-tool-status" aria-live="polite">Use the tool whenever you like. Audio is generated on request and is not saved.</small></div>${renderVoiceCloneTools()}`;
     } else if (page === 'voice-speech-to-text') {
       const languageCodes = { yoruba: 'yo', igbo: 'ig', hausa: 'ha', swahili: 'sw' };
-      content = `<div class="voice-feature-lesson-prompt"><span class="section-kicker">Lesson ${String(featureLessonNumber).padStart(2, '0')}</span><h2>${esc(featureLesson?.title || featureLesson?.phrase || 'Speak and transcribe')}</h2><p>Say this phrase clearly, then compare your transcription with the sample.</p><strong lang="${selectedLanguage === 'yoruba' ? 'yo' : selectedLanguage === 'igbo' ? 'ig' : selectedLanguage === 'hausa' ? 'ha' : 'sw'}">${esc(featureLesson?.phrase || '')}</strong>${featureLesson?.translation ? `<small>${esc(featureLesson.translation)}</small>` : ''}</div><div class="voice-feature-tool"><label class="curriculum-tool-label" for="voice-translation-input">Your recording transcription</label><textarea id="voice-translation-input" rows="5" maxlength="1000" placeholder="Your recognized words will appear here"></textarea><label class="curriculum-tool-label" for="voice-translation-source-language">Spoken language</label><select id="voice-translation-source-language"><option value="${languageCodes[selectedLanguage] || 'yo'}">${esc(langName)}</option></select><button class="button button-primary" type="button" data-action="start-voice-transcription">${icon('mic', 15)} Start recording</button><small id="voice-transcription-status" class="curriculum-tool-status" aria-live="polite">Microphone permission is requested only when you begin recording.</small></div>`;
+      content = `<div class="voice-feature-lesson-prompt"><h2>${esc(voiceLessonDisplayTitle(featureLesson, 'Speak and transcribe'))}</h2><p>Say any phrase clearly, then compare your transcription with the sample.</p><strong lang="${selectedLanguage === 'yoruba' ? 'yo' : selectedLanguage === 'igbo' ? 'ig' : selectedLanguage === 'hausa' ? 'ha' : 'sw'}">${esc(featureLesson?.phrase || '')}</strong>${featureLesson?.translation ? `<small>${esc(featureLesson.translation)}</small>` : ''}</div><div class="voice-feature-tool"><label class="curriculum-tool-label" for="voice-translation-input">Your recording transcription</label><textarea id="voice-translation-input" rows="5" maxlength="1000" placeholder="Your recognized words will appear here"></textarea><label class="curriculum-tool-label" for="voice-translation-source-language">Spoken language</label><select id="voice-translation-source-language"><option value="${languageCodes[selectedLanguage] || 'yo'}">${esc(langName)}</option></select><button class="button button-primary" type="button" data-action="start-voice-transcription">${icon('mic', 15)} Start recording</button><small id="voice-transcription-status" class="curriculum-tool-status" aria-live="polite">Microphone permission is requested only when you begin recording.</small></div>`;
     } else if (page === 'voice-translation') {
-      content = `<div class="voice-feature-lesson-prompt"><span class="section-kicker">Lesson ${String(featureLessonNumber).padStart(2, '0')}</span><h2>${esc(featureLesson?.title || featureLesson?.phrase || 'Translate a phrase')}</h2><p>Translate the English phrase, then check the sample to compare.</p></div>${renderVoiceTranslationTool({ lesson: featureLesson, language: selectedLanguage })}<details class="voice-feature-answer"><summary>Show sample translation</summary><p lang="${selectedLanguage === 'yoruba' ? 'yo' : selectedLanguage === 'igbo' ? 'ig' : selectedLanguage === 'hausa' ? 'ha' : 'sw'}">${esc(featureLesson?.phrase || '')}</p></details>`;
+      content = `${renderVoiceTranslationTool({ language: selectedLanguage })}`;
     }
 
-    const isFeatureLessonPage = featureLessonPages.includes(page);
-    const lessonNavigation = isFeatureLessonPage
-      ? renderVoiceFeatureLessonNavigation(page, selectedLanguage, featureLessonNumber, featureLessons.length)
-      : '';
-    const titleText = isFeatureLessonPage ? `${title} · Lesson ${featureLessonNumber} of ${featureLessons.length}` : title;
     const pageClass = page === 'voice-translation' ? 'voice-feature-page translation-page' : 'voice-feature-page';
-    return `<div class="container route-page ${pageClass}"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span>${routeLink('voice_lessons', 'Voice Lessons')}<span>/</span><strong>${esc(title)}</strong></div><section class="voice-feature-header"><div><span class="section-kicker">${esc(kicker)} · Voice Lessons</span><h1>${esc(titleText)}</h1><p>${esc(description)}</p></div>${routeLink('voice_lessons', `${icon('arrow', 14, 'voice-arrow-back')} All Voice Lessons`, 'button button-outline')}</section>${lessonNavigation}<section class="voice-feature-content">${content}</section>${lessonNavigation}</div>`;
+    return `<div class="container route-page ${pageClass}"><div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span>${routeLink('voice_lessons', 'Voice Lessons')}<span>/</span><strong>${esc(title)}</strong></div><section class="voice-feature-header"><div><span class="section-kicker">${esc(kicker)} · Voice Lessons</span><h1>${esc(title)}</h1><p>${esc(description)}</p></div>${routeLink('voice_lessons', `${icon('arrow', 14, 'voice-arrow-back')} All Voice Lessons`, 'button button-outline')}</section><section class="voice-feature-content">${content}</section></div>`;
   }
 
   function renderVoiceLessonsHome() {
@@ -3079,7 +3057,7 @@ import {
 
   function renderOralGenre() {
     const cards = [
-      { route: 'voice_lessons', title: 'Voice Lessons', subtitle: 'Live pitch & tone engine', icon: 'mic', tone: 'yellow', text: 'Interactive tone soundboards and voice recording across 60 lessons.' },
+      { route: 'voice_lessons', title: 'Voice Lessons', subtitle: 'Live pitch & tone engine', icon: 'mic', tone: 'yellow', text: 'Interactive tone soundboards and voice recording across African languages.' },
       { route: 'oriki', title: 'Oríkì', subtitle: 'Praise poetry & identity', icon: 'quote', tone: 'peach', text: 'Learn what praise poetry can express and how to listen for context.' },
       { route: 'owe', title: 'Òwe', subtitle: 'Proverbs & reflection', icon: 'sparkles', tone: 'mint', text: 'Explore short sayings and the ideas people carry through them.' },
       { route: 'voices', title: 'Spoken word', subtitle: 'Voices & pronunciation', icon: 'headphones', tone: 'lilac', text: 'Hear words spoken and build confidence through listening.' }

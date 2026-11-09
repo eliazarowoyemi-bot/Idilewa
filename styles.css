@@ -7738,12 +7738,6 @@ body[data-page="coding"] .coding-page.ide-fullscreen-page.ide-page-root { width:
 .voice-feature-header > a { flex: 0 0 auto; color: #fff; border-color: rgba(255,255,255,.55); background: rgba(255,255,255,.1); }
 .voice-feature-content { padding: 22px; border: 1px solid #e4ebe0; border-radius: 18px; background: #fff; }
 .voice-feature-choice-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-.voice-feature-lesson-progress { display: grid; gap: 7px; margin: -7px 0 12px; }
-.voice-feature-lesson-progress > div { display: flex; justify-content: space-between; gap: 10px; color: #435a49; font-size: 12px; font-weight: 750; }
-.voice-feature-lesson-progress progress { width: 100%; height: 9px; accent-color: #16834b; }
-.voice-feature-lesson-navigation { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 0 0 15px; }
-.voice-feature-lesson-navigation .button { min-height: 42px; }
-.voice-feature-lesson-navigation .button:disabled { opacity: .55; cursor: not-allowed; }
 .voice-feature-lesson-prompt { display: grid; gap: 7px; margin: 0 0 14px; padding: 17px; border: 1px solid #dcecdf; border-radius: 13px; background: #f3faf2; }
 .voice-feature-lesson-prompt h2 { margin: 0; color: #254b33; font-size: clamp(18px, 2.5vw, 23px); }
 .voice-feature-lesson-prompt p, .voice-feature-lesson-prompt small { margin: 0; color: #586a5d; line-height: 1.5; }
@@ -7903,9 +7897,6 @@ body[data-page="coding"] .coding-page.ide-fullscreen-page.ide-page-root { width:
   .voice-feature-header p { font-size: 13px; }
   .voice-trainer-toolbar { align-items: flex-start; flex-direction: column; }
   .voice-feature-content { padding: 12px; border-radius: 14px; }
-  .voice-feature-lesson-navigation { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .voice-feature-lesson-navigation > :last-child { grid-column: 2; }
-  .voice-feature-lesson-navigation .button { justify-content: center; padding-inline: 9px; white-space: nowrap; }
   .voice-feature-lesson-prompt { padding: 13px; }
   .voice-feature-choice-grid, .voice-audio-lesson-grid { grid-template-columns: minmax(0, 1fr); }
   .voice-feature-choice { min-height: 96px; }

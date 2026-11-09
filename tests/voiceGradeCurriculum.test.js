@@ -89,7 +89,7 @@ test('voice curriculum does not contain generated placeholder translations', () 
   assert.deepEqual(translations, []);
 });
 
-test('voice feature pages expose every authored lesson with no artificial lesson cap', () => {
+test('voice tools have no visible lesson counter and practice navigation can continue indefinitely', () => {
   const curriculumMatch = appSource.match(/const TRAINER_CURRICULUM = (\{[\s\S]*?\});/);
   assert.ok(curriculumMatch, 'Voice lesson curriculum data should be present');
   const curricula = JSON.parse(curriculumMatch[1]);
@@ -103,9 +103,15 @@ test('voice feature pages expose every authored lesson with no artificial lesson
     assert.equal(new Set(lessons.map((lesson) => lesson.id)).size, authoredLessonCount);
   }
 
-  assert.match(appSource, /renderVoiceFeatureLessonNavigation/);
+  assert.match(appSource, /renderVoicePracticeLessonNavigation/);
   assert.match(appSource, /Object\.values\(langData\)\.flat\(\)/);
-  assert.match(appSource, /Lesson \$\{featureLessonNumber\} of \$\{featureLessons\.length\}/);
+  assert.doesNotMatch(appSource, /Lesson \$\{featureLessonNumber\} of \$\{featureLessons\.length\}/);
+  assert.doesNotMatch(appSource, /60 (?:Audio )?Lessons|60 lessons/);
+  assert.doesNotMatch(appSource, /Course complete/);
+  assert.match(appSource, /voiceLessonDisplayTitle\(featureLesson,/);
+  assert.match(appSource, /replace\(\/\^lesson\\s\+\\d\+/);
+  assert.match(appSource, /lessons\[\(currentIndex \+ 1\) % lessons\.length\]/);
+  assert.match(appSource, /lessons\[\(currentIndex - 1 \+ lessons\.length\) % lessons\.length\]/);
   assert.doesNotMatch(appSource, /VOICE_FEATURE_LESSON_COUNT/);
   assert.match(appSource, /'voice-text-to-speech', 'voice-speech-to-text', 'voice-translation', 'voice-cloning'/);
   assert.match(appSource, /data-action="start-voice-transcription"/);
