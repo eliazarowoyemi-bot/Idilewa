@@ -7655,11 +7655,6 @@ body[data-page="coding"] .coding-page.ide-fullscreen-page.ide-page-root { width:
 .curriculum-dashboard-hotspot-start { top: 57%; left: 55%; width: 15%; height: 10%; }
 .curriculum-dashboard-hotspot:focus-visible { outline: 3px solid #164d32; outline-offset: -4px; border-radius: 10px; }
 .curriculum-dashboard-art .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
-.voice-lessons-welcome-art { position: relative; width: 100%; overflow: hidden; border-radius: 16px; }
-.voice-lessons-welcome-art > img { display: block; width: 100%; height: auto; }
-.voice-lessons-welcome-link { position: absolute; top: 69%; left: 3%; width: 27%; height: 15%; border-radius: 999px; }
-.voice-lessons-welcome-link:focus-visible { outline: 3px solid #164d32; outline-offset: 3px; }
-.voice-lessons-welcome-art .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
 .curriculum-tools-hotspot { position: absolute; top: 0; bottom: 0; width: 25%; }
 .curriculum-tools-hotspot-translation { left: 0; }
 .curriculum-tools-hotspot-speech { left: 25%; }
