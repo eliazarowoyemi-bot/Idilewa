@@ -95,6 +95,7 @@ import {
 
   const ROUTES = [
     'voice_lessons',
+    'voice-progress',
     'ai-conversation',
     'voice-language', 'voice-grade', 'voice-audio', 'voice-practice',
     'voice-text-to-speech', 'voice-cloning', 'voice-speech-to-text', 'voice-translation',
@@ -340,6 +341,7 @@ import {
   LABELS.library = 'Library';
   LABELS.game = 'Tile game';
   LABELS.voice_lessons = 'Voice Lessons';
+  LABELS['voice-progress'] = 'Voice progress';
   Object.assign(LABELS, {
     families: 'For Parents',
     'parent-login': 'Parent Login',
@@ -631,6 +633,8 @@ import {
   }
 
   function renderHeader(page) {
+    const academyShell = page === 'index' || page === 'voice_lessons' || page.startsWith('voice-');
+    document.body.classList.toggle('academy-reference-shell', academyShell);
     if (page === 'login' || page === 'ai-conversation' || page.startsWith('tutor') || page.startsWith('parent') || page === 'families') {
       document.getElementById('site-header').innerHTML = '';
       return;
@@ -641,10 +645,20 @@ import {
       : page === 'voice_lessons' || page.startsWith('voice-')
         ? 'trainer'
         : '');
-    const nav = NAV.map((item) => {
-      const active = currentGroup === item.group;
+    const academyNav = [
+      { route: 'index', label: 'Home' },
+      { route: 'voice_lessons', label: 'Voice Lessons' },
+      { route: 'voice-translation', label: 'Translate & Listen' },
+      { route: 'voice-progress', label: 'Progress' }
+    ];
+    const nav = (academyShell ? academyNav : NAV).map((item) => {
+      const active = academyShell
+        ? item.route === page || (item.route === 'voice_lessons' && (page === 'voice_lessons' || (page.startsWith('voice-') && page !== 'voice-progress' && page !== 'voice-translation')))
+        : currentGroup === item.group;
       const current = active ? ' aria-current="page"' : '';
-      return item.href
+      return academyShell
+        ? `<a class="nav-link ${active ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}"${current}>${item.label}</a>`
+        : item.href
         ? `<a class="nav-link ${active ? 'active' : ''}" href="${item.href}"${current}>${item.label}</a>`
         : `<a class="nav-link ${active ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}"${current}>${item.label}</a>`;
     }).join('');
@@ -654,7 +668,9 @@ import {
       : esc(avatarLabel);
     const accountActions = currentUser
       ? `<a class="header-profile ${page === 'profile' ? 'active' : ''}" href="#/profile" data-route="profile" aria-label="Open profile"${page === 'profile' ? ' aria-current="page"' : ''}><span class="header-avatar">${profileAvatar}</span><span class="header-profile-label">${esc(currentUser.name || 'Profile')}</span></a><button class="header-signout" type="button" data-action="account-sign-out">Sign out</button>`
-      : `${routeLink('login', 'Log in', 'header-signin', 'data-mode="signin"')}${routeLink('login', 'Get started', 'button button-primary header-cta', 'data-mode="signup"')}`;
+      : academyShell
+        ? `${routeLink('login', 'Log in', 'header-signin', 'data-mode="signin"')}${routeLink('voice-language', 'Start Learning', 'button button-primary header-cta')}`
+        : `${routeLink('login', 'Log in', 'header-signin', 'data-mode="signin"')}${routeLink('login', 'Get started', 'button button-primary header-cta', 'data-mode="signup"')}`;
     const mobileShortcuts = [
       { route: 'profile', label: 'Profile', ico: 'user' }
     ].map((item) => `<a class="mobile-menu-link ${page === item.route ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.ico, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('');
@@ -667,8 +683,7 @@ import {
     }).join('') + mobileShortcuts;
     document.getElementById('mobile-menu')?.remove();
     document.getElementById('site-header').innerHTML = `
-      ${page === 'index' ? `<div class="home-promo-strip"><span>A little every day brings you closer to your language.</span></div>` : ''}
-      <div class="header-inner">
+      <div class="header-inner ${academyShell ? 'academy-reference-header' : ''}">
         <a class="brand" href="#/index" data-route="index" aria-label="Idilewa home">
           ${brandLogo('Idilewa · Language · Culture · Future')}
         </a>
@@ -699,6 +714,12 @@ import {
     const mobileNav = document.getElementById('mobile-nav');
     mobileNav.className = 'mobile-nav mobile-bottom-navigation';
     mobileNav.setAttribute('aria-label', 'Primary navigation');
+    if (page === 'index' || page === 'voice_lessons' || page.startsWith('voice-')) {
+      mobileNav.replaceChildren();
+      mobileNav.hidden = true;
+      document.body.classList.remove('has-mobile-bottom-navigation');
+      return;
+    }
     if (page === 'login' || page === 'ai-conversation' ||
       page.startsWith('tutor') || page === 'families' ||
       (page.startsWith('parent') && !familyDashboard) || (currentUser?.role === 'parent' && !familyDashboard) || currentUser?.role === 'educator') {
@@ -725,6 +746,9 @@ import {
   }
 
   function renderFooter(page) {
+    if (page === 'index' || page === 'voice_lessons' || page.startsWith('voice-')) {
+      return `<footer class="academy-footer"><div class="academy-footer-inner"><span>Ìdíléwa · Learn. Speak. Connect.</span><nav aria-label="Footer navigation">${routeLink('index', 'Home')}${routeLink('voice_lessons', 'Voice Lessons')}${routeLink('privacy', 'Privacy')}</nav></div></footer>`;
+    }
     return `<footer class="site-footer">
       <div class="container footer-main">
         <section class="footer-contact">
@@ -783,46 +807,34 @@ import {
     </div></section><section class="home-principles-strip" aria-label="Idilewa learning principles"><div class="container"><span>${icon('globe', 17)} African languages</span><span>${icon('people', 17)} Family learning</span><span>${icon('leaf', 17)} Culture with context</span><span>${icon('message', 17)} Conversation practice</span></div></section>`;
   }
 
+  function renderAcademyLanguageChoices(className = '') {
+    const supportedLanguages = LANGUAGES.filter((language) => ['yoruba', 'igbo', 'hausa', 'swahili'].includes(language.id));
+    return `<div class="academy-language-grid ${className}" aria-label="Choose a language">${supportedLanguages.map((language) => `<button type="button" class="academy-language-card" data-route="voice-grade" data-lang="${language.id}" aria-label="Choose ${esc(language.name)}"><span class="academy-language-symbol" aria-hidden="true">${esc(language.glyph)}</span><strong>${esc(language.name)}</strong><small>${esc(language.region)}</small></button>`).join('')}</div>`;
+  }
+
   function renderHome() {
-    const pathways = [
-      { icon: 'book', title: 'Learn', copy: 'African languages', route: 'voice-language' },
-      { icon: 'volume', title: 'Listen', copy: 'Stories & audiobooks', route: 'voices' },
-      { icon: 'code', title: 'Code', copy: 'Build games and learn by making', route: 'code-studio' },
-      { icon: 'people', title: 'Join', copy: 'A global community', route: 'connect_students' }
-    ];
-    return `<div class="home-reference-page">
-      <section class="hero-section home-ribbon-section" aria-label="Welcome to Idilewa">
-        <div class="container hero-grid">
-          <div class="hero-copy">
-            <div class="home-reference-eyebrow">AFRICAN ROOTS <span aria-hidden="true">·</span> BRIGHTER FUTURES</div>
-            <h1>Preserving African Culture.<br /><span>Promoting Technology.</span></h1>
-            <p class="hero-lede">Learn African languages, hear our stories, build real skills and belong to a global community.</p>
-            <div class="hero-actions home-reference-actions">
-              ${routeLink('voice-language', `Start Learning ${icon('arrow', 17)}`, 'button button-primary')}
-              <a class="button button-outline" href="./code-studio.html">Code for Kids ${icon('code', 17)}</a>
-            </div>
-            <div class="hero-social-proof home-reference-proof"><span class="home-reference-proof-mark">${icon('globe', 19)}</span><span>Culture, creativity and learning<br />for every generation.</span></div>
-          </div>
-          <div class="hero-visual home-hero-art">
-            <img src="./assets/idilewa-family-view.png" alt="Idilewa Living Family View showing a family learning together" />
-          </div>
+    return `<div class="academy-reference-page academy-home-page">
+      <section class="academy-hero" aria-labelledby="academy-home-title">
+        <div class="academy-hero-copy">
+          <h1 id="academy-home-title">Your Language.<br /><span>Your Future.</span></h1>
+          <p>Learn. Speak. Connect.</p>
+          ${routeLink('voice-language', `Start Learning ${icon('arrow', 17)}`, 'button button-primary academy-start-button')}
+        </div>
+        <div class="academy-hero-art">
+          <img src="./assets/academy-reference-0.webp" alt="Illustrated African children exploring language learning together" width="1446" height="463" fetchpriority="high" />
+          <p class="academy-art-caption">Discover <strong>African languages</strong> together</p>
         </div>
       </section>
-      ${renderHomeAppPreview()}
-      <section class="container landing-pathways" aria-label="Explore Idilewa">
-        ${pathways.map((item) => `<a class="landing-pathway" href="${item.route === 'code-studio' ? './code-studio.html' : `#/${item.route}`}" ${item.route === 'code-studio' ? '' : `data-route="${item.route}"`}><span>${icon(item.icon, 23)}</span><strong>${item.title}</strong><small>${item.copy}</small></a>`).join('')}
+      <section class="academy-home-languages" aria-labelledby="academy-home-languages-title">
+        <h2 id="academy-home-languages-title">Choose your language</h2>
+        ${renderAcademyLanguageChoices()}
       </section>
-      <section class="container section" aria-labelledby="home-voice-tools-title">
-        <div class="section-heading"><div><span class="section-kicker">AI-powered language tools</span><h2 id="home-voice-tools-title">Listen, translate and speak</h2><p>Open the dedicated tools for live text translation, speech and voice practice.</p></div></div>
-        <div class="landing-pathways" aria-label="Voice and translation tools">
-          ${[
-            { icon: 'globe', title: 'Translate text', copy: 'Live text-to-text translation', route: 'voice-translation' },
-            { icon: 'volume', title: 'Text to speech', copy: 'Hear text in a supported language', route: 'voice-text-to-speech' },
-            { icon: 'mic', title: 'Speech to text', copy: 'Transcribe a short recording', route: 'voice-speech-to-text' },
-            { icon: 'sparkles', title: 'Voice cloning', copy: 'Create a voice with clear consent', route: 'voice-cloning' }
-          ].map((item) => `<a class="landing-pathway" href="#/${item.route}" data-route="${item.route}"><span>${icon(item.icon, 23)}</span><strong>${item.title}</strong><small>${item.copy}</small></a>`).join('')}
-        </div>
-      </section>
+      <div class="academy-benefits-strip" aria-label="Learning features">
+        <span>${icon('book', 19)} Age-adaptive lessons</span>
+        <span>${icon('volume', 19)} Speak &amp; listen</span>
+        <span>${icon('check', 19)} Practice activities</span>
+        <span>${icon('chart', 19)} Track your progress</span>
+      </div>
     </div>`;
   }
 
@@ -2970,7 +2982,7 @@ import {
     const hasEnglishTranslation = Boolean(activeLesson?.translation);
     const titles = {
       'voice-language': ['Choose your language', 'Choose a language to personalize your listening and speaking practice.', 'Language'],
-      'voice-grade': ['Choose your grade', `Select a learning level for ${langName} lessons.`, 'Subjects & grades'],
+      'voice-grade': ['Choose your age group', `Select the learning path that fits you for ${langName} lessons.`, 'Age-adaptive paths'],
       'voice-audio': ['Explore audio lessons', `Choose a ${langName} lesson and practise at your own pace.`, 'Audio lessons'],
       'voice-practice': [voiceLessonDisplayTitle(activeLesson, 'Speaking practice'), `Listen, practise the phrase and record your voice in ${langName}.`, 'Practice'],
       'voice-text-to-speech': ['Text to Speech', 'Write a phrase and hear it spoken in your chosen language.', 'Speak'],
@@ -2988,9 +3000,9 @@ import {
     let content = '';
 
     if (page === 'voice-language') {
-      content = `<div class="voice-feature-choice-grid">${languages.map(([id, name]) => `<button type="button" class="voice-feature-choice" data-route="voice-audio" data-lang="${id}" data-level="${lessonLevel}"><span>${icon('globe', 20)}</span><strong>${name}</strong></button>`).join('')}</div>`;
+      content = `<div class="voice-feature-choice-grid">${languages.map(([id, name]) => `<button type="button" class="voice-feature-choice" data-route="voice-grade" data-lang="${id}" data-level="${lessonLevel}"><span>${icon('globe', 20)}</span><strong>${name}</strong></button>`).join('')}</div>`;
     } else if (page === 'voice-grade') {
-      content = `<p class="voice-feature-current">Learning language: <strong>${langName}</strong>. Each grade opens its own lesson path with age-appropriate goals and a different lesson set.</p><div class="voice-feature-choice-grid voice-grade-choice-grid">${VOICE_GRADE_PATHS.map((grade) => `<button type="button" class="voice-feature-choice" data-route="voice-audio" data-grade="${grade.id}" data-lang="${selectedLanguage}" data-level="${grade.level}"><span>${icon('layers', 20)}</span><strong>${grade.name}</strong><small>${grade.ages} · ${grade.level} pathway</small><small>${grade.focus}</small></button>`).join('')}</div>`;
+      content = `<p class="voice-feature-current">Learning language: <strong>${langName}</strong>. Choose the age group that fits; each path opens its own lessons and learning goals.</p><div class="voice-feature-choice-grid voice-grade-choice-grid">${VOICE_GRADE_PATHS.map((grade) => `<button type="button" class="voice-feature-choice" data-route="voice-audio" data-grade="${grade.id}" data-lang="${selectedLanguage}" data-level="${grade.level}"><span>${icon('layers', 20)}</span><strong>${grade.name}</strong><small>${grade.ages} · ${grade.level} pathway</small><small>${grade.focus}</small></button>`).join('')}</div>`;
     } else if (page === 'voice-audio') {
       const languageFilter = `<label>Language<select data-action="voice-feature-language">${languages.map(([id, name]) => `<option value="${id}" ${selectedLanguage === id ? 'selected' : ''}>${name}</option>`).join('')}</select></label>`;
       const gradeContext = gradePath
@@ -3028,37 +3040,52 @@ import {
   }
 
   function renderVoiceLessonsHome() {
-    return `<div class="container route-page voice-lessons-home">
-      <div class="breadcrumbs">${routeLink('index', 'Home')}<span>/</span><strong>Voice Lessons</strong></div>
-      ${renderVoiceLessonsDashboard()}
-    </div>`;
+    return `<div class="academy-reference-page academy-voice-home">${renderVoiceLessonsDashboard()}</div>`;
   }
 
   function renderVoiceLessonsDashboard() {
-    return '<section class="curriculum-dashboard" aria-labelledby="curriculum-dashboard-title">' +
-      '<h1 class="curriculum-dashboard-title" id="curriculum-dashboard-title">Your Voice Lessons</h1>' +
-      '<nav class="voice-lessons-welcome-art" aria-label="Start Voice Lessons">' +
-        '<img src="./assets/voice-lessons-welcome.jpg" width="1056" height="372" alt="Idilewa Voice Lessons: choose a grade, then dive into fun, interactive lessons that build real speaking confidence." fetchpriority="high" />' +
-        routeLink('voice-language', '<span class="sr-only">Start a guided lesson</span>', 'voice-lessons-welcome-link', 'aria-label="Start a guided lesson"') +
-      '</nav>' +
+    const completedCount = Object.keys(state.trainer.completed || {}).length;
+    const tools = [
+      { route: 'voice-translation', title: 'Translate & Listen', description: 'Translate a phrase and hear the result.', icon: 'translate' },
+      { route: 'voice-text-to-speech', title: 'Text to Speech', description: 'Hear text in a supported language.', icon: 'volume' },
+      { route: 'voice-speech-to-text', title: 'Speech to Text', description: 'Record a phrase and review its transcript.', icon: 'mic' },
+      { route: 'voice-cloning', title: 'Voice Cloning', description: 'Create a voice only with informed permission.', icon: 'people' }
+    ];
+    const savedTranslations = state.translationLessons.length
+      ? `<section class="academy-saved-translations" aria-labelledby="academy-saved-translations-title"><h2 id="academy-saved-translations-title">Saved translations</h2><div>${state.translationLessons.map((item) => `<article><div><strong>${esc(item.translated)}</strong><small>${esc(item.source)} · ${esc(item.languageName)}</small></div><button type="button" data-action="open-saved-translation" data-id="${esc(item.id)}">Practice</button></article>`).join('')}</div></section>`
+      : '';
+    return `<section class="academy-pathway-page" aria-labelledby="academy-pathway-title">
+      <div class="academy-pathway-hero">
+        <div><h1 id="academy-pathway-title">Language Academy</h1><p>Choose your language, then find the level and age group that fits you.</p></div>
+        <img src="./assets/academy-reference-1.webp" alt="Two young learners exploring language together" width="556" height="349" fetchpriority="high" />
+      </div>
+      <section class="academy-pathway-section" aria-labelledby="academy-pathway-languages-title">
+        <h2 id="academy-pathway-languages-title">Choose your language</h2>
+        <p>Start with the language you want to hear and speak.</p>
+        ${renderAcademyLanguageChoices()}
+      </section>
+      <section class="academy-progress-summary" aria-label="Voice lesson progress">
+        <div><strong>My progress</strong><span>${completedCount} ${completedCount === 1 ? 'lesson' : 'lessons'} completed</span><small>Saved on this device</small></div>
+        ${routeLink('voice-progress', `View progress ${icon('arrow', 15)}`, 'text-link')}
+      </section>
+      <section class="academy-tools-section" aria-labelledby="academy-tools-title">
+        <h2 id="academy-tools-title">Speak, listen &amp; translate</h2>
+        <nav class="academy-tools-grid" aria-label="Voice and translation tools">${tools.map((tool) => routeLink(tool.route, `<span class="academy-tool-icon">${icon(tool.icon, 21)}</span><span><strong>${tool.title}</strong><small>${tool.description}</small></span>${icon('arrow', 15)}`, 'academy-tool-card')).join('')}</nav>
+      </section>
+      ${savedTranslations}
+    </section>`;
+  }
 
-      '<nav class="curriculum-tools-artwork" aria-label="Choose a voice lesson activity">' +
-        '<img src="./assets/voice-lessons-tools.jpg" width="1080" height="360" alt="Four illustrated voice lesson activities: Translation, Text to Speech, Speech to Text, and Voice Cloning." />' +
-        routeLink('voice-translation', '<span class="sr-only">Open Translation</span>', 'curriculum-tools-hotspot curriculum-tools-hotspot-translation', 'aria-label="Open Translation"') +
-        routeLink('voice-text-to-speech', '<span class="sr-only">Open Text to Speech</span>', 'curriculum-tools-hotspot curriculum-tools-hotspot-speech', 'aria-label="Open Text to Speech"') +
-        routeLink('voice-speech-to-text', '<span class="sr-only">Open Speech to Text</span>', 'curriculum-tools-hotspot curriculum-tools-hotspot-transcribe', 'aria-label="Open Speech to Text"') +
-        routeLink('voice-cloning', '<span class="sr-only">Open Voice Cloning</span>', 'curriculum-tools-hotspot curriculum-tools-hotspot-clone', 'aria-label="Open Voice Cloning"') +
-      '</nav>' +
-
-      (state.translationLessons.length ? '<section class="translation-saved-lessons" aria-labelledby="translation-saved-lessons-title"><span class="section-kicker">Your practice list</span><h2 id="translation-saved-lessons-title">Translations added to lessons</h2><div>' + state.translationLessons.map((item) => `<article><div><strong>${esc(item.translated)}</strong><small>${esc(item.source)} · ${esc(item.languageName)}</small></div><button type="button" data-action="open-saved-translation" data-id="${esc(item.id)}">Practice</button></article>`).join('') + '</div></section>' : '') +
-
-      '<nav class="curriculum-dashboard-art" aria-label="Choose a language, grade, or learning path">' +
-        '<img src="./assets/voice-lessons-dashboard.jpg" width="1037" height="379" alt="Voice lesson dashboard with language choices, grade levels, learning progress, and a learner ready to start." loading="lazy" />' +
-        routeLink('voice-language', '<span class="sr-only">Choose your language</span>', 'curriculum-dashboard-hotspot curriculum-dashboard-hotspot-language', 'aria-label="Choose your language"') +
-        routeLink('voice-grade', '<span class="sr-only">Choose a grade</span>', 'curriculum-dashboard-hotspot curriculum-dashboard-hotspot-grade', 'aria-label="Choose a grade"') +
-        routeLink('voice-audio', '<span class="sr-only">Start learning</span>', 'curriculum-dashboard-hotspot curriculum-dashboard-hotspot-start', `aria-label="Start learning" data-lang="${esc(state.trainer.lang)}" data-level="${esc(state.trainer.level)}"`) +
-      '</nav>' +
-    '</section>';
+  function renderVoiceProgress() {
+    const completedCount = Object.keys(state.trainer.completed || {}).length;
+    return `<div class="academy-reference-page academy-progress-page"><section class="academy-progress-content" aria-labelledby="academy-progress-title">
+      <h1 id="academy-progress-title">My progress</h1>
+      <p>${completedCount === 0
+        ? 'Your completed Voice Lessons will appear here as you learn.'
+        : `You have completed ${completedCount} ${completedCount === 1 ? 'lesson' : 'lessons'}. Keep going at your own pace.`}</p>
+      <p class="academy-progress-note">Progress is saved on this device.</p>
+      <div class="academy-progress-actions">${routeLink('voice-language', 'Choose a lesson ' + icon('arrow', 15), 'button button-primary')}${routeLink('voice_lessons', 'Back to Language Academy', 'button button-outline')}</div>
+    </section></div>`;
   }
 
   function renderOral() {
@@ -5604,6 +5631,7 @@ import {
       case 'tutor-settings': return renderTutorPortal(page);
       case 'mentors': return renderMentors();
       case 'voice_lessons': return renderVoiceLessonsHome();
+      case 'voice-progress': return renderVoiceProgress();
       case 'ai-conversation': return renderAiConversation();
       case 'voice-language':
       case 'voice-grade':
@@ -6149,7 +6177,7 @@ import {
     renderMobileNav(page);
     const gradeTitle = page === 'voice-audio' ? getVoiceGradePath(params.grade)?.name : '';
     const title = page === 'index'
-      ? 'Preserving African culture. Promoting technology.'
+      ? 'Your Language. Your Future.'
       : gradeTitle
         ? `${gradeTitle} voice lessons`
         : (PAGE_META[page]?.eyebrow || LABELS[page] || 'Explore Idilewa');

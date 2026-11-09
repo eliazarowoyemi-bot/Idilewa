@@ -17,13 +17,12 @@ const studioHtml = await readFile(new URL('../code-studio.html', import.meta.url
 const studioSource = await readFile(new URL('../src/codeStudio.js', import.meta.url), 'utf8');
 const engineSource = await readFile(new URL('../src/codeStudioEngine.js', import.meta.url), 'utf8');
 
-test('homepage Code for Kids links to the packaged Code Studio', () => {
+test('Code Studio stays packaged separately from the compact academy homepage', () => {
   const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderFullHome()'));
-  const routes = appSource.match(/const ROUTES = \[([\s\S]*?)\n  \];/)?.[1] || '';
 
-  assert.match(homeSource, /href="\.\/code-studio\.html">Code for Kids/);
-  assert.match(homeSource, /title: 'Code', copy: 'Build games and learn by making', route: 'code-studio'/);
-  assert.match(routes, /'kids'/);
+  assert.match(homeSource, /Your Language\.<br \/><span>Your Future\.<\/span>/);
+  assert.doesNotMatch(homeSource, /Code for Kids|code-studio\.html/);
+  assert.match(studioHtml, /Code Studio/);
   assert.match(viteConfig, /'code-studio'/);
 });
 

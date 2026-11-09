@@ -6,29 +6,23 @@ const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const styleSource = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 const indexSource = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 
-test('homepage follows the Family Living View mobile reference', () => {
+test('homepage follows the supplied language academy reference', () => {
   const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderFullHome()'));
   assert.match(indexSource, /<body data-default-route="index">/);
-  assert.match(homeSource, /src="\.\/assets\/idilewa-family-view\.png"/);
-  assert.match(homeSource, /Idilewa Living Family View showing a family learning together/);
-  assert.match(homeSource, /Learn African languages, hear our stories, build real skills and belong to a global community/);
+  assert.match(homeSource, /Your Language\.<br \/><span>Your Future\.<\/span>/);
+  assert.match(homeSource, /academy-reference-0\.webp/);
+  assert.match(homeSource, /Learn\. Speak\. Connect\./);
+  assert.match(appSource, /data-route="voice-grade" data-lang="\$\{language\.id\}"/);
   assert.match(homeSource, /Start Learning/);
-  assert.match(homeSource, /Code for Kids/);
-  assert.match(homeSource, /href="\.\/code-studio\.html">Code for Kids/);
   assert.doesNotMatch(homeSource, /AI Conversation/);
-  assert.match(homeSource, /\$\{renderHomeAppPreview\(\)\}/);
-  assert.match(homeSource, /class="container landing-pathways"/);
-  for (const route of ['voice-translation', 'voice-text-to-speech', 'voice-speech-to-text', 'voice-cloning']) {
-    assert.match(homeSource, new RegExp(`route: '${route}'`));
-  }
-  assert.doesNotMatch(homeSource, /route: 'heritage'/);
+  assert.doesNotMatch(homeSource, /Code for Kids|code-studio\.html|renderHomeAppPreview|landing-pathways|home-trainer-feature-section/);
   assert.doesNotMatch(homeSource, /visual-journey-3d-section|home-voice-promo|home-trainer-feature-section|explore-section|story-feature|audience-section|home-cta-section/);
   assert.match(appSource, /case 'index': return renderHome\(\);/);
   assert.match(appSource, /else if \(page === 'index'\) \{\s*document\.body\.dataset\.page = page;\s*document\.getElementById\('main'\)\.innerHTML = `\$\{pageMarkup\}\$\{renderFooter\(page\)\}`;/);
   assert.doesNotMatch(appSource, /page === 'index' \? renderHomeBenefits\(\)/);
-  assert.match(styleSource, /\.android-device \{[^}]*transform-style: preserve-3d; animation: android-device-orbit/);
-  assert.match(styleSource, /\.android-device \{ width: min\(42vw, 220px\); height: auto; aspect-ratio: \.46;/);
-  assert.match(styleSource, /@media \(prefers-reduced-motion: reduce\)[\s\S]*?\.android-device \{ animation: none;/);
+  assert.match(styleSource, /\.academy-hero \{/);
+  assert.match(styleSource, /\.academy-language-grid \{/);
+  assert.match(styleSource, /@media \(max-width: 760px\)[\s\S]*?\.academy-hero \{[\s\S]*?grid-template-columns: minmax\(0, 1fr\)/);
 });
 
 test('main and expanded mobile navigation omit retired pages', () => {
@@ -66,9 +60,9 @@ test('removed page families are absent while the retained learning destinations 
 });
 
 test('reference homepage and mobile navigation have responsive layouts', () => {
-  assert.match(styleSource, /@media \(max-width: 620px\)[\s\S]*?\.home-reference-page \.hero-grid \{/);
-  assert.match(styleSource, /\.home-reference-actions\s*\{/);
-  assert.match(styleSource, /\.home-app-layout\s*\{/);
+  assert.match(styleSource, /@media \(max-width: 760px\)[\s\S]*?\.academy-hero \{/);
+  assert.match(styleSource, /\.academy-language-grid\s*\{/);
+  assert.match(styleSource, /\.academy-tools-grid\s*\{/);
   assert.match(styleSource, /\.mobile-bottom-navigation \{[\s\S]*?grid-template-columns: repeat\(3, minmax\(0, 1fr\)\)/);
   assert.doesNotMatch(styleSource, /\.aic-|\.ai-auth-page|\.ai-workspace/);
 });

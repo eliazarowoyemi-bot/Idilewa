@@ -9,43 +9,50 @@ import {
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const stylesSource = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
-const voiceLessonToolsImage = await readFile(new URL('../public/assets/voice-lessons-tools.jpg', import.meta.url));
-const voiceLessonsWelcomeImage = await readFile(new URL('../public/assets/voice-lessons-welcome.jpg', import.meta.url));
-const voiceLessonsDashboardImage = await readFile(new URL('../public/assets/voice-lessons-dashboard.jpg', import.meta.url));
+const academyHeroImage = await readFile(new URL('../public/assets/academy-reference-0.webp', import.meta.url));
+const academyJourneyImage = await readFile(new URL('../public/assets/academy-reference-1.webp', import.meta.url));
 
-test('Voice Lessons welcome banner uses the supplied original image and preserves its lesson action', () => {
-  const dashboard = appSource.slice(
-    appSource.indexOf('function renderVoiceLessonsDashboard()'),
-    appSource.indexOf('const STORY_READINGS')
+test('homepage follows the supplied academy reference and keeps language selection connected', () => {
+  const home = appSource.slice(
+    appSource.indexOf('function renderHome()'),
+    appSource.indexOf('function renderFullHome()')
   );
-  assert.equal(voiceLessonsWelcomeImage.subarray(0, 2).toString('hex'), 'ffd8');
-  assert.match(dashboard, /src="\.\/assets\/voice-lessons-welcome\.jpg" width="1056" height="372"/);
-  assert.match(dashboard, /routeLink\('voice-language', '<span class="sr-only">Start a guided lesson<\/span>'/);
-  assert.doesNotMatch(dashboard, /curriculum-welcome-copy|curriculum-welcome-art|Every<br \/>voice matters/);
+  assert.equal(academyHeroImage.subarray(0, 4).toString(), 'RIFF');
+  assert.equal(academyHeroImage.subarray(8, 12).toString(), 'WEBP');
+  assert.match(home, /Your Language\.<br \/>[\s\S]*Your Future\./);
+  assert.match(home, /academy-reference-0\.webp/);
+  assert.match(home, /renderAcademyLanguageChoices\(\)/);
+  assert.match(home, /routeLink\('voice-language'/);
+  assert.match(appSource, /data-route="voice-grade" data-lang="\$\{language\.id\}"/);
+  assert.match(home, /Learn\. Speak\. Connect\./);
 });
 
-test('Voice Lessons uses the supplied unchanged activity artwork with accessible activity links', () => {
-  assert.equal(voiceLessonToolsImage.subarray(0, 2).toString('hex'), 'ffd8');
-  assert.match(appSource, /src="\.\/assets\/voice-lessons-tools\.jpg" width="1080" height="360"/);
-  assert.match(appSource, /aria-label="Choose a voice lesson activity"/);
-  assert.match(appSource, /curriculum-tools-hotspot-translation/);
-  assert.match(appSource, /curriculum-tools-hotspot-speech/);
-  assert.match(appSource, /curriculum-tools-hotspot-transcribe/);
-  assert.match(appSource, /curriculum-tools-hotspot-clone/);
-  assert.doesNotMatch(appSource, /<article class="curriculum-tool-card curriculum-tool-/);
-});
-
-test('Voice Lessons replaces the language, grade, and progress area with supplied dashboard artwork', () => {
+test('Voice Lessons uses the supplied learner artwork and links to working learning tools', () => {
   const dashboard = appSource.slice(
     appSource.indexOf('function renderVoiceLessonsDashboard()'),
-    appSource.indexOf('const STORY_READINGS')
+    appSource.indexOf('function renderVoiceProgress()')
   );
-  assert.equal(voiceLessonsDashboardImage.subarray(0, 2).toString('hex'), 'ffd8');
-  assert.match(dashboard, /src="\.\/assets\/voice-lessons-dashboard\.jpg" width="1037" height="379"/);
-  assert.match(dashboard, /curriculum-dashboard-hotspot-language/);
-  assert.match(dashboard, /curriculum-dashboard-hotspot-grade/);
-  assert.match(dashboard, /curriculum-dashboard-hotspot-start/);
-  assert.doesNotMatch(dashboard, /curriculum-dashboard-bottom|curriculum-progress-banner/);
+  assert.equal(academyJourneyImage.subarray(0, 4).toString(), 'RIFF');
+  assert.equal(academyJourneyImage.subarray(8, 12).toString(), 'WEBP');
+  assert.match(dashboard, /academy-reference-1\.webp/);
+  assert.match(dashboard, /renderAcademyLanguageChoices\(\)/);
+  for (const route of ['voice-translation', 'voice-text-to-speech', 'voice-speech-to-text', 'voice-cloning', 'voice-progress']) {
+    assert.ok(dashboard.includes(`'${route}'`), `${route} should be linked from Voice Lessons`);
+  }
+  assert.match(dashboard, /state\.trainer\.completed/);
+  assert.match(dashboard, /state\.translationLessons/);
+  assert.doesNotMatch(dashboard, /voice-lessons-welcome\.jpg|curriculum-tools-hotspot|curriculum-dashboard-hotspot/);
+});
+
+test('voice progress shows an open-ended completion count without a lesson cap', () => {
+  const progress = appSource.slice(
+    appSource.indexOf('function renderVoiceProgress()'),
+    appSource.indexOf('function renderOral()')
+  );
+  assert.match(progress, /Object\.keys\(state\.trainer\.completed \|\| \{\}\)\.length/);
+  assert.match(progress, /completedCount === 1 \? 'lesson' : 'lessons'/);
+  assert.doesNotMatch(progress, /of 60|\/ 60|Lesson 1 of 60/);
+  assert.match(appSource, /case 'voice-progress': return renderVoiceProgress\(\);/);
 });
 
 test('narrow language cards and voice lesson dashboard targets fit mobile screens', () => {
@@ -155,18 +162,18 @@ test('the retired Trainer page redirects to Voice Lessons and remaining lesson p
   assert.doesNotMatch(pageRouter, /case 'trainer': return renderTrainer/);
   assert.match(voiceLessonsHome, /renderVoiceLessonsDashboard\(\)/);
   assert.doesNotMatch(voiceLessonsHome, /voice-foundations|trainerStudio|trainer-hero/);
-  assert.match(appSource, /voice-lessons-welcome\.jpg/);
-  assert.match(appSource, /Start a guided lesson/);
+  assert.match(appSource, /academy-reference-1\.webp/);
+  assert.match(appSource, /Choose your language/);
   assert.doesNotMatch(voiceLessonsHome, /Explore sound foundations/);
   assert.doesNotMatch(appSource, /routeLink\('trainer'|route: 'trainer'/);
 });
 
-test('choosing a voice lesson language opens lessons directly with back and lesson navigation', () => {
+test('choosing a voice lesson language opens age-adaptive paths before the lessons', () => {
   const languagePicker = appSource.slice(
     appSource.indexOf("if (page === 'voice-language')"),
     appSource.indexOf("} else if (page === 'voice-grade')")
   );
-  assert.match(languagePicker, /data-route="voice-audio" data-lang="\$\{id\}"/);
+  assert.match(languagePicker, /data-route="voice-grade" data-lang="\$\{id\}"/);
   assert.doesNotMatch(languagePicker, /Open \$\{name\} lessons/);
   assert.doesNotMatch(languagePicker, /Continue with/);
   assert.match(appSource, /function renderVoicePracticeLessonNavigation/);
