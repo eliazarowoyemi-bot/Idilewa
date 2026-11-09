@@ -360,3 +360,25 @@ test('unsupported methods and origins are rejected', async () => {
     },
   });
 });
+
+test('local app preview origins can call the voice API proxy', async () => {
+  await withMocks({
+    fetchMock: async () => new Response(JSON.stringify([{ code: 'yo', name: 'Yoruba', services: ['tts'] }])),
+    run: async () => {
+      for (const origin of [
+        'http://localhost:8000',
+        'http://127.0.0.1:8000',
+        'http://localhost:8001',
+        'http://127.0.0.1:8001',
+      ]) {
+        const response = createResponse();
+        await plotweaverHandler(request({
+          path: 'languages?service=tts',
+          headers: { origin },
+        }), response);
+        assert.equal(response.statusCode, 200);
+        assert.equal(response.headers['Access-Control-Allow-Origin'], origin);
+      }
+    },
+  });
+});

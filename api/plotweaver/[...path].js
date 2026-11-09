@@ -7,6 +7,10 @@ const ALLOWED_ORIGINS = new Set([
   'https://tpsalm.github.io',
   'http://localhost:5173',
   'http://127.0.0.1:5173',
+  'http://localhost:8000',
+  'http://127.0.0.1:8000',
+  'http://localhost:8001',
+  'http://127.0.0.1:8001',
 ]);
 
 export const config = {
