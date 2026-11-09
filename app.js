@@ -11,6 +11,7 @@ import {
   isWebGLAvailable,
   prefersReducedMotion
 } from './src/threeScene.js';
+import { AI_CONVERSATION_LANGUAGES, getAiConversationLanguage } from './src/aiConversationLanguages.js';
 import {
   DICTIONARY,
   translateText,
@@ -274,7 +275,7 @@ import {
   const NAV = [
     { label: 'Home', route: 'index', group: 'home' },
     { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' },
-    { label: 'Translation Practice', route: 'ai-conversation', group: 'conversation' },
+    { label: 'AI Conversation', route: 'ai-conversation', group: 'conversation' },
     { label: 'For Tutors', route: 'tutor', group: 'tutor' }
   ];
   const MENU_NAV = [...NAV,
@@ -319,7 +320,7 @@ import {
   const LABELS = Object.fromEntries(ROUTES.map((r) => [r, r === 'index' ? 'Home' : r.replaceAll('_', ' ').replace(/\b\w/g, (c) => c.toUpperCase())]));
   Object.assign(LABELS, {
     'voice-language': 'Choose a voice lesson language',
-    'ai-conversation': 'Translation Practice',
+    'ai-conversation': 'AI Conversation',
     'voice-grade': 'Choose a voice lesson grade',
     'voice-audio': 'Voice audio lessons',
     'voice-practice': 'Voice lesson practice',
@@ -3651,33 +3652,9 @@ import {
   }
 
   /* ==========================================================================
-     Translation Practice · Speak · Learn · Translate · Practise
+     AI Conversation · Speak · Learn · Translate · Practise
      Phrase translation with Plotweaver voice tools.
      ========================================================================== */
-  const AICHAT_GUIDES = [
-    {
-      id: 'iya-aduke',
-      name: 'Iya Aduke',
-      photo: 'yoruba-educator-woman.jpg',
-      alt: 'Ìyá Adúkẹ́, a Yorùbá conversation guide wearing a green gèlè and coral beads',
-      tagline: 'Practise one phrase at a time.',
-    },
-    {
-      id: 'baba-tunde',
-      name: 'Bàbá Tundé',
-      photo: 'yoruba-educator-man.jpg',
-      alt: 'Bàbá Tundé, a Yorùbá conversation guide dressed for a heritage story session',
-      tagline: 'Practise one phrase at a time.',
-    },
-  ];
-
-  const AICHAT_LANGUAGES = [
-    { label: 'Yorùbá · Family & Friends', name: 'Yorùbá', code: 'yo', locale: 'yo-NG' },
-    { label: 'Igbo · Family & Friends', name: 'Igbo', code: 'ig', locale: 'ig-NG' },
-    { label: 'Hausa · Family & Friends', name: 'Hausa', code: 'ha', locale: 'ha-NG' },
-  ];
-  const AICHAT_FOCUS_OPTIONS = AICHAT_LANGUAGES.map(({ label }) => label);
-
   const AICHAT_TABS = [
     { label: 'Home', ico: 'home', route: 'index' },
     { label: 'Learn', ico: 'book', route: 'voice_lessons' },
@@ -3686,8 +3663,7 @@ import {
   ];
 
   const aiConversation = {
-    guideId: AICHAT_GUIDES[0].id,
-    focus: AICHAT_FOCUS_OPTIONS[0],
+    languageId: AI_CONVERSATION_LANGUAGES[0].id,
     showTranslation: true,
     autoSpeak: false,
     rate: 1,
@@ -3705,11 +3681,41 @@ import {
   let aiChatAudio = null;
   let aiChatAudioUrl = null;
   let aiChatPageActive = false;
+  let aiChatLanguageRevision = 0;
 
-  const aiChatGuide = () => AICHAT_GUIDES.find((guide) => guide.id === aiConversation.guideId) || AICHAT_GUIDES[0];
-  const aiChatLanguage = () => AICHAT_LANGUAGES.find(({ label }) => label === aiConversation.focus) || AICHAT_LANGUAGES[0];
+  const aiChatLanguage = () => getAiConversationLanguage(aiConversation.languageId);
+  const aiChatGuide = () => aiChatLanguage().teacher;
 
   const aiChatWave = `<svg class="aichat-wave" viewBox="0 0 26 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M2 9v2M6 5.5v5M10 2.5v11M14 5v6M18 3.5v9M22 7v2"/></svg>`;
+
+  function changeAiChatLanguage(languageId) {
+    const nextLanguage = AI_CONVERSATION_LANGUAGES.find((language) => language.id === languageId);
+    if (!nextLanguage || nextLanguage.id === aiConversation.languageId) {
+      closeAiChatPopovers();
+      return;
+    }
+
+    aiChatLanguageRevision += 1;
+    aiChatRequestController?.abort();
+    aiChatRequestController = null;
+    aiChatSpeechController?.abort();
+    aiChatSpeechController = null;
+    releaseAiChatAudio();
+    if (aiChatRecordingTimer) window.clearTimeout(aiChatRecordingTimer);
+    aiChatRecordingTimer = null;
+    if (aiChatRecorder?.state === 'recording') aiChatRecorder.stop();
+    aiChatStream?.getTracks().forEach((track) => track.stop());
+    aiChatStream = null;
+    aiChatRecorder = null;
+    aiChatListening = false;
+    aiChatRecordingChunks = [];
+
+    aiConversation.languageId = nextLanguage.id;
+    aiConversation.messages = [];
+    closeAiChatPopovers();
+    render();
+    showToast(`AI Conversation is now set to ${nextLanguage.name}.`, 'success');
+  }
 
   function aiChatTimeStamp() {
     try {
@@ -3720,27 +3726,32 @@ import {
   }
 
   function renderAiChatGuideOptions() {
-    return AICHAT_GUIDES.map((guide) => `<button type="button" class="aichat-guide-option" data-action="aichat-select-guide" data-guide="${guide.id}"${guide.id === aiConversation.guideId ? ' aria-current="true"' : ''}>
-      <img src="${imageUrl(guide.photo)}" alt="" width="30" height="30" loading="lazy" decoding="async" />
-      <span>${esc(guide.name)}</span>
-      ${guide.id === aiConversation.guideId ? icon('check', 15) : ''}
+    return AI_CONVERSATION_LANGUAGES.map((language) => `<button type="button" class="aichat-guide-option" data-action="aichat-select-guide" data-language="${language.id}"${language.id === aiConversation.languageId ? ' aria-current="true"' : ''}>
+      <img class="aichat-guide-photo" src="${imageUrl(language.teacher.image)}" alt="" width="30" height="30" loading="lazy" decoding="async" />
+      <span class="aichat-guide-photo-fallback" hidden aria-hidden="true">${esc(language.teacher.name.slice(0, 1))}</span>
+      <span>${esc(language.teacher.name)}</span>
+      ${language.id === aiConversation.languageId ? icon('check', 15) : ''}
     </button>`).join('');
   }
 
   function renderAiChatGuideCard() {
     const guide = aiChatGuide();
     const language = aiChatLanguage();
-    return `<section class="aichat-guide" aria-label="Your language guide">
+    return `<section class="aichat-guide" aria-label="${esc(language.name)} language guide">
       <div class="aichat-guide-media">
-        <img src="${imageUrl(guide.photo)}" alt="${esc(guide.alt)}" width="480" height="640" loading="eager" decoding="async" />
+        <img class="aichat-guide-photo" src="${imageUrl(guide.image)}" alt="${esc(guide.imageAlt)}" width="480" height="640" loading="eager" decoding="async" />
+        <div class="aichat-guide-photo-fallback" hidden role="img" aria-label="Teacher portrait not yet available">
+          ${icon('people', 36)}
+          <span>${esc(guide.name)}</span>
+        </div>
       </div>
       <div class="aichat-guide-copy">
         <div class="aichat-guide-name">
           <h2>${esc(guide.name)}</h2>
           <span class="aichat-verified" role="img" aria-label="Verified guide">${icon('check', 13)}</span>
         </div>
-        <p class="aichat-guide-role"><em>${esc(language.name)} guide</em>${aiChatWave}</p>
-        <p class="aichat-guide-tagline">${esc(guide.tagline)}</p>
+        <p class="aichat-guide-role"><em>${esc(guide.title)}</em>${aiChatWave}</p>
+        <p class="aichat-guide-tagline" lang="${esc(language.speechRecognitionLocale)}">${esc(guide.description)}</p>
         <div class="aichat-guide-change-wrap">
           <button type="button" class="aichat-change-guide" data-action="aichat-change-guide" aria-expanded="false" aria-controls="aichat-guide-menu">${icon('refresh', 15)}<span>Change guide</span>${icon('chevronDown', 15)}</button>
           <div class="aichat-popover aichat-guide-menu" id="aichat-guide-menu" hidden>${renderAiChatGuideOptions()}</div>
@@ -3764,7 +3775,7 @@ import {
     return `<div class="aichat-row aichat-row-guide" data-message="${esc(message.id)}">
       <span class="aichat-avatar aichat-avatar-bot" aria-hidden="true">${icon('bot', 22)}</span>
       <div class="aichat-bubble aichat-bubble-guide">
-        <p class="aichat-yoruba" lang="${esc(message.languageCode || aiChatLanguage().code)}">${esc(message.yoruba)}</p>
+        <p class="aichat-translation" lang="${esc(message.textToSpeechLocale || aiChatLanguage().textToSpeechLocale)}">${esc(message.translatedText)}</p>
         ${message.english ? `<p class="aichat-english"><span class="aichat-english-icon" aria-hidden="true">${icon('globe', 16)}</span><span>${esc(message.english)}</span></p>` : ''}
         <span class="aichat-time">${esc(message.time)}</span>
       </div>
@@ -3781,7 +3792,8 @@ import {
 
   function renderAiConversation() {
     const guide = aiChatGuide();
-    const focusOptions = AICHAT_FOCUS_OPTIONS.map((option) => `<option value="${esc(option)}"${option === aiConversation.focus ? ' selected' : ''}>${esc(option)}</option>`).join('');
+    const language = aiChatLanguage();
+    const focusOptions = AI_CONVERSATION_LANGUAGES.map((option) => `<option value="${esc(option.id)}"${option.id === aiConversation.languageId ? ' selected' : ''}>${esc(option.label)}</option>`).join('');
     const tabs = AICHAT_TABS.map((tab) => {
       const inner = `${icon(tab.ico, 22)}<span>${tab.label}</span>`;
       return tab.route
@@ -3790,12 +3802,12 @@ import {
     }).join('');
     const messages = aiConversation.messages
       .map((message) => (message.role === 'guide' ? renderAiChatGuideMessage(message) : renderAiChatUserMessage(message)))
-      .join('') || `<p class="aichat-empty-state">Type an English phrase below to see it translated into ${esc(aiChatLanguage().name)}. Plotweaver translates phrases; it does not generate open-ended chat replies.</p>`;
-    return `<div class="aichat-page">
+      .join('') || `<p class="aichat-empty-state" lang="${esc(language.speechRecognitionLocale)}">${esc(language.conversationInstructions)}</p>`;
+    return `<div class="aichat-page" lang="${esc(language.speechRecognitionLocale)}" data-language-id="${esc(language.id)}" data-translation-target="${esc(language.translationTarget)}" data-speech-recognition-locale="${esc(language.speechRecognitionLocale)}" data-text-to-speech-locale="${esc(language.textToSpeechLocale)}" aria-description="Plotweaver translates phrases; it does not generate open-ended chat replies.">
       <div class="aichat-canvas" aria-hidden="true"></div>
       <header class="aichat-header">
         <button type="button" class="aichat-iconbtn" data-action="aichat-back" aria-label="Go back">${icon('arrowLeft', 23)}</button>
-        <h1 class="aichat-title">Translation Practice</h1>
+        <h1 class="aichat-title" lang="${esc(language.speechRecognitionLocale)}">${esc(language.title)}</h1>
         <nav class="aichat-tabs aichat-tabs-desktop" aria-label="Idilewa desktop navigation">${tabs}</nav>
         <div class="aichat-settings-wrap">
           <button type="button" class="aichat-iconbtn aichat-iconbtn-mint" data-action="aichat-settings" aria-expanded="false" aria-controls="aichat-settings" aria-label="Conversation settings">${icon('settings', 21)}</button>
@@ -3810,7 +3822,7 @@ import {
         <div class="aichat-rail">
           <div class="aichat-focus">
             ${icon('people', 20)}
-            <select class="aichat-focus-select" aria-label="Language to translate into">${focusOptions}</select>
+            <select class="aichat-focus-select" aria-label="${esc(language.name)} language selector">${focusOptions}</select>
             <span class="aichat-focus-chevron" aria-hidden="true">${icon('chevronDown', 18)}</span>
           </div>
           ${renderAiChatGuideCard()}
@@ -3818,8 +3830,8 @@ import {
         <div class="aichat-thread${aiConversation.showTranslation ? '' : ' aichat-thread-hide-translation'}" id="aichat-thread" role="log" aria-live="polite" aria-label="Conversation with ${esc(guide.name)}">${messages}</div>
       </div>
       <form class="aichat-composer" data-form="aichat-composer">
-        <button type="button" class="aichat-mic" data-action="aichat-mic" aria-label="Speak your message">${icon('mic', 22)}</button>
-        <input class="aichat-input" type="text" name="message" placeholder="Type an English phrase to translate..." autocomplete="off" maxlength="300" aria-label="Type an English phrase to translate" />
+        <button type="button" class="aichat-mic" data-action="aichat-mic" aria-label="${language.speechRecognitionSupported ? 'Speak your message' : `Voice input unavailable for ${esc(language.name)}`}"${language.speechRecognitionSupported ? '' : ` title="Voice input for ${esc(language.name)} is not currently available"`}>${icon('mic', 22)}</button>
+        <input class="aichat-input" type="text" name="message" lang="${esc(language.speechRecognitionLocale)}" placeholder="${esc(language.inputPlaceholder)}" autocomplete="off" maxlength="300" aria-label="${esc(language.inputPlaceholder)}" />
         <button type="submit" class="aichat-send" aria-label="Send message">${icon('send', 21)}</button>
         <span class="aichat-status-sr-only" id="aichat-audio-status" role="status" aria-live="polite" aria-atomic="true"></span>
       </form>
@@ -3863,6 +3875,12 @@ import {
 
   function initializeAiConversation() {
     aiChatPageActive = true;
+    document.querySelectorAll('.aichat-guide-photo').forEach((image) => {
+      image.addEventListener('error', () => {
+        image.hidden = true;
+        if (image.nextElementSibling) image.nextElementSibling.hidden = false;
+      }, { once: true });
+    });
     aiChatScrollContainers().forEach((el) => {
       el.addEventListener('scroll', syncAiChatScrollEdges, { passive: true });
     });
@@ -3893,7 +3911,7 @@ import {
 
   function aiChatLatestPhrase() {
     const guideMessages = aiConversation.messages.filter((message) => message.role === 'guide');
-    return guideMessages[guideMessages.length - 1]?.yoruba || '';
+    return guideMessages[guideMessages.length - 1]?.translatedText || '';
   }
 
   function releaseAiChatAudio() {
@@ -3921,7 +3939,7 @@ import {
     try {
       const audioBlob = await synthesizePlotweaverSpeech({
         text,
-        language: aiChatLanguage().code,
+        language: aiChatLanguage().textToSpeechLanguage,
         signal: controller.signal,
       });
       if (controller.signal.aborted || !aiChatPageActive) return false;
@@ -3982,13 +4000,14 @@ import {
       .slice(-10)
       .map((message) => ({
         role: message.role === 'guide' ? 'model' : 'user',
-        text: message.role === 'guide' ? message.yoruba : message.text,
+        text: message.role === 'guide' ? message.translatedText : message.text,
       }));
     history.push({ role: 'user', text });
 
     try {
       const result = await sendAiChatMessage({
-        language: aiChatLanguage().code,
+        language: aiChatLanguage().translationTarget,
+        translationProvider: aiChatLanguage().translationProvider,
         messages: history,
         signal: controller.signal,
       });
@@ -4002,16 +4021,16 @@ import {
       const guideMessage = {
         id: `aichat-${aiConversation.sequence}`,
         role: 'guide',
-        yoruba: result.reply,
+        translatedText: result.reply,
         english: result.translation,
-        languageCode: aiChatLanguage().code,
+        textToSpeechLocale: aiChatLanguage().textToSpeechLocale,
         time: aiChatTimeStamp(),
         controls: false,
         plotweaverTranslated: true,
       };
       aiConversation.messages.push(guideMessage);
       appendAiChatMessage(guideMessage);
-      if (aiConversation.autoSpeak) void aiChatSpeak(guideMessage.yoruba);
+      if (aiConversation.autoSpeak) void aiChatSpeak(guideMessage.translatedText);
     } catch (error) {
       if (!controller.signal.aborted) {
         showToast(error instanceof Error ? error.message : 'The AI conversation could not be completed.', 'error');
@@ -4029,6 +4048,13 @@ import {
   async function startAiChatListening(trigger) {
     const input = document.querySelector('.aichat-input');
     const status = document.getElementById('aichat-audio-status');
+    const language = aiChatLanguage();
+    const languageRevision = aiChatLanguageRevision;
+    if (!language.speechRecognitionSupported) {
+      showToast(`Voice input for ${language.name} is not currently available. Type your phrase instead.`, 'error');
+      input?.focus();
+      return;
+    }
     if (aiChatListening && aiChatRecorder?.state === 'recording') {
       aiChatRecorder.stop();
       if (status) status.textContent = 'Transcribing your recording with Plotweaver…';
@@ -4045,7 +4071,7 @@ import {
     let stream;
     try {
       stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      if (!aiChatPageActive) {
+      if (!aiChatPageActive || languageRevision !== aiChatLanguageRevision) {
         stream.getTracks().forEach((track) => track.stop());
         return;
       }
@@ -4074,7 +4100,7 @@ import {
         trigger?.setAttribute('aria-pressed', 'false');
         trigger?.setAttribute('aria-label', 'Speak your message');
         if (trigger?.isConnected) trigger.disabled = false;
-        if (!aiChatPageActive) return;
+        if (!aiChatPageActive || languageRevision !== aiChatLanguageRevision) return;
         const recording = new Blob(aiChatRecordingChunks, {
           type: aiChatRecordingChunks[0]?.type || recorder.mimeType || 'audio/webm',
         });
@@ -4089,7 +4115,7 @@ import {
         }
         try {
           if (status) status.textContent = 'Transcribing your recording with Plotweaver…';
-          const result = await transcribeWithPlotweaver(recording, aiChatLanguage().code);
+          const result = await transcribeWithPlotweaver(recording, language.speechRecognitionLanguage);
           if (!aiChatPageActive || !input?.isConnected) return;
           input.value = result.text.slice(0, input.maxLength);
           input.focus();
@@ -4140,8 +4166,8 @@ import {
     if (thread) thread.setAttribute('aria-busy', 'true');
     try {
       const result = await translateWithPlotweaver({
-        text: message.yoruba,
-        sourceLanguage: aiChatLanguage().code,
+        text: message.translatedText,
+        sourceLanguage: aiChatLanguage().translationTarget,
         targetLanguage: 'en',
       });
       message.english = result.translated_text;
@@ -4202,13 +4228,7 @@ import {
         break;
       }
       case 'aichat-select-guide': {
-        const nextGuide = AICHAT_GUIDES.find((guide) => guide.id === el.dataset.guide);
-        if (!nextGuide) break;
-        aiConversation.guideId = nextGuide.id;
-        const card = document.querySelector('.aichat-guide');
-        if (card) card.outerHTML = renderAiChatGuideCard();
-        closeAiChatPopovers();
-        showToast(`${nextGuide.name} is now your conversation guide.`, 'success');
+        changeAiChatLanguage(el.dataset.language);
         break;
       }
       case 'aichat-translate':
@@ -7362,10 +7382,7 @@ import {
   document.addEventListener('change', (event) => {
     const el = event.target;
     if (el.matches('.aichat-focus-select')) {
-      aiConversation.focus = el.value;
-      aiConversation.messages = [];
-      render();
-      showToast(`Ready to translate English into ${aiChatLanguage().name}.`, 'success');
+      changeAiChatLanguage(el.value);
       return;
     }
     if (el.matches('.translation-speed-select select')) {

@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { sendAiChatMessage } from '../src/aiChatClient.js';
 
-test('translation practice sends the latest English phrase to Plotweaver in the selected language', async () => {
+test('AI Conversation sends the latest English phrase to Plotweaver in the selected language', async () => {
   const originalFetch = globalThis.fetch;
   const signal = new AbortController().signal;
   globalThis.fetch = async (url, options) => {
@@ -36,7 +36,7 @@ test('translation practice sends the latest English phrase to Plotweaver in the 
   }
 });
 
-test('translation practice surfaces Plotweaver failures and rejects unsupported languages', async () => {
+test('AI Conversation surfaces Plotweaver failures and rejects unsupported languages', async () => {
   const originalFetch = globalThis.fetch;
   globalThis.fetch = async () => new Response(JSON.stringify({
     error: 'Idilewa voice service reached a rate or usage limit.',
@@ -48,13 +48,46 @@ test('translation practice surfaces Plotweaver failures and rejects unsupported 
       /rate or usage limit/,
     );
     await assert.rejects(
-      sendAiChatMessage({ language: 'sw', messages: [{ role: 'user', text: 'Hello' }] }),
-      /Yorùbá, Igbo, or Hausa/,
+      sendAiChatMessage({ language: 'pcm', messages: [{ role: 'user', text: 'Hello' }] }),
+      /Yorùbá, Igbo, Hausa, or Swahili/,
     );
     await assert.rejects(
       sendAiChatMessage({ language: 'yo', messages: [] }),
       /Type an English phrase/,
     );
+  } finally {
+    globalThis.fetch = originalFetch;
+  }
+});
+
+test('Swahili uses the existing Google Cloud translation endpoint', async () => {
+  const originalFetch = globalThis.fetch;
+  const signal = new AbortController().signal;
+  globalThis.fetch = async (url, options) => {
+    assert.equal(url, '/api/translate');
+    assert.equal(options.method, 'POST');
+    assert.deepEqual(JSON.parse(options.body), {
+      text: 'Good morning',
+      target: 'sw',
+    });
+    assert.equal(options.signal, signal);
+    return new Response(JSON.stringify({
+      translated: 'Habari za asubuhi',
+      target: 'sw',
+      provider: 'Google Cloud Translation',
+    }));
+  };
+
+  try {
+    const result = await sendAiChatMessage({
+      language: 'sw',
+      translationProvider: 'google',
+      messages: [{ role: 'user', text: 'Good morning' }],
+      signal,
+    });
+    assert.equal(result.reply, 'Habari za asubuhi');
+    assert.equal(result.translation, 'Good morning');
+    assert.equal(result.provider, 'Google Cloud Translation');
   } finally {
     globalThis.fetch = originalFetch;
   }

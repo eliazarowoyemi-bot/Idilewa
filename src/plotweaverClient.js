@@ -126,6 +126,21 @@ export async function translateWithPlotweaver({ text, sourceLanguage, targetLang
   return result;
 }
 
+export async function translateWithGoogle({ text, targetLanguage, signal }) {
+  const response = await fetch(`${getApiBase()}/api/translate`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+    body: JSON.stringify({ text, target: targetLanguage }),
+    signal,
+  });
+  if (!response.ok) throw await responseError(response);
+  const result = await response.json();
+  if (typeof result?.translated !== 'string' || !result.translated.trim()) {
+    throw new Error('Google Cloud Translation returned no translated text.');
+  }
+  return result;
+}
+
 export async function transcribeWithPlotweaver(audio, language) {
   const formData = new FormData();
   const extension = audio.type.includes('ogg') ? 'ogg'

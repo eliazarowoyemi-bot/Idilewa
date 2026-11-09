@@ -1,6 +1,7 @@
 import assert from 'node:assert/strict';
 import { access, readFile } from 'node:fs/promises';
 import test from 'node:test';
+import { AI_CONVERSATION_LANGUAGES } from '../src/aiConversationLanguages.js';
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const stylesSource = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
@@ -43,7 +44,7 @@ test('the AI conversation screen renders the guide card, thread, composer, and t
     assert.match(appSource, new RegExp(`class="${className}`), `${className} markup should exist`);
     assert.match(stylesSource, new RegExp(`\\.${className}\\b`), `${className} styles should exist`);
   }
-  assert.match(appSource, /class="aichat-title">Translation Practice</);
+  assert.match(appSource, /class="aichat-title" lang="\$\{esc\(language\.speechRecognitionLocale\)\}">\$\{esc\(language\.title\)\}/);
   assert.match(appSource, /class="aichat-tabs aichat-tabs-desktop"/);
   assert.match(appSource, /class="aichat-tabs aichat-tabs-mobile"/);
   const tabs = appSource.match(/const AICHAT_TABS = \[([\s\S]*?)\n  \];/)?.[1] || '';
@@ -63,13 +64,18 @@ test('the AI conversation screen renders the guide card, thread, composer, and t
   assert.match(appSource, /<a class="aichat-tab" href="#\/\$\{tab\.route\}" data-route="\$\{tab\.route\}">/);
 });
 
-test('both Yoruba guides resolve to bundled portrait assets', async () => {
-  for (const photo of ['yoruba-educator-woman.jpg', 'yoruba-educator-man.jpg']) {
-    assert.match(appSource, new RegExp(`photo: '${photo.replace('.', '\\.')}'`), `${photo} should be wired to a guide`);
-    await access(new URL(`../public/assets/${photo}`, import.meta.url));
-  }
-  assert.match(appSource, /alt: 'Ìyá Adúkẹ́/);
-  assert.match(appSource, /alt: 'Bàbá Tundé/);
+test('each supported language has a dedicated guide and mapped portrait asset', async () => {
+  assert.deepEqual(AI_CONVERSATION_LANGUAGES.map(({ id }) => id), ['yo', 'ig', 'ha', 'sw']);
+  const portraitPaths = AI_CONVERSATION_LANGUAGES.map(({ teacher }) => teacher.image);
+  assert.equal(new Set(portraitPaths).size, AI_CONVERSATION_LANGUAGES.length);
+  assert.equal(AI_CONVERSATION_LANGUAGES[0].teacher.name, 'Iya Aduke');
+  assert.equal(AI_CONVERSATION_LANGUAGES[1].teacher.name, 'Ngozi Nwosu');
+  assert.equal(AI_CONVERSATION_LANGUAGES[2].teacher.name, 'Aisha Muhammad');
+  assert.equal(AI_CONVERSATION_LANGUAGES[3].teacher.name, 'Amina Juma');
+  await access(new URL('../public/assets/yoruba-educator-woman.jpg', import.meta.url));
+  assert.match(AI_CONVERSATION_LANGUAGES[1].teacher.image, /^teacher-guides\/igbo-/);
+  assert.match(AI_CONVERSATION_LANGUAGES[2].teacher.image, /^teacher-guides\/hausa-/);
+  assert.match(AI_CONVERSATION_LANGUAGES[3].teacher.image, /^teacher-guides\/swahili-/);
 });
 
 test('every AI chat control is wired through the shared action handler', () => {
@@ -84,14 +90,20 @@ test('every AI chat control is wired through the shared action handler', () => {
   assert.match(appSource, /closest\('\.aichat-popover, \[data-action="aichat-settings"\], \[data-action="aichat-change-guide"\]'\)/);
 });
 
-test('translation practice uses the Plotweaver proxy for text and voice services', () => {
+test('AI Conversation uses language configuration for translation and speech settings', () => {
   assert.match(appSource, /import \{ sendAiChatMessage \} from '\.\/src\/aiChatClient\.js'/);
-  assert.match(appSource, /sendAiChatMessage\(\{[\s\S]*?language: aiChatLanguage\(\)\.code/);
+  assert.match(appSource, /sendAiChatMessage\(\{[\s\S]*?language: aiChatLanguage\(\)\.translationTarget/);
+  assert.match(appSource, /translationProvider: aiChatLanguage\(\)\.translationProvider/);
   assert.match(appSource, /synthesizePlotweaverSpeech\(\{/);
-  assert.match(appSource, /transcribeWithPlotweaver\(recording, aiChatLanguage\(\)\.code\)/);
+  assert.match(appSource, /transcribeWithPlotweaver\(recording, language\.speechRecognitionLanguage\)/);
   assert.match(appSource, /translateWithPlotweaver\(\{/);
-  assert.match(appSource, /placeholder="Type an English phrase to translate/);
+  assert.match(appSource, /placeholder="\$\{esc\(language\.inputPlaceholder\)\}/);
+  assert.match(appSource, /data-speech-recognition-locale="\$\{esc\(language\.speechRecognitionLocale\)\}"/);
+  assert.match(appSource, /data-text-to-speech-locale="\$\{esc\(language\.textToSpeechLocale\)\}"/);
   assert.match(appSource, /Plotweaver translates phrases; it does not generate open-ended chat replies\./);
+  assert.match(appSource, /function changeAiChatLanguage\(languageId\)/);
+  assert.match(appSource, /aiConversation\.languageId = nextLanguage\.id/);
+  assert.match(appSource, /aiConversation\.messages = \[\]/);
   assert.doesNotMatch(appSource, /AICHAT_SEED_MESSAGES|Google Gemini|GEMINI_API_KEY/);
 });
 
