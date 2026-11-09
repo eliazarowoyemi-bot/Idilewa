@@ -8,6 +8,7 @@ import {
 } from '../src/voiceGradeCurriculum.js';
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+const stylesSource = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 const voiceLessonToolsImage = await readFile(new URL('../public/assets/voice-lessons-tools.jpg', import.meta.url));
 const voiceLessonsWelcomeImage = await readFile(new URL('../public/assets/voice-lessons-welcome.jpg', import.meta.url));
 const voiceLessonsDashboardImage = await readFile(new URL('../public/assets/voice-lessons-dashboard.jpg', import.meta.url));
@@ -45,6 +46,12 @@ test('Voice Lessons replaces the language, grade, and progress area with supplie
   assert.match(dashboard, /curriculum-dashboard-hotspot-grade/);
   assert.match(dashboard, /curriculum-dashboard-hotspot-start/);
   assert.doesNotMatch(dashboard, /curriculum-dashboard-bottom|curriculum-progress-banner/);
+});
+
+test('narrow language cards and voice lesson dashboard targets fit mobile screens', () => {
+  assert.match(stylesSource, /@media \(max-width: 375px\) \{[\s\S]*?\.language-choice-grid \{ grid-template-columns: minmax\(0, 1fr\); \}/);
+  assert.match(stylesSource, /\.curriculum-dashboard-hotspot-grade \{ left: 33%; width: 22%; \}/);
+  assert.match(stylesSource, /\.curriculum-dashboard-hotspot-start \{ top: 57%; left: 55%; width: max\(15%, 44px\); height: max\(10%, 44px\); \}/);
 });
 
 test('each grade has its own non-overlapping lesson set within its difficulty band', () => {

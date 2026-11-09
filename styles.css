@@ -1966,6 +1966,7 @@ h3 { font-size: 17px; line-height: 1.25; font-weight: 760; }
   .feature-card p { font-size: 9px; }
   .answer-option { font-size: 10px; }
   .language-choice { padding: 10px; }
+  .language-choice-grid { grid-template-columns: minmax(0, 1fr); }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -7651,8 +7652,8 @@ body[data-page="coding"] .coding-page.ide-fullscreen-page.ide-page-root { width:
 .curriculum-dashboard-art > img { display: block; width: 100%; height: auto; }
 .curriculum-dashboard-hotspot { position: absolute; top: 0; height: 68%; }
 .curriculum-dashboard-hotspot-language { left: 0; width: 33%; }
-.curriculum-dashboard-hotspot-grade { left: 33%; width: 27%; }
-.curriculum-dashboard-hotspot-start { top: 57%; left: 55%; width: 15%; height: 10%; }
+.curriculum-dashboard-hotspot-grade { left: 33%; width: 22%; }
+.curriculum-dashboard-hotspot-start { top: 57%; left: 55%; width: max(15%, 44px); height: max(10%, 44px); }
 .curriculum-dashboard-hotspot:focus-visible { outline: 3px solid #164d32; outline-offset: -4px; border-radius: 10px; }
 .curriculum-dashboard-art .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; clip-path: inset(50%); }
 .curriculum-tools-hotspot { position: absolute; top: 0; bottom: 0; width: 25%; }
