@@ -11,10 +11,15 @@ const handlers = {
 
 export const config = { maxDuration: 15 };
 
+function getRoute(req) {
+  const { pathname } = new URL(req.url || '/', 'https://idilewa.local');
+  const prefix = '/api/guardian';
+  if (pathname !== prefix && !pathname.startsWith(`${prefix}/`)) return '';
+  return pathname.slice(prefix.length).replace(/^\/+|\/+$/g, '');
+}
+
 export default async function handler(req, res) {
-  const route = Array.isArray(req.query?.path)
-    ? req.query.path.length === 1 ? req.query.path[0] : ''
-    : req.query?.path;
+  const route = getRoute(req);
   const endpoint = typeof route === 'string' && Object.hasOwn(handlers, route)
     ? handlers[route]
     : null;

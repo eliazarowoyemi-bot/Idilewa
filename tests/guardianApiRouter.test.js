@@ -26,9 +26,9 @@ function createResponse() {
 }
 
 test('guardian router preserves the request and verification endpoints', async () => {
-  for (const path of ['request', ['request'], 'verify', ['verify']]) {
+  for (const path of ['request', 'verify']) {
     const response = createResponse();
-    await handler({ method: 'GET', query: { path } }, response);
+    await handler({ method: 'GET', url: `/api/guardian/${path}` }, response);
     assert.equal(response.statusCode, 405);
     assert.equal(response.headers.Allow, 'POST');
     assert.deepEqual(response.body, { error: 'Method not allowed.' });
@@ -37,7 +37,7 @@ test('guardian router preserves the request and verification endpoints', async (
 
 test('guardian router preserves approval endpoint method handling', async () => {
   const response = createResponse();
-  await handler({ method: 'DELETE', query: { path: ['approve'] } }, response);
+  await handler({ method: 'DELETE', url: '/api/guardian/approve' }, response);
   assert.equal(response.statusCode, 405);
   assert.equal(response.headers.Allow, 'GET, POST');
   assert.match(response.headers['Content-Type'], /^text\/html/);
@@ -45,9 +45,9 @@ test('guardian router preserves approval endpoint method handling', async () => 
 });
 
 test('guardian router rejects unknown and nested routes', async () => {
-  for (const path of ['missing', ['request', 'extra']]) {
+  for (const path of ['/api/guardian/missing', '/api/guardian/request/extra']) {
     const response = createResponse();
-    await handler({ method: 'GET', query: { path } }, response);
+    await handler({ method: 'GET', url: path }, response);
     assert.equal(response.statusCode, 404);
     assert.deepEqual(response.body, { error: 'Guardian endpoint not found.' });
   }
