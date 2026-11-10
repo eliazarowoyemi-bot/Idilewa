@@ -9,8 +9,8 @@ import {
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const stylesSource = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
-const academyHeroImage = await readFile(new URL('../public/assets/academy-reference-0.webp', import.meta.url));
-const academyJourneyImage = await readFile(new URL('../public/assets/academy-reference-1.webp', import.meta.url));
+const academyHeroImage = await readFile(new URL('../assets/landing-home-hero.webp', import.meta.url));
+const academyJourneyImage = await readFile(new URL('../assets/landing-journey-learners.webp', import.meta.url));
 
 test('homepage follows the supplied academy reference and keeps language selection connected', () => {
   const home = appSource.slice(
@@ -19,10 +19,11 @@ test('homepage follows the supplied academy reference and keeps language selecti
   );
   assert.equal(academyHeroImage.subarray(0, 4).toString(), 'RIFF');
   assert.equal(academyHeroImage.subarray(8, 12).toString(), 'WEBP');
-  assert.match(home, /Your Language\.<br \/>[\s\S]*Your Future\./);
-  assert.match(home, /academy-reference-0\.webp/);
+  assert.match(home, /Our Language\.<br \/>[\s\S]*Our Future\./);
+  assert.match(home, /landingHomeHeroUrl/);
+  assert.match(appSource, /import landingHomeHeroUrl from '\.\/assets\/landing-home-hero\.webp'/);
   assert.match(home, /renderAcademyLanguageChoices\(\)/);
-  assert.match(home, /routeLink\('voice-language'/);
+  assert.match(home, /routeLink\('voice_lessons'/);
   assert.match(appSource, /data-route="voice-grade" data-lang="\$\{language\.id\}"/);
   assert.match(home, /Learn\. Speak\. Connect\./);
 });
@@ -34,7 +35,8 @@ test('Voice Lessons uses the supplied learner artwork and links to working learn
   );
   assert.equal(academyJourneyImage.subarray(0, 4).toString(), 'RIFF');
   assert.equal(academyJourneyImage.subarray(8, 12).toString(), 'WEBP');
-  assert.match(dashboard, /academy-reference-1\.webp/);
+  assert.match(dashboard, /landingJourneyLearnersUrl/);
+  assert.match(appSource, /import landingJourneyLearnersUrl from '\.\/assets\/landing-journey-learners\.webp'/);
   assert.match(dashboard, /renderAcademyLanguageChoices\(\)/);
   for (const route of ['voice-translation', 'voice-text-to-speech', 'voice-speech-to-text', 'voice-cloning', 'voice-progress']) {
     assert.ok(dashboard.includes(`'${route}'`), `${route} should be linked from Voice Lessons`);
@@ -162,7 +164,7 @@ test('the retired Trainer page redirects to Voice Lessons and remaining lesson p
   assert.doesNotMatch(pageRouter, /case 'trainer': return renderTrainer/);
   assert.match(voiceLessonsHome, /renderVoiceLessonsDashboard\(\)/);
   assert.doesNotMatch(voiceLessonsHome, /voice-foundations|trainerStudio|trainer-hero/);
-  assert.match(appSource, /academy-reference-1\.webp/);
+  assert.match(appSource, /import landingJourneyLearnersUrl from '\.\/assets\/landing-journey-learners\.webp'/);
   assert.match(appSource, /Choose your language/);
   assert.doesNotMatch(voiceLessonsHome, /Explore sound foundations/);
   assert.doesNotMatch(appSource, /routeLink\('trainer'|route: 'trainer'/);

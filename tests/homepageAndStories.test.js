@@ -9,13 +9,16 @@ const indexSource = await readFile(new URL('../index.html', import.meta.url), 'u
 test('homepage follows the supplied language academy reference', () => {
   const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderFullHome()'));
   assert.match(indexSource, /<body data-default-route="index">/);
-  assert.match(homeSource, /Your Language\.<br \/><span>Your Future\.<\/span>/);
-  assert.match(homeSource, /academy-reference-0\.webp/);
+  assert.match(homeSource, /Our Language\.<br \/><span>Our Future\.<\/span>/);
+  assert.match(homeSource, /landingHomeHeroUrl/);
+  assert.match(appSource, /import landingHomeHeroUrl from '\.\/assets\/landing-home-hero\.webp'/);
   assert.match(homeSource, /Learn\. Speak\. Connect\./);
   assert.match(appSource, /data-route="voice-grade" data-lang="\$\{language\.id\}"/);
+  assert.match(appSource, /routeLink\('voice_lessons', 'Start Learning', 'button button-primary header-cta'\)/);
   assert.match(homeSource, /Start Learning/);
-  assert.doesNotMatch(homeSource, /AI Conversation/);
-  assert.doesNotMatch(homeSource, /Code for Kids|code-studio\.html|renderHomeAppPreview|landing-pathways|home-trainer-feature-section/);
+  assert.match(homeSource, /AI Conversation/);
+  assert.match(homeSource, /Heritage Stories/);
+  assert.doesNotMatch(homeSource, /Code for Kids|renderHomeAppPreview|landing-pathways|home-trainer-feature-section/);
   assert.doesNotMatch(homeSource, /visual-journey-3d-section|home-voice-promo|home-trainer-feature-section|explore-section|story-feature|audience-section|home-cta-section/);
   assert.match(appSource, /case 'index': return renderHome\(\);/);
   assert.match(appSource, /else if \(page === 'index'\) \{\s*document\.body\.dataset\.page = page;\s*document\.getElementById\('main'\)\.innerHTML = `\$\{pageMarkup\}\$\{renderFooter\(page\)\}`;/);

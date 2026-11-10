@@ -1,5 +1,11 @@
 import * as THREE from 'three';
 import brandLogoUrl from './assets/idilewa-brand.png';
+import landingHomeHeroUrl from './assets/landing-home-hero.webp';
+import landingFeatureVoiceUrl from './assets/landing-feature-voice.webp';
+import landingFeatureCodeUrl from './assets/landing-feature-code.webp';
+import landingFeatureAiUrl from './assets/landing-feature-ai.webp';
+import landingFeatureHeritageUrl from './assets/landing-feature-heritage.webp';
+import landingJourneyLearnersUrl from './assets/landing-journey-learners.webp';
 import './src/convexClient.js';
 import {
   init3DCodeRobotGlyphs,
@@ -647,7 +653,7 @@ import {
         : '');
     const academyNav = [
       { route: 'index', label: 'Home' },
-      { route: 'voice_lessons', label: 'Voice Lessons' },
+      { route: 'voice_lessons', label: 'Learn' },
       { route: 'voice-translation', label: 'Translate & Listen' },
       { route: 'voice-progress', label: 'Progress' }
     ];
@@ -669,7 +675,7 @@ import {
     const accountActions = currentUser
       ? `<a class="header-profile ${page === 'profile' ? 'active' : ''}" href="#/profile" data-route="profile" aria-label="Open profile"${page === 'profile' ? ' aria-current="page"' : ''}><span class="header-avatar">${profileAvatar}</span><span class="header-profile-label">${esc(currentUser.name || 'Profile')}</span></a><button class="header-signout" type="button" data-action="account-sign-out">Sign out</button>`
       : academyShell
-        ? `${routeLink('login', 'Log in', 'header-signin', 'data-mode="signin"')}${routeLink('voice-language', 'Start Learning', 'button button-primary header-cta')}`
+        ? `${routeLink('login', 'Log in', 'header-signin', 'data-mode="signin"')}${routeLink('voice_lessons', 'Start Learning', 'button button-primary header-cta')}`
         : `${routeLink('login', 'Log in', 'header-signin', 'data-mode="signin"')}${routeLink('login', 'Get started', 'button button-primary header-cta', 'data-mode="signup"')}`;
     const mobileShortcuts = [
       { route: 'profile', label: 'Profile', ico: 'user' }
@@ -813,15 +819,30 @@ import {
   }
 
   function renderHome() {
+    const experiences = [
+      { title: 'Voice Lessons', description: 'Listen & Speak', image: landingFeatureVoiceUrl, alt: 'Learners exploring voice lessons', route: 'voice_lessons', tone: 'voice' },
+      { title: 'Code', description: 'Build & Run', image: landingFeatureCodeUrl, alt: 'A young learner exploring code', href: './code-studio.html', tone: 'code' },
+      { title: 'AI Conversation', description: 'Chat & Practise', image: landingFeatureAiUrl, alt: 'Learners practising a conversation', route: 'ai-conversation', tone: 'ai' },
+      { title: 'Heritage Stories', description: 'Stories & Culture', image: landingFeatureHeritageUrl, alt: 'A family sharing a heritage story', route: 'oral', tone: 'heritage' }
+    ];
+    const experienceCards = experiences.map((item) => {
+      const contents = `<img src="${item.image}" alt="${esc(item.alt)}" loading="lazy" /><span class="academy-home-feature-copy"><strong>${esc(item.title)}</strong><small>${esc(item.description)}</small></span><span class="academy-home-feature-arrow" aria-hidden="true">${icon('arrow', 17)}</span>`;
+      return item.route
+        ? routeLink(item.route, contents, `academy-home-feature academy-home-feature-${item.tone}`, `aria-label="${esc(`Open ${item.title}`)}"`)
+        : `<a class="academy-home-feature academy-home-feature-${item.tone}" href="${item.href}" aria-label="${esc(`Open ${item.title}`)}">${contents}</a>`;
+    }).join('');
     return `<div class="academy-reference-page academy-home-page">
       <section class="academy-hero" aria-labelledby="academy-home-title">
         <div class="academy-hero-copy">
-          <h1 id="academy-home-title">Your Language.<br /><span>Your Future.</span></h1>
+          <h1 id="academy-home-title">Our Language.<br /><span>Our Future.</span></h1>
           <p>Learn. Speak. Connect.</p>
-          ${routeLink('voice-language', `Start Learning ${icon('arrow', 17)}`, 'button button-primary academy-start-button')}
+          <div class="academy-home-actions">
+            ${routeLink('voice_lessons', `Start Learning ${icon('arrow', 17)}`, 'button button-primary academy-start-button')}
+            <a class="academy-code-button" href="./code-studio.html">${icon('code', 17)} Code</a>
+          </div>
         </div>
         <div class="academy-hero-art">
-          <img src="./assets/academy-reference-0.webp" alt="Illustrated African children exploring language learning together" width="1446" height="463" fetchpriority="high" />
+          <img src="${landingHomeHeroUrl}" alt="Illustrated African children exploring language learning with a phone" width="1446" height="463" fetchpriority="high" />
           <p class="academy-art-caption">Discover <strong>African languages</strong> together</p>
         </div>
       </section>
@@ -829,12 +850,7 @@ import {
         <h2 id="academy-home-languages-title">Choose your language</h2>
         ${renderAcademyLanguageChoices()}
       </section>
-      <div class="academy-benefits-strip" aria-label="Learning features">
-        <span>${icon('book', 19)} Age-adaptive lessons</span>
-        <span>${icon('volume', 19)} Speak &amp; listen</span>
-        <span>${icon('check', 19)} Practice activities</span>
-        <span>${icon('chart', 19)} Track your progress</span>
-      </div>
+      <nav class="academy-home-feature-grid" aria-label="Explore Idilewa learning experiences">${experienceCards}</nav>
     </div>`;
   }
 
@@ -3056,10 +3072,10 @@ import {
       : '';
     return `<section class="academy-pathway-page" aria-labelledby="academy-pathway-title">
       <div class="academy-pathway-hero">
-        <div><h1 id="academy-pathway-title">Language Academy</h1><p>Choose your language, then find the level and age group that fits you.</p></div>
-        <img src="./assets/academy-reference-1.webp" alt="Two young learners exploring language together" width="556" height="349" fetchpriority="high" />
+        <div><h1 id="academy-pathway-title">Language Academy</h1><p>Choose your language, proficiency and age group.</p><a class="button button-primary academy-pathway-start" href="#voice-language-choices">Start Learning ${icon('arrow', 15)}</a></div>
+        <img src="${landingJourneyLearnersUrl}" alt="Two smiling young African learners" width="556" height="349" fetchpriority="high" />
       </div>
-      <section class="academy-pathway-section" aria-labelledby="academy-pathway-languages-title">
+      <section class="academy-pathway-section" id="voice-language-choices" aria-labelledby="academy-pathway-languages-title">
         <h2 id="academy-pathway-languages-title">Choose your language</h2>
         <p>Start with the language you want to hear and speak.</p>
         ${renderAcademyLanguageChoices()}
@@ -6177,7 +6193,7 @@ import {
     renderMobileNav(page);
     const gradeTitle = page === 'voice-audio' ? getVoiceGradePath(params.grade)?.name : '';
     const title = page === 'index'
-      ? 'Your Language. Your Future.'
+      ? 'Our Language. Our Future.'
       : gradeTitle
         ? `${gradeTitle} voice lessons`
         : (PAGE_META[page]?.eyebrow || LABELS[page] || 'Explore Idilewa');

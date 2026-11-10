@@ -17,11 +17,11 @@ const studioHtml = await readFile(new URL('../code-studio.html', import.meta.url
 const studioSource = await readFile(new URL('../src/codeStudio.js', import.meta.url), 'utf8');
 const engineSource = await readFile(new URL('../src/codeStudioEngine.js', import.meta.url), 'utf8');
 
-test('Code Studio stays packaged separately from the compact academy homepage', () => {
+test('Code Studio stays packaged separately and is linked from the academy homepage', () => {
   const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderFullHome()'));
 
-  assert.match(homeSource, /Your Language\.<br \/><span>Your Future\.<\/span>/);
-  assert.doesNotMatch(homeSource, /Code for Kids|code-studio\.html/);
+  assert.match(homeSource, /Our Language\.<br \/><span>Our Future\.<\/span>/);
+  assert.match(homeSource, /code-studio\.html/);
   assert.match(studioHtml, /Code Studio/);
   assert.match(viteConfig, /'code-studio'/);
 });
