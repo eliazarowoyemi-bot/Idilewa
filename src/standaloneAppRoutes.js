@@ -32,9 +32,33 @@ const validViews = new Set([
   'studio',
 ]);
 
+const nativeAppPages = new Set([
+  'ai-conversation',
+  'auth-callback',
+  'consent',
+  'login',
+  'parents',
+  'tutor',
+  'trainer',
+  'voice_lessons',
+  'voices',
+]);
+
 const footerYearAssignment = 'document.getElementById("footerYear").textContent=new Date().getFullYear();';
 const guardedBilingualRoot = "const root=document.querySelector('.bilingualGame'), sel=root.querySelector(";
 const safeBilingualRoot = "const root=document.querySelector('.bilingualGame');if(!root)return;const sel=root.querySelector(";
+const nativeAppNavigation = `<script>
+(() => {
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+    const link = event.target.closest('a[href="#/index"], a[href="#/voice_lessons"]');
+    if (!link) return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    location.assign(link.getAttribute('href') === '#/index' ? '/' : '/voice_lessons.html');
+  }, true);
+})();
+</script>`;
 const accessibilityStyles = `<style id="idilewa-accessibility-overrides">
 .primary,.premium-cta,.idFootBottom button{background:linear-gradient(115deg,#087a2f,#005b2b);color:#fff}
 .heroCodeButton{background:linear-gradient(115deg,#006c43,#00583a);color:#fff}
@@ -56,7 +80,11 @@ const accessibilityStyles = `<style id="idilewa-accessibility-overrides">
 .labBilingual{border-left-width:1px}
 .eyebrow,.journeyTitle span,.testRole,.discoverWords small,.premium-brand-copy small,.id-bi-label,.compact-vocabulary .bilingualWords>*{font-size:12px!important}
 #discoveryGames .dgPanel{padding:16px}
-@media(max-width:980px){.premium-mobile-menu{margin-right:0;transform:translateX(-6px)}}
+.premium-auth-link{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 9px;border:1px solid #d5e7d8;border-radius:999px;background:#fff;color:#0b4d2c;font:inherit;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap;cursor:pointer}
+.premium-auth-link:hover{background:#eff8f1;color:#075c2e}
+.premium-auth-link:focus-visible{outline:3px solid #087a3e;outline-offset:3px}
+@media(max-width:980px){.premium-mobile-menu nav .premium-auth-link{width:100%;margin-top:5px}}
+@media(max-width:420px){.premium-brand-copy small{display:none}}
 </style>`;
 
 function renderRouteRedirect(routeName) {
@@ -75,6 +103,15 @@ function renderRouteRedirect(routeName) {
 </html>`;
 }
 
+function transformNativeAppHtml(html) {
+  const closingHeadIndex = html.toLowerCase().lastIndexOf('</head>');
+  if (closingHeadIndex === -1) {
+    throw new Error('Native app page is missing its closing head tag.');
+  }
+  return html.slice(0, closingHeadIndex)
+    .concat(nativeAppNavigation, html.slice(closingHeadIndex));
+}
+
 function transformAppHtml(html) {
   if (!html.includes(footerYearAssignment)) {
     throw new Error('Standalone app is missing the expected optional footer-year script.');
@@ -88,6 +125,29 @@ function transformAppHtml(html) {
 
   const viewBootstrap = `<script>
 (() => {
+  const nativeGo = window.go;
+  if (typeof nativeGo === 'function') {
+    window.go = (id, ...args) => {
+      if (id === 'aiChat') {
+        location.assign('/ai-conversation.html');
+        return;
+      }
+      return nativeGo(id, ...args);
+    };
+  }
+  const voiceTile = document.querySelector('.featureTile.voice');
+  if (voiceTile) voiceTile.onclick = () => location.assign('/voice_lessons.html');
+  const addAccountLink = (navigation) => {
+    if (!navigation || navigation.querySelector('[data-idilewa-account-link]')) return;
+    const link = document.createElement('a');
+    link.href = '/login.html';
+    link.className = 'premium-auth-link';
+    link.dataset.idilewaAccountLink = 'true';
+    link.textContent = 'Sign in';
+    navigation.append(link);
+  };
+  addAccountLink(document.querySelector('.premium-links'));
+  addAccountLink(document.querySelector('.premium-mobile-menu nav'));
   const view = new URLSearchParams(location.search).get('view');
   if (!view) return;
   if (!${JSON.stringify([...validViews])}.includes(view)) return;
@@ -125,7 +185,8 @@ export function createStandaloneAppPlugin(rootDirectory) {
       handler(html, context) {
         if (!context?.filename) return html;
         if (resolve(context.filename) === indexPath) return transformAppHtml(html);
-        return renderRouteRedirect(basename(context.filename).replace(/\.html$/i, ''));
+        const route = basename(context.filename).replace(/\.html$/i, '');
+        return nativeAppPages.has(route) ? transformNativeAppHtml(html) : renderRouteRedirect(route);
       },
     },
   };

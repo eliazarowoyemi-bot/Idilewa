@@ -1,37 +1,79 @@
-import { translateWithGoogle, translateWithPlotweaver } from './plotweaverClient.js';
+import { getOptionalSessionAccessToken } from './supabaseClient.js';
 
-const TRANSLATION_PROVIDERS = new Map([
-  ['yo', 'plotweaver'],
-  ['ig', 'plotweaver'],
-  ['ha', 'plotweaver'],
-  ['sw', 'google'],
-]);
+const SUPPORTED_LANGUAGES = new Set(['yo', 'ig', 'ha', 'sw', 'pcm']);
 
-export async function sendAiChatMessage({ language, translationProvider, messages, signal }) {
-  const expectedProvider = TRANSLATION_PROVIDERS.get(language);
-  if (!expectedProvider) {
-    throw new Error('Choose Yorùbá, Igbo, Hausa, or Swahili for AI Conversation.');
+async function requestConversation(url, options = {}) {
+  const accessToken = await getOptionalSessionAccessToken();
+  const headers = { Accept: 'application/json', ...options.headers };
+  if (accessToken) headers.Authorization = `Bearer ${accessToken}`;
+  const response = await fetch(url, {
+    ...options,
+    headers,
+    cache: 'no-store',
+  });
+  let result;
+  try {
+    result = await response.json();
+  } catch (error) {
+    throw new Error('AI Conversation returned an invalid response. Please try again.', { cause: error });
   }
-  if (translationProvider && translationProvider !== expectedProvider) {
-    throw new Error(`The selected language requires the ${expectedProvider} translation service.`);
+  if (!response.ok) {
+    const error = new Error(typeof result?.error === 'string'
+      ? result.error
+      : 'AI Conversation could not complete this request. Please try again.');
+    error.status = response.status;
+    throw error;
   }
-  const latestMessage = [...messages].reverse().find((message) => message.role === 'user');
-  if (typeof latestMessage?.text !== 'string' || !latestMessage.text.trim()) {
-    throw new Error('Type an English phrase before requesting a translation.');
-  }
+  return result;
+}
 
-  const text = latestMessage.text.trim();
-  const result = expectedProvider === 'google'
-    ? await translateWithGoogle({ text, targetLanguage: language, signal })
-    : await translateWithPlotweaver({
-      text,
-      sourceLanguage: 'en',
-      targetLanguage: language,
-      signal,
-    });
+export async function sendAiChatMessage({
+  language,
+  message,
+  conversationId = '',
+  messages = [],
+  signal,
+}) {
+  if (!SUPPORTED_LANGUAGES.has(language)) {
+    throw new Error('Choose Yorùbá, Igbo, Hausa, Kiswahili, or Nigerian Pidgin for AI Conversation.');
+  }
+  if (typeof message !== 'string' || !message.trim()) {
+    throw new Error('Type a message before sending it.');
+  }
+  const result = await requestConversation('/api/ai/conversation', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      language,
+      message: message.trim(),
+      conversationId: conversationId || undefined,
+      messages,
+    }),
+    signal,
+  });
+  if (typeof result.reply !== 'string' || !result.reply.trim() || result.language !== language) {
+    throw new Error('AI Conversation returned an incomplete reply. Please try again.');
+  }
   return {
-    reply: result.translated_text || result.translated,
-    translation: text,
-    provider: expectedProvider === 'google' ? 'Google Cloud Translation' : 'Plotweaver',
+    reply: result.reply.trim(),
+    language: result.language,
+    conversationId: typeof result.conversationId === 'string' ? result.conversationId : '',
+    persisted: result.persisted === true,
+    provider: typeof result.provider === 'string' ? result.provider : '',
+    sources: Array.isArray(result.sources) ? result.sources : [],
   };
+}
+
+export async function loadAiChatConversation({ conversationId, signal }) {
+  if (!/^[0-9a-f-]{36}$/i.test(conversationId || '')) {
+    throw new Error('Choose a valid saved conversation.');
+  }
+  const result = await requestConversation(
+    `/api/ai/conversation?id=${encodeURIComponent(conversationId)}`,
+    { method: 'GET', signal },
+  );
+  if (result.conversation?.id !== conversationId || !Array.isArray(result.messages)) {
+    throw new Error('AI Conversation returned an incomplete saved conversation.');
+  }
+  return result;
 }

@@ -4,6 +4,7 @@ import test from 'node:test';
 import { AI_CONVERSATION_LANGUAGES } from '../src/aiConversationLanguages.js';
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+const aiClientSource = await readFile(new URL('../src/aiChatClient.js', import.meta.url), 'utf8');
 const stylesSource = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 const viteConfig = await readFile(new URL('../vite.config.js', import.meta.url), 'utf8');
 
@@ -65,9 +66,9 @@ test('the AI conversation screen renders the guide card, thread, composer, and t
 });
 
 test('each supported language has a dedicated guide and mapped portrait asset', async () => {
-  assert.deepEqual(AI_CONVERSATION_LANGUAGES.map(({ id }) => id), ['yo', 'ig', 'ha', 'sw']);
-  const portraitPaths = AI_CONVERSATION_LANGUAGES.map(({ teacher }) => teacher.image);
-  assert.equal(new Set(portraitPaths).size, AI_CONVERSATION_LANGUAGES.length);
+  assert.deepEqual(AI_CONVERSATION_LANGUAGES.map(({ id }) => id), ['yo', 'ig', 'ha', 'sw', 'pcm']);
+  const portraitPaths = AI_CONVERSATION_LANGUAGES.slice(0, 4).map(({ teacher }) => teacher.image);
+  assert.equal(new Set(portraitPaths).size, portraitPaths.length);
   assert.equal(AI_CONVERSATION_LANGUAGES[0].teacher.name, 'Iya Aduke');
   assert.equal(AI_CONVERSATION_LANGUAGES[1].teacher.name, 'Ngozi Nwosu');
   assert.equal(AI_CONVERSATION_LANGUAGES[2].teacher.name, 'Aisha Muhammad');
@@ -81,6 +82,8 @@ test('each supported language has a dedicated guide and mapped portrait asset', 
       'teacher-guides/swahili-amina-juma.png',
     ],
   );
+  assert.equal(AI_CONVERSATION_LANGUAGES[4].teacher.name, 'Aunty Kemi');
+  assert.equal(AI_CONVERSATION_LANGUAGES[4].teacher.image, '');
   await Promise.all(portraitPaths.map((image) => (
     access(new URL(`../public/assets/${image}`, import.meta.url))
   )));
@@ -94,21 +97,24 @@ test('every AI chat control is wired through the shared action handler', () => {
     assert.match(appSource, new RegExp(`case '${action}':`), `${action} should have a handler branch`);
   }
   assert.match(appSource, /if \(type === 'aichat-composer'\)/);
+  assert.match(appSource, /retry\.dataset\.action = 'aichat-retry'/);
   assert.match(appSource, /if \(el\.matches\('\.aichat-focus-select'\)\)/);
   assert.match(appSource, /closest\('\.aichat-popover, \[data-action="aichat-settings"\], \[data-action="aichat-change-guide"\]'\)/);
 });
 
 test('AI Conversation uses language configuration for translation and speech settings', () => {
-  assert.match(appSource, /import \{ sendAiChatMessage \} from '\.\/src\/aiChatClient\.js'/);
-  assert.match(appSource, /sendAiChatMessage\(\{[\s\S]*?language: aiChatLanguage\(\)\.translationTarget/);
-  assert.match(appSource, /translationProvider: aiChatLanguage\(\)\.translationProvider/);
+  assert.match(appSource, /import \{ loadAiChatConversation, sendAiChatMessage \} from '\.\/src\/aiChatClient\.js'/);
+  assert.match(appSource, /sendAiChatMessage\(\{[\s\S]*?language: aiChatLanguage\(\)\.id/);
+  assert.match(appSource, /conversationId: aiConversation\.conversationId/);
   assert.match(appSource, /synthesizePlotweaverSpeech\(\{/);
   assert.match(appSource, /transcribeWithPlotweaver\(recording, language\.speechRecognitionLanguage\)/);
   assert.match(appSource, /translateWithPlotweaver\(\{/);
   assert.match(appSource, /placeholder="\$\{esc\(language\.inputPlaceholder\)\}/);
   assert.match(appSource, /data-speech-recognition-locale="\$\{esc\(language\.speechRecognitionLocale\)\}"/);
   assert.match(appSource, /data-text-to-speech-locale="\$\{esc\(language\.textToSpeechLocale\)\}"/);
-  assert.match(appSource, /Plotweaver translates phrases; it does not generate open-ended chat replies\./);
+  assert.match(aiClientSource, /\/api\/ai\/conversation/);
+  assert.match(appSource, /translateWithGoogle\(\{/);
+  assert.match(appSource, /retry\.dataset\.action = 'aichat-retry'/);
   assert.match(appSource, /function changeAiChatLanguage\(languageId\)/);
   assert.match(appSource, /aiConversation\.languageId = nextLanguage\.id/);
   assert.match(appSource, /aiConversation\.messages = \[\]/);

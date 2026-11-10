@@ -23,16 +23,16 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assert.doesNotMatch(transformed, /document\.getElementById\("footerYear"\)\.textContent=/);
   assert.doesNotMatch(transformed, /const root=document\.querySelector\('\.bilingualGame'\), sel=root\.querySelector\(/);
   assert.match(transformed, /id="idilewa-accessibility-overrides"/);
-  assert.match(transformed, /premium-mobile-menu\{margin-right:0;transform:translateX\(-6px\)\}/);
+  assert.match(transformed, /\.premium-auth-link/);
   assert.match(transformed, /<h2>Source<\/h2>/);
   assert.match(transformed, /urlSearchParams|URLSearchParams/);
+  assert.match(transformed, /\/ai-conversation\.html/);
+  assert.match(transformed, /Sign in/);
 });
 
-test('legacy learning, coding, conversation, and heritage URLs open their matching app views', () => {
+test('legacy learning, coding, and heritage URLs open their matching standalone views', () => {
   const destinations = [
-    ['voice_lessons.html', '/?view=learning'],
     ['code-studio.html', '/?view=codeLab'],
-    ['ai-conversation.html', '/?view=aiChat'],
     ['oral.html', '/?view=heritageLab'],
     ['languages.html', '/?view=academy'],
   ];
@@ -44,19 +44,46 @@ test('legacy learning, coding, conversation, and heritage URLs open their matchi
   }
 });
 
-test('retired sign-in, portal, and consent entries return to the new home view', () => {
-  for (const filename of ['login.html', 'auth-callback.html', 'parents.html', 'tutor.html', 'consent.html']) {
-    const redirect = transformEntry(filename);
-    assert.match(redirect, /location\.replace\("\/?\?view=home"\)/);
+test('native entry pages retain their app and return home or voice links to canonical pages', async () => {
+  for (const filename of [
+    'ai-conversation.html',
+    'auth-callback.html',
+    'consent.html',
+    'login.html',
+    'parents.html',
+    'tutor.html',
+    'trainer.html',
+    'voice_lessons.html',
+    'voices.html',
+  ]) {
+    const source = await readFile(resolve(rootDirectory, filename), 'utf8');
+    const transformed = transformEntry(filename, source);
+    const closingHead = source.toLowerCase().lastIndexOf('</head>');
+    assert.ok(transformed.startsWith(source.slice(0, closingHead)), filename);
+    assert.ok(transformed.endsWith(source.slice(closingHead)), filename);
+    assert.match(transformed, /event\.stopImmediatePropagation\(\)/, filename);
+    assert.match(transformed, /location\.assign\(link\.getAttribute\('href'\) === '#\/index' \? '\/' : '\/voice_lessons\.html'\)/, filename);
   }
 });
 
 test('every built HTML entry except the homepage points to the standalone app', async () => {
   const files = await readdir(rootDirectory);
   const pages = files.filter((file) => file.endsWith('.html') && file !== 'index.html');
+  const nativePages = new Set([
+    'ai-conversation.html',
+    'auth-callback.html',
+    'consent.html',
+    'login.html',
+    'parents.html',
+    'tutor.html',
+    'trainer.html',
+    'voice_lessons.html',
+    'voices.html',
+  ]);
 
   assert.ok(pages.length > 0);
   for (const filename of pages) {
+    if (nativePages.has(filename)) continue;
     const redirect = transformEntry(filename);
     assert.match(redirect, /Continue to Ìdíléwa Language Academy/, filename);
     assert.match(redirect, /location\.replace\(/, filename);

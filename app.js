@@ -31,9 +31,10 @@ import {
   speakWithDeviceVoice,
   synthesizePlotweaverSpeech,
   transcribeWithPlotweaver,
-  translateWithPlotweaver
+  translateWithPlotweaver,
+  translateWithGoogle
 } from './src/plotweaverClient.js';
-import { sendAiChatMessage } from './src/aiChatClient.js';
+import { loadAiChatConversation, sendAiChatMessage } from './src/aiChatClient.js';
 import {
   NASAL_VOWELS,
   CONSONANTS,
@@ -53,6 +54,7 @@ import {
   supabase,
   isSupabaseConfigured,
   getCurrentUser,
+  getOptionalSessionAccessToken,
   getRoleDashboard,
   getAdultLearningSummary,
   submitEducatorConnectionRequest,
@@ -564,6 +566,7 @@ import {
   };
 
   let defaultAuthEntryInitialized = false;
+  let authRouteInitialized = false;
   let authIntroPending = !window.location.hash;
   function parseLocation() {
     const hash = window.location.hash.replace(/^#\/?/, '');
@@ -578,6 +581,7 @@ import {
         state.loginMode = 'signin';
         state.authRole = 'adult';
         defaultAuthEntryInitialized = true;
+        authRouteInitialized = true;
       }
       return { page: ROUTES.includes(defaultPage) ? defaultPage : 'index', params: {}, removedRoute: false };
     }
@@ -593,9 +597,11 @@ import {
       page = 'owe';
       history.replaceState(null, '', `${window.location.pathname}${window.location.search}#/owe?section=${encodeURIComponent(params.section)}`);
     }
-    if (page === 'login' && ['signin', 'signup'].includes(params.mode)) {
-      state.loginMode = params.mode;
-      state.authRole = 'adult';
+    if (page === 'login') {
+      const nextMode = ['signin', 'signup'].includes(params.mode) ? params.mode : 'signin';
+      if (!authRouteInitialized || state.loginMode !== nextMode) state.authRole = 'adult';
+      state.loginMode = nextMode;
+      authRouteInitialized = true;
     }
     return {
       page: REMOVED_ROUTES.has(page) || !ROUTES.includes(page) ? 'index' : page,
@@ -3706,6 +3712,8 @@ import {
     rate: 1,
     returnRoute: 'index',
     sequence: 0,
+    conversationId: '',
+    failedMessage: '',
     messages: [],
   };
   let aiChatListening = false;
@@ -3719,6 +3727,7 @@ import {
   let aiChatAudioUrl = null;
   let aiChatPageActive = false;
   let aiChatLanguageRevision = 0;
+  let aiChatRestorePending = false;
 
   const aiChatLanguage = () => getAiConversationLanguage(aiConversation.languageId);
   const aiChatGuide = () => aiChatLanguage().teacher;
@@ -3748,15 +3757,17 @@ import {
     aiChatRecordingChunks = [];
 
     aiConversation.languageId = nextLanguage.id;
+    aiConversation.conversationId = '';
+    aiConversation.failedMessage = '';
     aiConversation.messages = [];
     closeAiChatPopovers();
     render();
     showToast(`AI Conversation is now set to ${nextLanguage.name}.`, 'success');
   }
 
-  function aiChatTimeStamp() {
+  function aiChatTimeStamp(value = Date.now()) {
     try {
-      return new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
+      return new Date(value).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
     } catch (error) {
       return '10:25';
     }
@@ -3764,8 +3775,7 @@ import {
 
   function renderAiChatGuideOptions() {
     return AI_CONVERSATION_LANGUAGES.map((language) => `<button type="button" class="aichat-guide-option" data-action="aichat-select-guide" data-language="${language.id}"${language.id === aiConversation.languageId ? ' aria-current="true"' : ''}>
-      <img class="aichat-guide-photo" src="${imageUrl(language.teacher.image)}" alt="" width="30" height="30" loading="lazy" decoding="async" />
-      <span class="aichat-guide-photo-fallback" hidden aria-hidden="true">${esc(language.teacher.name.slice(0, 1))}</span>
+      ${language.teacher.image ? `<img class="aichat-guide-photo" src="${imageUrl(language.teacher.image)}" alt="" width="30" height="30" loading="lazy" decoding="async" /><span class="aichat-guide-photo-fallback" hidden aria-hidden="true">${esc(language.teacher.name.slice(0, 1))}</span>` : `<span class="aichat-guide-photo-fallback" aria-hidden="true">${esc(language.teacher.name.slice(0, 1))}</span>`}
       <span>${esc(language.teacher.name)}</span>
       ${language.id === aiConversation.languageId ? icon('check', 15) : ''}
     </button>`).join('');
@@ -3776,11 +3786,7 @@ import {
     const language = aiChatLanguage();
     return `<section class="aichat-guide" aria-label="${esc(language.name)} language guide">
       <div class="aichat-guide-media">
-        <img class="aichat-guide-photo" src="${imageUrl(guide.image)}" alt="${esc(guide.imageAlt)}" width="480" height="640" loading="eager" decoding="async" />
-        <div class="aichat-guide-photo-fallback" hidden role="img" aria-label="Teacher portrait not yet available">
-          ${icon('people', 36)}
-          <span>${esc(guide.name)}</span>
-        </div>
+        ${guide.image ? `<img class="aichat-guide-photo" src="${imageUrl(guide.image)}" alt="${esc(guide.imageAlt)}" width="480" height="640" loading="eager" decoding="async" /><div class="aichat-guide-photo-fallback" hidden role="img" aria-label="Teacher portrait not yet available">${icon('people', 36)}<span>${esc(guide.name)}</span></div>` : `<div class="aichat-guide-photo-fallback" role="img" aria-label="${esc(guide.name)}">${icon('people', 36)}<span>${esc(guide.name)}</span></div>`}
       </div>
       <div class="aichat-guide-copy">
         <div class="aichat-guide-name">
@@ -3809,11 +3815,22 @@ import {
   }
 
   function renderAiChatGuideMessage(message) {
+    const sources = Array.isArray(message.sources) && message.sources.length
+      ? `<div class="aichat-sources"><strong>Related learning notes</strong><ul>${message.sources.map((source) => {
+        let safeUrl = '';
+        try {
+          const parsed = new URL(source.url);
+          if (parsed.protocol === 'https:') safeUrl = parsed.href;
+        } catch { /* Invalid source links are shown as plain text. */ }
+        return `<li>${safeUrl ? `<a href="${esc(safeUrl)}" target="_blank" rel="noopener noreferrer">${esc(source.title || source.name || 'Language note')}</a>` : `<span>${esc(source.title || source.name || 'Language note')}</span>`}${source.name && source.name !== source.title ? ` <small>${esc(source.name)}</small>` : ''}</li>`;
+      }).join('')}</ul></div>`
+      : '';
     return `<div class="aichat-row aichat-row-guide" data-message="${esc(message.id)}">
       <span class="aichat-avatar aichat-avatar-bot" aria-hidden="true">${icon('bot', 22)}</span>
       <div class="aichat-bubble aichat-bubble-guide">
         <p class="aichat-translation" lang="${esc(message.textToSpeechLocale || aiChatLanguage().textToSpeechLocale)}">${esc(message.translatedText)}</p>
         ${message.english ? `<p class="aichat-english"><span class="aichat-english-icon" aria-hidden="true">${icon('globe', 16)}</span><span>${esc(message.english)}</span></p>` : ''}
+        ${sources}
         <span class="aichat-time">${esc(message.time)}</span>
       </div>
     </div>${message.controls ? renderAiChatControls() : ''}`;
@@ -3840,7 +3857,7 @@ import {
     const messages = aiConversation.messages
       .map((message) => (message.role === 'guide' ? renderAiChatGuideMessage(message) : renderAiChatUserMessage(message)))
       .join('') || `<p class="aichat-empty-state" lang="${esc(language.speechRecognitionLocale)}">${esc(language.conversationInstructions)}</p>`;
-    return `<div class="aichat-page" lang="${esc(language.speechRecognitionLocale)}" data-language-id="${esc(language.id)}" data-translation-target="${esc(language.translationTarget)}" data-speech-recognition-locale="${esc(language.speechRecognitionLocale)}" data-text-to-speech-locale="${esc(language.textToSpeechLocale)}" aria-description="Plotweaver translates phrases; it does not generate open-ended chat replies.">
+    return `<div class="aichat-page" lang="${esc(language.speechRecognitionLocale)}" data-language-id="${esc(language.id)}" data-translation-target="${esc(language.translationTarget)}" data-speech-recognition-locale="${esc(language.speechRecognitionLocale)}" data-text-to-speech-locale="${esc(language.textToSpeechLocale)}">
       <div class="aichat-canvas" aria-hidden="true"></div>
       <header class="aichat-header">
         <button type="button" class="aichat-iconbtn" data-action="aichat-back" aria-label="Go back">${icon('arrowLeft', 23)}</button>
@@ -3868,7 +3885,7 @@ import {
       </div>
       <form class="aichat-composer" data-form="aichat-composer">
         <button type="button" class="aichat-mic" data-action="aichat-mic" aria-label="${language.speechRecognitionSupported ? 'Speak your message' : `Voice input unavailable for ${esc(language.name)}`}"${language.speechRecognitionSupported ? '' : ` title="Voice input for ${esc(language.name)} is not currently available"`}>${icon('mic', 22)}</button>
-        <input class="aichat-input" type="text" name="message" lang="${esc(language.speechRecognitionLocale)}" placeholder="${esc(language.inputPlaceholder)}" autocomplete="off" maxlength="300" aria-label="${esc(language.inputPlaceholder)}" />
+        <input class="aichat-input" type="text" name="message" lang="${esc(language.speechRecognitionLocale)}" placeholder="${esc(language.inputPlaceholder)}" autocomplete="off" maxlength="1000" aria-label="${esc(language.inputPlaceholder)}" />
         <button type="submit" class="aichat-send" aria-label="Send message">${icon('send', 21)}</button>
         <span class="aichat-status-sr-only" id="aichat-audio-status" role="status" aria-live="polite" aria-atomic="true"></span>
       </form>
@@ -3926,6 +3943,66 @@ import {
       window.addEventListener('resize', syncAiChatScrollEdges, { passive: true });
     }
     aiChatScrollToLatest('auto', { includePage: window.innerWidth < 620 });
+    if (!aiConversation.messages.length && !aiConversation.conversationId && !aiChatRestorePending) {
+      void restoreAiChatConversation();
+    }
+  }
+
+  function aiChatSessionKey(languageId = aiConversation.languageId) {
+    return `idilewa-ai-conversation:${languageId}`;
+  }
+
+  async function restoreAiChatConversation() {
+    let conversationId;
+    let accessToken;
+    try {
+      conversationId = sessionStorage.getItem(aiChatSessionKey());
+      if (!conversationId) return;
+      aiChatRestorePending = true;
+      accessToken = await getOptionalSessionAccessToken();
+    } catch (error) {
+      aiChatRestorePending = false;
+      showToast(error instanceof Error ? error.message : 'Saved conversation storage is unavailable in this browser session.', 'error');
+      return;
+    }
+    if (!accessToken) {
+      aiChatRestorePending = false;
+      return;
+    }
+
+    const languageRevision = aiChatLanguageRevision;
+    try {
+      const saved = await loadAiChatConversation({ conversationId });
+      if (!aiChatPageActive || languageRevision !== aiChatLanguageRevision
+        || saved.conversation.language_code !== aiConversation.languageId) return;
+      aiConversation.conversationId = saved.conversation.id;
+      aiConversation.messages = saved.messages.map((message, index) => ({
+        id: `saved-${index}`,
+        role: message.role === 'assistant' ? 'guide' : 'user',
+        ...(message.role === 'assistant'
+          ? { translatedText: message.content, textToSpeechLocale: aiChatLanguage().textToSpeechLocale, controls: index === saved.messages.length - 1 }
+          : { text: message.content }),
+        time: aiChatTimeStamp(message.created_at),
+      }));
+      aiConversation.sequence = aiConversation.messages.length;
+      render();
+      aiChatScrollToLatest('auto');
+    } catch (error) {
+      if (error?.status === 404) {
+        try {
+          sessionStorage.removeItem(aiChatSessionKey());
+        } catch (storageError) {
+          showToast('A saved conversation could not be removed from this browser session.', 'error');
+        }
+      }
+      showToast(error instanceof Error ? error.message : 'Saved conversation could not be restored.', 'error');
+    } finally {
+      aiChatRestorePending = false;
+      if (aiChatPageActive && !aiConversation.messages.length
+        && !aiConversation.conversationId && languageRevision !== aiChatLanguageRevision) {
+        void restoreAiChatConversation();
+      }
+    }
   }
 
   function closeAiChatPopovers() {
@@ -4010,7 +4087,7 @@ import {
     const status = document.createElement('p');
     status.className = 'aichat-pending';
     status.setAttribute('role', 'status');
-    status.textContent = 'Translating your phrase…';
+    status.textContent = 'Thinking of a helpful reply…';
     thread.append(status);
     aiChatScrollToLatest('smooth');
     return status;
@@ -4024,7 +4101,17 @@ import {
       input?.focus();
       return;
     }
+    aiConversation.failedMessage = '';
+    document.getElementById('aichat-error')?.remove();
     const submitButton = form.querySelector('button[type="submit"]');
+    const pendingMessageId = `pending-${Date.now()}-${aiConversation.sequence + 1}`;
+    const pendingMessage = {
+      id: pendingMessageId,
+      role: 'user',
+      text,
+      time: aiChatTimeStamp(),
+    };
+    appendAiChatMessage(pendingMessage);
     const pending = showAiChatReplyPending();
     const controller = new AbortController();
     aiChatRequestController?.abort();
@@ -4036,41 +4123,61 @@ import {
     const history = aiConversation.messages
       .slice(-10)
       .map((message) => ({
-        role: message.role === 'guide' ? 'model' : 'user',
+        role: message.role === 'guide' ? 'assistant' : 'user',
         text: message.role === 'guide' ? message.translatedText : message.text,
       }));
-    history.push({ role: 'user', text });
-
     try {
       const result = await sendAiChatMessage({
-        language: aiChatLanguage().translationTarget,
-        translationProvider: aiChatLanguage().translationProvider,
+        language: aiChatLanguage().id,
+        message: text,
+        conversationId: aiConversation.conversationId,
         messages: history,
         signal: controller.signal,
       });
       if (controller.signal.aborted) return;
       input.value = '';
+      pendingMessage.id = `aichat-${aiConversation.sequence + 1}`;
+      document.querySelector(`[data-message="${pendingMessageId}"]`)?.setAttribute('data-message', pendingMessage.id);
       aiConversation.sequence += 1;
-      const message = { id: `aichat-${aiConversation.sequence}`, role: 'user', text, time: aiChatTimeStamp() };
-      aiConversation.messages.push(message);
-      appendAiChatMessage(message);
-      aiConversation.sequence += 1;
+      aiConversation.messages.push(pendingMessage);
       const guideMessage = {
         id: `aichat-${aiConversation.sequence}`,
         role: 'guide',
         translatedText: result.reply,
-        english: result.translation,
         textToSpeechLocale: aiChatLanguage().textToSpeechLocale,
         time: aiChatTimeStamp(),
-        controls: false,
-        plotweaverTranslated: true,
+        controls: true,
+        sources: result.sources,
       };
       aiConversation.messages.push(guideMessage);
       appendAiChatMessage(guideMessage);
+      if (result.persisted && result.conversationId) {
+        aiConversation.conversationId = result.conversationId;
+        try {
+          sessionStorage.setItem(aiChatSessionKey(), result.conversationId);
+        } catch (error) {
+          showToast('This conversation is saved to your account but will not reopen automatically in this browser.', 'error');
+        }
+      }
       if (aiConversation.autoSpeak) void aiChatSpeak(guideMessage.translatedText);
     } catch (error) {
       if (!controller.signal.aborted) {
-        showToast(error instanceof Error ? error.message : 'The AI conversation could not be completed.', 'error');
+        document.querySelector(`[data-message="${pendingMessageId}"]`)?.remove();
+        aiConversation.failedMessage = text;
+        const alert = document.createElement('div');
+        alert.className = 'aichat-error';
+        alert.id = 'aichat-error';
+        alert.setAttribute('role', 'alert');
+        const errorMessage = error instanceof Error ? error.message : 'AI Conversation could not complete this message.';
+        const copy = document.createElement('p');
+        copy.textContent = errorMessage;
+        const retry = document.createElement('button');
+        retry.type = 'button';
+        retry.dataset.action = 'aichat-retry';
+        retry.textContent = 'Retry';
+        alert.append(copy, retry);
+        document.getElementById('aichat-thread')?.append(alert);
+        aiChatScrollToLatest('smooth');
       }
     } finally {
       pending?.remove();
@@ -4202,20 +4309,26 @@ import {
     if (button) button.disabled = true;
     if (thread) thread.setAttribute('aria-busy', 'true');
     try {
-      const result = await translateWithPlotweaver({
-        text: message.translatedText,
-        sourceLanguage: aiChatLanguage().translationTarget,
-        targetLanguage: 'en',
-      });
-      message.english = result.translated_text;
+      const translated = aiChatLanguage().translationProvider === 'google'
+        ? await translateWithGoogle({
+          text: message.translatedText,
+          targetLanguage: 'en',
+        })
+        : await translateWithPlotweaver({
+          text: message.translatedText,
+          sourceLanguage: aiChatLanguage().translationTarget,
+          targetLanguage: 'en',
+        });
+      const translatedText = translated.translated_text || translated.translated;
+      message.english = translatedText;
       message.plotweaverTranslated = true;
       aiConversation.showTranslation = true;
       const row = [...document.querySelectorAll('.aichat-row-guide')]
         .find((element) => element.dataset.message === message.id);
       const translationText = row?.querySelector('.aichat-english span:last-child');
-      if (translationText) translationText.textContent = result.translated_text;
+      if (translationText) translationText.textContent = translatedText;
       applyAiChatTranslationVisibility();
-      showToast('Reply translated with Plotweaver.', 'success');
+      showToast(`Reply translated with ${aiChatLanguage().translationProvider === 'google' ? 'Google Cloud Translation' : 'Plotweaver'}.`, 'success');
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Plotweaver could not translate this reply.', 'error');
     } finally {
@@ -4309,6 +4422,16 @@ import {
       case 'aichat-focus-input':
         document.querySelector('.aichat-input')?.focus();
         break;
+      case 'aichat-retry': {
+        const input = document.querySelector('.aichat-input');
+        const form = input?.closest('form');
+        if (input && form && aiConversation.failedMessage) {
+          input.value = aiConversation.failedMessage;
+          document.getElementById('aichat-error')?.remove();
+          form.requestSubmit();
+        }
+        break;
+      }
       default: break;
     }
   }
@@ -7133,7 +7256,9 @@ import {
       case 'billing-period': state.billing = el.dataset.period; saveState(); render(); break;
       case 'choose-plan': openModal(`${el.dataset.plan || 'Family'} updates`, 'Your interest has been noted in this browser preview. The Idilewa team will confirm final plans and pricing before launch.'); break;
       case 'login-mode': {
-        state.loginMode = el.dataset.mode === 'signup' ? 'signup' : 'signin';
+        const nextMode = el.dataset.mode === 'signup' ? 'signup' : 'signin';
+        if (state.loginMode !== nextMode) state.authRole = 'adult';
+        state.loginMode = nextMode;
         const [path, query = ''] = window.location.hash.replace(/^#\/?/, '').split('?');
         const params = new URLSearchParams(query);
         params.set('mode', state.loginMode);

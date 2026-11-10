@@ -73,7 +73,8 @@ The application is bundled with Vite as an ES module web application:
 - **`src/threeScene.js`:** Three.js 3D scene engine, orbit controls, audio visualizer, card tilt engine, and WebGL fallbacks.
 - **`src/translationEngine.js`:** Multi-language dictionary, word lexicons, and Web Audio API tone pitch synthesizer (`playTonePitch` for Dò-Re-Mí).
 - **`src/plotweaverClient.js` and `api/plotweaver/[...path].js`:** Browser client and server-side proxy for Plotweaver speech, voice discovery/cloning, translation, and transcription; the API key stays on the server.
-- **`src/aiChatClient.js`, `src/aiConversationLanguages.js` and `src/plotweaverClient.js`:** AI Conversation uses one language configuration for its guide, interface copy, translation target and speech settings. English phrases are translated through Plotweaver for Yorùbá, Igbo and Hausa, and Google Cloud Translation for Swahili.
+- **`src/aiChatClient.js`, `src/aiConversationLanguages.js`, `api/ai/conversation.js` and `src/server/aiConversation.js`:** AI Conversation sends messages and short history to a server-side Ollama provider for Yorùbá, Igbo, Hausa, Kiswahili and Nigerian Pidgin. Supabase stores owner-scoped chats; approved, source-attributed language notes are retrieved by language. Plotweaver handles supported speech and transcription; Google Cloud Translation handles Swahili reply translation.
+- **`api/ai/knowledge.js`:** Educators can submit attributed language notes, list notes awaiting review, and approve or reject notes. Submissions are pending by default; a different educator must review them before the chat service can retrieve them.
 - **`src/yorubaCodeEngine.js`:** *ÈdèKoodu* Yoruba coding keywords, curriculum lessons, transpiler, turtle graphics canvas, and safe sandbox executor (`executeYorubaCode`).
 - **`src/vowelsConsonantsData.js`:** Yoruba oral vowels, nasal vowels, consonants, and tone pitch reference guides with interactive soundboard.
 - **`src/supabaseClient.js`:** Supabase authentication and database persistence layer with local browser storage offline-first fallback.
@@ -100,7 +101,7 @@ The HTML entries declared in the active `vite.config.js` are supported:
 | | `#/login` (`login.html`) | Persona-based authentication (child, adult, parent, educator) with 3D shield and Supabase notice. |
 | | `#/pricing` (`pricing.html`) | Preview family/explorer plans; explicitly non-billing demonstration. |
 | **Voice & Speech** | `#/trainer` (`trainer.html`) | Voice African Language Trainer: 6 languages, 60 audio lessons, Do-Re-Mi soundboard, 3D visualizer. |
-| | `#/voice_lessons` (`voice_lessons.html`) | Route alias & standalone shell resolving to the Voice Trainer studio. |
+| | `#/voice_lessons` (`voice_lessons.html`) | Voice Trainer studio with age-adaptive lessons, speaking practice, and Plotweaver speech tools. |
 | | `#/voices` (`voices.html`) | Sample greeting library for Yorùbá, Igbo, Hausa, and Swahili with Plotweaver speech audio where supported. |
 | | `#/voice-translation`, `#/voice-text-to-speech`, `#/voice-speech-to-text`, `#/voice-cloning` | Dedicated Plotweaver-backed language tools linked from the homepage. |
 | **Culture & Oral Traditions** | `#/oral` (`oral.html`) | Oral traditions gateway introducing Oríkì, Òwe, spoken word, and song. |
@@ -124,8 +125,8 @@ The HTML entries declared in the active `vite.config.js` are supported:
 
 To ensure transparency and protect learner privacy:
 1. **Speech & Fluency:** Plotweaver provides text-to-speech and supported-language transcription. Transcription returns recognized text only; it does not evaluate pronunciation, tone, or fluency. Provider language coverage differs by service, so the interface loads available languages and does not promise support for every African language in every feature.
-2. **AI Conversation:** This experience translates English phrases; it does not generate open-ended chat replies. English text is sent to Plotweaver for Yorùbá, Igbo and Hausa, and to Google Cloud Translation for Swahili. Swahili voice transcription is not currently supported by the configured speech service; text-to-speech is supported. Do not enter personal or identifying information.
-3. **Authentication & Data Storage:** Sign-up, email-code verification, sign-in and sign-out use Supabase Auth when configured. Account metadata and learner-record APIs are available, but not every progress, code or voice interaction in the app is yet connected to remote storage; unconnected state remains browser-local. Remote account/database delivery has not been verified against the production project.
+2. **AI Conversation:** Open-ended replies use a server-side Ollama provider. The local development default is `http://127.0.0.1:11434`; production requires a separately hosted, private HTTPS Ollama endpoint and never falls back to localhost. Plotweaver remains the speech/transcription provider and Google Cloud Translation remains available for translation. Conversations are stored only for authenticated users; anonymous chats remain in the current page session. Approved knowledge notes are language-filtered and source-attributed. The included sample JSONL examples are synthetic and require human review; no model fine-tuning has been performed. Do not enter personal or identifying information.
+3. **Authentication & Data Storage:** Sign-up, email-code verification, sign-in and sign-out use Supabase Auth when configured. Authenticated AI conversation history is owner-scoped by Supabase row-level security. Account metadata and learner-record APIs are available, but not every progress, code or voice interaction in the app is yet connected to remote storage; unconnected state remains browser-local.
 4. **Child Safeguarding & Consent:** Child sign-up requires a guardian email approval request and one-time code through the Vercel API. The educator path requires a server-verified, single-use invitation. Both paths remain unavailable until their database migration and server email settings are configured. This workflow does not replace legal identity verification or educator background checks; live tutoring remains disabled.
 5. **Payments & Subscriptions:** Pricing cards are preview concepts only. No live financial transactions or payment gateways are configured.
 6. **Cultural Attribution:** Proverbs, Oríkì, and Ifá introductions are educational overviews and explicitly emphasize community permission, speaker context, and oral attribution.
@@ -166,6 +167,12 @@ VITE_CONVEX_URL=https://your-deployment.convex.cloud
 VITE_SUPABASE_URL=https://your-project-ref.supabase.co
 VITE_SUPABASE_ANON_KEY=your-anon-public-key
 PLOTWEAVER_API_KEY=your-plotweaver-api-key
+AI_PROVIDER=ollama
+OLLAMA_BASE_URL=http://127.0.0.1:11434
+OLLAMA_MODEL=qwen2.5:7b
+OLLAMA_EMBEDDING_MODEL=nomic-embed-text
+OLLAMA_API_KEY=
+AI_RATE_LIMIT_HMAC_KEY=generate-a-random-secret-of-at-least-32-characters
 JUDGE0_URL=https://your-private-judge0-service.example
 JUDGE0_AUTH_TOKEN=your-private-runner-token
 CANVA_CLIENT_ID=your-canva-client-id
@@ -174,6 +181,8 @@ CANVA_REDIRECT_URI=https://www.idilewa.com/api/canva/callback
 ```
 
 `VITE_CONVEX_URL`, `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are public client configuration, not secrets. `PLOTWEAVER_API_KEY`, `JUDGE0_URL`, `JUDGE0_AUTH_TOKEN`, and `CANVA_CLIENT_SECRET` are server-side configuration; never give them a `VITE_` prefix or place them in browser code. For Canva Connect, add `CANVA_CLIENT_ID`, `CANVA_CLIENT_SECRET`, and `CANVA_REDIRECT_URI` to Vercel, register the redirect URI exactly in the Canva developer app, and enable `asset:read`, `asset:write`, and `design:content:write`. The Canva button remains unavailable until those server variables are configured. The client forwards the current Supabase access token to Convex and refreshes it when required. `convex/auth.config.ts` configures Convex to verify Idilewa Supabase tokens using the Supabase JWKS endpoint and ES256 signing key; do not copy a private JWT signing key into the app. For existing deployments, `SUPABASE_PUBLIC_URL` and `SUPABASE_ANON_KEY` are also supported by the Supabase client. Keep Judge0 private and configure execution time and memory limits.
+
+Install Ollama locally, then run `ollama pull qwen2.5:7b` and `ollama pull nomic-embed-text`. Set `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, and `OLLAMA_EMBEDDING_MODEL` in the server environment. For production, provision a private HTTPS Ollama-compatible service and configure its URL, model, and optional `OLLAMA_API_KEY` in Vercel; a Plotweaver API key only enables its documented speech, transcription, and translation services and is not an AI chat model. Apply the migration in `supabase/migrations/20261110000000_ai_conversation.sql` before enabling conversation persistence, knowledge retrieval, and rate limits. Educator-added language knowledge starts as pending review; only approved notes are retrieved. Run `npm run validate:ai-data` to validate the five JSONL datasets before preparing any future fine-tuning. These starter examples are not a reviewed corpus and are not used to fine-tune the runtime model.
 
 Run `npx convex dev` in one terminal to deploy Convex functions and auth configuration to the configured development deployment, then run `npm run dev` in another terminal for the Vite app. The `convex/auth.whoami` query can be used to verify that a Supabase session is recognized by Convex. This auth bridge does not itself migrate Supabase tables or the existing Vercel API routes; keep those services active until their Convex replacements and data migration are separately implemented and validated.
 
@@ -217,9 +226,26 @@ Lesson completion and code attempts use the account-backed Supabase tables when 
 
 The voice studio uses its curated phrasebook for exact English-to-language matches, then calls the server-side Plotweaver translation proxy for supported source/target languages. Configure `PLOTWEAVER_API_KEY` in Vercel's Production and Preview environments (or migrate the existing `Idilewa` variable to that name); never expose it in a `VITE_` variable or browser bundle. Plotweaver's current translation endpoint supports Yorùbá, Hausa, Igbo, Nigerian Pidgin and English; it does not currently provide translation for every language in its speech catalogue. Text-to-speech and voice cloning use the languages enabled for the key. Speech-to-text currently supports Yorùbá, Hausa, Igbo, Nigerian Pidgin and English. The voice page loads the available language lists from Plotweaver instead of claiming unsupported languages work. Machine translation can miss idiom, context and tone marks; fluent-speaker review is recommended for important text.
 
-### Plotweaver voice services
+### AI Conversation and Plotweaver voice services
 
-The `/api/plotweaver/*` Vercel function keeps the API key server-side and proxies language/voice discovery, speech generation, translation, transcription and voice cloning. AI Conversation uses Plotweaver for Yorùbá, Igbo and Hausa phrase translation and speech; Swahili phrase translation uses `/api/translate` and requires `GOOGLE_TRANSLATE_API_KEY`, while Swahili speech transcription is unavailable. The guide portraits map to `/assets/yoruba-educator-woman.jpg`, `/assets/teacher-guides/igbo-ngozi-nwosu.jpg`, `/assets/teacher-guides/hausa-aisha-muhammad.jpg`, and `/assets/teacher-guides/swahili-amina-juma.jpg`; the three `teacher-guides` image files must be added before production. Guide introductions also need fluent-speaker review before production. For local API testing use `vercel dev`; Vite's static development server cannot execute Vercel functions. The voice library, lesson vowels/consonants, lesson playback, free-text speech generator, phrase translation/dictation and recorded lesson transcription use these proxies. Yorùbá vowel-sequence playback selects a recommended native Yorùbá voice from Plotweaver and does not substitute device speech if that voice is unavailable. Generated audio and recordings are not stored by Idilewa; recordings are sent to Plotweaver for the requested transcription or voice-clone operation.
+The `/api/ai/conversation` endpoint calls the configured Ollama-compatible model and never returns a fabricated response when the provider is unavailable. Configure a private HTTPS `OLLAMA_BASE_URL`, `OLLAMA_MODEL`, and the Supabase server credentials in Vercel before enabling production chat. The current Vercel project has no Ollama host configured, so live AI replies remain unavailable until one is provisioned. The UI reports this explicitly.
+
+The `/api/ai/knowledge` endpoint is restricted to authenticated educators. `POST` submits a note as pending, `GET?status=pending` lists the review queue, and `PATCH` approves or rejects a note. Include the current Supabase access token as a bearer token. Example submission:
+
+```json
+{
+  "language": "yo",
+  "category": "vocabulary",
+  "title": "Family greeting",
+  "content": "Reviewed explanation of a greeting.",
+  "source_name": "A named language reference",
+  "source_url": "https://example.org/language-reference"
+}
+```
+
+Only approved notes for the selected language are included in retrieval. Set `OLLAMA_EMBEDDING_MODEL=nomic-embed-text` to add semantic embeddings (the configured model must return 768 values); otherwise the search uses language-filtered full-text matching. The included JSONL examples are synthetic, marked `review_required`, and are not an evaluated or fine-tuning corpus.
+
+The `/api/plotweaver/*` Vercel function keeps the Plotweaver key server-side and proxies language/voice discovery, speech generation, translation, transcription and voice cloning. The production language-list endpoint currently reports TTS, transcription, and translation for Yorùbá, Igbo, Hausa and Nigerian Pidgin; Swahili currently reports TTS only. AI Conversation uses this service for voice input and playback where supported; Swahili reply translation uses `/api/translate` and requires `GOOGLE_TRANSLATE_API_KEY`. For local API testing use `vercel dev`; plain Vite only serves the front end. Generated audio and recordings are not stored by Idilewa; recordings are sent to Plotweaver for the requested transcription or voice-clone operation.
 
 Voice cloning requires an explicit ownership/permission confirmation and a clean 4–8 second clip. The public application limits uploads to 4 MB to fit serverless request-size limits; non-Nigerian voice samples require an exact transcript. Created voice IDs are saved only in the current browser’s local state; the public API does not expose clone enumeration or deletion. Plotweaver usage may incur charges, so configure provider-side usage limits and monitor consumption. The API endpoint is public; CORS only governs browser access and is not authentication. Do not upload a child’s or another person’s voice without their informed permission. Set `IDILEWA_ALLOWED_ORIGINS` to the exact GitHub Pages frontend origin if using a separate static site; keep API and frontend on the same trusted deployment where possible.
 

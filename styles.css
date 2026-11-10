@@ -12858,3 +12858,50 @@ body.academy-reference-shell ::selection { background: #c9eed2; color: #075e2b; 
   .academy-code-button:hover,
   .academy-home-feature:hover { transform: none; }
 }
+.aichat-sources {
+  margin-top: 8px;
+  padding-top: 7px;
+  border-top: 1px solid #bfd9c8;
+  color: #244a33;
+  font-size: 12px;
+  line-height: 1.45;
+}
+.aichat-sources strong { font-size: 11px; }
+.aichat-sources ul { margin: 4px 0 0; padding-left: 17px; }
+.aichat-sources a { color: #075c2e; text-decoration: underline; text-underline-offset: 2px; overflow-wrap: anywhere; }
+.aichat-sources small { color: #3f5b48; }
+.aichat-error {
+  align-self: flex-start;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: calc(100% - 54px);
+  max-width: 560px;
+  margin: 0 0 5px 54px;
+  padding: 9px 12px;
+  border: 1px solid #cf7b70;
+  border-radius: 14px;
+  background: #fff1ee;
+  color: #642b25;
+  font-size: 13px;
+  line-height: 1.4;
+}
+.aichat-error p { margin: 0; overflow-wrap: anywhere; }
+.aichat-error button {
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 0 14px;
+  border: 1px solid #9a4037;
+  border-radius: 999px;
+  background: #fff;
+  color: #642b25;
+  font: inherit;
+  font-weight: 750;
+  cursor: pointer;
+}
+.aichat-error button:hover { background: #fce1dc; }
+.aichat-error button:focus-visible { outline: 3px solid #9a4037; outline-offset: 2px; }
+@media (max-width: 420px) {
+  .aichat-error { gap: 7px; margin-left: 44px; width: calc(100% - 44px); padding: 8px 9px; font-size: 12px; }
+}

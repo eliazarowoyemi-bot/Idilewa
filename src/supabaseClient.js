@@ -572,6 +572,13 @@ export async function getSessionAccessToken() {
   return data.session.access_token;
 }
 
+export async function getOptionalSessionAccessToken() {
+  if (!supabase) return '';
+  const { data, error } = await supabase.auth.getSession();
+  if (error) throw new Error('Your sign-in session could not be checked.', { cause: error });
+  return data.session?.access_token || '';
+}
+
 export async function getRoleDashboard(endpoint) {
   const token = await getSessionAccessToken();
   const response = await fetch(endpoint, {

@@ -68,7 +68,9 @@ test('adult sign-in is password-based and child sign-in uses a parent-issued pas
 test('direct sign-in and signup routes default to the adult email-and-password flow', () => {
   assert.match(appSource, /authRole: stored\.authRole === 'child' \? 'child' : 'adult'/);
   assert.match(appSource, /if \(defaultPage === 'login' && !defaultAuthEntryInitialized\) \{\s*state\.loginMode = 'signin';\s*state\.authRole = 'adult';/);
-  assert.match(appSource, /if \(page === 'login' && \['signin', 'signup'\]\.includes\(params\.mode\)\) \{\s*state\.loginMode = params\.mode;\s*state\.authRole = 'adult';/);
+  assert.match(appSource, /if \(page === 'login'\) \{\s*const nextMode = \['signin', 'signup'\]\.includes\(params\.mode\) \? params\.mode : 'signin';\s*if \(!authRouteInitialized \|\| state\.loginMode !== nextMode\) state\.authRole = 'adult';\s*state\.loginMode = nextMode;\s*authRouteInitialized = true;/);
+  assert.match(appSource, /case 'auth-role-select': \{\s*state\.authRole = el\.dataset\.role === 'adult' \? 'adult' : 'child';[\s\S]*?render\(\);\s*break;/);
+  assert.match(appSource, /case 'login-mode': \{\s*const nextMode = el\.dataset\.mode === 'signup' \? 'signup' : 'signin';\s*if \(state\.loginMode !== nextMode\) state\.authRole = 'adult';/);
 });
 
 test('invalid password sign-in displays guidance inline instead of an overlapping toast', () => {
