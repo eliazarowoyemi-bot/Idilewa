@@ -11,9 +11,7 @@ import {
   readJsonBody,
   sendGuardianEmail,
   sendGuardianJson,
-} from '../../src/server/guardianConsent.js';
-
-export const config = { maxDuration: 15 };
+} from './guardianConsent.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

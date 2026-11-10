@@ -10,9 +10,7 @@ import {
   renderApprovalResult,
   sendGuardianEmail,
   sendGuardianHtml,
-} from '../../src/server/guardianConsent.js';
-
-export const config = { maxDuration: 15 };
+} from './guardianConsent.js';
 
 function readToken(req, body = {}) {
   const value = body.token || req.query?.token || '';
