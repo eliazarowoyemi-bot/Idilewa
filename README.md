@@ -96,7 +96,8 @@ The HTML entries declared in the active `vite.config.js` are supported:
 | | `#/lesson` (`lesson.html`) | Focused lesson practice, prompts, answer validation, and progress rewards. |
 | | `#/kids` (`kids.html`) | Child-centered learning portal with playful stories and coding. |
 | **Code Studio** | `code-studio.html` | Separate game-building workspace with playable Road Racer, Star Catcher, and Maze Runner projects; editable rules, design/sound settings, project import/export, and supported-language instruction translation. |
-| | `#/tutor` (`tutor.html`) | Tutor Portal with public introduction, educator sign-in/invitation signup, dashboard, learner connection requests, consent, lesson, messages, profile, availability, and settings interfaces. |
+| | `#/tutor` (`tutor.html`) | Local-only learner-facing tutoring prototype with sample profiles, messages, lessons, rates, and payment displays; no real bookings or charges are made. |
+| | `/educator-portal.html` | Existing educator portal with invitation sign-in, guardian-approved learner connections, lessons, messages, profile, availability, and settings. |
 | | `#/profile` (`profile.html`) | Learner progress dashboard, points, streaks, badges (stored in local browser state). |
 | | `#/login` (`login.html`) | Persona-based authentication (child, adult, parent, educator) with 3D shield and Supabase notice. |
 | | `#/pricing` (`pricing.html`) | Preview family/explorer plans; explicitly non-billing demonstration. |

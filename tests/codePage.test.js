@@ -44,6 +44,15 @@ test('the integrated coding view includes the supplied games and language contro
   assert.match(appSource, /Little Chefs/);
 });
 
+test('lost lives pause play and offer a language recovery challenge', () => {
+  assert.match(appSource, /window\.idilewaQuiz/);
+  assert.match(appSource, /idilewa-shared-life-loss/);
+  assert.match(appSource, /Answer the language question to try recovering a life/);
+  assert.ok(appSource.includes('playing=false;cancelAnimationFrame(raf);window.idilewaQuiz'));
+  assert.ok(appSource.includes('paused=true;window.parent.postMessage({type:&#x27;idilewa-shared-life-loss&#x27;'));
+  assert.match(appSource, /lives\+\+;score\+=20;updateStats\(\)/);
+});
+
 test('three starter games have bounded, testable control behavior', () => {
   assert.deepEqual(Object.keys(GAME_TEMPLATES), ['race', 'catch', 'maze']);
   assert.deepEqual(STARTER_RULES, ['movement', 'hazards', 'score', 'sound']);

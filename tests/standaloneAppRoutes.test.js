@@ -22,6 +22,7 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assert.match(transformed, /Little Scientists/);
   assert.doesNotMatch(transformed, /document\.getElementById\("footerYear"\)\.textContent=/);
   assert.doesNotMatch(transformed, /const root=document\.querySelector\('\.bilingualGame'\), sel=root\.querySelector\(/);
+  assert.doesNotMatch(transformed, /const root=document\.querySelector\(&#x27;\.bilingualGame&#x27;\), sel=root\.querySelector\(/);
   assert.match(transformed, /id="idilewa-accessibility-overrides"/);
   assert.match(transformed, /\.premium-auth-link/);
   assert.match(transformed, /<h2>Source<\/h2>/);
@@ -49,6 +50,7 @@ test('native entry pages retain their app and return home or voice links to cano
     'ai-conversation.html',
     'auth-callback.html',
     'consent.html',
+    'educator-portal.html',
     'login.html',
     'parents.html',
     'tutor.html',
@@ -63,6 +65,11 @@ test('native entry pages retain their app and return home or voice links to cano
     assert.ok(transformed.endsWith(source.slice(closingHead)), filename);
     assert.match(transformed, /event\.stopImmediatePropagation\(\)/, filename);
     assert.match(transformed, /location\.assign\(link\.getAttribute\('href'\) === '#\/index' \? '\/' : '\/voice_lessons\.html'\)/, filename);
+    if (filename === 'tutor.html') {
+      assert.match(transformed, /href = '\/educator-portal\.html'/);
+      assert.match(transformed, /link\.textContent = 'Educator Portal'/);
+      assert.match(transformed, /id="idilewa-tutor-accessibility-overrides"/);
+    }
   }
 });
 
@@ -73,6 +80,7 @@ test('every built HTML entry except the homepage points to the standalone app', 
     'ai-conversation.html',
     'auth-callback.html',
     'consent.html',
+    'educator-portal.html',
     'login.html',
     'parents.html',
     'tutor.html',

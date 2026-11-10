@@ -36,6 +36,7 @@ const nativeAppPages = new Set([
   'ai-conversation',
   'auth-callback',
   'consent',
+  'educator-portal',
   'login',
   'parents',
   'tutor',
@@ -47,6 +48,12 @@ const nativeAppPages = new Set([
 const footerYearAssignment = 'document.getElementById("footerYear").textContent=new Date().getFullYear();';
 const guardedBilingualRoot = "const root=document.querySelector('.bilingualGame'), sel=root.querySelector(";
 const safeBilingualRoot = "const root=document.querySelector('.bilingualGame');if(!root)return;const sel=root.querySelector(";
+const escapedBilingualRoot = 'const root=document.querySelector(&#x27;.bilingualGame&#x27;), sel=root.querySelector(';
+const safeEscapedBilingualRoot = 'const root=document.querySelector(&#x27;.bilingualGame&#x27;);if(!root)return;const sel=root.querySelector(';
+const bilingualRootGuards = [
+  [guardedBilingualRoot, safeBilingualRoot],
+  [escapedBilingualRoot, safeEscapedBilingualRoot],
+];
 const nativeAppNavigation = `<script>
 (() => {
   document.addEventListener('click', (event) => {
@@ -87,6 +94,14 @@ const accessibilityStyles = `<style id="idilewa-accessibility-overrides">
 @media(max-width:420px){.premium-brand-copy small{display:none}}
 </style>`;
 
+function guardBilingualGame(html) {
+  for (const [unguarded, guarded] of bilingualRootGuards) {
+    if (html.includes(guarded)) return html;
+    if (html.includes(unguarded)) return html.replaceAll(unguarded, guarded);
+  }
+  throw new Error('Standalone app is missing the expected embedded bilingual-game script.');
+}
+
 function renderRouteRedirect(routeName) {
   const view = routeViews[routeName] ?? 'home';
   const target = `/?view=${encodeURIComponent(view)}`;
@@ -103,21 +118,40 @@ function renderRouteRedirect(routeName) {
 </html>`;
 }
 
-function transformNativeAppHtml(html) {
+function transformNativeAppHtml(html, route) {
+  const tutorAccessibilityStyles = route === 'tutor'
+    ? `<style id="idilewa-tutor-accessibility-overrides">
+.primary,#messageTutor,#nextStep,.top nav button.active{background:#006b39!important;color:#fff!important}
+.eyebrow,h1 span{color:#006b39!important}
+.muted{color:#526257!important}
+</style>`
+    : '';
+  const tutorPortalNavigation = route === 'tutor'
+    ? `<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const nav = document.getElementById('nav');
+  if (!nav) throw new Error('Tutor prototype is missing its navigation container.');
+  if (nav.querySelector('[data-idilewa-educator-portal]')) return;
+  const link = document.createElement('a');
+  link.href = '/educator-portal.html';
+  link.className = 'ghost';
+  link.dataset.idilewaEducatorPortal = 'true';
+  link.textContent = 'Educator Portal';
+  nav.append(link);
+});
+</script>`
+    : '';
   const closingHeadIndex = html.toLowerCase().lastIndexOf('</head>');
   if (closingHeadIndex === -1) {
     throw new Error('Native app page is missing its closing head tag.');
   }
   return html.slice(0, closingHeadIndex)
-    .concat(nativeAppNavigation, html.slice(closingHeadIndex));
+    .concat(tutorAccessibilityStyles, tutorPortalNavigation, nativeAppNavigation, html.slice(closingHeadIndex));
 }
 
 function transformAppHtml(html) {
   if (!html.includes(footerYearAssignment)) {
     throw new Error('Standalone app is missing the expected optional footer-year script.');
-  }
-  if (!html.includes(guardedBilingualRoot)) {
-    throw new Error('Standalone app is missing the expected embedded bilingual-game script.');
   }
   if (!html.includes('<h3>Source</h3>')) {
     throw new Error('Standalone app is missing the expected translation source heading.');
@@ -158,14 +192,14 @@ function transformAppHtml(html) {
 </script>`;
   const transformed = html
     .replace(footerYearAssignment, '(()=>{const yearElement=document.getElementById("footerYear");if(yearElement)yearElement.textContent=new Date().getFullYear()})();')
-    .replaceAll(guardedBilingualRoot, safeBilingualRoot)
     .replace('<h3>Source</h3>', '<h2>Source</h2>');
-  const closingHeadIndex = transformed.toLowerCase().lastIndexOf('</head>');
+  const guarded = guardBilingualGame(transformed);
+  const closingHeadIndex = guarded.toLowerCase().lastIndexOf('</head>');
   if (closingHeadIndex === -1) {
     throw new Error('Standalone app is missing its closing head tag.');
   }
-  const styled = transformed.slice(0, closingHeadIndex)
-    .concat(accessibilityStyles, transformed.slice(closingHeadIndex));
+  const styled = guarded.slice(0, closingHeadIndex)
+    .concat(accessibilityStyles, guarded.slice(closingHeadIndex));
   const closingBodyIndex = styled.toLowerCase().lastIndexOf('</body>');
   if (closingBodyIndex === -1) {
     throw new Error('Standalone app is missing its closing body tag.');
@@ -186,7 +220,7 @@ export function createStandaloneAppPlugin(rootDirectory) {
         if (!context?.filename) return html;
         if (resolve(context.filename) === indexPath) return transformAppHtml(html);
         const route = basename(context.filename).replace(/\.html$/i, '');
-        return nativeAppPages.has(route) ? transformNativeAppHtml(html) : renderRouteRedirect(route);
+        return nativeAppPages.has(route) ? transformNativeAppHtml(html, route) : renderRouteRedirect(route);
       },
     },
   };
