@@ -10,54 +10,38 @@ import {
   RULE_CATALOG,
   STARTER_RULES,
 } from '../src/codeStudioEngine.js';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { createStandaloneAppPlugin } from '../src/standaloneAppRoutes.js';
 
-const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
-const viteConfig = await readFile(new URL('../vite.config.js', import.meta.url), 'utf8');
-const studioHtml = await readFile(new URL('../code-studio.html', import.meta.url), 'utf8');
-const studioSource = await readFile(new URL('../src/codeStudio.js', import.meta.url), 'utf8');
+const appSource = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const engineSource = await readFile(new URL('../src/codeStudioEngine.js', import.meta.url), 'utf8');
+const rootDirectory = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const routePlugin = createStandaloneAppPlugin(rootDirectory);
 
-test('Code Studio stays packaged separately and is linked from the academy homepage', () => {
-  const homeSource = appSource.slice(appSource.indexOf('function renderHome()'), appSource.indexOf('function renderFullHome()'));
-
-  assert.match(homeSource, /Our Language\.<br \/><span>Our Future\.<\/span>/);
-  assert.match(homeSource, /code-studio\.html/);
-  assert.match(studioHtml, /Code Studio/);
-  assert.match(viteConfig, /'code-studio'/);
+test('legacy Code Studio URL opens the integrated coding view', () => {
+  const redirect = routePlugin.transformIndexHtml.handler('', {
+    filename: resolve(rootDirectory, 'code-studio.html'),
+  });
+  assert.ok(redirect.includes('location.replace("/?view=codeLab")'));
+  assert.match(appSource, /id="codeLab"/);
 });
 
-test('Code Studio exposes working game, design, sound, language, and Canva controls', () => {
+test('the integrated coding view includes the supplied games and language controls', () => {
   for (const id of [
-    'game-template',
-    'block-stack',
-    'game-stage',
-    'run-game',
-    'reset-game',
-    'game-speed',
-    'player-color',
-    'sound-enabled',
-    'sound-volume',
-    'sound-tempo',
-    'target-language',
-    'translate-game-text',
-    'apply-translation',
-    'open-canva',
-    'save-project',
-    'import-project',
-    'export-project',
+    'orbitFrame',
+    'hideFrame',
+    'fruitStart',
+    'fruitLanguage',
+    'dgScienceTab',
+    'dgKitchenTab',
   ]) {
-    assert.match(studioHtml, new RegExp(`id="${id}"`), `${id} should be available on the page`);
+    assert.match(appSource, new RegExp(`id="${id}"`), `${id} should be available in the app`);
   }
-  assert.match(studioHtml, /value="yo"/);
-  assert.match(studioHtml, /value="ig"/);
-  assert.match(studioHtml, /value="ha"/);
-  assert.match(studioHtml, /value="pcm"/);
-  assert.match(studioHtml, /value="sw"/);
-  assert.match(studioHtml, /current game preview is uploaded/);
-  assert.match(studioSource, /translateWithPlotweaver/);
-  assert.match(studioSource, /localStorage/);
-  assert.doesNotMatch(studioHtml, /cdn\.tailwindcss\.com|Anansi|pest_control/);
-  assert.doesNotMatch(studioHtml, /<img\b/i);
+  assert.match(appSource, /Orbit Breaker/);
+  assert.match(appSource, /Hide &amp; Seek/);
+  assert.match(appSource, /Science Lab/);
+  assert.match(appSource, /Little Chefs/);
 });
 
 test('three starter games have bounded, testable control behavior', () => {

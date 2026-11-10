@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import { createStandaloneAppPlugin } from './src/standaloneAppRoutes.js';
 
 const routes = [
   'auth-callback', 'index', 'parents', 'about', 'connect_students', 'connect_teachers', 'consent', 'course',
@@ -13,6 +14,7 @@ const routes = [
 const input = Object.fromEntries(routes.map((route) => [route, resolve(__dirname, `${route}.html`)]));
 
 export default defineConfig({
+  plugins: [createStandaloneAppPlugin(__dirname)],
   envPrefix: [
     'VITE_PLOTWEAVER_API_BASE_URL',
     'VITE_CONVEX_URL',
