@@ -198,7 +198,11 @@ The migration files in this repository are not proof that a remote database has 
 1. `supabase/migrations/20261016000000_initial_schema.sql` (base tables and owner-only profile access).
 2. `supabase/migrations/20261016010000_guardian_consent.sql` (guardian approval and child account checks).
 3. `supabase/migrations/20261017000000_account_security_and_educator_invites.sql` (role protection and one-time educator invitations).
-4. `supabase/migrations/20261111000000_educator_google_signup.sql` (rate limits and invitation-backed Google educator registration).
+4. `supabase/migrations/20261018000000_role_dashboards_and_teacher_consent.sql` (role dashboards and teacher consent).
+5. `supabase/migrations/20261020000000_expire_educator_connection_requests.sql` (educator connection request expiry).
+6. `supabase/migrations/20261021000000_auth_email_code_rate_limits.sql` (authentication email-code rate limits).
+7. `supabase/migrations/20261110000000_ai_conversation.sql` (AI conversation persistence).
+8. `supabase/migrations/20261111000000_educator_google_signup.sql` (Google educator registration and its rate limits).
 
 Run `supabase link --project-ref <project-ref>` and `supabase db push --linked` after verifying the target project. Do not enable account registration until the migrations complete successfully; deployment does not apply database migrations. Never test account creation against production with an unowned test address.
 
