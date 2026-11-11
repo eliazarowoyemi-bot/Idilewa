@@ -62,6 +62,8 @@ import {
   updateUserProfile,
   signOut as signOutAccount,
   signIn as signInAccount,
+  signInWithGoogle,
+  beginEducatorGoogleSignup,
   signUp as signUpAccount,
   verifyEducatorInvite,
   resendSignupConfirmation,
@@ -3515,28 +3517,33 @@ import {
 
   function renderTutorAuth(signup) {
     const title = signup ? 'Create Tutor Account' : 'Welcome Back, Tutor';
-    const image = signup ? 'yoruba-educator-man.jpg' : 'yoruba-educator-woman.jpg';
+    const currentUser = getCurrentUser();
+    const currentNameParts = (currentUser?.name || '').trim().split(/\s+/);
+    const firstName = signup ? currentNameParts.shift() || '' : '';
+    const lastName = signup ? currentNameParts.join(' ') : '';
+    const email = signup ? currentUser?.email || '' : '';
     const action = signup ? 'tutor-signup' : 'tutor-login';
     return `<div class="tutor-auth-page ${signup ? 'tutor-auth-signup-page' : ''}">
       <header class="tutor-auth-header">${renderTutorBrand()}<nav class="tutor-auth-nav" aria-label="Tutor account navigation">${renderTutorHomeLink()}<a href="#/tutor" data-route="tutor">Back to tutor portal</a></nav></header>
-      <main class="tutor-auth-layout">${signup ? `<aside class="tutor-signup-intro"><span class="tutor-eyebrow"><i></i> ÌDÍLÉWA LIVE TUTORSHIP</span><h2>A brighter way to teach together.</h2><p>Share your knowledge, connect with learners and help African languages and culture thrive.</p><ul><li>${icon('play', 17)} Live lessons with learners and families</li><li>${icon('book', 17)} Languages, culture and core subjects</li><li>${icon('chart', 17)} Lesson progress in your tutor dashboard</li></ul><p class="tutor-signup-note">${icon('shield', 15)} A one-time educator invitation is required. Learner information stays protected until a guardian approves a connection.</p></aside>` : ''}<section class="tutor-auth-card"><div class="tutor-auth-mobile-brand">${renderTutorBrand()}</div><span class="tutor-eyebrow">IDILEWA · EDUCATOR PORTAL</span><h1>${title}</h1><p>${signup ? 'Create your secure tutor account. No payment details are needed to join.' : 'Log in to continue your teaching journey.'}</p>
+      <main class="tutor-auth-layout">${signup ? `<aside class="tutor-signup-intro"><span class="tutor-eyebrow"><i></i> ÌDÍLÉWA LIVE TUTORSHIP</span><span class="tutor-signup-badge">A personal way to learn, wherever you are</span><h2>A brighter way<br /><em>to learn together.</em></h2><p>Connect with expert tutors in languages, Mathematics and more — with learning that fits your family.</p><div class="tutor-signup-art"><img src="/assets/tutor-signup-happy-toon.webp" alt="Happy cartoon tutor and children learning together on a laptop" /></div><ul><li><span class="tutor-signup-feature-icon">${icon('play', 17)}</span>Live Zoom lessons</li><li><span class="tutor-signup-feature-icon">${icon('book', 17)}</span>Languages &amp; subjects</li><li><span class="tutor-signup-feature-icon">${icon('chart', 17)}</span>Progress tracking</li><li><span class="tutor-signup-feature-icon">${icon('people', 17)}</span>Parent dashboards</li></ul><p class="tutor-signup-note">For parents, students and tutors. <strong>No payment required to sign up.</strong><span>A valid, one-time educator invitation is required for tutor accounts.</span></p></aside>` : ''}<section class="tutor-auth-card"><div class="tutor-auth-mobile-brand">${renderTutorBrand()}</div><span class="tutor-eyebrow">IDILEWA · EDUCATOR PORTAL</span><h1>${title}</h1><p>${signup ? 'Create your secure tutor account. No payment details are needed to join.' : 'Log in to continue your teaching journey.'}</p>
         <form class="tutor-auth-form" data-form="${action}" novalidate>
           ${signup ? `<div class="tutor-signup-progress" aria-label="Account setup steps"><span class="is-current"><b>1</b> Account</span><i></i><span><b>2</b> Email check</span><i></i><span><b>3</b> Dashboard</span></div><div class="tutor-signup-fields">
-            <label>First name<input name="firstName" autocomplete="given-name" maxlength="40" placeholder="First name" required /></label>
-            <label>Last name<input name="lastName" autocomplete="family-name" maxlength="40" placeholder="Last name" required /></label>
-            <label class="tutor-signup-span">Email address<input name="email" type="email" autocomplete="email" maxlength="180" placeholder="you@example.com" required /></label>
-            <label>Country<select name="country" required><option value="">Choose country</option><option>United Kingdom</option><option>Nigeria</option><option>Ghana</option><option>United States</option><option>Canada</option><option>Other</option></select></label>
-            <label>Time zone<select name="timeZone" required><option value="">Choose time zone</option><option value="Europe/London">UK / London</option><option value="Africa/Lagos">Nigeria / Lagos</option><option value="Africa/Accra">Ghana / Accra</option><option value="America/New_York">US / Eastern</option><option value="America/Los_Angeles">US / Pacific</option><option value="other">Other</option></select></label>
-            <label class="tutor-signup-span">Educator invitation code<input name="inviteCode" autocomplete="one-time-code" maxlength="64" placeholder="Enter your one-time code" required /><small>Invitations are one-time use and expire for your security.</small></label>
-            <label>Main teaching subject<select name="teachingSubject" required><option value="">Choose a subject</option><option>Yorùbá</option><option>Igbo</option><option>Hausa</option><option>Arabic</option><option>Kiswahili</option><option>Mathematics</option><option>English</option><option>Science</option><option>Coding</option><option>Other</option></select></label>
-            <label>Teaching experience<select name="teachingExperience" required><option value="">Choose experience</option><option>Less than 1 year</option><option>1–3 years</option><option>4–7 years</option><option>8+ years</option></select></label>
+            <label>First name<input name="firstName" autocomplete="given-name" maxlength="40" placeholder="First name" value="${esc(firstName)}" data-google-required required /></label>
+            <label>Last name<input name="lastName" autocomplete="family-name" maxlength="40" placeholder="Last name" value="${esc(lastName)}" data-google-required required /></label>
+            <label class="tutor-signup-span">Email address<input name="email" type="email" autocomplete="email" maxlength="180" placeholder="you@example.com" value="${esc(email)}" required /></label>
+            <label>Country<select name="country" data-google-required required><option value="">Choose country</option><option>United Kingdom</option><option>Nigeria</option><option>Ghana</option><option>United States</option><option>Canada</option><option>Other</option></select></label>
+            <label>Time zone<select name="timeZone" data-google-required required><option value="">Choose time zone</option><option value="Europe/London">UK / London</option><option value="Africa/Lagos">Nigeria / Lagos</option><option value="Africa/Accra">Ghana / Accra</option><option value="America/New_York">US / Eastern</option><option value="America/Los_Angeles">US / Pacific</option><option value="other">Other</option></select></label>
+            <label class="tutor-signup-span">Educator invitation code<input name="inviteCode" autocomplete="one-time-code" maxlength="64" placeholder="Enter your one-time code" data-google-required required /><small>Invitations are one-time use and expire for your security.</small></label>
+            <label>Main teaching subject<select name="teachingSubject" data-google-required required><option value="">Choose a subject</option><option>Yorùbá</option><option>Igbo</option><option>Hausa</option><option>Arabic</option><option>Kiswahili</option><option>Mathematics</option><option>English</option><option>Science</option><option>Coding</option><option>Other</option></select></label>
+            <label>Teaching experience<select name="teachingExperience" data-google-required required><option value="">Choose experience</option><option>Less than 1 year</option><option>1–3 years</option><option>4–7 years</option><option>8+ years</option></select></label>
             <label class="tutor-signup-span">Qualifications and experience<textarea name="qualifications" maxlength="600" rows="3" placeholder="Share relevant teaching experience or qualifications (optional)"></textarea></label>
             <label class="tutor-signup-span">Password<span class="tutor-password-field"><input id="tutor-password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Create a password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-password" aria-label="Show password">${icon('eye', 15)}</button></span></label>
             <label class="tutor-signup-span">Confirm password<span class="tutor-password-field"><input id="tutor-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Confirm your password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-confirm-password" aria-label="Show password">${icon('eye', 15)}</button></span></label>
-          </div><small class="tutor-password-guidance">Use 12–128 characters, including uppercase and lowercase letters, a number, and a symbol.</small><label class="tutor-check-label tutor-signup-terms"><input type="checkbox" name="agreement" required /> I agree to follow Idilewa’s child-safeguarding and privacy requirements.</label>` : `<label>Email Address<input name="email" type="email" autocomplete="email" placeholder="Enter your email" required /></label><label>Password<span class="tutor-password-field"><input id="tutor-password" name="password" type="password" autocomplete="current-password" minlength="12" maxlength="128" placeholder="Enter your password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-password" aria-label="Show password">${icon('eye', 15)}</button></span></label><div class="tutor-auth-options"><label class="tutor-check-label"><input type="checkbox" name="remember" /> Remember me</label><a href="#/login?mode=signin" data-route="login" data-mode="signin">Forgot password?</a></div>`}
+          </div><small class="tutor-password-guidance">Use 12–128 characters, including uppercase and lowercase letters, a number, and a symbol.</small><label class="tutor-check-label tutor-signup-terms"><input type="checkbox" name="agreement" data-google-required required /> I agree to follow Idilewa’s child-safeguarding and privacy requirements.</label>` : `<label>Email Address<input name="email" type="email" autocomplete="email" placeholder="Enter your email" required /></label><label>Password<span class="tutor-password-field"><input id="tutor-password" name="password" type="password" autocomplete="current-password" minlength="12" maxlength="128" placeholder="Enter your password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-password" aria-label="Show password">${icon('eye', 15)}</button></span></label><div class="tutor-auth-options"><label class="tutor-check-label"><input type="checkbox" name="remember" /> Remember me</label><a href="#/login?mode=signin" data-route="login" data-mode="signin">Forgot password?</a></div>`}
           <p class="tutor-auth-error" role="alert" aria-live="polite" hidden></p>
           <button type="submit" class="tutor-button tutor-button-primary tutor-auth-submit">${signup ? 'Create Account' : 'Login'} ${icon('arrow', 15)}</button>
         </form>
+        <div class="tutor-google-auth"><div class="tutor-google-divider"><span>or</span></div><button type="button" class="tutor-google-button" data-action="${signup ? 'tutor-google-signup' : 'tutor-google-login'}"><svg aria-hidden="true" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94a11.05 11.05 0 0 1-4.8 7.24l7.75 6.01c4.52-4.18 7.09-10.34 7.09-17.72Z"/><path fill="#FBBC05" d="M10.53 28.59a14.4 14.4 0 0 1-.75-4.59c0-1.59.27-3.13.75-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19Z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.73l-7.75-6.01c-2.15 1.45-4.9 2.31-8.15 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"/></svg>Continue with Google</button>${signup ? '<small class="tutor-google-note">Google sign-up uses the email on your Google account and still requires the tutor details and one-time invitation above.</small>' : ''}</div>
         <p class="tutor-auth-switch">${signup ? 'Already have an account?' : 'Don’t have an account?'} <a href="#/${signup ? 'tutor-login' : 'tutor-signup'}" data-route="${signup ? 'tutor-login' : 'tutor-signup'}">${signup ? 'Sign in' : 'Sign up'}</a></p>
         <small class="tutor-auth-security">${icon('lock', 13)} Secure educator access · family consent is always required</small>
       </section>${signup ? '' : `<aside class="tutor-auth-art"><img src="/assets/${image}" alt="Idilewa language tutor working at a laptop" /><div class="tutor-auth-art-caption">Better Language Skills<br /><strong>Brighter Futures</strong></div></aside>`}</main>
@@ -6659,6 +6666,74 @@ import {
         input.type = reveal ? 'text' : 'password';
         el.setAttribute('aria-label', reveal ? 'Hide password' : 'Show password');
         el.innerHTML = icon(reveal ? 'eyeOff' : 'eye', 15);
+        break;
+      }
+      case 'tutor-google-login': {
+        const form = document.querySelector('[data-form="tutor-login"]');
+        const errorElement = form?.querySelector('.tutor-auth-error');
+        const originalMarkup = el.innerHTML;
+        const fail = (error) => {
+          if (errorElement) {
+            errorElement.textContent = error instanceof Error ? error.message : 'Google sign-in could not be started.';
+            errorElement.hidden = false;
+          }
+          el.disabled = false;
+          el.innerHTML = originalMarkup;
+        };
+        if (!isSupabaseConfigured || !supabase) {
+          fail(new Error('Google sign-in is not configured on this deployment. Please try again later.'));
+          break;
+        }
+        el.disabled = true;
+        el.textContent = 'Connecting to Google…';
+        void signInWithGoogle().catch(fail);
+        break;
+      }
+      case 'tutor-google-signup': {
+        const form = document.querySelector('[data-form="tutor-signup"]');
+        const errorElement = form?.querySelector('.tutor-auth-error');
+        if (!form) break;
+        if (!isSupabaseConfigured || !supabase) {
+          if (errorElement) {
+            errorElement.textContent = 'Google sign-up is not configured on this deployment. Please try again later.';
+            errorElement.hidden = false;
+          }
+          break;
+        }
+        const invalidField = [...form.querySelectorAll('[data-google-required]')]
+          .find((field) => !field.checkValidity());
+        if (invalidField) {
+          invalidField.reportValidity();
+          break;
+        }
+        const formData = new FormData(form);
+        const originalMarkup = el.innerHTML;
+        const fail = (error) => {
+          if (errorElement) {
+            errorElement.textContent = error instanceof Error ? error.message : 'Google tutor sign-up could not be started.';
+            errorElement.hidden = false;
+          }
+          el.disabled = false;
+          el.innerHTML = originalMarkup;
+        };
+        if (errorElement) {
+          errorElement.textContent = '';
+          errorElement.hidden = true;
+        }
+        el.disabled = true;
+        el.textContent = 'Connecting to Google…';
+        void beginEducatorGoogleSignup({
+          firstName: String(formData.get('firstName') || ''),
+          lastName: String(formData.get('lastName') || ''),
+          inviteCode: String(formData.get('inviteCode') || ''),
+          educatorProfile: {
+            country: String(formData.get('country') || ''),
+            timeZone: String(formData.get('timeZone') || ''),
+            teachingSubject: String(formData.get('teachingSubject') || ''),
+            teachingExperience: String(formData.get('teachingExperience') || ''),
+            qualifications: String(formData.get('qualifications') || ''),
+          },
+        }).catch(fail);
         break;
       }
       case 'tutor-toggle-preference': {

@@ -1,4 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
+import { normalizeEducatorProfile } from './educatorProfile.js';
+
+export { normalizeEducatorProfile } from './educatorProfile.js';
 
 function readEnvValue(...names) {
   const clientEnv = (typeof import.meta !== 'undefined' && import.meta.env) ? import.meta.env : {};
@@ -41,6 +44,7 @@ const LOCAL_STORAGE_KEY_USER = 'idilewa_auth_user';
 const LOCAL_STORAGE_KEY_PROGRESS = 'idilewa_db_progress';
 const LOCAL_STORAGE_KEY_CODE = 'idilewa_db_code';
 const LOCAL_STORAGE_KEY_VOICE = 'idilewa_db_voice';
+const SESSION_STORAGE_KEY_TUTOR_GOOGLE_SIGNUP = 'idilewa_tutor_google_signup';
 let authStateSubscription = null;
 
 function getLocalItem(key, fallback = []) {
@@ -177,39 +181,6 @@ function mapAuthUser(authUser, metadata = authUser.user_metadata || {}) {
     streak: Number.isFinite(metadata.streak) ? metadata.streak : 0,
     createdAt: authUser.created_at || new Date().toISOString(),
   };
-}
-
-const EDUCATOR_COUNTRIES = new Set(['United Kingdom', 'Nigeria', 'Ghana', 'United States', 'Canada', 'Other']);
-const EDUCATOR_TIME_ZONES = new Set([
-  'Europe/London', 'Africa/Lagos', 'Africa/Accra',
-  'America/New_York', 'America/Los_Angeles', 'other',
-]);
-const EDUCATOR_SUBJECTS = new Set([
-  'Yorùbá', 'Igbo', 'Hausa', 'Arabic', 'Kiswahili',
-  'Mathematics', 'English', 'Science', 'Coding', 'Other',
-]);
-const EDUCATOR_EXPERIENCE = new Set(['Less than 1 year', '1–3 years', '4–7 years', '8+ years']);
-
-export function normalizeEducatorProfile(value) {
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
-    throw new Error('Complete your tutor profile before creating an account.');
-  }
-  const country = typeof value.country === 'string' ? value.country.trim() : '';
-  const timeZone = typeof value.timeZone === 'string' ? value.timeZone.trim() : '';
-  const teachingSubject = typeof value.teachingSubject === 'string' ? value.teachingSubject.trim() : '';
-  const teachingExperience = typeof value.teachingExperience === 'string' ? value.teachingExperience.trim() : '';
-  if (value.qualifications !== undefined && typeof value.qualifications !== 'string') {
-    throw new Error('Qualifications and experience must be entered as text.');
-  }
-  const qualifications = typeof value.qualifications === 'string' ? value.qualifications.trim() : '';
-
-  if (!EDUCATOR_COUNTRIES.has(country)) throw new Error('Choose a country from the list.');
-  if (!EDUCATOR_TIME_ZONES.has(timeZone)) throw new Error('Choose a time zone from the list.');
-  if (!EDUCATOR_SUBJECTS.has(teachingSubject)) throw new Error('Choose your main teaching subject.');
-  if (!EDUCATOR_EXPERIENCE.has(teachingExperience)) throw new Error('Choose your teaching experience.');
-  if (qualifications.length > 600) throw new Error('Qualifications and experience must be 600 characters or fewer.');
-
-  return { country, timeZone, teachingSubject, teachingExperience, qualifications };
 }
 
 async function loadAccountProfile(client, authUser) {
@@ -377,6 +348,127 @@ export async function verifyEducatorInvite(code) {
     throw new Error('The invitation service did not return a valid invitation.');
   }
   return result.inviteId;
+}
+
+export async function beginEducatorGoogleSignup({ inviteCode, educatorProfile, firstName, lastName }) {
+  const client = requireSupabase();
+  const normalizedFirstName = typeof firstName === 'string' ? firstName.trim() : '';
+  const normalizedLastName = typeof lastName === 'string' ? lastName.trim() : '';
+  if (!normalizedFirstName || normalizedFirstName.length > 40
+    || !normalizedLastName || normalizedLastName.length > 40) {
+    throw new Error('Enter a first and last name using no more than 40 characters each.');
+  }
+  const profile = normalizeEducatorProfile(educatorProfile);
+  const inviteId = await verifyEducatorInvite(inviteCode);
+  const pendingSignup = {
+    inviteId,
+    profile,
+    firstName: normalizedFirstName,
+    lastName: normalizedLastName,
+    createdAt: Date.now(),
+  };
+  try {
+    sessionStorage.setItem(SESSION_STORAGE_KEY_TUTOR_GOOGLE_SIGNUP, JSON.stringify(pendingSignup));
+  } catch (error) {
+    throw new Error('Your tutor signup details could not be saved for Google sign-in. Please enable session storage and try again.', { cause: error });
+  }
+  try {
+    await signInWithGoogle({ redirectRoute: 'tutor-login' });
+  } catch (error) {
+    clearPendingEducatorGoogleSignup();
+    throw error;
+  }
+}
+
+export async function signInWithGoogle({ redirectRoute = 'tutor-login' } = {}) {
+  const client = requireSupabase();
+  if (redirectRoute !== 'tutor-login') {
+    throw new Error('Google sign-in is only available for the tutor portal.');
+  }
+  const { data, error } = await client.auth.signInWithOAuth({
+    provider: 'google',
+    options: {
+      redirectTo: new URL('/auth-callback.html?next=tutor-login', window.location.origin).toString(),
+      queryParams: { prompt: 'select_account' },
+    },
+  });
+  if (error) throw new Error('Google sign-in could not be started. Check that Google is enabled for Idilewa and try again.', { cause: error });
+  if (!data?.url) throw new Error('Google sign-in did not return a secure redirect. Please try again.');
+}
+
+export function getPendingEducatorGoogleSignup() {
+  let raw;
+  try {
+    raw = sessionStorage.getItem(SESSION_STORAGE_KEY_TUTOR_GOOGLE_SIGNUP);
+  } catch (error) {
+    throw new Error('Your pending Google tutor signup could not be read.', { cause: error });
+  }
+  if (!raw) return null;
+  let pendingSignup;
+  try {
+    pendingSignup = JSON.parse(raw);
+  } catch (error) {
+    clearPendingEducatorGoogleSignup();
+    throw new Error('Your pending Google tutor signup is invalid. Please start again.', { cause: error });
+  }
+  const valid = pendingSignup && typeof pendingSignup === 'object'
+    && /^[0-9a-f-]{36}$/i.test(pendingSignup.inviteId || '')
+    && typeof pendingSignup.createdAt === 'number'
+    && Date.now() - pendingSignup.createdAt >= 0
+    && Date.now() - pendingSignup.createdAt <= 15 * 60 * 1000
+    && typeof pendingSignup.firstName === 'string'
+    && typeof pendingSignup.lastName === 'string';
+  if (!valid) {
+    clearPendingEducatorGoogleSignup();
+    return null;
+  }
+  return {
+    inviteId: pendingSignup.inviteId,
+    profile: normalizeEducatorProfile(pendingSignup.profile),
+    firstName: pendingSignup.firstName,
+    lastName: pendingSignup.lastName,
+  };
+}
+
+export function clearPendingEducatorGoogleSignup() {
+  try {
+    sessionStorage.removeItem(SESSION_STORAGE_KEY_TUTOR_GOOGLE_SIGNUP);
+  } catch (error) {
+    throw new Error('Your pending Google tutor signup could not be cleared.', { cause: error });
+  }
+}
+
+export async function completeEducatorGoogleSignup({ accessToken, inviteId, educatorProfile, firstName, lastName }) {
+  if (typeof accessToken !== 'string' || !accessToken.trim()) {
+    throw new Error('Your Google session could not be verified. Please sign in again.');
+  }
+  const response = await fetch('/api/educator/complete-google-signup', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+    },
+    body: JSON.stringify({
+      inviteId,
+      educatorProfile: normalizeEducatorProfile(educatorProfile),
+      firstName,
+      lastName,
+      safeguardingAccepted: true,
+    }),
+  });
+  let result;
+  try {
+    result = await response.json();
+  } catch (error) {
+    throw new Error('The tutor signup service returned an invalid response.', { cause: error });
+  }
+  if (!response.ok) {
+    throw new Error(typeof result?.error === 'string' ? result.error : 'Your Google tutor signup could not be completed.');
+  }
+  if (result?.role !== 'educator') {
+    throw new Error('The tutor signup service did not confirm your educator account.');
+  }
 }
 
 export async function resendSignupConfirmation(email) {

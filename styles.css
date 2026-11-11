@@ -10503,6 +10503,31 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .tutor-auth-options a { font-size: 8px; }
 .tutor-auth-submit { width: 100%; margin-top: 3px; }
 .tutor-auth-error { margin: 0; padding: 8px 10px; border-radius: 8px; color: #a63c30; background: #fff2ef; font-size: 9px; line-height: 1.45; }
+.tutor-google-auth { margin-top: 16px; }
+.tutor-google-divider { height: 1px; margin-bottom: 14px; position: relative; display: grid; place-items: center; background: #e4ebe6; }
+.tutor-google-divider span { padding: 0 10px; color: #68786f; background: #fff; font-size: 11px; }
+.tutor-google-button {
+  width: 100%;
+  min-height: 46px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 11px;
+  border: 1px solid #cfdad3;
+  border-radius: 10px;
+  color: #263a30;
+  background: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background .16s ease, border-color .16s ease;
+}
+.tutor-google-button:hover:not(:disabled) { border-color: #9db7a5; background: #f8fbf8; }
+.tutor-google-button:focus-visible { outline: 3px solid #80d5b0; outline-offset: 3px; }
+.tutor-google-button:disabled { opacity: .7; cursor: wait; }
+.tutor-google-button svg { width: 19px; height: 19px; flex: 0 0 auto; }
+.tutor-google-note { margin-top: 8px; display: block; color: #536d5e; font-size: 10px; line-height: 1.5; text-align: center; }
 .tutor-auth-switch { margin: 13px 0 0 !important; text-align: center; }
 .tutor-auth-security { margin-top: 7px; display: flex; align-items: center; justify-content: center; gap: 5px; color: #7b8b83; font-size: 8px; }
 .tutor-auth-security .icon { color: #13835f; }
@@ -10526,48 +10551,91 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
   justify-content: center;
   background: linear-gradient(155deg, #fffefa 0%, #f5faf5 58%, #e8f4ec 100%);
 }
+.tutor-signup-badge {
+  width: fit-content;
+  margin-top: 12px;
+  padding: 6px 11px;
+  border: 1px solid #dce8dd;
+  border-radius: 999px;
+  color: #355747;
+  background: #fff;
+  font-size: 10px;
+}
 .tutor-signup-intro h2 {
-  margin: 20px 0 11px;
+  margin: 15px 0 9px;
   color: #103e2d;
   font-size: clamp(31px, 3.2vw, 44px);
   line-height: 1.08;
   letter-spacing: -.045em;
 }
+.tutor-signup-intro h2 em { color: #07834f; font-style: normal; }
 .tutor-signup-intro > p {
   max-width: 38ch;
   margin: 0;
   color: #496558;
-  font-size: 15px;
-  line-height: 1.65;
+  font-size: 12px;
+  line-height: 1.6;
+}
+.tutor-signup-art {
+  width: 100%;
+  margin-top: 15px;
+  overflow: hidden;
+  border: 1px solid #d3e6d5;
+  border-radius: 16px;
+  background: #e7f4e4;
+  aspect-ratio: 1.13;
+}
+.tutor-signup-art img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
 }
 .tutor-signup-intro ul {
-  margin: 26px 0 0;
+  margin: 11px 0 0;
   padding: 0;
   display: grid;
-  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
   list-style: none;
 }
 .tutor-signup-intro li {
+  min-height: 42px;
+  padding: 6px 8px;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 7px;
+  border: 1px solid #dbe8dd;
+  border-radius: 11px;
   color: #294d3a;
-  font-size: 13px;
+  background: rgba(255,255,255,.82);
+  font-size: 9px;
   font-weight: 700;
 }
-.tutor-signup-intro li .icon,
+.tutor-signup-feature-icon {
+  width: 24px;
+  height: 24px;
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid #e1ece2;
+  border-radius: 7px;
+  color: #1b7b50;
+  background: #f0f7ef;
+}
 .tutor-signup-note .icon { flex: 0 0 auto; color: #087448; }
 .tutor-signup-intro .tutor-signup-note {
-  margin-top: 30px;
-  padding-top: 17px;
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
+  margin-top: 12px;
+  padding-top: 10px;
+  display: block;
   border-top: 1px solid #d5e5d9;
   color: #3f5e4d;
-  font-size: 12px;
-  line-height: 1.55;
+  font-size: 9px;
+  line-height: 1.6;
 }
+.tutor-signup-note strong { color: #087448; }
+.tutor-signup-note span { margin-top: 3px; display: block; color: #536d5e; }
 .tutor-auth-signup-page .tutor-auth-card {
   align-self: start;
   padding: clamp(24px, 3vw, 38px);
@@ -10848,8 +10916,9 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
   .tutor-auth-signup-page .tutor-auth-card { padding: 22px; }
   .tutor-signup-intro { padding: 26px 22px; }
   .tutor-signup-intro h2 { margin-top: 13px; font-size: 32px; }
-  .tutor-signup-intro ul { margin-top: 18px; }
-  .tutor-signup-intro .tutor-signup-note { margin-top: 20px; }
+  .tutor-signup-art { margin-top: 12px; }
+  .tutor-signup-intro ul { margin-top: 9px; }
+  .tutor-signup-intro .tutor-signup-note { margin-top: 12px; }
   .tutor-auth-mobile-brand { margin-bottom: 17px; display: block; }
   .tutor-auth-header > .tutor-brand { display: none; }
   .tutor-auth-art { min-height: 220px; }
