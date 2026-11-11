@@ -442,7 +442,7 @@ export async function completeEducatorGoogleSignup({ accessToken, inviteId, educ
   if (typeof accessToken !== 'string' || !accessToken.trim()) {
     throw new Error('Your Google session could not be verified. Please sign in again.');
   }
-  const response = await fetch('/api/educator/complete-google-signup', {
+  const response = await fetch('/api/educator/verify-invite?action=complete-google-signup', {
     method: 'POST',
     headers: {
       Authorization: `Bearer ${accessToken}`,

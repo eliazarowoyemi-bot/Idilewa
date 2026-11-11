@@ -5,7 +5,7 @@ import test from 'node:test';
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const authClientSource = await readFile(new URL('../src/supabaseClient.js', import.meta.url), 'utf8');
 const callbackSource = await readFile(new URL('../src/authCallback.js', import.meta.url), 'utf8');
-const apiSource = await readFile(new URL('../api/educator/complete-google-signup.js', import.meta.url), 'utf8');
+const apiSource = await readFile(new URL('../api/educator/verify-invite.js', import.meta.url), 'utf8');
 const migrationSource = await readFile(new URL('../supabase/migrations/20261111000000_educator_google_signup.sql', import.meta.url), 'utf8');
 
 test('tutor signup uses the exact supplied artwork and matches the reference content', async () => {
@@ -30,7 +30,7 @@ test('tutor account pages offer Google sign-in and invite-gated Google registrat
   assert.match(appSource, /beginEducatorGoogleSignup\(\{/);
   assert.match(authClientSource, /signInWithOAuth\(\{\s*provider: 'google'/);
   assert.match(authClientSource, /verifyEducatorInvite\(inviteCode\)/);
-  assert.match(authClientSource, /complete-google-signup/);
+  assert.match(authClientSource, /verify-invite\?action=complete-google-signup/);
 });
 
 test('Google OAuth callback completes only verified educator accounts', () => {
@@ -43,6 +43,7 @@ test('Google OAuth callback completes only verified educator accounts', () => {
   assert.match(apiSource, /user\.email_confirmed_at/);
   assert.match(apiSource, /complete_educator_google_signup/);
   assert.match(apiSource, /safeguardingAccepted !== true/);
+  assert.match(apiSource, /req\.query\?\.action === 'complete-google-signup'/);
 });
 
 test('Google educator invitation redemption is atomic and service-role only', () => {
