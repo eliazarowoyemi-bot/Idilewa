@@ -588,4 +588,145 @@ watch('fruitFeedback','fruit',/Time is up|Try again! Correct answer/i);
 watch('dgMessage','science',/Not quite\.|Time is up|Try again or choose Hint/i);
 window.idilewaOpenLanguageChallenge=show;
 })();
+</script><script id="idilewa-kids-arcade-integration">
+(() => {
+  const games = {
+    'turbo-racers': { title: 'Turbo Racers', path: '/games/turbo-racers.html' },
+    'balloon-ludo': { title: 'Balloon Ludo', path: '/games/balloon-ludo.html' },
+  };
+  const gameOrder = [
+    'first', 'orbit', 'seek', 'fruit', 'science', 'chefs',
+    'adventure', 'mouse', 'pet', 'zombie', 'temple',
+    'turbo-racers', 'balloon-ludo',
+  ];
+  const previousOpen = window.openCodeGame;
+  const previousClose = window.closeCodeGame;
+  let activeGame = null;
+
+  function getArcadeFrame() {
+    const frame = document.getElementById('arcade-merged-frame');
+    if (!frame) throw new Error('The Code Playground game frame is unavailable.');
+    return frame;
+  }
+
+  function openSuppliedGame(gameId) {
+    const game = games[gameId];
+    if (!game) return false;
+    if (typeof go === 'function') go('codeLab');
+    const root = document.getElementById('codeLab');
+    const pane = document.getElementById('arcade-merged-pane');
+    const nav = document.getElementById('game-nav-bar');
+    const title = document.getElementById('game-current-title');
+    const frame = getArcadeFrame();
+    if (!root || !pane || !nav || !title) {
+      throw new Error('The Code Playground navigation could not be opened.');
+    }
+
+    activeGame = gameId;
+    root.classList.add('code-playing');
+    document.querySelectorAll('#codeLab .game-view-pane').forEach((view) => view.classList.remove('game-active'));
+    pane.classList.add('game-active');
+    nav.hidden = false;
+    title.textContent = game.title;
+    frame.title = `Ìdíléwa ${game.title}`;
+    frame.removeAttribute('srcdoc');
+    frame.src = game.path;
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    requestAnimationFrame(() => {
+      const top = nav.getBoundingClientRect().top + window.scrollY - 110;
+      window.scrollTo({ top: Math.max(0, top), behavior: 'instant' });
+    });
+    return true;
+  }
+
+  window.openCodeGame = (gameId) => {
+    const frame = getArcadeFrame();
+    frame.removeAttribute('src');
+    frame.title = 'Ìdíléwa playable arcade game';
+    if (openSuppliedGame(gameId)) return;
+    activeGame = gameId;
+    previousOpen(gameId);
+  };
+
+  window.closeCodeGame = () => {
+    activeGame = null;
+    const frame = getArcadeFrame();
+    frame.removeAttribute('src');
+    frame.removeAttribute('srcdoc');
+    frame.title = 'Ìdíléwa playable arcade game';
+    previousClose();
+  };
+
+  window.nextCodeGame = () => {
+    const index = gameOrder.indexOf(activeGame);
+    window.openCodeGame(gameOrder[(index + 1) % gameOrder.length]);
+  };
+
+  function addGameCards() {
+    const selector = document.querySelector('#idilewa-game-switcher .idilewa-game-tiles');
+    const directory = document.querySelector('#all-coding-games .game-directory-grid');
+    if (!selector || !directory) return;
+    const entries = [
+      {
+        id: 'turbo-racers',
+        icon: '🏎️',
+        title: 'Turbo Racers',
+        description: 'Build your racer, practise steering and answer learning questions on the track.',
+      },
+      {
+        id: 'balloon-ludo',
+        icon: '🎲',
+        title: 'Balloon Ludo',
+        description: 'Play a same-device board game and answer quick learning challenges to earn knowledge stars.',
+      },
+    ];
+
+    const heading = document.querySelector('#idilewa-game-switcher h3');
+    if (heading) heading.textContent = '🎮 Select a game · 13 games';
+    for (const game of entries) {
+      if (!selector.querySelector(`[data-game="${game.id}"]`)) {
+        const tile = document.createElement('button');
+        tile.type = 'button';
+        tile.className = 'idilewa-game-tile';
+        tile.dataset.game = game.id;
+        tile.setAttribute('aria-label', `Open ${game.title}`);
+        const icon = document.createElement('span');
+        icon.className = 'game-emoji';
+        icon.setAttribute('aria-hidden', 'true');
+        icon.textContent = game.icon;
+        const label = document.createElement('span');
+        label.textContent = game.title;
+        tile.append(icon, label);
+        tile.addEventListener('click', () => window.openCodeGame(game.id));
+        selector.appendChild(tile);
+      }
+
+      if (!directory.querySelector(`[data-idilewa-game-card="${game.id}"]`)) {
+        const card = document.createElement('article');
+        card.className = 'game-directory-card';
+        card.dataset.idilewaGameCard = game.id;
+        const icon = document.createElement('div');
+        icon.setAttribute('aria-hidden', 'true');
+        icon.style.fontSize = '32px';
+        icon.textContent = game.icon;
+        const title = document.createElement('h3');
+        title.textContent = game.title;
+        const description = document.createElement('p');
+        description.textContent = game.description;
+        const button = document.createElement('button');
+        button.type = 'button';
+        button.textContent = `Play ${game.title}`;
+        button.addEventListener('click', () => window.openCodeGame(game.id));
+        card.append(icon, title, description, button);
+        directory.appendChild(card);
+      }
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', addGameCards, { once: true });
+  } else {
+    addGameCards();
+  }
+})();
 </script></body></html>

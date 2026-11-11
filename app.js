@@ -8326,6 +8326,46 @@ import {
     }
   });
 
+  window.addEventListener('message', (event) => {
+    const payload = event.data;
+    if (event.origin !== window.location.origin || !payload || typeof payload !== 'object'
+      || payload.type !== 'idilewa-game-complete') return;
+    const frame = document.getElementById('arcade-merged-frame');
+    if (!frame || event.source !== frame.contentWindow) return;
+
+    const gamePaths = {
+      'turbo-racers': '/games/turbo-racers.html',
+      'balloon-ludo': '/games/balloon-ludo.html',
+    };
+    const gameId = payload.game;
+    if (!Object.hasOwn(gamePaths, gameId) || frame.getAttribute('src') !== gamePaths[gameId]) return;
+
+    const allowedOutcomes = gameId === 'turbo-racers' ? ['won', 'finished'] : ['won'];
+    const allowedLanguages = ['en', 'yo', 'ig', 'ha', 'sw'];
+    const allowedDifficulties = ['easy', 'medium', 'hard', 'beginner', 'intermediate', 'advanced'];
+    if (!allowedOutcomes.includes(payload.outcome)
+      || !Number.isSafeInteger(payload.score) || payload.score < 0 || payload.score > 100_000
+      || !allowedLanguages.includes(payload.language)
+      || !allowedDifficulties.includes(payload.difficulty)) return;
+
+    const user = getCurrentUser();
+    void saveProgress({
+      userId: user?.id,
+      lessonType: 'coding',
+      lessonId: `kids-arcade-${gameId}`,
+      meta: {
+        score: payload.score,
+        outcome: payload.outcome,
+        language: payload.language,
+        difficulty: payload.difficulty,
+      },
+    }).then(() => {
+      showToast(user?.id ? 'Game progress saved to your account.' : 'Game progress saved on this device.');
+    }).catch((error) => {
+      showToast(error instanceof Error ? error.message : 'Game progress could not be saved.', 'error');
+    });
+  });
+
   window.addEventListener('hashchange', render);
   if (isSupabaseConfigured) {
     try {
