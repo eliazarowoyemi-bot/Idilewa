@@ -10439,7 +10439,7 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .tutor-brand .brand-logo { display: block; width: 136px; height: auto; }
 .tutor-public-header { width: min(1190px, calc(100% - 48px)); min-height: 70px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
 .tutor-public-header nav { display: flex; align-items: center; gap: 18px; }
-.tutor-public-header nav > a:not(.tutor-button), .tutor-auth-header > a { color: #35564d; font-size: 12px; font-weight: 750; }
+.tutor-public-header nav > a:not(.tutor-button), .tutor-auth-nav > a { color: #35564d; font-size: 12px; font-weight: 750; }
 .tutor-public-main { width: min(1190px, calc(100% - 48px)); margin: 0 auto; padding: 12px 0 34px; }
 .tutor-public-hero { min-height: 420px; display: grid; grid-template-columns: 1fr 1fr; overflow: hidden; border: 1px solid #e4e9e4; border-radius: 20px; background: linear-gradient(120deg, #f8fbf6 0%, #eff7ee 52%, #e8f4ef 100%); box-shadow: 0 17px 44px rgba(27, 62, 45, .11); }
 .tutor-public-copy { align-self: center; padding: clamp(26px, 4.5vw, 56px); }
@@ -10479,6 +10479,7 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 
 .tutor-auth-page { min-height: 100vh; padding: 0 24px 28px; background: #f3f7f5; }
 .tutor-auth-header { width: min(1050px, 100%); min-height: 68px; margin: auto; display: flex; align-items: center; justify-content: space-between; gap: 15px; }
+.tutor-auth-nav { display: flex; align-items: center; gap: 16px; }
 .tutor-auth-layout { width: min(1050px, 100%); min-height: min(640px, calc(100vh - 100px)); margin: 0 auto; display: grid; grid-template-columns: .87fr 1.13fr; overflow: hidden; border: 1px solid #e3ebe6; border-radius: 20px; background: #fff; box-shadow: 0 18px 48px rgba(31, 57, 48, .1); }
 .tutor-auth-card { align-self: center; padding: clamp(22px, 4vw, 46px); }
 .tutor-auth-card > .tutor-eyebrow { margin-top: 7px; }
@@ -10511,6 +10512,152 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .tutor-auth-art-caption strong { color: #e6f4a8; }
 .tutor-auth-mobile-brand { display: none; }
 
+.tutor-auth-signup-page { padding-bottom: 36px; }
+.tutor-auth-signup-page .tutor-auth-layout {
+  width: min(1160px, 100%);
+  min-height: 0;
+  grid-template-columns: minmax(0, .82fr) minmax(0, 1.18fr);
+  align-items: stretch;
+}
+.tutor-signup-intro {
+  padding: clamp(28px, 4vw, 52px);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  background: linear-gradient(155deg, #fffefa 0%, #f5faf5 58%, #e8f4ec 100%);
+}
+.tutor-signup-intro h2 {
+  margin: 20px 0 11px;
+  color: #103e2d;
+  font-size: clamp(31px, 3.2vw, 44px);
+  line-height: 1.08;
+  letter-spacing: -.045em;
+}
+.tutor-signup-intro > p {
+  max-width: 38ch;
+  margin: 0;
+  color: #496558;
+  font-size: 15px;
+  line-height: 1.65;
+}
+.tutor-signup-intro ul {
+  margin: 26px 0 0;
+  padding: 0;
+  display: grid;
+  gap: 12px;
+  list-style: none;
+}
+.tutor-signup-intro li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: #294d3a;
+  font-size: 13px;
+  font-weight: 700;
+}
+.tutor-signup-intro li .icon,
+.tutor-signup-note .icon { flex: 0 0 auto; color: #087448; }
+.tutor-signup-intro .tutor-signup-note {
+  margin-top: 30px;
+  padding-top: 17px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  border-top: 1px solid #d5e5d9;
+  color: #3f5e4d;
+  font-size: 12px;
+  line-height: 1.55;
+}
+.tutor-auth-signup-page .tutor-auth-card {
+  align-self: start;
+  padding: clamp(24px, 3vw, 38px);
+}
+.tutor-auth-signup-page .tutor-auth-card h1 {
+  font-size: clamp(27px, 2.8vw, 35px);
+}
+.tutor-auth-signup-page .tutor-auth-card > p {
+  margin-bottom: 21px;
+  font-size: 13px;
+}
+.tutor-auth-signup-page .tutor-auth-form { gap: 15px; }
+.tutor-signup-progress {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #63786b;
+}
+.tutor-signup-progress span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+.tutor-signup-progress span b {
+  width: 23px;
+  height: 23px;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 50%;
+  background: #e9f2eb;
+  color: #42634d;
+  font-size: 11px;
+}
+.tutor-signup-progress .is-current { color: #075e3d; }
+.tutor-signup-progress .is-current b { color: white; background: #0e6a43; }
+.tutor-signup-progress > i { height: 1px; min-width: 8px; flex: 1; background: #dce8df; }
+.tutor-signup-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px 12px;
+}
+.tutor-auth-signup-page .tutor-signup-fields label {
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  color: #355747;
+  font-size: 12px;
+  font-weight: 750;
+}
+.tutor-auth-signup-page .tutor-signup-fields .tutor-signup-span { grid-column: 1 / -1; }
+.tutor-auth-signup-page .tutor-signup-fields input,
+.tutor-auth-signup-page .tutor-signup-fields select,
+.tutor-auth-signup-page .tutor-signup-fields textarea {
+  width: 100%;
+  min-width: 0;
+  min-height: 45px;
+  padding: 10px 12px;
+  border: 1px solid #d5e3d9;
+  border-radius: 10px;
+  outline: none;
+  color: #203d34;
+  background: white;
+  font: inherit;
+  font-size: 13px;
+  transition: border-color .15s, box-shadow .15s;
+}
+.tutor-auth-signup-page .tutor-signup-fields textarea { min-height: 82px; resize: vertical; }
+.tutor-auth-signup-page .tutor-signup-fields input:focus,
+.tutor-auth-signup-page .tutor-signup-fields select:focus,
+.tutor-auth-signup-page .tutor-signup-fields textarea:focus {
+  border-color: #16835d;
+  box-shadow: 0 0 0 3px rgba(22, 131, 93, .12);
+}
+.tutor-auth-signup-page .tutor-signup-fields label > small {
+  color: #536d5e;
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+.tutor-auth-signup-page .tutor-signup-terms { font-size: 11px; }
+.tutor-auth-signup-page .tutor-password-guidance { font-size: 10px; }
+.tutor-auth-signup-page .tutor-auth-submit { min-height: 48px; font-size: 13px; }
+.tutor-auth-signup-page .tutor-auth-switch { font-size: 12px; }
+.tutor-auth-signup-page .tutor-auth-security { font-size: 10px; }
+.tutor-auth-signup-page .tutor-auth-error { font-size: 12px; }
+
 .tutor-workspace { min-height: 100vh; display: grid; grid-template-columns: 195px minmax(0, 1fr); background: var(--tutor-canvas); }
 .tutor-sidebar { min-width: 0; min-height: 100vh; padding: 0 10px 14px; display: flex; flex-direction: column; color: #fff; background: var(--tutor-sidebar); }
 .tutor-sidebar-brand { min-height: 66px; padding: 11px 8px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid rgba(255,255,255,.13); }
@@ -10531,6 +10678,7 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .tutor-topbar > div:first-child { overflow: hidden; color: #819089; font-size: 9px; white-space: nowrap; }
 .tutor-topbar > div:first-child a { color: #4a655b; font-weight: 700; }
 .tutor-topbar > div:first-child strong { overflow: hidden; color: #203a32; text-overflow: ellipsis; }
+.tutor-topbar-home { color: #4a655b; font-size: 9px; font-weight: 700; white-space: nowrap; }
 .tutor-secure-status { display: inline-flex; align-items: center; gap: 5px; color: #628071; font-size: 8px; white-space: nowrap; }
 .tutor-topbar-avatar { width: 27px; height: 27px; display: grid; place-items: center; border-radius: 50%; color: #08704f; background: #e5f4eb; font-size: 10px; font-weight: 800; }
 .tutor-workspace-content { width: min(1240px, 100%); margin: 0 auto; padding: clamp(19px, 3vw, 32px); }
@@ -10695,7 +10843,13 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
   .tutor-auth-page { padding: 0 14px 18px; }
   .tutor-auth-header { min-height: 57px; }
   .tutor-auth-layout { min-height: auto; grid-template-columns: 1fr; }
+  .tutor-auth-signup-page .tutor-auth-layout { grid-template-columns: minmax(0, 1fr); }
   .tutor-auth-card { padding: 21px; }
+  .tutor-auth-signup-page .tutor-auth-card { padding: 22px; }
+  .tutor-signup-intro { padding: 26px 22px; }
+  .tutor-signup-intro h2 { margin-top: 13px; font-size: 32px; }
+  .tutor-signup-intro ul { margin-top: 18px; }
+  .tutor-signup-intro .tutor-signup-note { margin-top: 20px; }
   .tutor-auth-mobile-brand { margin-bottom: 17px; display: block; }
   .tutor-auth-header > .tutor-brand { display: none; }
   .tutor-auth-art { min-height: 220px; }
@@ -10729,8 +10883,16 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
   .tutor-public-footer { font-size: 7px; }
   .tutor-public-footer .brand-logo { width: 93px; }
   .tutor-auth-card { padding: 18px 15px; }
+  .tutor-auth-signup-page .tutor-auth-card { padding: 20px 16px; }
+  .tutor-signup-fields { grid-template-columns: minmax(0, 1fr); }
+  .tutor-auth-signup-page .tutor-signup-fields .tutor-signup-span { grid-column: auto; }
+  .tutor-signup-progress { gap: 5px; }
+  .tutor-signup-progress span { gap: 4px; font-size: 9px; }
+  .tutor-signup-progress span b { width: 21px; height: 21px; font-size: 10px; }
+  .tutor-signup-progress > i { min-width: 4px; }
   .tutor-auth-art { min-height: 180px; }
-  .tutor-auth-header > a { font-size: 9px; }
+  .tutor-auth-nav { gap: 8px; }
+  .tutor-auth-nav > a, .tutor-topbar-home { font-size: 8px; }
   .tutor-workspace-content { padding: 16px 11px 25px; }
   .tutor-topbar > div:first-child { gap: 5px; font-size: 8px; }
   .tutor-secure-status { font-size: 7px; }

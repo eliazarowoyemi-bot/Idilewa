@@ -171,6 +171,15 @@ function transformAppHtml(html) {
   }
   const voiceTile = document.querySelector('.featureTile.voice');
   if (voiceTile) voiceTile.onclick = () => location.assign('/voice_lessons.html');
+  const addTutorPortalLink = (navigation) => {
+    if (!navigation || navigation.querySelector('[data-idilewa-tutor-link]')) return;
+    const link = document.createElement('a');
+    link.href = '/educator-portal.html';
+    link.className = 'premium-auth-link';
+    link.dataset.idilewaTutorLink = 'true';
+    link.textContent = 'For Tutors';
+    navigation.append(link);
+  };
   const addAccountLink = (navigation) => {
     if (!navigation || navigation.querySelector('[data-idilewa-account-link]')) return;
     const link = document.createElement('a');
@@ -180,6 +189,8 @@ function transformAppHtml(html) {
     link.textContent = 'Sign in';
     navigation.append(link);
   };
+  addTutorPortalLink(document.querySelector('.premium-links'));
+  addTutorPortalLink(document.querySelector('.premium-mobile-menu nav'));
   addAccountLink(document.querySelector('.premium-links'));
   addAccountLink(document.querySelector('.premium-mobile-menu nav'));
   const view = new URLSearchParams(location.search).get('view');

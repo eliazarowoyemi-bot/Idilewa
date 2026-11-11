@@ -33,6 +33,7 @@ test('auth callback exchanges confirmation sessions and safely routes recovery',
   assert.match(callbackSource, /callback\?\.type === 'recovery'/);
   assert.match(callbackSource, /updateAccountPassword\(password\)/);
   assert.match(callbackSource, /includes\(next \|\| ''\)/);
+  assert.match(callbackSource, /destination === 'tutor-login'\s*\? '\/educator-portal\.html#\/tutor-login'/);
   assert.match(viteConfigSource, /'auth-callback'/);
 });
 

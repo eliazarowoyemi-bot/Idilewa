@@ -3497,9 +3497,13 @@ import {
     return `<a class="tutor-brand" href="#/tutor" data-route="tutor" aria-label="Idilewa tutor portal home">${brandLogo('Idilewa · Language · Culture · Future')}</a>`;
   }
 
+  function renderTutorHomeLink() {
+    return '<a class="tutor-home-link" href="/" aria-label="Go to Idilewa home">Home</a>';
+  }
+
   function renderTutorLanding() {
     return `<div class="tutor-public-page">
-      <header class="tutor-public-header">${renderTutorBrand()}<nav aria-label="Tutor portal navigation"><a href="#/tutor-login" data-route="tutor-login">Sign in</a><a class="tutor-button tutor-button-primary tutor-button-small" href="#/tutor-signup" data-route="tutor-signup">Create tutor account</a></nav></header>
+      <header class="tutor-public-header">${renderTutorBrand()}<nav aria-label="Tutor portal navigation">${renderTutorHomeLink()}<a href="#/tutor-login" data-route="tutor-login">Sign in</a><a class="tutor-button tutor-button-primary tutor-button-small" href="#/tutor-signup" data-route="tutor-signup">Create tutor account</a></nav></header>
       <main class="tutor-public-main">
         <section class="tutor-public-hero"><div class="tutor-public-copy"><span class="tutor-eyebrow"><i></i> For language educators</span><h1>Make a difference.<br />Teach the world.</h1><p>Connect with children from around the world, help them learn new languages, and be part of their global journey.</p><div class="tutor-public-actions"><a class="tutor-button tutor-button-primary" href="#/tutor-signup" data-route="tutor-signup">Create Tutor Account ${icon('arrow', 15)}</a><a class="tutor-button tutor-button-outline" href="#/tutor-login" data-route="tutor-login">Sign in</a></div><div class="tutor-public-values"><span>${icon('check', 15)} Trusted connections</span><span>${icon('shield', 15)} Safe & secure</span><span>${icon('people', 15)} Global impact</span></div></div><div class="tutor-public-art"><img src="/assets/yoruba-educator-woman.jpg" alt="Language tutor preparing a lesson at her laptop" /><span class="tutor-art-message">Teach<br />Inspire<br />Empower</span></div></section>
         <section class="tutor-public-steps" aria-label="How the tutor portal works"><article><span>01</span><strong>Create your account</strong><p>Use your one-time educator invitation to sign up securely.</p></article><article><span>02</span><strong>Connect with care</strong><p>Families approve each learner connection before any details are shared.</p></article><article><span>03</span><strong>Help learners grow</strong><p>See approved learning progress and prepare thoughtful lessons.</p></article></section>
@@ -3513,21 +3517,29 @@ import {
     const title = signup ? 'Create Tutor Account' : 'Welcome Back, Tutor';
     const image = signup ? 'yoruba-educator-man.jpg' : 'yoruba-educator-woman.jpg';
     const action = signup ? 'tutor-signup' : 'tutor-login';
-    return `<div class="tutor-auth-page">
-      <header class="tutor-auth-header">${renderTutorBrand()}<a href="#/tutor" data-route="tutor">Back to tutor portal</a></header>
-      <main class="tutor-auth-layout"><section class="tutor-auth-card"><div class="tutor-auth-mobile-brand">${renderTutorBrand()}</div><span class="tutor-eyebrow">IDILEWA · EDUCATOR PORTAL</span><h1>${title}</h1><p>${signup ? 'Join our community of dedicated language tutors.' : 'Log in to continue your teaching journey.'}</p>
+    return `<div class="tutor-auth-page ${signup ? 'tutor-auth-signup-page' : ''}">
+      <header class="tutor-auth-header">${renderTutorBrand()}<nav class="tutor-auth-nav" aria-label="Tutor account navigation">${renderTutorHomeLink()}<a href="#/tutor" data-route="tutor">Back to tutor portal</a></nav></header>
+      <main class="tutor-auth-layout">${signup ? `<aside class="tutor-signup-intro"><span class="tutor-eyebrow"><i></i> ÌDÍLÉWA LIVE TUTORSHIP</span><h2>A brighter way to teach together.</h2><p>Share your knowledge, connect with learners and help African languages and culture thrive.</p><ul><li>${icon('play', 17)} Live lessons with learners and families</li><li>${icon('book', 17)} Languages, culture and core subjects</li><li>${icon('chart', 17)} Lesson progress in your tutor dashboard</li></ul><p class="tutor-signup-note">${icon('shield', 15)} A one-time educator invitation is required. Learner information stays protected until a guardian approves a connection.</p></aside>` : ''}<section class="tutor-auth-card"><div class="tutor-auth-mobile-brand">${renderTutorBrand()}</div><span class="tutor-eyebrow">IDILEWA · EDUCATOR PORTAL</span><h1>${title}</h1><p>${signup ? 'Create your secure tutor account. No payment details are needed to join.' : 'Log in to continue your teaching journey.'}</p>
         <form class="tutor-auth-form" data-form="${action}" novalidate>
-          ${signup ? '<label>Full Name<input name="name" autocomplete="name" maxlength="80" placeholder="Enter your full name" required /></label>' : ''}
-          <label>Email Address<input name="email" type="email" autocomplete="email" placeholder="Enter your email" required /></label>
-          ${signup ? '<label>Educator Invitation Code<input name="inviteCode" autocomplete="one-time-code" maxlength="80" placeholder="Enter your invitation code" required /><small>A valid, unused invitation is required to create an educator account.</small></label>' : ''}
-          <label>Password<span class="tutor-password-field"><input id="tutor-password" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="12" maxlength="128" placeholder="${signup ? 'Create a password' : 'Enter your password'}" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-password" aria-label="Show password">${icon('eye', 15)}</button></span></label>
-          ${signup ? `<label>Confirm Password<span class="tutor-password-field"><input id="tutor-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Confirm your password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-confirm-password" aria-label="Show password">${icon('eye', 15)}</button></span></label><small class="tutor-password-guidance">Use 12 or more characters, including uppercase and lowercase letters, a number, and a symbol.</small><label class="tutor-check-label"><input type="checkbox" name="agreement" required /> I agree to follow Idilewa’s child-safeguarding and privacy requirements.</label>` : '<div class="tutor-auth-options"><label class="tutor-check-label"><input type="checkbox" name="remember" /> Remember me</label><a href="#/login?mode=signin" data-route="login" data-mode="signin">Forgot password?</a></div>'}
-          <p class="tutor-auth-error" role="alert" hidden></p>
+          ${signup ? `<div class="tutor-signup-progress" aria-label="Account setup steps"><span class="is-current"><b>1</b> Account</span><i></i><span><b>2</b> Email check</span><i></i><span><b>3</b> Dashboard</span></div><div class="tutor-signup-fields">
+            <label>First name<input name="firstName" autocomplete="given-name" maxlength="40" placeholder="First name" required /></label>
+            <label>Last name<input name="lastName" autocomplete="family-name" maxlength="40" placeholder="Last name" required /></label>
+            <label class="tutor-signup-span">Email address<input name="email" type="email" autocomplete="email" maxlength="180" placeholder="you@example.com" required /></label>
+            <label>Country<select name="country" required><option value="">Choose country</option><option>United Kingdom</option><option>Nigeria</option><option>Ghana</option><option>United States</option><option>Canada</option><option>Other</option></select></label>
+            <label>Time zone<select name="timeZone" required><option value="">Choose time zone</option><option value="Europe/London">UK / London</option><option value="Africa/Lagos">Nigeria / Lagos</option><option value="Africa/Accra">Ghana / Accra</option><option value="America/New_York">US / Eastern</option><option value="America/Los_Angeles">US / Pacific</option><option value="other">Other</option></select></label>
+            <label class="tutor-signup-span">Educator invitation code<input name="inviteCode" autocomplete="one-time-code" maxlength="64" placeholder="Enter your one-time code" required /><small>Invitations are one-time use and expire for your security.</small></label>
+            <label>Main teaching subject<select name="teachingSubject" required><option value="">Choose a subject</option><option>Yorùbá</option><option>Igbo</option><option>Hausa</option><option>Arabic</option><option>Kiswahili</option><option>Mathematics</option><option>English</option><option>Science</option><option>Coding</option><option>Other</option></select></label>
+            <label>Teaching experience<select name="teachingExperience" required><option value="">Choose experience</option><option>Less than 1 year</option><option>1–3 years</option><option>4–7 years</option><option>8+ years</option></select></label>
+            <label class="tutor-signup-span">Qualifications and experience<textarea name="qualifications" maxlength="600" rows="3" placeholder="Share relevant teaching experience or qualifications (optional)"></textarea></label>
+            <label class="tutor-signup-span">Password<span class="tutor-password-field"><input id="tutor-password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Create a password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-password" aria-label="Show password">${icon('eye', 15)}</button></span></label>
+            <label class="tutor-signup-span">Confirm password<span class="tutor-password-field"><input id="tutor-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Confirm your password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-confirm-password" aria-label="Show password">${icon('eye', 15)}</button></span></label>
+          </div><small class="tutor-password-guidance">Use 12–128 characters, including uppercase and lowercase letters, a number, and a symbol.</small><label class="tutor-check-label tutor-signup-terms"><input type="checkbox" name="agreement" required /> I agree to follow Idilewa’s child-safeguarding and privacy requirements.</label>` : `<label>Email Address<input name="email" type="email" autocomplete="email" placeholder="Enter your email" required /></label><label>Password<span class="tutor-password-field"><input id="tutor-password" name="password" type="password" autocomplete="current-password" minlength="12" maxlength="128" placeholder="Enter your password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-password" aria-label="Show password">${icon('eye', 15)}</button></span></label><div class="tutor-auth-options"><label class="tutor-check-label"><input type="checkbox" name="remember" /> Remember me</label><a href="#/login?mode=signin" data-route="login" data-mode="signin">Forgot password?</a></div>`}
+          <p class="tutor-auth-error" role="alert" aria-live="polite" hidden></p>
           <button type="submit" class="tutor-button tutor-button-primary tutor-auth-submit">${signup ? 'Create Account' : 'Login'} ${icon('arrow', 15)}</button>
         </form>
         <p class="tutor-auth-switch">${signup ? 'Already have an account?' : 'Don’t have an account?'} <a href="#/${signup ? 'tutor-login' : 'tutor-signup'}" data-route="${signup ? 'tutor-login' : 'tutor-signup'}">${signup ? 'Sign in' : 'Sign up'}</a></p>
         <small class="tutor-auth-security">${icon('lock', 13)} Secure educator access · family consent is always required</small>
-      </section><aside class="tutor-auth-art"><img src="/assets/${image}" alt="Idilewa language tutor working at a laptop" /><div class="tutor-auth-art-caption">Better Language Skills<br /><strong>Brighter Futures</strong></div></aside></main>
+      </section>${signup ? '' : `<aside class="tutor-auth-art"><img src="/assets/${image}" alt="Idilewa language tutor working at a laptop" /><div class="tutor-auth-art-caption">Better Language Skills<br /><strong>Brighter Futures</strong></div></aside>`}</main>
     </div>`;
   }
 
@@ -3540,7 +3552,7 @@ import {
     const initial = name.trim().charAt(0).toUpperCase() || 'T';
     const active = TUTOR_ACTIVE_LINK[page] || 'tutor-dashboard';
     const links = TUTOR_PORTAL_LINKS.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="tutor-sidebar-link ${item.route === active ? 'is-active' : ''}" ${item.route === active ? 'aria-current="page"' : ''}>${icon(item.icon, 17)}<span>${item.label}</span></a>`).join('');
-    return `<div class="tutor-workspace"><aside class="tutor-sidebar"><a class="tutor-sidebar-brand" href="#/tutor-dashboard" data-route="tutor-dashboard" aria-label="Idilewa · Language · Culture · Future">${brandLogo('Idilewa · Language · Culture · Future')}</a><nav class="tutor-sidebar-nav" aria-label="Tutor workspace">${links}<a href="#/tutor-availability" data-route="tutor-availability" class="tutor-sidebar-link ${page === 'tutor-availability' ? 'is-active' : ''}">${icon('calendar', 17)}<span>Availability</span></a></nav><a href="#/tutor-profile" data-route="tutor-profile" class="tutor-sidebar-user"><span class="tutor-avatar">${esc(initial)}</span><span><strong>${esc(name)}</strong><small>Educator</small></span></a></aside><main class="tutor-workspace-main"><header class="tutor-topbar"><div><a href="#/tutor-dashboard" data-route="tutor-dashboard">Tutor Portal</a><span>/</span><strong>${esc(title)}</strong></div><div><span class="tutor-secure-status"><i></i> Secure workspace</span><a class="tutor-topbar-avatar" href="#/tutor-profile" data-route="tutor-profile" aria-label="Open tutor profile">${esc(initial)}</a></div></header><div class="tutor-workspace-content">${content}</div></main></div>`;
+    return `<div class="tutor-workspace"><aside class="tutor-sidebar"><a class="tutor-sidebar-brand" href="#/tutor-dashboard" data-route="tutor-dashboard" aria-label="Idilewa · Language · Culture · Future">${brandLogo('Idilewa · Language · Culture · Future')}</a><nav class="tutor-sidebar-nav" aria-label="Tutor workspace">${links}<a href="#/tutor-availability" data-route="tutor-availability" class="tutor-sidebar-link ${page === 'tutor-availability' ? 'is-active' : ''}">${icon('calendar', 17)}<span>Availability</span></a></nav><a href="#/tutor-profile" data-route="tutor-profile" class="tutor-sidebar-user"><span class="tutor-avatar">${esc(initial)}</span><span><strong>${esc(name)}</strong><small>Educator</small></span></a></aside><main class="tutor-workspace-main"><header class="tutor-topbar"><div><a href="#/tutor-dashboard" data-route="tutor-dashboard">Tutor Portal</a><span>/</span><strong>${esc(title)}</strong></div><div><a class="tutor-topbar-home" href="/" aria-label="Go to Idilewa home">Home</a><span class="tutor-secure-status"><i></i> Secure workspace</span><a class="tutor-topbar-avatar" href="#/tutor-profile" data-route="tutor-profile" aria-label="Open tutor profile">${esc(initial)}</a></div></header><div class="tutor-workspace-content">${content}</div></main></div>`;
   }
 
   function renderTutorHeading(eyebrow, title, description, actions = '') {
@@ -7795,11 +7807,21 @@ import {
         const email = String(data.get('email') || '').trim();
         const password = String(data.get('password') || '');
         if (type === 'tutor-signup') {
-          const name = String(data.get('name') || '').trim();
+          const firstName = String(data.get('firstName') || '').trim();
+          const lastName = String(data.get('lastName') || '').trim();
+          const name = `${firstName} ${lastName}`.trim();
           const inviteCode = String(data.get('inviteCode') || '').trim();
+          if (!firstName || !lastName || name.length > 80) throw new Error('Enter a first and last name using no more than 80 characters.');
           if (!data.get('agreement')) throw new Error('Please agree to follow Idilewa’s safeguarding and privacy requirements.');
           if (password !== String(data.get('confirmPassword') || '')) throw new Error('The passwords do not match.');
           if (!isSignupPasswordValid(password)) throw new Error('Use 12–128 characters with uppercase and lowercase letters, a number, and a symbol.');
+          const educatorProfile = {
+            country: String(data.get('country') || '').trim(),
+            timeZone: String(data.get('timeZone') || '').trim(),
+            teachingSubject: String(data.get('teachingSubject') || '').trim(),
+            teachingExperience: String(data.get('teachingExperience') || '').trim(),
+            qualifications: String(data.get('qualifications') || '').trim(),
+          };
           const educatorInviteId = await verifyEducatorInvite(inviteCode);
           const { session, welcomeEmailError } = await signUpAccount({
             email,
@@ -7807,6 +7829,7 @@ import {
             name,
             role: 'educator',
             educatorInviteId,
+            educatorProfile,
             redirectRoute: 'tutor-login'
           });
           if (!session) {

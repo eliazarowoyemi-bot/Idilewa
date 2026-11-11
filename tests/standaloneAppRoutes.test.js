@@ -28,6 +28,8 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assert.match(transformed, /<h2>Source<\/h2>/);
   assert.match(transformed, /urlSearchParams|URLSearchParams/);
   assert.match(transformed, /\/ai-conversation\.html/);
+  assert.match(transformed, /For Tutors/);
+  assert.match(transformed, /link\.href = '\/educator-portal\.html'/);
   assert.match(transformed, /Sign in/);
 });
 

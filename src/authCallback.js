@@ -28,7 +28,12 @@ async function initializeAuthCallback() {
   } else if (callback) {
     const next = new URLSearchParams(window.location.search).get('next');
     const destination = ['index', 'login', 'profile', 'tutor-login', 'parent-dashboard'].includes(next || '') ? next : 'index';
-    window.location.replace(destination === 'login' ? '/#/login?mode=signin' : `/#/${destination}`);
+    const redirectUrl = destination === 'tutor-login'
+      ? '/educator-portal.html#/tutor-login'
+      : destination === 'login'
+        ? '/#/login?mode=signin'
+        : `/#/${destination}`;
+    window.location.replace(redirectUrl);
   }
 }
 

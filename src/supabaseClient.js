@@ -162,6 +162,11 @@ function mapAuthUser(authUser, metadata = authUser.user_metadata || {}) {
     name: metadata.name || authUser.email?.split('@')[0] || '',
     phone: metadata.phone || '',
     role: metadata.role || 'adult',
+    country: metadata.country || '',
+    timeZone: metadata.time_zone || '',
+    teachingSubject: metadata.teaching_subject || '',
+    teachingExperience: metadata.teaching_experience || '',
+    qualifications: metadata.qualifications || '',
     avatar: metadata.avatar_url || '',
     bio: metadata.bio || '',
     learning_goal: metadata.learning_goal || '',
@@ -172,6 +177,39 @@ function mapAuthUser(authUser, metadata = authUser.user_metadata || {}) {
     streak: Number.isFinite(metadata.streak) ? metadata.streak : 0,
     createdAt: authUser.created_at || new Date().toISOString(),
   };
+}
+
+const EDUCATOR_COUNTRIES = new Set(['United Kingdom', 'Nigeria', 'Ghana', 'United States', 'Canada', 'Other']);
+const EDUCATOR_TIME_ZONES = new Set([
+  'Europe/London', 'Africa/Lagos', 'Africa/Accra',
+  'America/New_York', 'America/Los_Angeles', 'other',
+]);
+const EDUCATOR_SUBJECTS = new Set([
+  'Yorùbá', 'Igbo', 'Hausa', 'Arabic', 'Kiswahili',
+  'Mathematics', 'English', 'Science', 'Coding', 'Other',
+]);
+const EDUCATOR_EXPERIENCE = new Set(['Less than 1 year', '1–3 years', '4–7 years', '8+ years']);
+
+export function normalizeEducatorProfile(value) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error('Complete your tutor profile before creating an account.');
+  }
+  const country = typeof value.country === 'string' ? value.country.trim() : '';
+  const timeZone = typeof value.timeZone === 'string' ? value.timeZone.trim() : '';
+  const teachingSubject = typeof value.teachingSubject === 'string' ? value.teachingSubject.trim() : '';
+  const teachingExperience = typeof value.teachingExperience === 'string' ? value.teachingExperience.trim() : '';
+  if (value.qualifications !== undefined && typeof value.qualifications !== 'string') {
+    throw new Error('Qualifications and experience must be entered as text.');
+  }
+  const qualifications = typeof value.qualifications === 'string' ? value.qualifications.trim() : '';
+
+  if (!EDUCATOR_COUNTRIES.has(country)) throw new Error('Choose a country from the list.');
+  if (!EDUCATOR_TIME_ZONES.has(timeZone)) throw new Error('Choose a time zone from the list.');
+  if (!EDUCATOR_SUBJECTS.has(teachingSubject)) throw new Error('Choose your main teaching subject.');
+  if (!EDUCATOR_EXPERIENCE.has(teachingExperience)) throw new Error('Choose your teaching experience.');
+  if (qualifications.length > 600) throw new Error('Qualifications and experience must be 600 characters or fewer.');
+
+  return { country, timeZone, teachingSubject, teachingExperience, qualifications };
 }
 
 async function loadAccountProfile(client, authUser) {
@@ -218,7 +256,17 @@ async function requestAuthEmailCode(email, purpose) {
   }
 }
 
-export async function signUp({ email, password, name, phone = '', role = 'child', guardianAccessRequestId, educatorInviteId, redirectRoute = 'index' }) {
+export async function signUp({
+  email,
+  password,
+  name,
+  phone = '',
+  role = 'child',
+  guardianAccessRequestId,
+  educatorInviteId,
+  educatorProfile,
+  redirectRoute = 'index',
+}) {
   const client = requireSupabase();
   if (!['child', 'adult', 'parent', 'educator'].includes(role)) {
     throw new Error('Choose a supported account type before creating an account.');
@@ -232,6 +280,9 @@ export async function signUp({ email, password, name, phone = '', role = 'child'
   if (role === 'educator' && !/^[0-9a-f-]{36}$/i.test(educatorInviteId || '')) {
     throw new Error('A verified one-time educator invitation code is required before creating a teacher account.');
   }
+  const normalizedEducatorProfile = role === 'educator'
+    ? normalizeEducatorProfile(educatorProfile)
+    : null;
   if (!['index', 'tutor-login', 'parent-dashboard'].includes(redirectRoute)) {
     throw new Error('Choose a supported destination for the account confirmation link.');
   }
@@ -247,7 +298,15 @@ export async function signUp({ email, password, name, phone = '', role = 'child'
         role,
         ...(role === 'parent' && phone ? { phone: phone.trim().slice(0, 24) } : {}),
         ...(role === 'child' ? { guardian_access_request_id: guardianAccessRequestId } : {}),
-        ...(role === 'educator' ? { educator_invite_id: educatorInviteId } : {}),
+        ...(role === 'educator' ? {
+          educator_invite_id: educatorInviteId,
+          country: normalizedEducatorProfile.country,
+          time_zone: normalizedEducatorProfile.timeZone,
+          teaching_subject: normalizedEducatorProfile.teachingSubject,
+          teaching_experience: normalizedEducatorProfile.teachingExperience,
+          qualifications: normalizedEducatorProfile.qualifications,
+          safeguarding_accepted_at: new Date().toISOString(),
+        } : {}),
       },
       emailRedirectTo: new URL(`/auth-callback.html?next=${encodeURIComponent(redirectRoute)}`, window.location.origin).toString(),
     },
