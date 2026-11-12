@@ -157,6 +157,8 @@ test('Canva callback hands off the one-time authorization code without storing t
     assert.match(response.body, /idilewa-canva-authorized/);
     assert.match(response.body, /short-lived-code/);
     assert.match(response.body, /https:\/\/www\.idilewa\.com/);
+    assert.match(response.body, /\/\?view=codeLab/);
+    assert.doesNotMatch(response.body, /code-studio\.html/);
     assert.equal(response.headers['Set-Cookie'], undefined);
     assert.doesNotMatch(response.body, /access_token|refresh_token/);
   });

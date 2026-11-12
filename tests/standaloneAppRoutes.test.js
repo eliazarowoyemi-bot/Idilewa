@@ -50,7 +50,6 @@ test('native entry pages retain their app and return home or voice links to cano
   for (const filename of [
     'ai-conversation.html',
     'auth-callback.html',
-    'code-studio.html',
     'consent.html',
     'educator-portal.html',
     'login.html',
@@ -81,7 +80,6 @@ test('every built HTML entry except the homepage points to the standalone app', 
   const nativePages = new Set([
     'ai-conversation.html',
     'auth-callback.html',
-    'code-studio.html',
     'consent.html',
     'educator-portal.html',
     'login.html',

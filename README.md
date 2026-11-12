@@ -13,7 +13,7 @@ The experience unifies:
 - **Language Discovery:** Foundation learning for Yorùbá, Igbo, Hausa, and Kiswahili, alongside planned paths for Twi, Wolof, isiZulu, and Fulfulde.
 - **African Voice Trainer & Sound Studio:** 60 structured lessons across Beginner, Intermediate, and Advanced tiers, Do-Re-Mi tone melodies, and phonetic visualizers.
 - **Living Oral Traditions:** Òwe (proverbs), Oríkì (praise poetry & remembrance), Ifá educational overviews, and cultural introductions.
-- **Code for Kids (K–8 STEM):** Age-banded lessons plus a game-building studio with playable starter games, editable rules and design/sound settings, and African-language instructions.
+- **Code for Kids (K–8 STEM):** Age-banded lessons, interactive coding activities, and playable games with African-language instruction.
 - **Family & Educator Stewardship:** Parent/guardian consent demonstrations and tutor discovery with privacy-conscious safeguarding.
 
 ---
@@ -96,7 +96,7 @@ The HTML entries declared in the active `vite.config.js` are supported:
 | | `#/course` (`course.html`) | Language course tracks (3 levels, 4 modules per level, 5 lessons per module). |
 | | `#/lesson` (`lesson.html`) | Focused lesson practice, prompts, answer validation, and progress rewards. |
 | | `#/kids` (`kids.html`) | Child-centered learning portal with playful stories and coding. |
-| **Code Studio** | `code-studio.html` | Separate game-building workspace with playable Road Racer, Star Catcher, and Maze Runner projects; editable rules, design/sound settings, project import/export, and supported-language instruction translation. |
+| **Code & STEM** | `#/codeLab` (`index.html`) | In-app Code Lab with the existing playable game collection and game-selection controls. |
 | | `#/tutor` (`tutor.html`) | Local-only learner-facing tutoring prototype with sample profiles, messages, lessons, rates, and payment displays; no real bookings or charges are made. |
 | | `/educator-portal.html` | Existing educator portal with invitation sign-in, guardian-approved learner connections, lessons, messages, profile, availability, and settings. |
 | | `#/profile` (`profile.html`) | Learner progress dashboard, points, streaks, badges (stored in local browser state). |
@@ -160,7 +160,7 @@ Vite bundles the configured HTML entry points and compiles assets to the `dist/`
 
 ### IDE and authentication services
 
-The Code for Kids page provides age-banded coding and STEM lessons. The separate Code Studio (`/code-studio.html`) builds playable game projects and saves them in the current browser unless the learner exports a project file. Custom instruction translation uses the server-side Plotweaver proxy when `PLOTWEAVER_API_KEY` (or the supported legacy `Idilewa` variable) is configured. Canva Connect is optional: on an explicit learner action, it uploads the current game preview to the learner's Canva account and opens a new editable Canva design. The short-lived Canva authorization code and PKCE verifier are handled server-side; access tokens are not persisted by Idilewa.
+The Code for Kids experience provides age-banded coding and STEM lessons. The in-app Code Lab (`#/codeLab`) retains the playable game collection.
 
 Configure these values in `.env.local` for the Vite client and in the deployment environment settings:
 

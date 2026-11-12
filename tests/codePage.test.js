@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import {
@@ -12,38 +13,20 @@ import {
 } from '../src/codeStudioEngine.js';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { createStandaloneAppPlugin } from '../src/standaloneAppRoutes.js';
 
 const appSource = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-const codeStudioSource = await readFile(new URL('../code-studio.html', import.meta.url), 'utf8');
+const appModuleSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const engineSource = await readFile(new URL('../src/codeStudioEngine.js', import.meta.url), 'utf8');
 const rootDirectory = resolve(fileURLToPath(new URL('..', import.meta.url)));
-const routePlugin = createStandaloneAppPlugin(rootDirectory);
 
-test('Code page serves the original block, costume, and sound workspaces', () => {
-  const page = routePlugin.transformIndexHtml.handler(codeStudioSource, {
-    filename: resolve(rootDirectory, 'code-studio.html'),
-  });
-  assert.match(page, /<title>Code \| Ìdíléwa<\/title>/);
-  assert.match(page, /<main id="code-editor" class="code-studio-editor">/);
-  assert.match(page, /data-workspace="code"/);
-  assert.match(page, /data-workspace="costumes"/);
-  assert.match(page, /data-workspace="sounds"/);
-  assert.match(page, /id="block-categories"/);
-  assert.match(page, /id="costume-canvas"/);
-  assert.match(page, /id="sound-waveform"/);
-  assert.match(page, /href="\/\?view=codeLab&amp;embedded=1"/);
-  assert.doesNotMatch(page, /Scratch|scratchcat|Canva|Your game rules/);
+test('standalone Code page is removed while homepage links retain the in-app Code Lab', () => {
+  for (const path of ['code-studio.html', 'src/codeStudio.js', 'styles/code-studio.css']) {
+    assert.equal(existsSync(resolve(rootDirectory, path)), false, `${path} should be removed`);
+  }
+  assert.doesNotMatch(appModuleSource, /code-studio\.html/);
+  assert.match(appModuleSource, /routeLink\('codeLab'/);
+  assert.match(appModuleSource, /title: 'Code', description: 'Build & Run'.*route: 'codeLab'/);
   assert.match(appSource, /id="codeLab"/);
-});
-
-test('Code navigation opens the new page while its embedded game library stays in the app', () => {
-  const transformed = routePlugin.transformIndexHtml.handler(appSource, {
-    filename: resolve(rootDirectory, 'index.html'),
-  });
-  assert.match(transformed, /id === 'codeLab' && !embeddedCodeLab/);
-  assert.match(transformed, /location\.assign\('\/code-studio\.html'\)/);
-  assert.match(transformed, /search\.get\('embedded'\) === '1'/);
 });
 
 test('the integrated coding view includes the supplied games and language controls', () => {

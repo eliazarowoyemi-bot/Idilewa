@@ -8,7 +8,7 @@ const routes = [
   'keepers',
   'kids', 'languages', 'lesson', 'login', 'oral', 'oral_genre', 'oriki', 'owe',
   'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'pricing', 'profile',
-  'trainer', 'tutor', 'educator-portal', 'voices', 'voice_lessons', 'code-studio',
+  'trainer', 'tutor', 'educator-portal', 'voices', 'voice_lessons',
 ];
 
 const input = Object.fromEntries(routes.map((route) => [route, resolve(__dirname, `${route}.html`)]));
