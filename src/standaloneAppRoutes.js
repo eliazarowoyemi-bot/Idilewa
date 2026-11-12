@@ -2,7 +2,6 @@ import { basename, resolve } from 'path';
 
 const routeViews = {
   'ai-conversation': 'aiChat',
-  'code-studio': 'codeLab',
   course: 'learning',
   kids: 'learning',
   languages: 'academy',
@@ -35,6 +34,7 @@ const validViews = new Set([
 const nativeAppPages = new Set([
   'ai-conversation',
   'auth-callback',
+  'code-studio',
   'consent',
   'educator-portal',
   'login',
@@ -159,6 +159,9 @@ function transformAppHtml(html) {
 
   const viewBootstrap = `<script>
 (() => {
+    const search = new URLSearchParams(location.search);
+    const view = search.get('view');
+    const embeddedCodeLab = view === 'codeLab' && search.get('embedded') === '1';
   const nativeGo = window.go;
   if (typeof nativeGo === 'function') {
     window.go = (id, ...args) => {
@@ -166,6 +169,10 @@ function transformAppHtml(html) {
         location.assign('/ai-conversation.html');
         return;
       }
+        if (id === 'codeLab' && !embeddedCodeLab) {
+          location.assign('/code-studio.html');
+          return;
+        }
       return nativeGo(id, ...args);
     };
   }
@@ -193,9 +200,12 @@ function transformAppHtml(html) {
   addTutorPortalLink(document.querySelector('.premium-mobile-menu nav'));
   addAccountLink(document.querySelector('.premium-links'));
   addAccountLink(document.querySelector('.premium-mobile-menu nav'));
-  const view = new URLSearchParams(location.search).get('view');
   if (!view) return;
   if (!${JSON.stringify([...validViews])}.includes(view)) return;
+  if (view === 'codeLab' && !embeddedCodeLab) {
+    location.replace('/code-studio.html');
+    return;
+  }
   if (typeof window.go !== 'function') throw new Error('Standalone app view navigation is unavailable.');
   window.go(view);
   history.replaceState(null, '', location.pathname);

@@ -33,9 +33,8 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assert.match(transformed, /Sign in/);
 });
 
-test('legacy learning, coding, and heritage URLs open their matching standalone views', () => {
+test('legacy learning and heritage URLs open their matching standalone views', () => {
   const destinations = [
-    ['code-studio.html', '/?view=codeLab'],
     ['oral.html', '/?view=heritageLab'],
     ['languages.html', '/?view=academy'],
   ];
@@ -51,6 +50,7 @@ test('native entry pages retain their app and return home or voice links to cano
   for (const filename of [
     'ai-conversation.html',
     'auth-callback.html',
+    'code-studio.html',
     'consent.html',
     'educator-portal.html',
     'login.html',
@@ -81,6 +81,7 @@ test('every built HTML entry except the homepage points to the standalone app', 
   const nativePages = new Set([
     'ai-conversation.html',
     'auth-callback.html',
+    'code-studio.html',
     'consent.html',
     'educator-portal.html',
     'login.html',

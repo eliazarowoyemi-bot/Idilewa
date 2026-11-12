@@ -15,16 +15,35 @@ import { fileURLToPath } from 'node:url';
 import { createStandaloneAppPlugin } from '../src/standaloneAppRoutes.js';
 
 const appSource = await readFile(new URL('../index.html', import.meta.url), 'utf8');
+const codeStudioSource = await readFile(new URL('../code-studio.html', import.meta.url), 'utf8');
 const engineSource = await readFile(new URL('../src/codeStudioEngine.js', import.meta.url), 'utf8');
 const rootDirectory = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const routePlugin = createStandaloneAppPlugin(rootDirectory);
 
-test('legacy Code Studio URL opens the integrated coding view', () => {
-  const redirect = routePlugin.transformIndexHtml.handler('', {
+test('Code page serves the original block, costume, and sound workspaces', () => {
+  const page = routePlugin.transformIndexHtml.handler(codeStudioSource, {
     filename: resolve(rootDirectory, 'code-studio.html'),
   });
-  assert.ok(redirect.includes('location.replace("/?view=codeLab")'));
+  assert.match(page, /<title>Code \| Ìdíléwa<\/title>/);
+  assert.match(page, /<main id="code-editor" class="code-studio-editor">/);
+  assert.match(page, /data-workspace="code"/);
+  assert.match(page, /data-workspace="costumes"/);
+  assert.match(page, /data-workspace="sounds"/);
+  assert.match(page, /id="block-categories"/);
+  assert.match(page, /id="costume-canvas"/);
+  assert.match(page, /id="sound-waveform"/);
+  assert.match(page, /href="\/\?view=codeLab&amp;embedded=1"/);
+  assert.doesNotMatch(page, /Scratch|scratchcat|Canva|Your game rules/);
   assert.match(appSource, /id="codeLab"/);
+});
+
+test('Code navigation opens the new page while its embedded game library stays in the app', () => {
+  const transformed = routePlugin.transformIndexHtml.handler(appSource, {
+    filename: resolve(rootDirectory, 'index.html'),
+  });
+  assert.match(transformed, /id === 'codeLab' && !embeddedCodeLab/);
+  assert.match(transformed, /location\.assign\('\/code-studio\.html'\)/);
+  assert.match(transformed, /search\.get\('embedded'\) === '1'/);
 });
 
 test('the integrated coding view includes the supplied games and language controls', () => {
