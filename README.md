@@ -96,7 +96,7 @@ The HTML entries declared in the active `vite.config.js` are supported:
 | | `#/course` (`course.html`) | Language course tracks (3 levels, 4 modules per level, 5 lessons per module). |
 | | `#/lesson` (`lesson.html`) | Focused lesson practice, prompts, answer validation, and progress rewards. |
 | | `#/kids` (`kids.html`) | Child-centered learning portal with playful stories and coding. |
-| **Code & STEM** | `#/codeLab` (`index.html`) | In-app Code Lab with the existing playable game collection and game-selection controls. |
+| **Code & STEM** | `creative-studio.html` | Offline Creative Studio for drawing, toon creation, 3D scenes, animation, and stories. The existing Code Playground and games remain at `/?view=codeLab`. |
 | | `#/tutor` (`tutor.html`) | Local-only learner-facing tutoring prototype with sample profiles, messages, lessons, rates, and payment displays; no real bookings or charges are made. |
 | | `/educator-portal.html` | Existing educator portal with invitation sign-in, guardian-approved learner connections, lessons, messages, profile, availability, and settings. |
 | | `#/profile` (`profile.html`) | Learner progress dashboard, points, streaks, badges (stored in local browser state). |
@@ -160,7 +160,7 @@ Vite bundles the configured HTML entry points and compiles assets to the `dist/`
 
 ### IDE and authentication services
 
-The Code for Kids experience provides age-banded coding and STEM lessons. The in-app Code Lab (`#/codeLab`) retains the playable game collection.
+The Creative Studio uses the supplied offline-first page for drawing, toon creation, 3D scene building, animation, and storytelling. Projects remain in the learner's browser and can be exported or imported as files; the Studio does not send project data to a backend. The existing Code Playground and game collection remain available at `/?view=codeLab`.
 
 Configure these values in `.env.local` for the Vite client and in the deployment environment settings:
 

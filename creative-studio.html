@@ -1,0 +1,805 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Ìdíléwa Creative Studio — Milestone 10</title><style>
+:root{--g:#087b36;--lg:#eaf8ee;--ink:#163a28;--line:#dbe8df;--muted:#63766a}*{box-sizing:border-box}body{margin:0;background:#f5faf6;color:var(--ink);font:14px system-ui,Segoe UI,Arial}button,input,select,textarea{font:inherit}button{cursor:pointer;border:1px solid var(--line);border-radius:11px;background:white;color:var(--ink);padding:9px 12px}button:hover{border-color:var(--g)}button.active,.primary{background:var(--g);color:white;border-color:var(--g)}button:disabled{opacity:.5;cursor:not-allowed}.top{display:flex;align-items:center;gap:14px;padding:11px 20px;background:white;border-bottom:1px solid var(--line);flex-wrap:wrap}.brand{font-weight:900;font-size:20px;color:var(--g)}.brand small{display:block;font-size:10px;letter-spacing:.7px;color:var(--muted)}.tabs{display:flex;gap:5px;flex:1;flex-wrap:wrap}.tabs button{border:0}.actions{display:flex;gap:6px;flex-wrap:wrap}.banner{padding:8px 20px;background:var(--lg);font-size:12px}.layout{display:grid;grid-template-columns:225px minmax(0,1fr) 240px;gap:12px;padding:12px;max-width:1700px;margin:auto}.panel{background:white;border:1px solid var(--line);border-radius:16px;padding:13px;min-width:0}.panel h3{font-size:14px;margin:6px 0 12px}.panel h4{font-size:12px;margin:15px 0 6px}.side{max-height:calc(100vh - 155px);overflow:auto}.stack{display:grid;gap:8px}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:6px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}.tool{padding:9px 4px;font-size:12px}.tool span{display:block;font-size:22px}.field{display:grid;gap:5px;margin:10px 0}.field label{font-size:12px;color:var(--muted)}input[type=range]{width:100%;accent-color:var(--g)}input[type=color]{width:100%;height:38px;border:1px solid var(--line);border-radius:8px;background:white}input[type=text],input[type=number],select,textarea{width:100%;border:1px solid var(--line);border-radius:9px;padding:9px;background:white;color:var(--ink)}textarea{min-height:70px;resize:vertical}.row{display:flex;align-items:center;gap:7px;flex-wrap:wrap}.row>*{min-width:0}.grow{flex:1}.stage{min-width:0}.stagehead{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}.stagehead h2{margin:0;font-size:17px;flex:1}.canvaswrap{background:repeating-conic-gradient(#f3f6f3 0% 25%,white 0% 50%) 50% / 24px 24px;border:1px solid var(--line);border-radius:13px;overflow:hidden;position:relative;min-height:380px;display:flex;align-items:center;justify-content:center}canvas{display:block;max-width:100%;touch-action:none}#paint{background:white;cursor:crosshair}#view{background:linear-gradient(#f4fcf5,#e4f3e9);cursor:grab}.foot{margin-top:10px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}.hint{font-size:12px;color:var(--muted)}.swatches{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}.swatch{width:100%;aspect-ratio:1;padding:0;border-radius:50%}.asset{min-height:76px}.asset b{display:block;font-size:29px}.asset small{display:block;font-size:10px}.layer{display:flex;gap:5px;align-items:center;border:1px solid var(--line);border-radius:9px;padding:5px;margin:5px 0}.layer.selected{border-color:var(--g);background:var(--lg)}.layer button{padding:5px}.timeline{padding:12px;margin:0 12px 15px}.track{height:12px;border-radius:20px;background:linear-gradient(90deg,#18b761,#b8e8c8);position:relative;margin:12px 0}.playhead{position:absolute;top:-5px;height:22px;width:3px;background:#142d1c;left:0}.welcome{max-width:1080px;margin:25px auto;padding:20px}.hero{background:linear-gradient(110deg,#e6f8e8,#fff);border-radius:24px;padding:35px}.hero h1{font-size:clamp(27px,4vw,46px);margin:0}.hero p{color:var(--muted);font-size:17px}.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-top:20px}.card{padding:24px;text-align:left;min-height:170px}.card strong{display:block;font-size:18px;margin:8px 0}.card .emoji{font-size:42px}.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:#153f26;color:white;border-radius:12px;padding:12px 18px;z-index:50;display:none;max-width:90vw}.hidden{display:none!important}.full .top,.full .banner,.full .side,.full .timeline,.full .foot{display:none}.full .layout{display:block;padding:0;max-width:none}.full .stage{border:0;border-radius:0}.full .canvaswrap{height:calc(100vh - 72px)}.full canvas{max-height:calc(100vh - 90px)}.mobileTools{display:none}.pill{background:var(--lg);border-radius:9px;padding:7px;font-size:12px}.status{font-size:12px;color:var(--g)}@media(max-width:1000px){.layout{grid-template-columns:175px minmax(0,1fr)}.right{grid-column:1/-1;max-height:none}.side{max-height:none}.canvaswrap{min-height:310px}}@media(max-width:650px){.top{padding:9px}.tabs{order:3;flex-basis:100%;overflow-x:auto;flex-wrap:nowrap}.tabs button{white-space:nowrap;padding:8px}.layout{display:block;padding:7px}.side{display:none;margin-bottom:8px}.side.open{display:block}.right{display:none;margin-top:8px}.right.open{display:block}.mobileTools{display:flex;gap:7px;padding:7px}.canvaswrap{min-height:300px}.cards{grid-template-columns:1fr}.hero{padding:22px}.stagehead h2{flex-basis:100%}.timeline{margin:7px}.panel{padding:10px}}
+
+/* Scene Builder v2.0: keep editor tools beside the room, never below it */
+.studio-scene .banner{display:none}.studio-scene .layout{grid-template-columns:minmax(215px,260px) minmax(0,1fr) minmax(240px,290px);gap:10px;align-items:stretch;max-width:1800px}.studio-scene .side{max-height:calc(100dvh - 135px);overflow-y:auto}.studio-scene .stage{min-width:0}.studio-scene .canvaswrap{min-height:0;height:min(67vh,680px);background:#e5f5e9}.studio-scene #view{width:100%;height:100%;max-width:100%;object-fit:contain}.studio-scene .stagehead{margin-bottom:5px}.studio-scene .stagehead h2{font-size:16px}.studio-scene .timeline{margin-top:0}.studio-scene .mobileTools{display:none!important}.studio-modebar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:7px}.studio-modebar button{padding:7px 11px}.studio-modebar .active{background:#087b36;color:#fff}.studio-scene-dock{display:none}.studio-context{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:4px;padding:6px;background:rgba(255,255,255,.97);border:1px solid #cbded1;border-radius:13px;box-shadow:0 4px 20px #153f2629;z-index:5;max-width:96%;overflow-x:auto}.studio-context button{white-space:nowrap;padding:7px 9px;font-size:12px}.studio-selected{font-size:12px;font-weight:700;white-space:nowrap;padding:0 5px}.studio-panel-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}.studio-panel-heading span{font-size:11px;color:#63766a}.studio-search-label{display:grid;gap:4px;font-size:12px;margin:7px 0}.studio-search-label input,.studio-search-label select{min-width:0}.studio-chips{display:flex;flex-wrap:wrap;gap:5px;margin:9px 0}.studio-chips button{padding:5px 8px;font-size:11px}.studio-assets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.studio-asset{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:93px;padding:6px 3px}.studio-asset span{font-size:27px}.studio-asset b{font-size:12px;text-align:center}.studio-asset small{font-size:10px;color:#63766a;text-align:center}.studio-asset .asset-add{color:#087b36;font-weight:700}.studio-desktop-tabs{display:flex;gap:5px;margin-bottom:10px}.studio-desktop-tabs button{flex:1;padding:8px 4px;font-size:12px}.studio-desktop-tabs button.active{background:#087b36;color:white}.studio-props-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.studio-props-grid label{font-size:12px;display:grid;gap:3px}.studio-props-grid input{min-width:0}.studio-quick-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin-top:12px}.studio-quick-grid button{padding:8px 4px;font-size:12px}.studio-layer-list{display:grid;gap:6px;margin-top:10px}.studio-layer{display:flex;gap:4px;align-items:center}.studio-layer button{padding:5px}.studio-mobile-drawer{display:none}.studio-scene #sceneEditDock{display:none!important}
+@media(max-width:1100px) and (min-width:701px){.studio-scene .layout{grid-template-columns:190px minmax(0,1fr) 210px}.studio-scene .side{display:block}.studio-scene .right{grid-column:auto}}
+@media(max-width:700px){.studio-scene .top{padding:7px 9px}.studio-scene .brand{font-size:16px}.studio-scene .layout{display:block;padding:5px}.studio-scene .side{display:none!important}.studio-scene .stage{padding:7px;border-radius:13px}.studio-scene .stagehead{display:flex;flex-wrap:nowrap;gap:5px}.studio-scene .stagehead h2{font-size:14px;flex-basis:auto}.studio-scene .stagehead button{font-size:11px;padding:6px}.studio-scene .canvaswrap{height:clamp(330px,58dvh,650px);min-height:0;border-radius:12px}.studio-scene #view{height:100%;width:100%;object-fit:contain}.studio-scene .foot{margin-top:5px}.studio-scene .timeline{margin:6px;padding:7px}.studio-scene .timeline.collapsed{max-height:45px;overflow:hidden}.studio-scene .timeline .row{gap:5px}.studio-scene .timeline button{padding:6px}.studio-modebar{gap:4px;overflow-x:auto;flex-wrap:nowrap}.studio-modebar button{white-space:nowrap;font-size:11px;padding:7px}.studio-scene-dock{display:flex;position:absolute;top:7px;left:7px;right:7px;gap:4px;z-index:4;overflow-x:auto;max-width:100%;padding:4px;background:rgba(255,255,255,.92);border-radius:11px}.studio-scene-dock button{font-size:11px;padding:7px 9px;white-space:nowrap}.studio-scene-dock button.active{background:#087b36;color:#fff}.studio-context{bottom:9px;left:7px;right:7px;transform:none;max-width:none}.studio-context .studio-selected{display:none}.studio-context button{flex:1;font-size:11px;padding:8px 5px}.studio-mobile-drawer{display:flex;flex-direction:column;position:fixed;z-index:45;bottom:0;left:0;right:0;max-height:min(63dvh,570px);background:white;border-radius:20px 20px 0 0;border:1px solid #dbe8df;box-shadow:0 -8px 30px #163a2833;transform:translateY(110%);transition:transform .2s ease;visibility:hidden}.studio-mobile-drawer.open{transform:translateY(0);visibility:visible}.studio-drawer-grip{height:5px;width:50px;border-radius:5px;background:#c5d6ca;margin:8px auto 3px}.studio-drawer-top{display:flex;align-items:center;justify-content:space-between;padding:5px 15px 10px;border-bottom:1px solid #e3eee6}.studio-drawer-body{overflow-y:auto;padding:12px 14px 28px;overscroll-behavior:contain}.studio-assets{grid-template-columns:repeat(3,minmax(0,1fr))}.studio-asset{min-height:90px}.studio-scene .full .canvaswrap{height:calc(100dvh - 90px)} }
+
+</style><style id="drawing-tool-fix">#paint{touch-action:none;cursor:crosshair}.studio-draw .canvaswrap{overscroll-behavior:contain}.tool.active{outline:2px solid #0b8b42;outline-offset:1px}</style><style id="scene-upgrade">.scene-dock{position:absolute;left:8px;bottom:8px;display:flex;gap:5px;flex-wrap:wrap;max-width:calc(100% - 16px);background:#ffffffec;border-radius:12px;padding:6px;z-index:3;box-shadow:0 3px 14px #0002}.scene-dock button{font-size:12px;padding:7px}.timeline.collapsed>.row,.timeline.collapsed>.track,.timeline.collapsed>.hint{display:none}.timeline #sceneTimelineToggle{display:none}.canvaswrap:has(#sceneEditDock){min-height:410px}#view{width:100%;height:auto;object-fit:contain}@media(max-width:650px){.timeline #sceneTimelineToggle{display:inline-block}.canvaswrap:has(#sceneEditDock){min-height:340px}.scene-dock{position:relative;left:auto;bottom:auto;width:100%;justify-content:center}.scene-dock button{font-size:11px;padding:7px 5px}.stagehead h2{font-size:18px}.canvaswrap:has(#sceneEditDock){display:block}#view{width:100%}.timeline.collapsed{padding:8px}}</style><style id="scene-layers-v2">.scene-panel-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:12px}.scene-panel-tabs button{padding:9px 3px}.scene-layer{display:flex;align-items:center;gap:3px;border:1px solid #dce9df;border-radius:10px;padding:4px;margin:6px 0;background:#fff}.scene-layer.chosen{border:2px solid #139b4c;background:#effbf1}.scene-layer.dim{opacity:.55}.scene-layer button{padding:5px 4px;min-width:27px;border:0;background:transparent}.scene-layer-name{flex:1;text-align:left;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px}.scene-transform{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.scene-transform label{font-size:12px}.scene-transform input{margin-top:4px}.scene-nudge{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin:8px 0}.scene-catalog{display:grid;grid-template-columns:1fr 1fr;gap:6px}.scene-catalog button{min-height:48px}.scene-dock{align-items:center}.scene-dock button{min-height:36px}@media(max-width:650px){.canvaswrap:has(#sceneEditDock){min-height:410px}.scene-dock{position:relative;flex-wrap:nowrap;overflow-x:auto;justify-content:flex-start}.scene-dock button{flex-shrink:0}.right.open{max-height:none}.scene-layer button{min-width:30px}.scene-layer-name{min-width:80px}.canvaswrap:has(#sceneEditDock) #view{min-height:285px;object-fit:contain}}@media(min-width:651px){.right{max-height:calc(100vh - 155px);overflow-y:auto}}</style></head><body><div id="app"><header class="top"><div class="brand">🌳 Ìdíléwa<small>CREATIVE STUDIO</small></div><nav class="tabs" id="tabs"></nav><div class="actions"><button onclick="saveProject()">💾 Save</button><button onclick="loadProject()">📂 Load</button><button onclick="exportPNG()">⬇ PNG</button></div></header><div class="banner">Create • Draw • Paint • Build in 3D • Animate • Tell Stories — Works offline in your browser. Your projects stay on this device.</div><div id="welcome" class="welcome"><section class="hero"><h1>Make something amazing! 🎨</h1><p>Draw a picture, design a toon, build a 3D world and bring your story to life.</p><div class="row"><span>Creative mode:</span><select id="age" style="width:auto"><option>Little Creator</option><option>Young Animator</option><option>Creative Pro</option></select></div></section><div class="cards"><button class="card" onclick="go('draw')"><span class="emoji">🖌️</span><strong>Draw & Paint</strong>Brushes, colours, shapes and layers →</button><button class="card" onclick="go('toon')"><span class="emoji">🧒🏾</span><strong>Create Your Toon</strong>Customise people, animals and objects →</button><button class="card" onclick="go('3d')"><span class="emoji">🧊</span><strong>Build & Animate in 3D</strong>Move characters, animate and tell stories →</button></div></div><div class="mobileTools"><button onclick="toggleSide('left')">☰ Tools</button><button onclick="toggleSide('right')">⚙ Settings</button></div><main id="layout" class="layout hidden"><aside id="left" class="side panel"></aside><section class="stage panel"><div class="stagehead"><h2 id="heading"></h2><button id="fullbtn" onclick="toggleFull()">⛶ Full Canvas</button><button class="primary" id="nextbtn"></button></div><div class="canvaswrap"><canvas id="paint" width="1000" height="650"></canvas><canvas id="view" width="1000" height="650" class="hidden"></canvas></div><div class="foot" id="foot"></div></section><aside id="right" class="side right panel"></aside></main><section id="timeline" class="panel timeline hidden"><div class="row"><b>🎞️ Animation timeline</b><button onclick="togglePlay()" id="playBtn">▶ Play</button><button onclick="resetTime()">↺ Reset</button><label>Duration <input id="duration" type="number" value="10" min="1" max="60" style="width:60px" onchange="duration=+this.value||10"></label><span id="clock">0.0s</span><button onclick="recordPose()">🔴 Record Pose</button><button onclick="exportVideo()">⬇ WebM video</button></div><div class="track" id="track" onclick="scrub(event)"><div class="playhead" id="playhead"></div></div><div class="hint">Drag or click timeline to scrub. Record Pose stores the current body angles as an editable keyframe. Video export records the canvas in supported browsers.</div></section></div><div class="toast" id="toast"></div><script>
+const $=id=>document.getElementById(id),P=$('paint'),pc=P.getContext('2d'),V=$('view'),vc=V.getContext('2d');const tabs=[['welcome','🏠 Home'],['draw','🎨 Draw'],['toon','🧒🏾 Toons'],['3d','🧊 3D'],['animate','🕺 Animate'],['scene','🎬 Scene'],['story','📖 Story']];let stage='welcome',tool='brush',color='#168e45',size=12,opacity=1,painting=false,origin=null,history=[],redoStack=[],layers=[],activeLayer=0,selectedToon='child',toonName='My Toon',skin='#b8794b',outfit='#168e45',hat=true,accessory='none',hair='short',camera={yaw:.35,pitch:.12,zoom:1},obj={x:0,y:0,z:0,scale:1,rot:0},joint='leftArm',angles={head:0,leftArm:0,rightArm:0,leftLeg:0,rightLeg:0,torso:0},speeds={head:1,leftArm:1,rightArm:1,leftLeg:1,rightLeg:1,torso:1},moves={walk:false,wave:false,dance:false,jump:false,spin:false},scene='village',props=[],actors=[],dialogue='Ẹ káàárọ̀!',voice='en-GB',playing=false,elapsed=0,duration=10,lastFrame=0,keyframes=[],drag=null,recording=null;
+function notify(s){const t=$('toast');t.textContent=s;t.style.display='block';clearTimeout(window.toastT);window.toastT=setTimeout(()=>t.style.display='none',3500)}function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}function btn(label,fn,cls=''){return `<button class="${cls}" onclick="${fn}">${label}</button>`}function selectHTML(id,opts,value,fn){return `<select id="${id}" onchange="${fn}">${opts.map(x=>`<option ${x===value?'selected':''}>${esc(x)}</option>`).join('')}</select>`}function slider(name,value,min,max,step,fn){return `<div class="field"><label>${name}: <b id="val_${name.replace(/\W/g,'')}">${value}</b></label><input type="range" min="${min}" max="${max}" step="${step}" value="${value}" oninput="${fn}"></div>`}function renderTabs(){$('tabs').innerHTML=tabs.map(t=>`<button class="${stage===t[0]?'active':''}" onclick="go('${t[0]}')">${t[1]}</button>`).join('')}function go(s){stage=s;document.body.classList.remove('full');$('welcome').classList.toggle('hidden',s!=='welcome');$('layout').classList.toggle('hidden',s==='welcome');$('timeline').classList.toggle('hidden',!['animate','scene','story'].includes(s));P.classList.toggle('hidden',s!=='draw');V.classList.toggle('hidden',s==='draw');$('fullbtn').textContent='⛶ Full Canvas';$('left').classList.remove('open');$('right').classList.remove('open');render();if(s!=='draw'&&s!=='welcome')draw3D()}function toggleSide(which){$(which).classList.toggle('open')}function toggleFull(){document.body.classList.toggle('full');$('fullbtn').textContent=document.body.classList.contains('full')?'Exit Full Canvas':'⛶ Full Canvas'}function setTool(t){tool=t;render();}function render(){renderTabs();if(stage==='welcome')return;const names={draw:'Drawing & Painting Studio',toon:'Toon Library & Creator','3d':'2D → 3D Workshop',animate:'Body-Part Animation Studio',scene:'Scene Builder',story:'Story Mode'};$('heading').textContent=names[stage];$('nextbtn').textContent=stage==='draw'?'Make It 3D →':stage==='toon'?'Open in 3D →':stage==='3d'?'Animate →':stage==='animate'?'Create Scene →':stage==='scene'?'Story Mode →':'Play Story ▶';$('nextbtn').onclick=()=>stage==='draw'?convertDrawing():stage==='toon'?go('3d'):stage==='3d'?go('animate'):stage==='animate'?go('scene'):stage==='scene'?go('story'):togglePlay();$('left').innerHTML=leftPanel();$('right').innerHTML=rightPanel();$('foot').innerHTML=stage==='draw'?'<span class="hint">Draw directly on the white canvas. Use Undo to reverse edits. Save projects or export PNG.</span>':`<span class="status">● Interactive ${stage==='toon'?'2D toon preview':'software-rendered 3D scene'}</span><span class="hint">Drag to orbit • Wheel or pinch to zoom • Change controls to update the scene</span>`;if(stage==='draw')composite();else draw3D()}
+function leftPanel(){if(stage==='draw')return `<h3>🖌️ Drawing Tools</h3><div class="grid3">${[['brush','🖌️'],['pencil','✏️'],['marker','🖍️'],['crayon','🟠'],['airbrush','💨'],['eraser','🧽'],['line','📏'],['rect','▭'],['ellipse','◯'],['fill','🪣'],['text','🔤'],['move','✥']].map(x=>`<button class="tool ${tool===x[0]?'active':''}" onclick="setTool('${x[0]}')"><span>${x[1]}</span>${x[0]}</button>`).join('')}</div><p class="hint" id="brushDescription">${({brush:'Paintbrush: smooth solid strokes',pencil:'Pencil: thin precise lines',marker:'Marker: broad semi-transparent strokes',crayon:'Crayon: grainy textured strokes',airbrush:'Airbrush: soft scattered spray',eraser:'Eraser: removes pixels from current layer',line:'Line: drag between two points',rect:'Rectangle: drag to size a box',ellipse:'Ellipse: drag to size an oval',fill:'Fill: tap a closed region on this layer',text:'Text: tap and enter a label',move:'Move: drag to shift the entire selected layer'})[tool]}</p><h4>Canvas actions</h4><div class="stack">${btn('↶ Undo','undo()')}${btn('↷ Redo','redo()')}${btn('🧹 Clear current layer','clearLayer()')}${btn('🖼️ Import image','importImage()')}</div>`;if(stage==='toon')return `<h3>📚 Ready-Made Toon Library</h3><div class="grid2">${[['child','🧒🏾'],['girl','👧🏾'],['adult','👩🏾'],['lion','🦁'],['elephant','🐘'],['dog','🐕'],['car','🚗'],['bus','🚌'],['tree','🌳'],['house','🏠']].map(x=>`<button class="asset ${selectedToon===x[0]?'active':''}" onclick="selectedToon='${x[0]}';render()"><b>${x[1]}</b><small>${x[0]}</small></button>`).join('')}</div><h4>Create Your Own Toon</h4><p class="hint">Select a character, then change its appearance. The preview updates immediately.</p>${btn('Reset toon','resetToon()')}`;if(stage==='3d')return `<h3>🧊 Build in 3D</h3><div class="stack">${btn('Extrude drawing silhouette','convertDrawing()')}${btn('3D character template',"selectedToon='child';draw3D()")}${btn('3D animal template',"selectedToon='lion';draw3D()")}${btn('3D vehicle',"selectedToon='car';draw3D()")}${btn('Reset 3D view','resetView()')}</div><h4>Conversion methods</h4><p class="hint">Drawing extrusion produces a depth-based 3D panel. Toon templates use simple articulated 3D primitives. AI reconstruction is not enabled.</p>`;if(stage==='animate')return `<h3>🕺 Movement Presets</h3><div class="grid2">${Object.keys(moves).map(x=>`<button class="${moves[x]?'active':''}" onclick="moves.${x}=!moves.${x};render()">${({walk:'🚶',wave:'👋',dance:'💃',jump:'🦘',spin:'🔄'})[x]} ${x}</button>`).join('')}</div><h4>Motion Recording</h4><div class="stack">${btn('🔴 Capture current pose','recordPose()')}${btn('Clear keyframes','keyframes=[];notify("Keyframes cleared")')}${btn('▶ Play all actions','togglePlay()','primary')}</div>`;if(stage==='scene'||stage==='story')return `<h3>🌍 Environments</h3><div class="grid2">${['village','classroom','forest','space','beach','city'].map(x=>`<button class="${scene===x?'active':''}" onclick="scene='${x}';draw3D()">${({village:'🏡',classroom:'🏫',forest:'🌳',space:'🚀',beach:'🏖️',city:'🏙️'})[x]} ${x}</button>`).join('')}</div><h4>Props</h4><div class="grid2">${[['tree','🌳'],['house','🏠'],['ball','⚽'],['car','🚗']].map(x=>`<button onclick="addProp('${x[0]}')">${x[1]} ${x[0]}</button>`).join('')}</div><h4>Characters</h4><div class="stack">${btn('➕ Add another toon','addActor()')}${btn('Remove last toon','actors.pop();draw3D()')}${btn('Clear props','props=[];draw3D()')}</div>`;return ''}
+function rightPanel(){if(stage==='draw')return `<h3>🎨 Paint & Colours</h3><div class="swatches">${['#168e45','#f04d46','#ff9d22','#ffdc4e','#2684e7','#9654bd','#f5b6d5','#965e3d','#202b2a','#ffffff','#b8794b','#000000'].map(c=>`<button class="swatch" style="background:${c};border:${color===c?'3px solid #163a28':'1px solid #ccc'}" onclick="color='${c}';render()"></button>`).join('')}</div><div class="field"><label>Custom colour</label><input type="color" value="${color}" oninput="color=this.value"></div>${slider('Brush size',size,1,90,1,'size=+this.value;this.previousElementSibling.querySelector("b").textContent=size')}${slider('Opacity',opacity,0.1,1,0.1,'opacity=+this.value;this.previousElementSibling.querySelector("b").textContent=opacity')}<h3>🗂️ Layers</h3><div id="layers">${layers.map((l,i)=>`<div class="layer ${activeLayer===i?'selected':''}"><button onclick="activeLayer=${i};render()">${esc(l.name)}</button><button title="Visibility" onclick="layers[${i}].visible=!layers[${i}].visible;render()">${l.visible?'👁':'🚫'}</button><button title="Lock" onclick="layers[${i}].locked=!layers[${i}].locked;render()">${l.locked?'🔒':'🔓'}</button></div>`).join('')}</div><div class="grid2">${btn('＋ Layer','addLayer()')}${btn('− Layer','removeLayer()')}${btn('↑ Raise','moveLayer(1)')}${btn('↓ Lower','moveLayer(-1)')}</div>`;if(stage==='toon')return `<h3>✨ Customise Toon</h3><div class="field"><label>Name</label><input value="${esc(toonName)}" oninput="toonName=this.value"></div><div class="field"><label>Skin / body colour</label><input type="color" value="${skin}" oninput="skin=this.value;draw3D()"></div><div class="field"><label>Outfit colour</label><input type="color" value="${outfit}" oninput="outfit=this.value;draw3D()"></div><div class="field"><label>Hairstyle</label>${selectHTML('hair',['short','curly','bald'],hair,'hair=this.value;draw3D()')}</div><div class="field"><label>Accessory</label>${selectHTML('acc',['none','glasses','necklace'],accessory,'accessory=this.value;draw3D()')}</div><label><input type="checkbox" ${hat?'checked':''} onchange="hat=this.checked;draw3D()"> Traditional cap</label><p class="hint">People are articulated 3D templates; objects and animals have simpler geometry.</p>`;if(stage==='3d')return `<h3>🧭 Object Transform</h3>${slider('X position',obj.x,-4,4,.1,'obj.x=+this.value;draw3D()')}${slider('Y position',obj.y,-3,3,.1,'obj.y=+this.value;draw3D()')}${slider('Z position',obj.z,-4,4,.1,'obj.z=+this.value;draw3D()')}${slider('Object scale',obj.scale,.3,2.5,.1,'obj.scale=+this.value;draw3D()')}${slider('Rotation',obj.rot,-180,180,5,'obj.rot=+this.value;draw3D()')}${slider('Camera zoom',camera.zoom,.4,2.5,.1,'camera.zoom=+this.value;draw3D()')}`;if(stage==='animate')return `<h3>🦴 Body Parts & Joints</h3>${selectHTML('joint',Object.keys(angles),joint,'joint=this.value;render()')}${slider('Joint angle',angles[joint],-85,85,1,'angles[joint]=+this.value;this.previousElementSibling.querySelector("b").textContent=this.value;draw3D()')}${slider('Movement speed',speeds[joint],.1,3,.1,'speeds[joint]=+this.value;this.previousElementSibling.querySelector("b").textContent=this.value;draw3D()')}<div class="stack">${btn('Reset selected joint','angles[joint]=0;render()')}${btn('Reset all joints','Object.keys(angles).forEach(k=>angles[k]=0);render()')}</div><h4>Movement Mixer</h4><p class="hint">Combine walking, waving, dancing, jumping and spinning. Each joint has its own speed setting.</p>`;if(stage==='scene'||stage==='story')return `<h3>💬 Dialogue & Sound</h3><div class="field"><label>Speech bubble</label><textarea id="dialogue" oninput="dialogue=this.value;draw3D()">${esc(dialogue)}</textarea></div><div class="stack">${btn('🔊 Speak dialogue','speak()')}${btn('🎙️ Record narration','recordNarration()')}</div><h4>Camera</h4>${slider('Camera zoom',camera.zoom,.4,2.5,.1,'camera.zoom=+this.value;draw3D()')}<h4>Story Mode</h4><p class="hint">1. Choose environment. 2. Add toons and props. 3. Choose movements. 4. Type dialogue. 5. Play and export.</p><div class="stack">${btn('Add wave action',"moves.wave=true;notify('Wave added');draw3D()")}${btn('Add walking action',"moves.walk=true;notify('Walking added');draw3D()")}${btn('Play My Story','togglePlay()','primary')}</div>`;return ''}
+function newLayer(name='Layer '+(layers.length+1)){let c=document.createElement('canvas');c.width=P.width;c.height=P.height;return {name,canvas:c,visible:true,locked:false}}function initLayers(){layers=[newLayer('Sketch')];activeLayer=0;composite()}function snapshot(){history.push(layers.map(l=>({name:l.name,visible:l.visible,locked:l.locked,img:l.canvas.toDataURL()})));if(history.length>25)history.shift();redoStack=[]}function restore(s){layers=s.map(x=>{let l=newLayer(x.name);l.visible=x.visible;l.locked=x.locked;let img=new Image();img.onload=()=>{l.canvas.getContext('2d').drawImage(img,0,0);composite()};img.src=x.img;return l});activeLayer=Math.min(activeLayer,layers.length-1);render()}function undo(){if(!history.length)return notify('Nothing to undo');redoStack.push(layers.map(l=>({name:l.name,visible:l.visible,locked:l.locked,img:l.canvas.toDataURL()})));restore(history.pop())}function redo(){if(!redoStack.length)return notify('Nothing to redo');history.push(layers.map(l=>({name:l.name,visible:l.visible,locked:l.locked,img:l.canvas.toDataURL()})));restore(redoStack.pop())}function composite(){pc.clearRect(0,0,P.width,P.height);pc.fillStyle='white';pc.fillRect(0,0,P.width,P.height);layers.forEach(l=>{if(l.visible)pc.drawImage(l.canvas,0,0)})}function addLayer(){snapshot();layers.push(newLayer());activeLayer=layers.length-1;render()}function removeLayer(){if(layers.length===1)return notify('Keep at least one layer');snapshot();layers.splice(activeLayer,1);activeLayer=Math.max(0,activeLayer-1);render()}function moveLayer(d){let j=activeLayer+d;if(j<0||j>=layers.length)return;snapshot();[layers[activeLayer],layers[j]]=[layers[j],layers[activeLayer]];activeLayer=j;render()}function clearLayer(){if(!confirm('Clear the selected layer?'))return;snapshot();layers[activeLayer].canvas.getContext('2d').clearRect(0,0,P.width,P.height);composite()}function importImage(){let input=document.createElement('input');input.type='file';input.accept='image/*';input.onchange=()=>{let f=input.files[0];if(!f)return;let img=new Image();img.onload=()=>{snapshot();let c=layers[activeLayer].canvas.getContext('2d');c.drawImage(img,0,0,P.width,P.height);composite();URL.revokeObjectURL(img.src)};img.src=URL.createObjectURL(f)};input.click()}function pt(e){let r=P.getBoundingClientRect();return {x:(e.clientX-r.left)*P.width/r.width,y:(e.clientY-r.top)*P.height/r.height}}function ctx(){return layers[activeLayer].canvas.getContext('2d')}function brushSetup(c){c.globalAlpha=opacity;c.strokeStyle=color;c.fillStyle=color;c.lineCap='round';c.lineJoin='round';c.lineWidth=size;c.globalCompositeOperation=tool==='eraser'?'destination-out':'source-over';c.setLineDash([]);if(tool==='pencil'){c.lineWidth=Math.max(1,size*.22);c.globalAlpha=opacity*.85}else if(tool==='marker'){c.lineWidth=size*2.2;c.globalAlpha=opacity*.48;c.lineCap='square'}else if(tool==='crayon'){c.lineWidth=size*1.3;c.globalAlpha=opacity*.7}else if(tool==='airbrush'){c.globalAlpha=opacity*.12}}
+function dab(c,x,y,r,alpha){c.globalAlpha=alpha;c.beginPath();c.arc(x,y,Math.max(.5,r),0,Math.PI*2);c.fill()}
+function drawStroke(c,a,b){c.save();brushSetup(c);const dist=Math.hypot(b.x-a.x,b.y-a.y),steps=Math.max(1,Math.ceil(dist/Math.max(1,size*.17)));if(tool==='airbrush'){for(let k=0;k<=steps;k++){let t=k/steps,x=a.x+(b.x-a.x)*t,y=a.y+(b.y-a.y)*t;for(let j=0;j<16;j++){let angle=Math.random()*Math.PI*2,rad=Math.sqrt(Math.random())*size*2.3;dab(c,x+Math.cos(angle)*rad,y+Math.sin(angle)*rad,Math.max(.6,size*.07),opacity*.075)}}}else if(tool==='crayon'){for(let k=0;k<=steps;k++){let t=k/steps,x=a.x+(b.x-a.x)*t,y=a.y+(b.y-a.y)*t;for(let j=0;j<8;j++){let ox=(Math.random()-.5)*size*1.4,oy=(Math.random()-.5)*size*1.4;c.globalAlpha=opacity*(.2+Math.random()*.45);c.fillRect(x+ox,y+oy,Math.max(1,size*.11),Math.max(1,size*.23))}}}else if(tool==='brush'){for(let k=0;k<=steps;k++){let t=k/steps,x=a.x+(b.x-a.x)*t,y=a.y+(b.y-a.y)*t;dab(c,x,y,size*.5,opacity*.9);dab(c,x,y,size*.35,opacity*.32)}}else{c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke()}c.restore()}
+function flood(x,y){let c=ctx(),w=P.width,h=P.height,im=c.getImageData(0,0,w,h),d=im.data,ix=(Math.floor(y)*w+Math.floor(x))*4,src=[...d.slice(ix,ix+4)],target=color.match(/[a-f\d]{2}/gi).map(x=>parseInt(x,16));if(src[0]===target[0]&&src[1]===target[1]&&src[2]===target[2]&&src[3]===255)return;let stack=[ix/4],seen=new Uint8Array(w*h),n=0;while(stack.length&&n<700000){let p=stack.pop();if(p<0||p>=w*h||seen[p])continue;seen[p]=1;let i=p*4;if(Math.abs(d[i]-src[0])+Math.abs(d[i+1]-src[1])+Math.abs(d[i+2]-src[2])+Math.abs(d[i+3]-src[3])>20)continue;d[i]=target[0];d[i+1]=target[1];d[i+2]=target[2];d[i+3]=255;n++;let px=p%w|0;if(px>0)stack.push(p-1);if(px<w-1)stack.push(p+1);stack.push(p-w,p+w)}c.putImageData(im,0,0)}P.addEventListener('pointerdown',e=>{if(stage!=='draw')return;let l=layers[activeLayer];if(l.locked)return notify('Unlock this layer to draw');P.setPointerCapture(e.pointerId);origin=pt(e);painting=true;if(tool==='fill'){snapshot();flood(origin.x,origin.y);composite();painting=false;return}if(tool==='text'){let t=prompt('Enter text');if(t){snapshot();let c=ctx();c.fillStyle=color;c.font=`${Math.max(16,size*3)}px system-ui`;c.fillText(t,origin.x,origin.y);composite()}painting=false;return}snapshot();if(['pen','brush','pencil','marker','crayon','airbrush','eraser'].includes(tool)){drawStroke(ctx(),origin,{x:origin.x+.1,y:origin.y+.1});composite()}});P.addEventListener('pointermove',e=>{if(!painting)return;let p=pt(e);if(['pen','brush','pencil','marker','crayon','airbrush','eraser'].includes(tool)){drawStroke(ctx(),origin,p);origin=p;composite()}else if(['line','rect','ellipse'].includes(tool)){composite();pc.save();pc.globalAlpha=opacity;pc.strokeStyle=color;pc.lineWidth=size;pc.beginPath();if(tool==='line'){pc.moveTo(origin.x,origin.y);pc.lineTo(p.x,p.y)}if(tool==='rect')pc.rect(origin.x,origin.y,p.x-origin.x,p.y-origin.y);if(tool==='ellipse')pc.ellipse((origin.x+p.x)/2,(origin.y+p.y)/2,Math.max(1,Math.abs(p.x-origin.x)/2),Math.max(1,Math.abs(p.y-origin.y)/2),0,0,Math.PI*2);pc.stroke();pc.restore()}});P.addEventListener('pointerup',e=>{if(!painting)return;let p=pt(e),c=ctx();if(['line','rect','ellipse'].includes(tool)){brushSetup(c);c.beginPath();if(tool==='line'){c.moveTo(origin.x,origin.y);c.lineTo(p.x,p.y)}if(tool==='rect')c.rect(origin.x,origin.y,p.x-origin.x,p.y-origin.y);if(tool==='ellipse')c.ellipse((origin.x+p.x)/2,(origin.y+p.y)/2,Math.max(1,Math.abs(p.x-origin.x)/2),Math.max(1,Math.abs(p.y-origin.y)/2),0,0,Math.PI*2);c.stroke();c.globalAlpha=1}else if(tool==='move'){let dx=p.x-origin.x,dy=p.y-origin.y,tmp=document.createElement('canvas');tmp.width=P.width;tmp.height=P.height;tmp.getContext('2d').drawImage(layers[activeLayer].canvas,0,0);c.clearRect(0,0,P.width,P.height);c.drawImage(tmp,dx,dy)}painting=false;composite()});
+// 3D software renderer: vertices in 3D, perspective projection and depth-sorted shaded faces.
+function rgb(hex,f=1){let a=hex.replace('#','').match(/../g).map(x=>parseInt(x,16));return `rgb(${a.map(v=>Math.max(0,Math.min(255,Math.round(v*f)))).join(',')})`}function rotate(p,axis,a){let [x,y,z]=p,c=Math.cos(a),s=Math.sin(a);return axis==='x'?[x,y*c-z*s,y*s+z*c]:axis==='y'?[x*c+z*s,y,-x*s+z*c]:[x*c-y*s,x*s+y*c,z]}function project(p){let q=[p[0]-camera.yaw*.0,p[1],p[2]];q=rotate(q,'y',camera.yaw);q=rotate(q,'x',camera.pitch);let z=q[2]+13;return [V.width/2+q[0]*650*camera.zoom/z,V.height*.66-q[1]*650*camera.zoom/z,z]}let faces=[];function poly3(points,fill){let v=points.map(project),z=v.reduce((s,p)=>s+p[2],0)/v.length;faces.push({v,z,fill})}function box3(x,y,z,w,h,d,fill,ry=0){let v=[[-w/2,-h/2,-d/2],[w/2,-h/2,-d/2],[w/2,h/2,-d/2],[-w/2,h/2,-d/2],[-w/2,-h/2,d/2],[w/2,-h/2,d/2],[w/2,h/2,d/2],[-w/2,h/2,d/2]].map(p=>{p=rotate(p,'y',ry);return [p[0]+x,p[1]+y,p[2]+z]});[[0,1,2,3],[5,4,7,6],[4,0,3,7],[1,5,6,2],[3,2,6,7],[4,5,1,0]].forEach((f,i)=>poly3(f.map(j=>v[j]),rgb(fill,[.72,.93,.75,.82,1,.65][i])))}function sphere3(x,y,z,r,fill){let stacks=8,slices=12;for(let a=0;a<stacks;a++)for(let b=0;b<slices;b++){let pts=[[a,b],[a+1,b],[a+1,b+1],[a,b+1]].map(([i,j])=>{let phi=Math.PI*i/stacks,th=2*Math.PI*j/slices;return [x+r*Math.sin(phi)*Math.cos(th),y+r*Math.cos(phi),z+r*Math.sin(phi)*Math.sin(th)]});poly3(pts,rgb(fill,.7+.3*Math.cos(2*Math.PI*b/slices)) )}}function limb(a,b,r,fill){let mid=a.map((v,i)=>(v+b[i])/2),len=Math.hypot(...a.map((v,i)=>v-b[i]));let dx=b[0]-a[0],dy=b[1]-a[1],dz=b[2]-a[2];let up=[0,1,0],dir=[dx/len,dy/len,dz/len];let u=[dir[2],0,-dir[0]],ul=Math.hypot(...u)||1;u=u.map(x=>x/ul);let v=[dir[1]*u[2]-dir[2]*u[1],dir[2]*u[0]-dir[0]*u[2],dir[0]*u[1]-dir[1]*u[0]];let rings=[a,b].map(center=>Array.from({length:7},(_,j)=>center.map((q,k)=>q+r*(u[k]*Math.cos(j*2*Math.PI/7)+v[k]*Math.sin(j*2*Math.PI/7)))));for(let j=0;j<7;j++)poly3([rings[0][j],rings[0][(j+1)%7],rings[1][(j+1)%7],rings[1][j]],rgb(fill,.72+.25*Math.sin(j)))}function getAngle(k){let a=angles[k]*Math.PI/180;if(playing){let t=elapsed;let s=speeds[k];if(moves.walk&&(k==='leftLeg'||k==='rightLeg'||k==='leftArm'||k==='rightArm'))a+=Math.sin(t*5*s+(k.startsWith('right')?Math.PI:0))*.45;if(moves.wave&&k==='leftArm')a+=.6+Math.sin(t*7*s)*.45;if(moves.dance)a+=Math.sin(t*4*s+(k==='torso'?0:1))*.25;if(moves.jump&&k==='leftLeg')a+=Math.sin(t*4*s)*.3}if(keyframes.length>1&&playing){let sorted=[...keyframes].sort((a,b)=>a.t-b.t),at=elapsed%duration;let lo=sorted[0],hi=sorted[sorted.length-1];for(let i=0;i<sorted.length-1;i++)if(at>=sorted[i].t&&at<=sorted[i+1].t){lo=sorted[i];hi=sorted[i+1];break}let frac=Math.max(0,Math.min(1,(at-lo.t)/Math.max(.001,hi.t-lo.t)));a+=(lo.angles[k]*(1-frac)+hi.angles[k]*frac)*Math.PI/180}return a}function character(x=0,z=0,scale=1,offset=0){let a=Object.fromEntries(Object.keys(angles).map(k=>[k,getAngle(k)])),jump=playing&&moves.jump?Math.abs(Math.sin(elapsed*4))*0.6:0;let Y=obj.y+jump,xx=x+obj.x,zz=z+obj.z,sc=scale*obj.scale;function point(X,y,Z){let p=[X*sc,y*sc+Y,Z*sc];p=rotate(p,'y',(obj.rot*Math.PI/180)+(playing&&moves.spin?elapsed:0)+offset);return [p[0]+xx,p[1],p[2]+zz]}function B(X,y,Z,w,h,d,c){let p=point(X,y,Z);box3(...p,w*sc,h*sc,d*sc,c,obj.rot*Math.PI/180)}function S(X,y,Z,r,c){sphere3(...point(X,y,Z),r*sc,c)}B(0,1.85,0,.78,1.25,.44,outfit);S(0,2.85,0,.43,skin);S(-.16,2.9,.38,.047,'#1e3026');S(.16,2.9,.38,.047,'#1e3026');if(hair!=='bald')B(0,3.21,0,.75,.15,.62,'#222b25');if(hat){B(0,3.34,0,.7,.19,.65,outfit);B(0,3.26,.2,.9,.07,.74,'#d9ad44')}if(accessory==='glasses'){B(0,2.89,.44,.5,.05,.03,'#1b3028')}if(accessory==='necklace')S(0,2.48,.32,.09,'#e4b349');let arms=[['leftArm',-.52],['rightArm',.52]];arms.forEach(([k,side])=>{let ang=a[k],top=point(side,2.34,0),end=point(side+Math.sin(ang)*.68,1.46+Math.cos(ang)*-.14,.05);limb(top,end,.14*sc,outfit);sphere3(...end,.14*sc,skin)});[['leftLeg',-.23],['rightLeg',.23]].forEach(([k,side])=>{let ang=a[k],start=point(side,1.25,0),end=point(side+Math.sin(ang)*.5,.28+Math.cos(ang)*.08,.05);limb(start,end,.17*sc,'#3c5b78');sphere3(...end,.2*sc,'#333a3d')})}function ground(){for(let i=-5;i<=5;i++){poly3([[i,0,-5],[i,0,5],[i+.012,0,5],[i+.012,0,-5]],'#d0e3d6');poly3([[-5,0,i],[5,0,i],[5,0,i+.012],[-5,0,i+.012]],'#d0e3d6')}}function propDraw(p){let {kind,x,z}=p;if(kind==='tree'){box3(x,.75,z,.3,1.5,.3,'#98683b');sphere3(x,1.9,z,.9,'#238d47')}if(kind==='house'){box3(x,.85,z,1.7,1.7,1.3,'#f2cf9a');box3(x,1.8,z,2,.45,1.5,'#9c503e');box3(x,.42,z+.7,.45,.8,.1,'#66442d')}if(kind==='ball')sphere3(x,.35,z,.35,'#f1a12e');if(kind==='car'){box3(x,.4,z,1.4,.55,.7,'#e44842');box3(x,.82,z,.8,.4,.65,'#4c8cbb');sphere3(x-.43,.2,z+.36,.2,'#333333');sphere3(x+.43,.2,z+.36,.2,'#333333')}}function draw3D(){if(stage==='draw'||stage==='welcome')return;vc.clearRect(0,0,V.width,V.height);let backgrounds={village:['#e7f7ea','#d4efdb'],classroom:['#f2f5ff','#e4e7ef'],forest:['#d8f5e0','#b9dfbe'],space:['#18283f','#1a3554'],beach:['#bcebf5','#f8e6bd'],city:['#e8f2fa','#e0e5e9']},bg=backgrounds[scene]||backgrounds.village;let grad=vc.createLinearGradient(0,0,0,V.height);grad.addColorStop(0,bg[0]);grad.addColorStop(1,bg[1]);vc.fillStyle=grad;vc.fillRect(0,0,V.width,V.height);faces=[];ground();if(stage==='toon'||stage==='3d'||stage==='animate'){if(['child','girl','adult'].includes(selectedToon))character();else if(selectedToon==='lion'||selectedToon==='elephant'||selectedToon==='dog'){box3(0,1,0,1.8,1,.9,selectedToon==='elephant'?'#9da6a4':'#d8a35c');sphere3(1,1.3,0,.55,selectedToon==='elephant'?'#9da6a4':'#d8a35c');for(let x of [-.6,.6])for(let z of [-.3,.3])box3(x,.35,z,.25,.7,.25,'#b88854')}else if(selectedToon==='car'||selectedToon==='bus')propDraw({kind:'car',x:0,z:0});else propDraw({kind:selectedToon==='tree'?'tree':'house',x:0,z:0})}else{renderEditableScene()}faces.sort((a,b)=>b.z-a.z);for(let f of faces){vc.fillStyle=f.fill;vc.beginPath();f.v.forEach((p,i)=>i?vc.lineTo(p[0],p[1]):vc.moveTo(p[0],p[1]));vc.closePath();vc.fill();vc.strokeStyle='rgba(15,50,28,.10)';vc.lineWidth=.5;vc.stroke()}if((stage==='scene'||stage==='story'))drawSceneSelection();if((stage==='scene'||stage==='story')&&dialogue){vc.fillStyle='rgba(255,255,255,.92)';vc.beginPath();vc.roundRect(360,30,280,66,16);vc.fill();vc.fillStyle='#173e29';vc.font='23px system-ui';vc.textAlign='center';vc.fillText(dialogue.slice(0,28),500,72);vc.textAlign='start'}if(stage==='3d'&&converted){vc.fillStyle='#fff';vc.fillRect(15,15,195,128);vc.drawImage(P,20,20,185,120);vc.fillStyle='#163a28';vc.font='15px system-ui';vc.fillText('Original drawing',25,164)}}let converted=false;function convertDrawing(){converted=true;selectedToon='child';go('3d');notify('3D character template opened alongside your original drawing. Full sketch-to-mesh reconstruction is not supported.')}function resetView(){camera={yaw:.35,pitch:.12,zoom:1};obj={x:0,y:0,z:0,scale:1,rot:0};render()}function resetToon(){skin='#b8794b';outfit='#168e45';hat=true;accessory='none';hair='short';render()}function addProp(kind){sceneAdd(kind)}function addActor(){sceneAdd('person')}V.addEventListener('pointerdown',e=>{V.setPointerCapture(e.pointerId);drag={x:e.clientX,y:e.clientY,yaw:camera.yaw,pitch:camera.pitch}});V.addEventListener('pointermove',e=>{if(!drag)return;camera.yaw=drag.yaw+(e.clientX-drag.x)*.008;camera.pitch=Math.max(-1.1,Math.min(1.1,drag.pitch+(e.clientY-drag.y)*.006));draw3D()});V.addEventListener('pointerup',()=>drag=null);V.addEventListener('wheel',e=>{e.preventDefault();camera.zoom=Math.max(.4,Math.min(2.5,camera.zoom*(e.deltaY>0?.92:1.08)));draw3D()},{passive:false});function togglePlay(){playing=!playing;$('playBtn').textContent=playing?'⏸ Pause':'▶ Play';if(playing)lastFrame=performance.now();notify(playing?'Playing animation':'Paused')}function resetTime(){elapsed=0;playing=false;$('playBtn').textContent='▶ Play';draw3D();updateClock()}function updateClock(){$('clock').textContent=elapsed.toFixed(1)+'s';$('playhead').style.left=(elapsed/duration*100)+'%'}function scrub(e){let r=$('track').getBoundingClientRect();elapsed=Math.max(0,Math.min(duration,(e.clientX-r.left)/r.width*duration));updateClock();draw3D()}function recordPose(){keyframes.push({t:elapsed,angles:{...angles}});notify('Pose captured at '+elapsed.toFixed(1)+'s ('+keyframes.length+' keyframes)')}function frame(now){if(playing){elapsed+=(now-lastFrame)/1000;if(elapsed>=duration){elapsed%=duration;if(stage==='story')speak()}if(stage!=='draw'&&stage!=='welcome')draw3D();updateClock()}lastFrame=now;requestAnimationFrame(frame)}requestAnimationFrame(frame);
+function speak(){if(!('speechSynthesis'in window))return notify('Speech not supported in this browser');speechSynthesis.cancel();let u=new SpeechSynthesisUtterance(dialogue);u.lang=voice;u.rate=.85;speechSynthesis.speak(u);notify('Speech playback started (voice pronunciation depends on browser)')}let micRecorder=null;async function recordNarration(){if(!navigator.mediaDevices?.getUserMedia)return notify('Microphone requires HTTPS or localhost');try{let stream=await navigator.mediaDevices.getUserMedia({audio:true});let chunks=[];micRecorder=new MediaRecorder(stream);micRecorder.ondataavailable=e=>chunks.push(e.data);micRecorder.onstop=()=>{let url=URL.createObjectURL(new Blob(chunks,{type:micRecorder.mimeType}));let a=document.createElement('a');a.href=url;a.download='idilewa-narration.webm';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);stream.getTracks().forEach(t=>t.stop())};micRecorder.start();notify('Recording audio for 5 seconds');setTimeout(()=>micRecorder.state==='recording'&&micRecorder.stop(),5000)}catch(e){notify('Microphone permission denied or unavailable')}}function exportPNG(){let c=stage==='draw'?P:V;c.toBlob(b=>{let a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='idilewa-'+stage+'.png';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)})}function exportVideo(){if(!V.captureStream||!window.MediaRecorder)return notify('WebM recording unsupported. Use PNG export or Chrome/Edge.');if(stage==='draw'||stage==='welcome')return notify('Open Animation, Scene or Story to record video');let stream=V.captureStream(30),chunks=[],rec;try{rec=new MediaRecorder(stream,{mimeType:MediaRecorder.isTypeSupported('video/webm;codecs=vp9')?'video/webm;codecs=vp9':'video/webm'});}catch(e){return notify('Video recording unavailable: '+e.message)}rec.ondataavailable=e=>{if(e.data.size)chunks.push(e.data)};rec.onstop=()=>{let url=URL.createObjectURL(new Blob(chunks,{type:'video/webm'})),a=document.createElement('a');a.href=url;a.download='idilewa-animation.webm';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);stream.getTracks().forEach(t=>t.stop());notify('Video saved')};resetTime();playing=true;lastFrame=performance.now();rec.start();notify('Recording '+duration+' seconds of canvas animation (no audio)');setTimeout(()=>{rec.stop();playing=false;$('playBtn').textContent='▶ Play'},duration*1000)}function saveProject(){try{let state={layers:layers.map(l=>({name:l.name,visible:l.visible,locked:l.locked,img:l.canvas.toDataURL('image/png')})),activeLayer,selectedToon,toonName,skin,outfit,hat,accessory,hair,camera,obj,angles,speeds,moves,scene,props,actors,dialogue,keyframes,duration,sceneItems,roomEnabled,gridSnap,roomColour};localStorage.setItem('idilewa-m10',JSON.stringify(state));notify('Project saved on this browser')}catch(e){notify('Storage full or blocked. Export PNG instead.')}}function loadProject(){let raw=localStorage.getItem('idilewa-m10');if(!raw)return notify('No saved project found on this browser');try{let s=JSON.parse(raw);activeLayer=s.activeLayer??0;selectedToon=s.selectedToon||'child';toonName=s.toonName||'My Toon';skin=s.skin||skin;outfit=s.outfit||outfit;hat=s.hat??hat;accessory=s.accessory||'none';hair=s.hair||'short';camera=s.camera||camera;obj=s.obj||obj;angles=s.angles||angles;speeds=s.speeds||speeds;moves=s.moves||moves;scene=s.scene||scene;props=s.props||[];actors=s.actors||[];sceneItems=s.sceneItems||[];roomEnabled=s.roomEnabled??true;gridSnap=s.gridSnap??true;roomColour=s.roomColour||'#e8c68c';dialogue=s.dialogue||'';keyframes=s.keyframes||[];duration=s.duration||10;layers=s.layers.map(o=>{let l=newLayer(o.name);l.visible=o.visible;l.locked=o.locked;let img=new Image();img.onload=()=>{l.canvas.getContext('2d').drawImage(img,0,0);composite()};img.src=o.img;return l});render();notify('Project loaded')}catch(e){notify('Unable to load saved project: '+e.message)}}
+initLayers();go('welcome');
+
+/* Scene Builder editing upgrade: offline touch-first floor editor */
+let sceneItems=[],selectedItem=null,sceneTool='select',gridSnap=true,roomEnabled=true,roomColour='#e8c68c',sceneHistory=[],sceneFuture=[],sceneDrag=null,sceneCameraDrag=null;
+const sceneCatalog=[['table','🪑 Table'],['chair','🪑 Chair'],['sofa','🛋️ Sofa'],['shelf','📚 Shelf'],['bed','🛏️ Bed'],['plant','🪴 Plant'],['lamp','💡 Lamp'],['rug','🟩 Rug'],['tree','🌳 Tree'],['house','🏠 House'],['car','🚗 Car'],['ball','⚽ Ball'],['person','🧒🏾 Character']];
+function sceneMode(){return stage==='scene'||stage==='story'}
+function ensureScene(){if(sceneItems.length)return;sceneItems=[{id:'a1',kind:'person',x:-1.7,z:0,scale:1,rot:0},{id:'a2',kind:'person',x:1.6,z:0,scale:1,rot:0},{id:'p1',kind:'table',x:0,z:.9,scale:1,rot:0},{id:'p2',kind:'plant',x:3,z:-1.8,scale:1,rot:0}];}
+function sceneSnapshot(){return JSON.stringify({items:sceneItems,roomEnabled,roomColour})}
+function sceneCheckpoint(){sceneHistory.push(sceneSnapshot());if(sceneHistory.length>60)sceneHistory.shift();sceneFuture=[]}
+function sceneRestore(s){let d=JSON.parse(s);sceneItems=d.items;roomEnabled=d.roomEnabled;roomColour=d.roomColour;selectedItem=null;sceneRefresh()}
+function sceneUndo(){if(!sceneHistory.length)return notify('Nothing to undo');sceneFuture.push(sceneSnapshot());sceneRestore(sceneHistory.pop())}
+function sceneRedo(){if(!sceneFuture.length)return notify('Nothing to redo');sceneHistory.push(sceneSnapshot());sceneRestore(sceneFuture.pop())}
+function sceneAdd(kind){ensureScene();sceneCheckpoint();let id='item'+Date.now()+Math.random().toString(16).slice(2);sceneItems.push({id,kind,x:0,z:0,scale:1,rot:0});selectedItem=id;sceneRefresh();notify(kind+' added — drag it to arrange')}
+function sceneSelected(){return sceneItems.find(i=>i.id===selectedItem)}
+function sceneAction(action){let a=sceneSelected();if(!a)return notify('Tap an item first');sceneCheckpoint();if(action==='delete'){sceneItems=sceneItems.filter(x=>x.id!==a.id);selectedItem=null}else if(action==='duplicate'){let b={...a,id:'item'+Date.now(),x:a.x+.6,z:a.z+.5};sceneItems.push(b);selectedItem=b.id}else if(action==='front'){a.z+=.5}else if(action==='back'){a.z-=.5}else if(action==='rotate'){a.rot=(a.rot+15)%360}else if(action==='grow'){a.scale=Math.min(3,a.scale+.15)}else if(action==='shrink'){a.scale=Math.max(.3,a.scale-.15)}sceneRefresh()}
+function sceneTransform(key,value){let a=sceneSelected();if(!a)return;sceneCheckpoint();a[key]=key==='scale'?Math.max(.2,Math.min(4,+value)):key==='rot'?+value:Math.max(-5,Math.min(5,+value));sceneRefresh()}
+function sceneSetTool(t){sceneTool=t;sceneRefresh()}
+function sceneRefresh(){if(!sceneMode())return;const left=$('left'),right=$('right');left.innerHTML=sceneLeftPanel();right.innerHTML=sceneRightPanel();$('foot').innerHTML='<span class="status">● Room editor · Tap an item to select · Drag to arrange · Camera mode to orbit</span>';draw3D()}
+function sceneLeftPanel(){return `<h3>🏠 Room & Scene</h3><div class="grid2"><button class="${sceneTool==='select'?'active':''}" onclick="sceneSetTool('select')">☝ Select / Move</button><button class="${sceneTool==='camera'?'active':''}" onclick="sceneSetTool('camera')">📷 Orbit Camera</button></div><div class="grid2" style="margin-top:8px"><button onclick="sceneUndo()">↶ Undo</button><button onclick="sceneRedo()">↷ Redo</button></div><h4>Environments</h4><div class="grid2">${['classroom','village','forest','city','beach','space'].map(x=>`<button class="${scene===x?'active':''}" onclick="scene='${x}';draw3D()">${x}</button>`).join('')}</div><label class="field"><span>Room walls</span><input type="checkbox" ${roomEnabled?'checked':''} onchange="sceneCheckpoint();roomEnabled=this.checked;draw3D()"></label><label class="field"><span>Wall colour</span><input type="color" value="${roomColour}" onchange="sceneCheckpoint();roomColour=this.value;draw3D()"></label><h4>Add items to the room</h4><div class="grid2">${sceneCatalog.map(([k,n])=>`<button onclick="sceneAdd('${k}')">${n}</button>`).join('')}</div><p class="hint">Drag objects across the floor. Use Camera mode to rotate the view.</p>`}
+function sceneRightPanel(){let a=sceneSelected();return `<h3>🧰 Arrange Items</h3><div class="grid2"><button onclick="sceneAction('duplicate')">⧉ Duplicate</button><button onclick="sceneAction('delete')">🗑 Delete</button><button onclick="sceneAction('rotate')">↻ Rotate 15°</button><button onclick="sceneAction('front')">↑ Forward</button><button onclick="sceneAction('back')">↓ Backward</button><button onclick="sceneAction('grow')">＋ Larger</button><button onclick="sceneAction('shrink')">－ Smaller</button><button onclick="saveProject()">💾 Save</button></div><label class="field"><span><input type="checkbox" ${gridSnap?'checked':''} onchange="gridSnap=this.checked"> Snap to 0.5 grid</span></label>${a?`<h4>Selected: ${esc(a.kind)}</h4>${[['x','X position',-5,5,.1],['z','Z position',-5,5,.1],['scale','Size',.2,4,.1],['rot','Rotation',-180,180,5]].map(([k,n,min,max,step])=>`<label class="field">${n}<input type="number" min="${min}" max="${max}" step="${step}" value="${a[k]}" onchange="sceneTransform('${k}',this.value)"></label>`).join('')}`:'<p class="hint">Tap an item in the scene to edit its position, size and rotation.</p>'}<h4>Items in scene</h4><div class="stack">${sceneItems.map(i=>`<button class="${selectedItem===i.id?'active':''}" onclick="selectedItem='${i.id}';sceneRefresh()">${esc(i.kind)} · ${i.x.toFixed(1)}, ${i.z.toFixed(1)}</button>`).join('')}</div>`}
+const sceneOldLeft=leftPanel,sceneOldRight=rightPanel,sceneOldGo=go;
+leftPanel=function(){return sceneMode()?sceneLeftPanel():sceneOldLeft()};rightPanel=function(){return sceneMode()?sceneRightPanel():sceneOldRight()};
+go=function(s){if(s==='scene'||s==='story')ensureScene();sceneOldGo(s);if(sceneMode()){setupSceneToolbar();sceneRefresh();if(window.innerWidth<650){$('timeline').classList.add('collapsed')}}};
+function setupSceneToolbar(){if(!sceneMode())return;let wrap=document.querySelector('.canvaswrap');let existing=$('sceneEditDock');if(existing)existing.remove();let dock=document.createElement('div');dock.id='sceneEditDock';dock.className='scene-dock';dock.innerHTML=`<button onclick="sceneSetTool('select')">☝ Move</button><button onclick="sceneSetTool('camera')">📷 Camera</button><button onclick="sceneAction('rotate')">↻ Rotate</button><button onclick="sceneAction('duplicate')">⧉ Copy</button><button onclick="sceneAction('delete')">🗑 Delete</button><button onclick="toggleSide('left')">＋ Items</button><button onclick="toggleSide('right')">⚙ Edit</button>`;wrap.appendChild(dock);let timeline=$('timeline');let toggle=$('sceneTimelineToggle');if(!toggle){toggle=document.createElement('button');toggle.id='sceneTimelineToggle';toggle.textContent='🎞 Timeline ▾';toggle.onclick=()=>timeline.classList.toggle('collapsed');timeline.prepend(toggle)}}
+function sceneBox(item){let k=item.kind,x=item.x,z=item.z,s=item.scale,r=item.rot*Math.PI/180;function B(dx,y,dz,w,h,d,c){let X=x+dx*Math.cos(r)-dz*Math.sin(r),Z=z+dx*Math.sin(r)+dz*Math.cos(r);box3(X,y*s,Z,w*s,h*s,d*s,c,r)}if(k==='person'){let old={...obj};obj={x:0,y:0,z:0,scale:s*.8,rot:item.rot};character(x,z,1);obj=old;return}if(k==='table'){B(0,.82,0,1.7,.16,1.1,'#a16a3c');for(let dx of [-.65,.65])for(let dz of [-.38,.38])B(dx,.38,dz,.15,.75,.15,'#80512d')}
+else if(k==='chair'){B(0,.5,0,.7,.16,.7,'#c08b51');B(0,1.02,-.3,.7,.9,.14,'#986039');for(let dx of [-.25,.25])for(let dz of [-.25,.25])B(dx,.25,dz,.11,.5,.11,'#85562f')}
+else if(k==='sofa'){B(0,.42,0,1.8,.6,.8,'#459c70');B(0,1,-.32,1.8,.7,.22,'#25764e');for(let dx of [-.8,.8])B(dx,.75,0,.2,.7,.8,'#28794c')}
+else if(k==='shelf'){B(0,1,0,1.4,2,.35,'#9b6d3e');for(let y of [.45,1,1.55])B(0,y,.22,1.25,.08,.35,'#d2a46b')}
+else if(k==='bed'){B(0,.4,0,1.8,.4,2,'#b0d9e7');B(0,.5,-.9,1.9,.8,.15,'#8d633b');B(0,.68,-.52,1.2,.13,.45,'#fff')}
+else if(k==='plant'){B(0,.34,0,.55,.65,.55,'#bc7447');sphere3(x,1.05*s,z,.68*s,'#238a49')}
+else if(k==='lamp'){B(0,.85,0,.12,1.7,.12,'#6c7270');B(0,1.8,0,.8,.45,.8,'#ffe2a1')}
+else if(k==='rug'){B(0,.035,0,2,.05,1.6,'#8dd0ae')}
+else if(k==='tree'||k==='house'||k==='car'||k==='ball'){let temp={...item};propDraw(temp)} }
+function renderEditableScene(){ensureScene();if(roomEnabled){poly3([[-5,0,-5],[5,0,-5],[5,0,5],[-5,0,5]],'#e8d5ba');poly3([[-5,0,-5],[-5,4,-5],[5,4,-5],[5,0,-5]],roomColour);poly3([[-5,0,-5],[-5,4,-5],[-5,4,5],[-5,0,5]],'#dcb887');}sceneItems.forEach(sceneBox)}
+function sceneScreenPos(item){return project([item.x,(item.kind==='person'?1.4:.65)*item.scale,item.z])}
+function drawSceneSelection(){let a=sceneSelected();if(!a)return;let p=sceneScreenPos(a),scale=V.width/1000;vc.save();vc.strokeStyle='#11cb51';vc.lineWidth=4;vc.setLineDash([10,5]);let w=(a.kind==='person'?90:75)*a.scale*camera.zoom,h=(a.kind==='person'?155:90)*a.scale*camera.zoom;vc.strokeRect(p[0]-w/2,p[1]-h/2,w,h);vc.setLineDash([]);vc.fillStyle='#fff';vc.beginPath();vc.arc(p[0],p[1]-h/2,9,0,Math.PI*2);vc.fill();vc.stroke();vc.restore()}
+function scenePointerPos(e){let r=V.getBoundingClientRect();return [(e.clientX-r.left)*V.width/r.width,(e.clientY-r.top)*V.height/r.height]}
+function scenePick(e){let [x,y]=scenePointerPos(e),best=null,dist=Infinity;for(let i of sceneItems){let p=sceneScreenPos(i),w=(i.kind==='person'?100:95)*i.scale*camera.zoom,h=(i.kind==='person'?170:110)*i.scale*camera.zoom,dx=Math.abs(x-p[0]),dy=Math.abs(y-p[1]);if(dx<w/2+18&&dy<h/2+18){let d=(dx/w)**2+(dy/h)**2;if(d<dist){best=i;dist=d}}}return best}
+function sceneScreenToFloor(x,y,ref){let p=project([ref.x,0,ref.z]),px=project([ref.x+.05,0,ref.z]),pz=project([ref.x,0,ref.z+.05]);let a=(px[0]-p[0])/.05,b=(pz[0]-p[0])/.05,c=(px[1]-p[1])/.05,d=(pz[1]-p[1])/.05,det=a*d-b*c;if(Math.abs(det)<1)return {x:ref.x,z:ref.z};let dx=x-p[0],dy=y-p[1];return {x:ref.x+(dx*d-b*dy)/det,z:ref.z+(a*dy-dx*c)/det}}
+V.addEventListener('pointerdown',e=>{if(!sceneMode())return;e.stopImmediatePropagation();V.setPointerCapture(e.pointerId);let [x,y]=scenePointerPos(e);if(sceneTool==='camera'){sceneCameraDrag={x:e.clientX,y:e.clientY,yaw:camera.yaw,pitch:camera.pitch};return}let hit=scenePick(e);selectedItem=hit?.id||null;if(hit){sceneCheckpoint();sceneDrag={id:hit.id,startX:x,startY:y,original:{x:hit.x,z:hit.z},moved:false}}sceneRefresh() },true);
+V.addEventListener('pointermove',e=>{if(!sceneMode())return;e.stopImmediatePropagation();if(sceneCameraDrag){camera.yaw=sceneCameraDrag.yaw+(e.clientX-sceneCameraDrag.x)*.008;camera.pitch=Math.max(-.8,Math.min(.8,sceneCameraDrag.pitch+(e.clientY-sceneCameraDrag.y)*.006));draw3D();return}if(!sceneDrag)return;let item=sceneSelected();if(!item)return;let [x,y]=scenePointerPos(e),ref=sceneDrag.original,world=sceneScreenToFloor(x-sceneDrag.startX+project([ref.x,0,ref.z])[0],y-sceneDrag.startY+project([ref.x,0,ref.z])[1],ref);item.x=Math.max(-4.8,Math.min(4.8,gridSnap?Math.round(world.x*2)/2:world.x));item.z=Math.max(-4.8,Math.min(4.8,gridSnap?Math.round(world.z*2)/2:world.z));sceneDrag.moved=true;draw3D()},true);
+function sceneEnd(e){if(!sceneMode())return;e.stopImmediatePropagation();let moved=sceneDrag?.moved;sceneDrag=null;sceneCameraDrag=null;if(moved)sceneRefresh()}
+V.addEventListener('pointerup',sceneEnd,true);V.addEventListener('pointercancel',sceneEnd,true);
+const oldRender=render;render=function(){oldRender();if(sceneMode()){setupSceneToolbar();sceneRefresh()}};
+const oldToggleFull=toggleFull;toggleFull=function(){oldToggleFull();if(sceneMode())setupSceneToolbar()};
+
+
+/* Milestone 10.2: usable scene layers and editing workspace */
+let sceneLayerFilter='',scenePanelTab='layers',sceneInitialized=false,sceneAutoTimer=null;
+const sceneIcons={person:'🧒🏾',table:'🪑',chair:'🪑',sofa:'🛋️',shelf:'📚',bed:'🛏️',plant:'🪴',lamp:'💡',rug:'🟩',tree:'🌳',house:'🏠',car:'🚗',ball:'⚽'};
+const sceneBaseEnsure=ensureScene;
+ensureScene=function(){if(!sceneInitialized){sceneBaseEnsure();sceneInitialized=true;}sceneItems.forEach((i,n)=>{if(i.visible===undefined)i.visible=true;if(i.locked===undefined)i.locked=false;if(!i.name)i.name=(sceneIcons[i.kind]||'📦')+' '+i.kind+' '+(n+1);});};
+const sceneBaseSnapshot=sceneSnapshot;
+sceneSnapshot=function(){return JSON.stringify({items:sceneItems,roomEnabled,roomColour,scene:scene,gridSnap})};
+sceneRestore=function(raw){const s=JSON.parse(raw);sceneItems=s.items||[];roomEnabled=s.roomEnabled??true;roomColour=s.roomColour||roomColour;scene=s.scene||scene;gridSnap=s.gridSnap??true;sceneInitialized=true;selectedItem=null;sceneRefresh();queueSceneAutosave()};
+function queueSceneAutosave(){clearTimeout(sceneAutoTimer);sceneAutoTimer=setTimeout(()=>{try{localStorage.setItem('idilewa-scene-autosave-v2',sceneSnapshot())}catch(e){}},500)}
+const sceneBaseCheckpoint=sceneCheckpoint;
+sceneCheckpoint=function(){sceneBaseCheckpoint();queueSceneAutosave()};
+const sceneBaseAdd=sceneAdd;
+sceneAdd=function(kind){sceneBaseAdd(kind);ensureScene();scenePanelTab='layers';sceneRefresh();queueSceneAutosave()};
+const sceneBaseAction=sceneAction;
+sceneAction=function(action){let a=sceneSelected();if(!a)return notify('Select an item first');if(a.locked)return notify('Unlock this layer before editing');sceneBaseAction(action);queueSceneAutosave()};
+const sceneBaseTransform=sceneTransform;
+sceneTransform=function(key,value){let a=sceneSelected();if(!a||a.locked)return notify('Unlock this layer first');sceneBaseTransform(key,value);queueSceneAutosave()};
+function sceneLayerChange(id,action,value){ensureScene();let i=sceneItems.findIndex(x=>x.id===id);if(i<0)return;sceneCheckpoint();let a=sceneItems[i];if(action==='visible'){a.visible=!a.visible;if(!a.visible&&selectedItem===id)selectedItem=null}
+else if(action==='locked'){a.locked=!a.locked}
+else if(action==='rename'){a.name=String(value||'').trim().slice(0,48)||a.name}
+else if(action==='up'&&i<sceneItems.length-1){sceneItems.splice(i,1);sceneItems.splice(i+1,0,a)}
+else if(action==='down'&&i>0){sceneItems.splice(i,1);sceneItems.splice(i-1,0,a)}
+else if(action==='select'){if(a.visible){selectedItem=id;scenePanelTab='properties'}}
+sceneRefresh();queueSceneAutosave()}
+function sceneNudge(dx,dz){let a=sceneSelected();if(!a||a.locked)return notify('Select an unlocked object');sceneCheckpoint();a.x=Math.max(-4.8,Math.min(4.8,a.x+dx));a.z=Math.max(-4.8,Math.min(4.8,a.z+dz));sceneRefresh();queueSceneAutosave()}
+function sceneRename(id){let a=sceneItems.find(x=>x.id===id);if(!a)return;let name=prompt('Rename scene layer',a.name);if(name!==null)sceneLayerChange(id,'rename',name)}
+function sceneClearAll(){if(!confirm('Clear every item in this scene? You can undo this action.'))return;sceneCheckpoint();sceneItems=[];selectedItem=null;sceneRefresh();queueSceneAutosave()}
+function sceneResetCamera(){camera={yaw:.35,pitch:.12,zoom:1};draw3D();notify('Camera reset')}
+function sceneExportJSON(){let payload={format:'idilewa-scene',version:2,scene:JSON.parse(sceneSnapshot()),camera,dialogue};let blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});let url=URL.createObjectURL(blob);let a=document.createElement('a');a.href=url;a.download='idilewa-scene.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1500)}
+function sceneImportJSON(){let input=document.createElement('input');input.type='file';input.accept='.json,application/json';input.onchange=async()=>{try{let file=input.files[0];if(!file)return;let data=JSON.parse(await file.text());if(data.format!=='idilewa-scene'||!Array.isArray(data.scene?.items)||data.scene.items.length>500)throw Error('Unsupported scene file');sceneCheckpoint();sceneRestore(JSON.stringify(data.scene));if(data.camera)camera=data.camera;if(typeof data.dialogue==='string')dialogue=data.dialogue.slice(0,500);sceneRefresh();notify('Scene imported')}catch(e){notify('Unable to import: '+e.message)}};input.click()}
+function sceneSetPanel(tab){scenePanelTab=tab;sceneRefresh();if(innerWidth<650){$('right').classList.add('open');$('right').scrollIntoView({behavior:'smooth',block:'nearest'})}}
+function sceneLayerList(){let rows=sceneItems.map((a,i)=>({a,i})).reverse().filter(({a})=>a.name.toLowerCase().includes(sceneLayerFilter.toLowerCase())||a.kind.includes(sceneLayerFilter.toLowerCase()));return `<div class="row"><b>🗂 Scene layers (${sceneItems.length})</b><button onclick="sceneClearAll()" title="Clear scene">Clear</button></div><input aria-label="Search scene layers" placeholder="Find an item…" value="${esc(sceneLayerFilter)}" oninput="sceneLayerFilter=this.value;document.getElementById('sceneLayerRows').innerHTML=sceneLayerListRows()"><div id="sceneLayerRows">${sceneLayerListRows(rows)}</div>`}
+function sceneLayerListRows(rows){rows=rows||sceneItems.map((a,i)=>({a,i})).reverse().filter(({a})=>a.name.toLowerCase().includes(sceneLayerFilter.toLowerCase())||a.kind.includes(sceneLayerFilter.toLowerCase()));return rows.length?rows.map(({a,i})=>`<div class="scene-layer ${selectedItem===a.id?'chosen':''} ${!a.visible?'dim':''}"><button class="scene-layer-name" onclick="sceneLayerChange('${a.id}','select')" title="Select object">${sceneIcons[a.kind]||'📦'} ${esc(a.name)}</button><button title="Show or hide" aria-label="Toggle visibility" onclick="sceneLayerChange('${a.id}','visible')">${a.visible?'👁':'◌'}</button><button title="Lock or unlock" aria-label="Toggle lock" onclick="sceneLayerChange('${a.id}','locked')">${a.locked?'🔒':'🔓'}</button><button title="Rename" onclick="sceneRename('${a.id}')">✎</button><button title="Raise layer" onclick="sceneLayerChange('${a.id}','up')">↑</button><button title="Lower layer" onclick="sceneLayerChange('${a.id}','down')">↓</button></div>`).join(''):'<p class="hint">No matching objects. Add one from the Items tab.</p>'}
+function sceneProperties(){let a=sceneSelected();if(!a)return `<p class="hint">Tap a visible object or select a layer to edit it.</p><button onclick="sceneSetPanel('items')">＋ Add an object</button>`;return `<div class="row"><b>${esc(a.name)}</b><button onclick="sceneRename('${a.id}')">Rename</button></div>${a.locked?'<p class="hint">🔒 This object is locked. Unlock it in Layers.</p>':''}<div class="scene-transform">${[['x','Left / right',-4.8,4.8,.1],['z','Forward / back',-4.8,4.8,.1],['scale','Size',.2,4,.1],['rot','Rotation',-180,180,5]].map(([key,label,min,max,step])=>`<label>${label}<input type="number" min="${min}" max="${max}" step="${step}" value="${a[key]}" ${a.locked?'disabled':''} onchange="sceneTransform('${key}',this.value)"></label>`).join('')}</div><div class="scene-nudge"><button onclick="sceneNudge(0,-.5)">↑ Forward</button><button onclick="sceneNudge(-.5,0)">← Left</button><button onclick="sceneNudge(.5,0)">Right →</button><button onclick="sceneNudge(0,.5)">↓ Back</button></div><div class="grid2"><button onclick="sceneAction('rotate')">↻ Rotate</button><button onclick="sceneAction('duplicate')">⧉ Duplicate</button><button onclick="sceneAction('grow')">＋ Larger</button><button onclick="sceneAction('shrink')">－ Smaller</button><button onclick="sceneAction('delete')">🗑 Delete</button></div>`}
+function sceneItemsPanel(){return `<h4>Furniture, characters and props</h4><div class="scene-catalog">${sceneCatalog.map(([k,n])=>`<button onclick="sceneAdd('${k}')">${n}</button>`).join('')}</div>`}
+sceneRightPanel=function(){ensureScene();return `<div class="scene-panel-tabs"><button class="${scenePanelTab==='layers'?'active':''}" onclick="sceneSetPanel('layers')">Layers</button><button class="${scenePanelTab==='properties'?'active':''}" onclick="sceneSetPanel('properties')">Edit</button><button class="${scenePanelTab==='items'?'active':''}" onclick="sceneSetPanel('items')">＋ Items</button></div>${scenePanelTab==='layers'?sceneLayerList():scenePanelTab==='properties'?sceneProperties():sceneItemsPanel()}<hr><div class="row"><button onclick="sceneUndo()">↶ Undo</button><button onclick="sceneRedo()">↷ Redo</button><button onclick="saveProject()">💾 Save</button></div>`};
+sceneLeftPanel=function(){return `<h3>🏠 Room & Camera</h3><div class="grid2"><button class="${sceneTool==='select'?'active':''}" onclick="sceneSetTool('select')">☝ Select / Move</button><button class="${sceneTool==='camera'?'active':''}" onclick="sceneSetTool('camera')">📷 Orbit Camera</button></div><div class="grid2" style="margin-top:8px"><button onclick="sceneResetCamera()">⌖ Reset view</button><button onclick="sceneSetPanel('layers')">🗂 Layers</button></div><label class="field">Environment<select onchange="sceneCheckpoint();scene=this.value;sceneRefresh()">${['classroom','village','forest','city','beach','space'].map(x=>`<option value="${x}" ${scene===x?'selected':''}>${x}</option>`).join('')}</select></label><label class="field">Room walls <input type="checkbox" ${roomEnabled?'checked':''} onchange="sceneCheckpoint();roomEnabled=this.checked;sceneRefresh()"></label><label class="field">Wall colour<input type="color" value="${roomColour}" onchange="sceneCheckpoint();roomColour=this.value;sceneRefresh()"></label><label class="field"><span><input type="checkbox" ${gridSnap?'checked':''} onchange="gridSnap=this.checked;sceneRefresh()"> Snap to 0.5 grid</span></label><div class="grid2"><button onclick="sceneExportJSON()">⬇ Scene JSON</button><button onclick="sceneImportJSON()">⬆ Import scene</button></div><p class="hint">Select mode: drag objects. Camera mode: drag to orbit. Use Layers to lock, hide, rename and reorder objects.</p>`};
+sceneRefresh=function(){if(!sceneMode())return;ensureScene();$('left').innerHTML=sceneLeftPanel();$('right').innerHTML=sceneRightPanel();$('foot').innerHTML='<span class="status">● Select objects to move them · Use Layers to edit visibility and order</span>';draw3D()};
+const scenePreviousRenderEditable=renderEditableScene;
+renderEditableScene=function(){ensureScene();if(roomEnabled){poly3([[-5,0,-5],[5,0,-5],[5,0,5],[-5,0,5]],'#e8d5ba');poly3([[-5,0,-5],[-5,4,-5],[5,4,-5],[5,0,-5]],roomColour);poly3([[-5,0,-5],[-5,4,-5],[-5,4,5],[-5,0,5]],'#dcb887')}sceneItems.filter(a=>a.visible).forEach(sceneBox)};
+const scenePreviousPick=scenePick;
+scenePick=function(e){let picked=scenePreviousPick(e);return picked&&picked.visible&&!picked.locked?picked:null};
+const scenePreviousSelection=drawSceneSelection;
+drawSceneSelection=function(){let a=sceneSelected();if(a&&a.visible)scenePreviousSelection()};
+const scenePreviousEnd=sceneEnd;
+sceneEnd=function(e){scenePreviousEnd(e);queueSceneAutosave()};
+V.addEventListener('pointerup',()=>{if(sceneMode())queueSceneAutosave()},true);
+const scenePreviousSetup=setupSceneToolbar;
+setupSceneToolbar=function(){scenePreviousSetup();if(!sceneMode())return;let dock=$('sceneEditDock');if(!dock)return;dock.innerHTML=`<button onclick="sceneSetTool('select')">☝ Move</button><button onclick="sceneSetTool('camera')">📷 Camera</button><button onclick="sceneSetPanel('layers')">🗂 Layers</button><button onclick="sceneSetPanel('items')">＋ Items</button><button onclick="sceneSetPanel('properties')">⚙ Edit</button><button onclick="sceneUndo()">↶</button><button onclick="sceneRedo()">↷</button>`};
+const scenePreviousGo=go;
+go=function(s){scenePreviousGo(s);if(sceneMode()){scenePanelTab='layers';sceneRefresh();if(innerWidth<650){$('timeline').classList.add('collapsed')}}};
+const scenePreviousSave=saveProject;
+saveProject=function(){scenePreviousSave();if(sceneMode())queueSceneAutosave()};
+const scenePreviousLoad=loadProject;
+loadProject=function(){scenePreviousLoad();sceneInitialized=true;ensureScene();if(sceneMode())sceneRefresh()};
+window.addEventListener('keydown',e=>{if(!sceneMode()||['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName))return;if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();e.shiftKey?sceneRedo():sceneUndo()}else if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='y'){e.preventDefault();sceneRedo()}else if((e.key==='Delete'||e.key==='Backspace')&&sceneSelected()){e.preventDefault();sceneAction('delete')}else if(e.key==='ArrowLeft')sceneNudge(-.5,0);else if(e.key==='ArrowRight')sceneNudge(.5,0);else if(e.key==='ArrowUp')sceneNudge(0,-.5);else if(e.key==='ArrowDown')sceneNudge(0,.5)});
+try{let saved=localStorage.getItem('idilewa-scene-autosave-v2');if(saved){let d=JSON.parse(saved);if(Array.isArray(d.items)){sceneItems=d.items;sceneInitialized=true;roomEnabled=d.roomEnabled??roomEnabled;roomColour=d.roomColour||roomColour;scene=d.scene||scene;gridSnap=d.gridSnap??gridSnap}}}catch(e){}
+
+
+/* Milestone 10.2 scene-first responsive editor. Existing studios are preserved. */
+let studioLanguage='yo',studioSearch='',studioCategory='all',studioDrawer='objects',studioDrawerOpen=false,studioEditMode='select';
+const studioNames={
+ table:{en:'Table',yo:'Tábìlì',ig:'Tebụl',ha:'Tebur',sw:'Meza',cat:'furniture'},chair:{en:'Chair',yo:'Àga',ig:'Oche',ha:'Kujera',sw:'Kiti',cat:'furniture'},sofa:{en:'Sofa',yo:'Sófà',ig:'Sofa',ha:'Sofa',sw:'Sofa',cat:'furniture'},shelf:{en:'Bookshelf',yo:'Àtẹ ìwé',ig:'Ebe akwụkwọ',ha:'Shiryayyen littattafai',sw:'Rafu ya vitabu',cat:'furniture'},bed:{en:'Bed',yo:'Ìbùsùn',ig:'Akwa',ha:'Gado',sw:'Kitanda',cat:'furniture'},plant:{en:'Plant',yo:'Ohun ọ̀gbìn',ig:'Osisi',ha:'Shuka',sw:'Mmea',cat:'nature'},lamp:{en:'Lamp',yo:'Fìtílà',ig:'Oriọna',ha:'Fitila',sw:'Taa',cat:'furniture'},rug:{en:'Rug',yo:'Kápẹ́ẹ̀tì',ig:'Kapeeti',ha:'Kafet',sw:'Zulia',cat:'furniture'},tree:{en:'Tree',yo:'Igi',ig:'Osisi',ha:'Itace',sw:'Mti',cat:'nature'},house:{en:'House',yo:'Ilé',ig:'Ụlọ',ha:'Gida',sw:'Nyumba',cat:'buildings'},car:{en:'Car',yo:'Ọkọ̀ ayọ́kẹ́lẹ́',ig:'Ụgbọala',ha:'Mota',sw:'Gari',cat:'vehicles'},ball:{en:'Ball',yo:'Bọ́ọ̀lù',ig:'Bọọlụ',ha:'Kwallo',sw:'Mpira',cat:'objects'},person:{en:'Character',yo:'Ènìyàn',ig:'Mmadụ',ha:'Mutum',sw:'Mtu',cat:'characters'}
+};
+const studioLangs={en:'English',yo:'Yorùbá',ig:'Igbo',ha:'Hausa',sw:'Kiswahili'};
+const studioEmoji={table:'🪑',chair:'🪑',sofa:'🛋️',shelf:'📚',bed:'🛏️',plant:'🪴',lamp:'💡',rug:'🟩',tree:'🌳',house:'🏠',car:'🚗',ball:'⚽',person:'🧒🏾'};
+function studioNorm(s){return String(s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/ẹ/g,'e').replace(/ọ/g,'o').replace(/ṣ/g,'s').replace(/Ẹ/g,'E').replace(/Ọ/g,'O').replace(/Ṣ/g,'S').toLowerCase().trim()}
+function studioLabel(kind){let a=studioNames[kind];return a?(a[studioLanguage]||a.en):kind}
+function studioSetLanguage(lang){studioLanguage=lang;studioRefreshPanels()}
+function studioSetSearch(s){studioSearch=s;let area=document.getElementById('studioAssetGrid');if(area)area.innerHTML=studioAssetsHTML()}
+function studioSetCategory(s){studioCategory=s;studioRefreshPanels()}
+function studioAssetsHTML(){let items=Object.entries(studioNames).filter(([k,o])=>(studioCategory==='all'||o.cat===studioCategory)&&(!studioSearch||studioNorm(Object.values(o).join(' ')).includes(studioNorm(studioSearch))));return items.length?items.map(([k,o])=>`<button class="studio-asset" onclick="studioAdd('${k}')" title="Add ${esc(o.en)}"><span>${studioEmoji[k]}</span><b>${esc(studioLabel(k))}</b><small>${studioLanguage==='en'?'':esc(o.en)}</small><small class="asset-add">＋ Add</small></button>`).join(''):'<p class="hint">No matching objects. Try the English name or another language.</p>'}
+function studioLibraryHTML(){return `<div class="studio-panel-heading"><b>＋ Object Library</b><span>${sceneItems.length} in room</span></div><label class="studio-search-label">Search objects in any language<input id="studioAssetSearch" type="search" placeholder="Chair / Àga / Oche / Kujera / Kiti" value="${esc(studioSearch)}" oninput="studioSetSearch(this.value)"></label><label class="studio-search-label">Object labels<select onchange="studioSetLanguage(this.value)">${Object.entries(studioLangs).map(([k,v])=>`<option value="${k}" ${studioLanguage===k?'selected':''}>${v}</option>`).join('')}</select></label><div class="studio-chips">${[['all','All'],['furniture','Furniture'],['characters','People'],['nature','Nature'],['buildings','Buildings'],['vehicles','Vehicles'],['objects','Objects']].map(([k,n])=>`<button class="${studioCategory===k?'active':''}" onclick="studioSetCategory('${k}')">${n}</button>`).join('')}</div><div id="studioAssetGrid" class="studio-assets">${studioAssetsHTML()}</div><p class="hint">Select an object to add it to the room. Names are searchable across all five languages; vocabulary should receive fluent-speaker review before public launch.</p>`}
+function studioAdd(kind){sceneAdd(kind);studioDrawerOpen=false;studioDrawer='properties';studioRefreshPanels();notify(studioLabel(kind)+' added — drag it in the room')}
+function studioPropertiesHTML(){let a=sceneSelected();if(!a)return '<p class="hint">Tap an object in the room to edit it, or open Objects to add furniture.</p>';return `<div class="studio-panel-heading"><b>${studioEmoji[a.kind]||'📦'} ${esc(a.name)}</b><button onclick="sceneRename('${a.id}')">Rename</button></div><div class="studio-props-grid">${[['x','Left / right',-4.8,4.8,.1],['z','Forward / back',-4.8,4.8,.1],['scale','Size',.2,4,.1],['rot','Rotation',-180,180,5]].map(([key,name,min,max,step])=>`<label>${name}<input type="number" min="${min}" max="${max}" step="${step}" value="${Number(a[key]||0).toFixed(key==='rot'?0:2)}" ${a.locked?'disabled':''} onchange="sceneTransform('${key}',this.value)"></label>`).join('')}</div><div class="studio-quick-grid"><button onclick="sceneNudge(-.5,0)">← Left</button><button onclick="sceneNudge(0,-.5)">↑ Forward</button><button onclick="sceneNudge(0,.5)">↓ Back</button><button onclick="sceneNudge(.5,0)">Right →</button><button onclick="sceneAction('rotate')">↻ Rotate</button><button onclick="sceneAction('duplicate')">⧉ Duplicate</button><button onclick="sceneAction('grow')">＋ Larger</button><button onclick="sceneAction('shrink')">－ Smaller</button><button onclick="sceneAction('delete')">🗑 Delete</button></div>`}
+function studioLayersHTML(){return `<div class="studio-panel-heading"><b>Layers (${sceneItems.length})</b><button onclick="sceneClearAll()">Clear</button></div><input type="search" placeholder="Find a layer" value="${esc(sceneLayerFilter)}" oninput="sceneLayerFilter=this.value;studioRefreshPanels()"><div class="studio-layer-list">${sceneLayerListRows()}</div><p class="hint">Layers manage selection, visibility and locking. Reordering does not change 3D depth.</p>`}
+function studioSettingsHTML(){return `<h3>Room & Camera</h3><div class="studio-quick-grid"><button onclick="sceneSetTool('select')">✥ Edit objects</button><button onclick="sceneSetTool('camera')">◎ Orbit camera</button><button onclick="sceneResetCamera()">⌖ Reset camera</button><button onclick="sceneExportJSON()">⬇ Scene JSON</button><button onclick="sceneImportJSON()">⬆ Import JSON</button></div><label class="field">Environment<select onchange="sceneCheckpoint();scene=this.value;sceneRefresh()">${['classroom','village','forest','city','beach','space'].map(x=>`<option ${scene===x?'selected':''}>${x}</option>`).join('')}</select></label><label class="field">Wall colour<input type="color" value="${roomColour}" onchange="sceneCheckpoint();roomColour=this.value;sceneRefresh()"></label><label class="field"><span><input type="checkbox" ${roomEnabled?'checked':''} onchange="sceneCheckpoint();roomEnabled=this.checked;sceneRefresh()"> Room walls</span></label><label class="field"><span><input type="checkbox" ${gridSnap?'checked':''} onchange="gridSnap=this.checked;sceneRefresh()"> Snap to 0.5 grid</span></label>`}
+function studioPanelContent(tab){return tab==='objects'?studioLibraryHTML():tab==='layers'?studioLayersHTML():tab==='properties'?studioPropertiesHTML():studioSettingsHTML()}
+function studioOpen(tab){studioDrawer=tab;studioDrawerOpen=true;studioRefreshPanels()}
+function studioClose(){studioDrawerOpen=false;studioRefreshPanels()}
+function studioRefreshPanels(){if(!sceneMode())return;let left=$('left'),right=$('right');left.innerHTML=studioLibraryHTML();right.innerHTML=`<div class="studio-desktop-tabs">${[['properties','Edit'],['layers','Layers'],['settings','Room']].map(([k,v])=>`<button class="${studioDrawer===k?'active':''}" onclick="studioOpen('${k}')">${v}</button>`).join('')}</div><div class="studio-right-content">${studioPanelContent(studioDrawer==='objects'?'properties':studioDrawer)}</div>`;let drawer=$('studioMobileDrawer');if(drawer){drawer.classList.toggle('open',studioDrawerOpen);drawer.innerHTML=`<div class="studio-drawer-grip"></div><div class="studio-drawer-top"><b>${{objects:'Add Objects',layers:'Layers',properties:'Edit Object',settings:'Room Settings'}[studioDrawer]}</b><button onclick="studioClose()" aria-label="Close panel">✕</button></div><div class="studio-drawer-body">${studioPanelContent(studioDrawer)}</div>`}let dock=$('studioSceneDock');if(dock)dock.innerHTML=`<button class="${sceneTool==='select'?'active':''}" onclick="sceneSetTool('select')">✥ Move</button><button class="${sceneTool==='camera'?'active':''}" onclick="sceneSetTool('camera')">◎ Camera</button><button onclick="studioOpen('objects')">＋ Objects</button><button onclick="studioOpen('layers')">▤ Layers</button><button onclick="studioOpen('properties')">⚙ Edit</button>`;let float=$('studioContext');let a=sceneSelected();if(float){float.classList.toggle('hidden',!a||!a.visible);float.innerHTML=a?`<span class="studio-selected">${esc(a.name)}</span><button onclick="sceneSetTool('select')">✥ Move</button><button onclick="sceneAction('rotate')">↻ Rotate</button><button onclick="sceneAction('grow')">＋ Size</button><button onclick="sceneAction('duplicate')">⧉ Copy</button><button onclick="sceneAction('delete')">⌫ Delete</button>`:''}draw3D()}
+const studioOriginalSceneRefresh=sceneRefresh;
+sceneRefresh=function(){if(!sceneMode())return;ensureScene();$('foot').innerHTML='<span class="status">● Tap an object to select · Drag in Move mode · Camera mode orbits the room</span>';studioRefreshPanels()};
+const studioOriginalSceneAdd=sceneAdd;
+sceneAdd=function(kind){studioOriginalSceneAdd(kind);let a=sceneSelected();if(a){a.name=studioLabel(kind)+' '+sceneItems.filter(i=>i.kind===kind).length}studioRefreshPanels()};
+const studioOriginalSceneSetPanel=sceneSetPanel;
+sceneSetPanel=function(tab){studioOpen(tab==='items'?'objects':tab)};
+const studioOriginalScenePick=scenePick;
+scenePick=function(e){let [x,y]=scenePointerPos(e);let candidates=sceneItems.filter(a=>a.visible&&!a.locked).map(a=>{let p=sceneScreenPos(a),w=(a.kind==='person'?100:95)*a.scale*camera.zoom,h=(a.kind==='person'?170:110)*a.scale*camera.zoom;return {a,score:Math.pow((x-p[0])/(w/2+20),2)+Math.pow((y-p[1])/(h/2+20),2),depth:project([a.x,0,a.z])[2]||0}}).filter(v=>v.score<=1.6).sort((a,b)=>a.score-b.score);return candidates[0]?.a||null};
+const studioOriginalSceneTransform=sceneTransform;
+sceneTransform=function(key,value){let n=Number(value);if(!Number.isFinite(n))return notify('Enter a valid number');studioOriginalSceneTransform(key,n)};
+const studioOriginalSceneSetTool=sceneSetTool;
+sceneSetTool=function(t){studioOriginalSceneSetTool(t);studioRefreshPanels()};
+const studioOriginalSceneGo=go;
+go=function(s){studioDrawerOpen=false;studioOriginalSceneGo(s);document.body.classList.toggle('studio-scene',sceneMode());if(sceneMode()){studioEnsureChrome();studioRefreshPanels()}};
+function studioEnsureChrome(){let wrap=document.querySelector('.canvaswrap');if(!$('studioSceneDock')){let dock=document.createElement('div');dock.id='studioSceneDock';dock.className='studio-scene-dock';wrap.append(dock)}if(!$('studioContext')){let ctx=document.createElement('div');ctx.id='studioContext';ctx.className='studio-context hidden';wrap.append(ctx)}if(!$('studioMobileDrawer')){let drawer=document.createElement('div');drawer.id='studioMobileDrawer';drawer.className='studio-mobile-drawer';document.body.append(drawer)}if(!$('studioModeBar')){let mode=document.createElement('div');mode.id='studioModeBar';mode.className='studio-modebar';document.querySelector('.stagehead').after(mode)}$('studioModeBar').innerHTML=`<button class="${sceneTool==='select'?'active':''}" onclick="sceneSetTool('select')">✥ Edit</button><button class="${sceneTool==='camera'?'active':''}" onclick="sceneSetTool('camera')">◎ Camera</button><button onclick="togglePlay()">▶ Play</button><button onclick="sceneUndo()">↶ Undo</button><button onclick="sceneRedo()">↷ Redo</button><button onclick="saveProject()">💾 Save</button>`;let oldDock=$('sceneEditDock');if(oldDock)oldDock.remove();let mobileTools=document.querySelector('.mobileTools');if(mobileTools)mobileTools.style.display='none';}
+const studioOriginalSetupSceneToolbar=setupSceneToolbar;
+setupSceneToolbar=function(){if(!sceneMode())return;studioEnsureChrome()};
+const studioOriginalSceneLayerChange=sceneLayerChange;
+sceneLayerChange=function(id,action,value){studioOriginalSceneLayerChange(id,action,value);studioRefreshPanels()};
+const studioOriginalSceneEnd=sceneEnd;
+// Pointer handlers already installed by Milestone 10; update panels after pointer release.
+V.addEventListener('pointerup',()=>{if(sceneMode())studioRefreshPanels()},false);
+window.addEventListener('resize',()=>{if(sceneMode())studioRefreshPanels()});
+if(sceneMode()){document.body.classList.add('studio-scene');studioEnsureChrome();studioRefreshPanels()}
+
+
+/* Avoid the original opaque wall faces covering every object in the room. */
+renderEditableScene=function(){ensureScene();sceneItems.filter(a=>a.visible).forEach(sceneBox)};
+
+
+/* Ìdíléwa v11: editable path -> actual extruded polygon mesh, independent of character templates. */
+let studioPaths=[],studioPathActive=null,studioMesh=null,studioMeshInScene=false,studioDepth=.7;
+const studioOldLeftPanel=leftPanel;
+leftPanel=function(){let html=studioOldLeftPanel();if(stage==='draw'){
+ html=html.replace("[['brush','🖌️']","[['pen','🖊️'],['brush','🖌️']");
+ html=html.replace("({brush:'Paintbrush", "({pen:'Pen: draw a CLOSED outline for 3D conversion',brush:'Paintbrush");
+ html+=`<h4>3D conversion</h4><p class="hint">Draw a closed outline using Pen, Rectangle or Ellipse. Then tap Make It 3D. Open pen strokes and painted pixels cannot be extruded automatically.</p><button class="primary" onclick="convertDrawing()">⬡ Make selected shape 3D</button><button onclick="studioPaths=[];notify('Conversion outlines cleared')">Clear conversion outlines</button>`;
+ }if(stage==='3d')html+=`<h4>Converted drawing</h4><div class="stack"><label>Depth <input aria-label="Extrusion depth" type="range" min="0.1" max="2.5" step="0.1" value="${studioDepth}" oninput="studioDepth=+this.value;if(studioMesh){studioMesh.depth=studioDepth;draw3D()}"></label><button onclick="studioMeshInScene=true;go('scene');notify('Converted mesh added to scene')">＋ Add converted model to Scene</button><button onclick="studioExportOBJ()">⬇ Export actual mesh (OBJ)</button><button onclick="studioMesh=null;studioMeshInScene=false;draw3D()">Remove converted mesh</button></div>`;
+ return html};
+const studioOldBrushSetup=brushSetup;
+brushSetup=function(c){studioOldBrushSetup(c);if(tool==='pen'){c.lineWidth=Math.max(2,size*.35);c.globalAlpha=1;c.lineCap='round';c.lineJoin='round'}};
+const studioOldDrawStroke=drawStroke;
+drawStroke=function(c,a,b){if(tool==='pen'){c.save();brushSetup(c);c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();c.restore()}else studioOldDrawStroke(c,a,b)};
+P.addEventListener('pointerdown',e=>{if(stage!=='draw')return;if(tool==='pen'){studioPathActive={kind:'pen',points:[pt(e)],color};}else if(['rect','ellipse'].includes(tool)){studioPathActive={kind:tool,points:[pt(e)],color};}},true);
+P.addEventListener('pointermove',e=>{if(stage==='draw'&&studioPathActive&&tool==='pen'&&e.buttons)studioPathActive.points.push(pt(e));},true);
+P.addEventListener('pointerup',e=>{if(stage!=='draw'||!studioPathActive)return;let path=studioPathActive;studioPathActive=null;let end=pt(e);if(path.kind==='pen'){
+ path.points.push(end);let first=path.points[0],dist=Math.hypot(first.x-end.x,first.y-end.y);
+ if(dist>Math.max(25,size*2)){notify('Pen outline is open. Join its start and end before Make It 3D.');return}
+ path.points=studioSimplify(path.points,5);
+ }else{let a=path.points[0],b=end;if(Math.abs(a.x-b.x)<6||Math.abs(a.y-b.y)<6)return;
+ if(path.kind==='rect')path.points=[{x:a.x,y:a.y},{x:b.x,y:a.y},{x:b.x,y:b.y},{x:a.x,y:b.y}];
+ else path.points=Array.from({length:48},(_,i)=>({x:(a.x+b.x)/2+Math.abs(b.x-a.x)/2*Math.cos(i*2*Math.PI/48),y:(a.y+b.y)/2+Math.abs(b.y-a.y)/2*Math.sin(i*2*Math.PI/48)}));}
+ if(path.points.length>=3){studioPaths.push(path);notify('Closed outline ready for Make It 3D ('+studioPaths.length+' shapes)')}
+},true);
+function studioSimplify(points,minDist){let out=[points[0]];for(let p of points.slice(1)){let q=out[out.length-1];if(Math.hypot(p.x-q.x,p.y-q.y)>=minDist)out.push(p)}if(out.length>2&&Math.hypot(out[0].x-out[out.length-1].x,out[0].y-out[out.length-1].y)<minDist*2)out.pop();return out.slice(0,250)}
+function studioSignedArea(points){let a=0;for(let i=0;i<points.length;i++){let p=points[i],q=points[(i+1)%points.length];a+=p.x*q.y-q.x*p.y}return a/2}
+function studioEarClip(points){let ids=points.map((_,i)=>i),tris=[],ccw=studioSignedArea(points)>0,limit=points.length*points.length;
+ const cross=(a,b,c)=>(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+ const inside=(p,a,b,c)=>{let x=cross(a,b,p),y=cross(b,c,p),z=cross(c,a,p);return (x>=-1e-7&&y>=-1e-7&&z>=-1e-7)||(x<=1e-7&&y<=1e-7&&z<=1e-7)};
+ while(ids.length>3&&limit--){let found=false;for(let j=0;j<ids.length;j++){let ia=ids[(j-1+ids.length)%ids.length],ib=ids[j],ic=ids[(j+1)%ids.length],a=points[ia],b=points[ib],c=points[ic];if((ccw?1:-1)*cross(a,b,c)<1e-5)continue;if(ids.some(k=>k!==ia&&k!==ib&&k!==ic&&inside(points[k],a,b,c)))continue;tris.push([ia,ib,ic]);ids.splice(j,1);found=true;break}if(!found)break}if(ids.length===3)tris.push([...ids]);return tris}
+function studioBuildMesh(path){let pts=studioSimplify(path.points,4);if(pts.length<3)throw Error('At least 3 distinct points are needed');let area=Math.abs(studioSignedArea(pts));if(area<80)throw Error('Outline is too small');let triangles=studioEarClip(pts);if(triangles.length!==pts.length-2)throw Error('Outline overlaps itself or contains invalid geometry. Try a simpler closed shape.');let xs=pts.map(p=>p.x),ys=pts.map(p=>p.y),cx=(Math.min(...xs)+Math.max(...xs))/2,cy=(Math.min(...ys)+Math.max(...ys))/2,scale=4/Math.max(Math.max(...xs)-Math.min(...xs),Math.max(...ys)-Math.min(...ys));return {vertices:pts.map(p=>[(p.x-cx)*scale,(cy-p.y)*scale,0]),triangles,depth:studioDepth,color:path.color||'#168e45',x:0,y:1.8,z:0,scale:1,rot:0}}
+convertDrawing=function(){if(!studioPaths.length){notify('Draw a CLOSED outline with Pen, Rectangle or Ellipse first. Painted pixels and open strokes cannot be extruded.');return}try{studioMesh=studioBuildMesh(studioPaths[studioPaths.length-1]);studioMeshInScene=false;converted=true;go('3d');notify('Real extruded geometry created from your own drawing. Drag to orbit.')}catch(e){notify('Conversion: '+e.message)}};
+function studioMeshFaces(mesh){if(!mesh)return[];let d=mesh.depth/2,v=mesh.vertices,n=v.length,verts=[...v.map(p=>[p[0],p[1],-d]),...v.map(p=>[p[0],p[1],d])];let faces=[];for(let t of mesh.triangles){faces.push(t.map(i=>i+n));faces.push([...t].reverse())}for(let i=0;i<n;i++){let j=(i+1)%n;faces.push([i,j,j+n,i+n])}return faces.map(f=>f.map(i=>{let p=verts[i],q=rotate([p[0]*mesh.scale,p[1]*mesh.scale,p[2]*mesh.scale],'y',mesh.rot*Math.PI/180);return [q[0]+mesh.x,q[1]+mesh.y,q[2]+mesh.z]}))}
+function studioDrawMesh(mesh){if(!mesh)return;let polygons=studioMeshFaces(mesh).map((v,i)=>{let p=v.map(project);return {p,z:p.reduce((s,q)=>s+q[2],0)/p.length,i}}).sort((a,b)=>b.z-a.z);vc.save();for(let f of polygons){vc.beginPath();f.p.forEach((p,i)=>i?vc.lineTo(p[0],p[1]):vc.moveTo(p[0],p[1]));vc.closePath();vc.fillStyle=rgb(mesh.color,f.i<(mesh.triangles?.length||mesh.parts?.reduce((n,p)=>n+p.triangles.length,0)||0)*2?.94:.68);vc.fill();vc.strokeStyle='#183e2a';vc.lineWidth=1;vc.stroke()}vc.restore()}
+const studioOldDraw3D=draw3D;
+draw3D=function(){studioOldDraw3D();if(stage==='3d'&&studioMesh||['scene','story'].includes(stage)&&studioMesh&&studioMeshInScene)studioDrawMesh(studioMesh)};
+function studioExportOBJ(){if(!studioMesh)return notify('Convert a closed drawing first');let mesh=studioMesh,v=mesh.vertices,n=v.length,d=mesh.depth/2,lines=['# Idilewa extruded drawing','o drawing'];for(let z of [-d,d])for(let p of v)lines.push(`v ${p[0].toFixed(5)} ${p[1].toFixed(5)} ${z.toFixed(5)}`);for(let t of mesh.triangles){lines.push('f '+t.map(i=>i+n+1).join(' '));lines.push('f '+[...t].reverse().map(i=>i+1).join(' '))}for(let i=0;i<n;i++){let j=(i+1)%n;lines.push(`f ${i+1} ${j+1} ${j+n+1} ${i+n+1}`)}let blob=new Blob([lines.join('\n')+'\n'],{type:'text/plain'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='idilewa-drawing.obj';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000)}
+const studioOldSave=saveProject,studioOldLoad=loadProject;
+saveProject=function(){studioOldSave();try{localStorage.setItem('idilewa-v11-geometry',JSON.stringify({paths:studioPaths,mesh:studioMesh,inScene:studioMeshInScene,depth:studioDepth}))}catch(e){notify('3D geometry could not be saved: storage limit')}};
+loadProject=function(){studioOldLoad();try{let s=JSON.parse(localStorage.getItem('idilewa-v11-geometry')||'null');if(s){studioPaths=s.paths||[];studioMesh=s.mesh||null;studioMeshInScene=!!s.inScene;studioDepth=s.depth||.7;setTimeout(()=>draw3D(),100)}}catch(e){notify('Unable to restore saved 3D geometry')}};
+
+
+/* v11.1: freehand ink-to-3D repair. Open strokes become extruded ribbons;
+   closed paths remain filled extrusions. The existing brush rendering is retained. */
+let studioInkStrokes=[],studioInkActive=null;
+const studioInkTools=new Set(['pen','brush','pencil','marker','crayon','airbrush']);
+P.addEventListener('pointerdown',e=>{
+ if(stage!=='draw'||!studioInkTools.has(tool)||layers[activeLayer]?.locked)return;
+ studioInkActive={pointerId:e.pointerId,points:[pt(e)],color,weight:Math.max(3,size*(tool==='pencil'?.35:tool==='marker'?1.1:tool==='airbrush'?1.4:.75)),kind:tool};
+},true);
+P.addEventListener('pointermove',e=>{
+ if(!studioInkActive||e.pointerId!==studioInkActive.pointerId)return;
+ const q=pt(e),a=studioInkActive.points.at(-1);
+ if(Math.hypot(q.x-a.x,q.y-a.y)>=2)studioInkActive.points.push(q);
+},true);
+function studioFinishInk(e){
+ if(!studioInkActive||e.pointerId!==studioInkActive.pointerId)return;
+ const stroke=studioInkActive;studioInkActive=null;
+ const q=pt(e),a=stroke.points.at(-1);
+ if(Math.hypot(q.x-a.x,q.y-a.y)>2)stroke.points.push(q);
+ if(stroke.points.length>=2)studioInkStrokes.push(stroke);
+}
+P.addEventListener('pointerup',studioFinishInk,true);
+P.addEventListener('pointercancel',()=>{studioInkActive=null},true);
+function studioRibbon(stroke){
+ const points=studioSimplify(stroke.points,5);
+ if(points.length<2)throw Error('Stroke too short');
+ const half=Math.max(4,stroke.weight/2),left=[],right=[];
+ for(let i=0;i<points.length;i++){
+  const a=points[Math.max(0,i-1)],b=points[Math.min(points.length-1,i+1)];
+  const len=Math.hypot(b.x-a.x,b.y-a.y)||1,nx=-(b.y-a.y)/len,ny=(b.x-a.x)/len;
+  left.push({x:points[i].x+nx*half,y:points[i].y+ny*half});
+  right.push({x:points[i].x-nx*half,y:points[i].y-ny*half});
+ }
+ // Each segment is an independently extruded quadrilateral. This avoids
+ // self-intersection failures for crossing scribbles.
+ return left.slice(0,-1).map((a,i)=>studioBuildMesh({points:[a,left[i+1],right[i+1],right[i]],color:stroke.color}));
+}
+function studioConvertInk(){
+ const pieces=[];
+ for(const path of studioPaths){try{pieces.push(studioBuildMesh(path))}catch(e){/* skip invalid outline */}}
+ for(const stroke of studioInkStrokes){try{pieces.push(...studioRibbon(stroke))}catch(e){/* skip tiny strokes */}}
+ if(!pieces.length)throw Error('Draw a stroke or shape first.');
+ if(pieces.length>1200)throw Error('Drawing is too complex; use fewer strokes.');
+ // Align each component in a shared drawing coordinate system rather than
+ // independently centering every segment.
+ const all=pieces.flatMap(m=>m.vertices),minX=Math.min(...all.map(p=>p[0])),maxX=Math.max(...all.map(p=>p[0]));
+ // Rebuild with common canvas-space transform, retaining each polygon mesh.
+ const allPaths=[...studioPaths.map(p=>p.points),...studioInkStrokes.flatMap(st=>{
+  const pts=studioSimplify(st.points,5),h=Math.max(4,st.weight/2),result=[];
+  for(let i=0;i<pts.length-1;i++){
+   const a=pts[i],b=pts[i+1],len=Math.hypot(b.x-a.x,b.y-a.y)||1,nx=-(b.y-a.y)/len*h,ny=(b.x-a.x)/len*h;
+   result.push([{x:a.x+nx,y:a.y+ny},{x:b.x+nx,y:b.y+ny},{x:b.x-nx,y:b.y-ny},{x:a.x-nx,y:a.y-ny}]);
+  }return result;
+ })];
+ const coords=allPaths.flat(),cx=(Math.min(...coords.map(p=>p.x))+Math.max(...coords.map(p=>p.x)))/2,cy=(Math.min(...coords.map(p=>p.y))+Math.max(...coords.map(p=>p.y)))/2;
+ const k=4/Math.max(1,Math.max(...coords.map(p=>p.x))-Math.min(...coords.map(p=>p.x)),Math.max(...coords.map(p=>p.y))-Math.min(...coords.map(p=>p.y)));
+ let index=0;
+ for(const path of studioPaths){try{const m=studioBuildMesh(path);m.vertices=path.points.map(p=>[(p.x-cx)*k,(cy-p.y)*k,0]);pieces[index++]=m}catch(e){}}
+ // Instead of relying on potentially mismatched path ordering, construct all
+ // pieces directly from common-coordinate polygons.
+ const unified=[];
+ for(const path of studioPaths){try{const m=studioBuildMesh(path);m.vertices=studioSimplify(path.points,4).map(p=>[(p.x-cx)*k,(cy-p.y)*k,0]);unified.push(m)}catch(e){}}
+ for(const st of studioInkStrokes){
+  const pts=studioSimplify(st.points,5),h=Math.max(4,st.weight/2);
+  for(let i=0;i<pts.length-1;i++){
+   const a=pts[i],b=pts[i+1],len=Math.hypot(b.x-a.x,b.y-a.y)||1,nx=-(b.y-a.y)/len*h,ny=(b.x-a.x)/len*h;
+   const quad=[{x:a.x+nx,y:a.y+ny},{x:b.x+nx,y:b.y+ny},{x:b.x-nx,y:b.y-ny},{x:a.x-nx,y:a.y-ny}];
+   try{const m=studioBuildMesh({points:quad,color:st.color});m.vertices=quad.map(p=>[(p.x-cx)*k,(cy-p.y)*k,0]);unified.push(m)}catch(e){}
+  }
+ }
+ if(!unified.length)throw Error('No usable marks found');
+ return {parts:unified,depth:studioDepth,color:'#168e45',x:0,y:1.8,z:0,scale:1,rot:0};
+}
+convertDrawing=function(){
+ try{studioMesh=studioConvertInk();studioMeshInScene=false;converted=true;go('3d');notify('Converted '+studioMesh.parts.length+' drawing sections into real 3D geometry.');}
+ catch(e){notify('3D conversion: '+e.message)}
+};
+const studioOldMeshFaces=studioMeshFaces;
+studioMeshFaces=function(mesh){
+ if(!mesh?.parts)return studioOldMeshFaces(mesh);
+ return mesh.parts.flatMap(part=>studioOldMeshFaces({...part,depth:mesh.depth,x:mesh.x,y:mesh.y,z:mesh.z,scale:mesh.scale,rot:mesh.rot}));
+};
+const studioOldExportOBJ=studioExportOBJ;
+studioExportOBJ=function(){
+ if(!studioMesh?.parts)return studioOldExportOBJ();
+ const lines=['# Idilewa drawing extrusion'],d=studioMesh.depth/2;let offset=0;
+ for(const m of studioMesh.parts){
+  const n=m.vertices.length;
+  for(const z of [-d,d])for(const v of m.vertices)lines.push(`v ${v[0]} ${v[1]} ${z}`);
+  for(const t of m.triangles){lines.push('f '+t.map(i=>offset+n+i+1).join(' '));lines.push('f '+[...t].reverse().map(i=>offset+i+1).join(' '))}
+  for(let i=0;i<n;i++){const j=(i+1)%n;lines.push(`f ${offset+i+1} ${offset+j+1} ${offset+n+j+1} ${offset+n+i+1}`)}
+  offset+=2*n;
+ }
+ const blob=new Blob([lines.join('\n')],{type:'text/plain'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='idilewa-drawing.obj';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+};
+const studioSaveInk=saveProject,studioLoadInk=loadProject;
+saveProject=function(){studioSaveInk();try{localStorage.setItem('idilewa-v11-ink',JSON.stringify(studioInkStrokes))}catch(e){}};
+loadProject=function(){studioLoadInk();try{studioInkStrokes=JSON.parse(localStorage.getItem('idilewa-v11-ink')||'[]')}catch(e){studioInkStrokes=[]}};
+const studioOldInitLayers=initLayers;
+initLayers=function(){studioOldInitLayers();studioInkStrokes=[];studioPaths=[]};
+
+
+/* v11.2: canvas-first 3D conversion. Read actual painted pixels, not only pointer
+   event logs. This supports saved/imported and ordinary brush artwork. */
+function studioRasterTo3D(){
+  const source=document.createElement('canvas');
+  source.width=P.width;source.height=P.height;
+  const g=source.getContext('2d',{willReadFrequently:true});
+  for(const layer of layers){if(layer.visible!==false&&layer.canvas)g.drawImage(layer.canvas,0,0)}
+  const W=source.width,H=source.height, data=g.getImageData(0,0,W,H).data;
+  const cell=8, cols=Math.ceil(W/cell),rows=Math.ceil(H/cell), runs=[];
+  for(let gy=0;gy<rows;gy++){
+    let run=null;
+    for(let gx=0;gx<=cols;gx++){
+      let hit=false,r=0,gg=0,b=0,count=0;
+      if(gx<cols)for(let yy=gy*cell;yy<Math.min(H,(gy+1)*cell);yy+=2)
+        for(let xx=gx*cell;xx<Math.min(W,(gx+1)*cell);xx+=2){
+          const i=(yy*W+xx)*4,a=data[i+3];
+          if(a>35 && (data[i]<238||data[i+1]<238||data[i+2]<238)){
+            hit=true;r+=data[i];gg+=data[i+1];b+=data[i+2];count++;
+          }
+        }
+      if(hit){
+        if(!run)run={x:gx,y:gy,w:0,r:0,g:0,b:0,n:0};
+        run.w++;run.r+=r;run.g+=gg;run.b+=b;run.n+=count;
+      }else if(run){runs.push(run);run=null}
+    }
+  }
+  if(!runs.length)throw Error('No painted marks found. Draw on an unlocked visible layer.');
+  if(runs.length>1800)throw Error('Artwork is very detailed. Try a simpler sketch.');
+  const hex=v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,'0');
+  const parts=runs.map(run=>{
+    const x=run.x*cell,y=run.y*cell,w=Math.min(W-x,run.w*cell),h=Math.min(H-y,cell);
+    const pts=[{x,y},{x:x+w,y},{x:x+w,y:y+h},{x,y:y+h}];
+    const rgb='#'+hex(run.r/run.n)+hex(run.g/run.n)+hex(run.b/run.n);
+    return {vertices:pts.map(pt=>[(pt.x-W/2)*4/W,(H/2-pt.y)*4/W,0]),
+      triangles:[[0,1,2],[0,2,3]],color:rgb};
+  });
+  return {parts,depth:studioDepth,x:0,y:1.8,z:0,scale:1,rot:0,color:'#168e45'};
+}
+convertDrawing=function(){
+  try{
+    // Canvas pixels are authoritative: works even when stroke logging fails.
+    studioMesh=studioRasterTo3D();
+    studioMeshInScene=false;converted=true;
+    go('3d');
+    notify('Your drawing is now a raised 3D model. Drag to rotate it.');
+  }catch(e){notify('3D conversion: '+e.message)}
+};
+/* The scene controls were leaking into the Drawing workspace. */
+const studioGoBefore112=go;
+go=function(s){
+  studioGoBefore112(s);
+  const isScene=s==='scene'||s==='story';
+  for(const id of ['studioSceneDock','studioContext','sceneEditDock','studioModeBar']){
+    const el=$(id);if(el)el.style.display=isScene?'':'none';
+  }
+  const drawer=$('studioMobileDrawer');
+  if(drawer&&!isScene){drawer.classList.remove('open');drawer.style.display='none'}
+  else if(drawer)drawer.style.display='';
+  document.body.classList.toggle('studio-draw',s==='draw');
+};
+
+/* v11.3 — object choice and drawing-only animation */
+let studioAssetMode='drawing',studioDrawingMotion='spin',studioDrawingSpeed=1,studioDrawingAmplitude=.6;
+const studioCharacterOriginal=character;
+character=function(...args){
+  if((stage==='3d'||stage==='animate')&&studioAssetMode==='drawing'&&studioMesh)return;
+  return studioCharacterOriginal(...args);
+};
+const studioDraw3DBefore113=draw3D;
+draw3D=function(){
+  if(studioMesh&&(stage==='3d'||stage==='animate')&&studioAssetMode==='drawing'&&playing){
+    const oldRot=studioMesh.rot,oldY=studioMesh.y,oldX=studioMesh.x,oldScale=studioMesh.scale;
+    const t=elapsed*studioDrawingSpeed;
+    if(studioDrawingMotion==='spin')studioMesh.rot=oldRot+t*75;
+    if(studioDrawingMotion==='bounce')studioMesh.y=oldY+Math.abs(Math.sin(t*3))*studioDrawingAmplitude;
+    if(studioDrawingMotion==='sway')studioMesh.rot=oldRot+Math.sin(t*2)*25*studioDrawingAmplitude;
+    if(studioDrawingMotion==='slide')studioMesh.x=oldX+Math.sin(t*2)*studioDrawingAmplitude;
+    if(studioDrawingMotion==='pulse')studioMesh.scale=oldScale*(1+Math.sin(t*3)*.16*studioDrawingAmplitude);
+    studioDraw3DBefore113();
+    Object.assign(studioMesh,{rot:oldRot,y:oldY,x:oldX,scale:oldScale});
+  }else studioDraw3DBefore113();
+};
+const studioRenderBefore113=render;
+render=function(){studioRenderBefore113();studioShowAssetControls()};
+function studioShowAssetControls(){
+  let el=document.getElementById('studioAssetControls113');
+  if(!el){
+    el=document.createElement('section');el.id='studioAssetControls113';
+    el.style.cssText='background:white;border:1px solid #dbe8df;border-radius:16px;padding:12px;margin:12px 0;display:none';
+    const viewport=V.parentElement;
+    viewport.parentElement.insertBefore(el,viewport.nextSibling);
+  }
+  if(!['3d','animate'].includes(stage)){el.style.display='none';return}
+  el.style.display='block';
+  el.innerHTML=`<div style="font-weight:700;margin-bottom:8px">Choose what to work with</div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px">
+  <button onclick="studioSelectAsset('drawing')" ${studioAssetMode==='drawing'?'style="background:#087b39;color:white"':''}>✏️ My drawing</button>
+  <button onclick="studioSelectAsset('toon')" ${studioAssetMode==='toon'?'style="background:#087b39;color:white"':''}>🧒 Toon character</button>
+  <button onclick="studioSelectAsset('both')" ${studioAssetMode==='both'?'style="background:#087b39;color:white"':''}>➕ Both</button>
+  <button onclick="studioRemoveDrawing()">🗑 Remove drawing</button>
+  <button onclick="go('draw')">＋ Draw another</button>
+  </div>
+  ${stage==='animate'?`<div style="margin-top:12px;font-weight:700">Animate my drawing</div>
+  <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
+  ${['spin','bounce','sway','slide','pulse'].map(m=>`<button onclick="studioDrawingMotion='${m}';studioShowAssetControls();draw3D()" ${studioDrawingMotion===m?'style="background:#087b39;color:white"':''}>${m}</button>`).join('')}
+  </div>
+  <label style="display:block;margin-top:10px">Speed <input type="range" min=".25" max="4" step=".25" value="${studioDrawingSpeed}" oninput="studioDrawingSpeed=+this.value;document.getElementById('studioSpeed113').textContent=this.value+'×'"> <b id="studioSpeed113">${studioDrawingSpeed}×</b></label>
+  <label style="display:block;margin-top:8px">Movement amount <input type="range" min=".1" max="2" step=".1" value="${studioDrawingAmplitude}" oninput="studioDrawingAmplitude=+this.value"></label>
+  <div style="margin-top:8px">Press <b>Play</b> on the animation timeline to animate your drawing.</div>`:''}
+  <p style="font-size:13px;color:#486657;margin-bottom:0">My drawing is independent from the toon. Choose “My drawing” to work without a character.</p>`;
+}
+function studioSelectAsset(mode){
+  if(mode==='drawing'&&!studioMesh){notify('Draw something and tap Make It 3D first.');return}
+  studioAssetMode=mode;studioShowAssetControls();draw3D();
+}
+function studioRemoveDrawing(){
+  studioMesh=null;studioMeshInScene=false;studioAssetMode='toon';
+  studioShowAssetControls();draw3D();notify('Converted drawing removed. Original 2D artwork is preserved.');
+}
+const studioConvertBefore113=convertDrawing;
+convertDrawing=function(){
+  studioConvertBefore113();
+  if(studioMesh){studioAssetMode='drawing';studioShowAssetControls();draw3D()}
+};
+const studioGoBefore113=go;
+go=function(s){studioGoBefore113(s);studioShowAssetControls();if(s==='animate'&&studioMesh&&studioAssetMode==='drawing')draw3D()};
+const studioSaveBefore113=saveProject,studioLoadBefore113=loadProject;
+saveProject=function(){studioSaveBefore113();localStorage.setItem('idilewa-v113-mode',JSON.stringify({mode:studioAssetMode,motion:studioDrawingMotion,speed:studioDrawingSpeed,amplitude:studioDrawingAmplitude}))};
+loadProject=function(){studioLoadBefore113();try{const a=JSON.parse(localStorage.getItem('idilewa-v113-mode')||'{}');studioAssetMode=a.mode||'drawing';studioDrawingMotion=a.motion||'spin';studioDrawingSpeed=a.speed||1;studioDrawingAmplitude=a.amplitude||.6;studioShowAssetControls();draw3D()}catch(e){}};
+
+/* v11.4 Scene playback + portable learner project files */
+let sceneMotion114='bounce',sceneSpeed114=1,sceneAmount114=.65;
+const sceneBox114=sceneBox;
+sceneBox=function(item){
+  if(!playing || !['scene','story'].includes(stage))return sceneBox114(item);
+  const t=elapsed*sceneSpeed114,base={...item};
+  if(sceneMotion114==='spin')base.rot=(base.rot||0)+t*65;
+  if(sceneMotion114==='slide')base.x=(base.x||0)+Math.sin(t*2)*sceneAmount114;
+  if(sceneMotion114==='sway')base.rot=(base.rot||0)+Math.sin(t*2)*25*sceneAmount114;
+  if(sceneMotion114==='pulse')base.scale=(base.scale||1)*(1+Math.sin(t*3)*.25*sceneAmount114);
+  if(sceneMotion114==='bounce')base.scale=(base.scale||1)*(1+Math.abs(Math.sin(t*3))*.18*sceneAmount114);
+  return sceneBox114(base);
+};
+const studioDrawMesh114=studioDrawMesh;
+studioDrawMesh=function(mesh){
+  if(!playing||!['scene','story'].includes(stage))return studioDrawMesh114(mesh);
+  const t=elapsed*sceneSpeed114,copy={...mesh};
+  if(sceneMotion114==='spin')copy.rot=(copy.rot||0)+t*65;
+  if(sceneMotion114==='slide')copy.x=(copy.x||0)+Math.sin(t*2)*sceneAmount114;
+  if(sceneMotion114==='sway')copy.rot=(copy.rot||0)+Math.sin(t*2)*25*sceneAmount114;
+  if(sceneMotion114==='pulse'||sceneMotion114==='bounce')copy.scale=(copy.scale||1)*(1+Math.abs(Math.sin(t*3))*.2*sceneAmount114);
+  return studioDrawMesh114(copy);
+};
+const togglePlay114=togglePlay;
+togglePlay=function(){
+  togglePlay114();
+  if(playing&&['scene','story'].includes(stage))notify('Playing scene: '+sceneMotion114+' · '+sceneSpeed114+'×');
+};
+function studioScenePlaybackControls114(){
+  let host=document.getElementById('scenePlayback114');
+  if(!host){host=document.createElement('section');host.id='scenePlayback114';host.style.cssText='padding:12px;margin:8px 0;background:#fff;border:1px solid #d8e8df;border-radius:14px';V.parentElement.parentElement.appendChild(host)}
+  host.style.display=['scene','story'].includes(stage)?'block':'none';
+  if(host.style.display==='none')return;
+  host.innerHTML=`<strong>🎬 Animate scene objects</strong><p style="margin:6px 0">Choose an action, then press Play. This moves scene objects, including imported drawings.</p><label>Movement <select id="sceneMotionSelect114">${['bounce','spin','sway','slide','pulse'].map(v=>`<option value="${v}" ${sceneMotion114===v?'selected':''}>${v}</option>`).join('')}</select></label> <label>Speed <input id="sceneSpeed114" type="range" min=".25" max="4" step=".25" value="${sceneSpeed114}"> <b id="sceneSpeedValue114">${sceneSpeed114}×</b></label><div style="margin-top:8px;display:flex;gap:8px;flex-wrap:wrap"><button onclick="togglePlay()">▶ Play / Pause</button><button onclick="resetTime()">↺ Reset</button><button onclick="studioExportLearnerProject114()">⬇ Save project file</button><button onclick="document.getElementById('studioImport114').click()">⬆ Open project file</button></div><p style="font-size:12px;color:#476552">Account sync needs a connected Ìdíléwa login and backend. Project files can be saved and transferred now.</p>`;
+  document.getElementById('sceneMotionSelect114').onchange=e=>{sceneMotion114=e.target.value;draw3D()};
+  document.getElementById('sceneSpeed114').oninput=e=>{sceneSpeed114=Number(e.target.value);document.getElementById('sceneSpeedValue114').textContent=sceneSpeed114+'×'};
+}
+const go114=go;
+go=function(s){go114(s);studioScenePlaybackControls114()};
+function studioExportLearnerProject114(){
+  saveProject();
+  const data={version:'11.4',project:localStorage.getItem('idilewa-m10'),geometry:localStorage.getItem('idilewa-v11-geometry'),mode:localStorage.getItem('idilewa-v113-mode'),motion:{sceneMotion114,sceneSpeed114,sceneAmount114}};
+  const blob=new Blob([JSON.stringify(data)],{type:'application/json'}),url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='idilewa-learner-project.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000);
+}
+const studioImport114=document.createElement('input');studioImport114.type='file';studioImport114.accept='.json,application/json';studioImport114.id='studioImport114';studioImport114.hidden=true;document.body.appendChild(studioImport114);
+studioImport114.onchange=async e=>{
+  try{const f=e.target.files[0];if(!f)return;if(f.size>15000000)throw Error('File is too large');const data=JSON.parse(await f.text());if(!data.project||!JSON.parse(data.project).layers)throw Error('Not a valid Ìdíléwa project');localStorage.setItem('idilewa-m10',data.project);if(data.geometry)localStorage.setItem('idilewa-v11-geometry',data.geometry);if(data.mode)localStorage.setItem('idilewa-v113-mode',data.mode);sceneMotion114=data.motion?.sceneMotion114||'bounce';sceneSpeed114=data.motion?.sceneSpeed114||1;loadProject();studioScenePlaybackControls114();notify('Learner project restored');}catch(err){notify('Could not import project: '+err.message)}finally{e.target.value=''}
+};
+
+/* v11.5 — learner-authored multilingual names for scene objects and drawings */
+const idilewaNames={};
+const idilewaLanguages={en:'English',yo:'Yorùbá',ig:'Igbo',ha:'Hausa',sw:'Kiswahili'};
+let idilewaLabelLanguage='yo';
+function idilewaTarget(){
+  if(['scene','story'].includes(stage)){
+    return sceneItems.find(o=>o.id===selectedItem)||null;
+  }
+  if(['3d','animate'].includes(stage)&&studioMesh)return {id:'converted-drawing',kind:'drawing'};
+  return null;
+}
+function idilewaObjectKey(o){return o?.id||null}
+function idilewaName(o,lang=idilewaLabelLanguage){
+  if(!o)return '';
+  let record=idilewaNames[idilewaObjectKey(o)]||{};
+  return record[lang]||record.en||o.name||o.kind||'Object';
+}
+function idilewaRenderNamePanel(){
+  let panel=document.getElementById('idilewa-name-panel');
+  if(!panel){
+    panel=document.createElement('section');
+    panel.id='idilewa-name-panel';
+    panel.style.cssText='background:#fff;border:1px solid #cde4d2;border-radius:16px;padding:12px;margin:10px 0;font:inherit';
+    const viewport=V.parentElement;
+    viewport.parentElement.insertAdjacentElement('afterend',panel);
+  }
+  if(!['scene','story','3d','animate'].includes(stage)){panel.hidden=true;return}
+  panel.hidden=false;
+  const o=idilewaTarget(),key=idilewaObjectKey(o);
+  panel.innerHTML=`<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><strong>🏷️ Name this object</strong>
+  <select id="idilewa-label-lang" aria-label="Object label language">${Object.entries(idilewaLanguages).map(([v,t])=>`<option value="${v}" ${v===idilewaLabelLanguage?'selected':''}>${t}</option>`).join('')}</select></div>
+  <p style="margin:6px 0;font-size:13px">${o?'Selected: '+idilewaEscape(idilewaName(o)):'Tap an object in the scene to name it.'}</p>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+  <input id="idilewa-label-input" aria-label="Object name" placeholder="Enter the name in your chosen language" style="min-width:160px;flex:1" ${o?'':'disabled'}>
+  <button id="idilewa-label-save" ${o?'':'disabled'}>Save name</button></div>
+  <div id="idilewa-label-all" style="font-size:13px;margin-top:8px">${o?idilewaEscape(Object.entries(idilewaNames[key]||{}).map(([l,n])=>idilewaLanguages[l]+': '+n).join(' · ')):'Names are saved with this browser project.'}</div>`;
+  panel.querySelector('#idilewa-label-lang').onchange=e=>{idilewaLabelLanguage=e.target.value;idilewaRenderNamePanel()};
+  if(o){
+    const inp=panel.querySelector('#idilewa-label-input');
+    inp.value=(idilewaNames[key]||{})[idilewaLabelLanguage]||'';
+    panel.querySelector('#idilewa-label-save').onclick=()=>{
+      const value=inp.value.trim();
+      if(!value){notify('Enter a name before saving.');return}
+      if(value.length>80){notify('Keep the name under 80 characters.');return}
+      (idilewaNames[key]??={})[idilewaLabelLanguage]=value;
+      try{localStorage.setItem('idilewa-object-names-v115',JSON.stringify(idilewaNames))}catch(e){}
+      idilewaRenderNamePanel();draw3D();notify('Object name saved');
+    };
+  }
+}
+function idilewaEscape(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+try{Object.assign(idilewaNames,JSON.parse(localStorage.getItem('idilewa-object-names-v115')||'{}'))}catch(e){}
+const idilewaOldGo115=go;
+go=function(s){idilewaOldGo115(s);idilewaRenderNamePanel()};
+const idilewaOldSave115=saveProject;
+saveProject=function(){idilewaOldSave115();try{localStorage.setItem('idilewa-object-names-v115',JSON.stringify(idilewaNames))}catch(e){}};
+const idilewaOldLoad115=loadProject;
+loadProject=function(){idilewaOldLoad115();try{Object.assign(idilewaNames,JSON.parse(localStorage.getItem('idilewa-object-names-v115')||'{}'))}catch(e){};idilewaRenderNamePanel()};
+const idilewaOldDraw115=draw3D;
+draw3D=function(){
+  idilewaOldDraw115();
+  if(!['scene','story','3d','animate'].includes(stage))return;
+  const o=idilewaTarget();
+  if(!o)return;
+  const label=idilewaName(o);
+  if(!label)return;
+  vc.save();vc.font='bold 17px sans-serif';vc.textAlign='center';
+  const x=V.width/2,y=36,w=Math.min(V.width-24,vc.measureText(label).width+28);
+  vc.fillStyle='rgba(255,255,255,.94)';vc.fillRect(x-w/2,y-23,w,34);
+  vc.fillStyle='#075b2b';vc.fillText(label,x,y);vc.restore();
+};
+const idilewaOldRender115=render;
+render=function(){idilewaOldRender115();idilewaRenderNamePanel()};
+
+/* v11.6 — integrated multilingual object naming, in the actual Edit/Layers panel */
+const idilewaNativeNames={
+ chair:{en:'Chair',yo:'Àga',ig:'Oche',ha:'Kujera',sw:'Kiti'},
+ table:{en:'Table',yo:'Tábìlì',ig:'Tebụl',ha:'Tebur',sw:'Meza'},
+ tree:{en:'Tree',yo:'Igi',ig:'Osisi',ha:'Itace',sw:'Mti'},
+ house:{en:'House',yo:'Ilé',ig:'Ụlọ',ha:'Gida',sw:'Nyumba'},
+ car:{en:'Car',yo:'Ọkọ̀ ayọ́kẹ́lẹ́',ig:'Ụgbọala',ha:'Mota',sw:'Gari'}
+};
+function idilewaNameControls(a){
+ if(!a)return '';
+ const key=idilewaObjectKey(a),saved=idilewaNames[key]||{};
+ return `<div class="idilewa-names" style="border:1px solid #b8ddc4;border-radius:12px;padding:10px;margin:10px 0">
+ <strong>🏷️ Name / Orúkọ</strong><p class="hint">Give this object a name in each language. Suggested names are editable.</p>
+ <label>Language <select id="idilewa-editor-lang" onchange="idilewaLabelLanguage=this.value;sceneRefresh()">
+ ${Object.entries(idilewaLanguages).map(([l,n])=>`<option value="${l}" ${l===idilewaLabelLanguage?'selected':''}>${n}</option>`).join('')}</select></label>
+ <label>Object name <input id="idilewa-editor-name" maxlength="80" value="${esc(saved[idilewaLabelLanguage]||'')}" placeholder="Enter a name"></label>
+ <div class="row"><button onclick="idilewaSaveSceneName('${key}')">✓ Save name</button>
+ <button onclick="idilewaSuggestSceneName('${key}')">Use suggested name</button></div>
+ <p class="hint">${Object.entries(saved).map(([l,n])=>`${idilewaLanguages[l]}: ${esc(n)}`).join(' · ')||'No names added yet'}</p>
+ </div>`;
+}
+function idilewaSaveSceneName(key){
+ const a=sceneItems.find(x=>x.id===key);if(!a)return;
+ const input=document.getElementById('idilewa-editor-name');if(!input)return;
+ const name=input.value.trim();if(!name)return notify('Enter a name first.');
+ (idilewaNames[key]??={})[idilewaLabelLanguage]=name;
+ a.name=name;
+ idilewaPersistNames();sceneRefresh();studioRefreshPanels?.();notify('Name saved');
+}
+function idilewaSuggestSceneName(key){
+ const a=sceneItems.find(x=>x.id===key);if(!a)return;
+ const suggestion=idilewaNativeNames[a.kind]?.[idilewaLabelLanguage];
+ if(!suggestion)return notify('No verified suggestion for this object and language. Enter a name yourself.');
+ const input=document.getElementById('idilewa-editor-name');if(input)input.value=suggestion;
+}
+function idilewaPersistNames(){
+ try{localStorage.setItem('idilewa-object-names-v115',JSON.stringify(idilewaNames))}catch(e){}
+}
+const idilewaPropertiesBefore116=sceneProperties;
+sceneProperties=function(){
+ const a=sceneSelected();
+ return idilewaPropertiesBefore116()+idilewaNameControls(a);
+};
+const idilewaSceneRefreshBefore116=sceneRefresh;
+sceneRefresh=function(){
+ idilewaSceneRefreshBefore116();
+ // Keep the naming panel beside the editor, not far below the viewport.
+ const panel=document.getElementById('idilewa-name-panel');if(panel)panel.hidden=true;
+};
+const idilewaDrawBefore116=draw3D;
+draw3D=function(){
+ idilewaDrawBefore116();
+ if(stage!=='scene'&&stage!=='story')return;
+ const a=sceneSelected();if(!a)return;
+ const n=idilewaNames[a.id]?.[idilewaLabelLanguage]||a.name;
+ if(!n)return;
+ vc.save();vc.font='bold 16px sans-serif';vc.textAlign='center';
+ const pt=sceneScreenPos(a),x=Math.max(85,Math.min(V.width-85,pt[0])),y=Math.max(25,pt[1]-90);
+ const w=Math.min(V.width-12,vc.measureText(n).width+24);
+ vc.fillStyle='rgba(255,255,255,.95)';vc.fillRect(x-w/2,y-21,w,29);
+ vc.fillStyle='#075b2b';vc.fillText(n,x,y);vc.restore();
+};
+
+/* v11.7 — inline object actions and multilingual built-in asset names */
+const idilewaVocabulary117={
+ table:['Table','Tábìlì','Tebụl','Tebur','Meza'],
+ chair:['Chair','Àga','Oche','Kujera','Kiti'],
+ sofa:['Sofa','Àga ìjókòó','Sofa','Sofa','Sofa'],
+ shelf:['Shelf','Àtẹ́ ìwé','Shelf','Shiryayye','Rafu'],
+ bed:['Bed','Ibùsùn','Akwa','Gado','Kitanda'],
+ plant:['Plant','Ohun ọ̀gbìn','Osisi','Shuka','Mmea'],
+ lamp:['Lamp','Fìtílà','Oriọna','Fitila','Taa'],
+ rug:['Rug','Kápẹ́ẹ̀tì','Kapeeti','Kafet','Zulia'],
+ tree:['Tree','Igi','Osisi','Itace','Mti'],
+ house:['House','Ilé','Ụlọ','Gida','Nyumba'],
+ car:['Car','Ọkọ̀ ayọ́kẹ́lẹ́','Ụgbọala','Mota','Gari'],
+ ball:['Ball','Bọ́ọ̀lù','Bọọlụ','Kwallo','Mpira'],
+ person:['Character','Ẹni','Mmadụ','Mutum','Mhusika'],
+ drawing:['My drawing','Àwòrán mi','Ihe osise m','Zanena','Mchoro wangu']
+};
+const idilewaLangKeys117=['en','yo','ig','ha','sw'];
+let idilewaClipboard117=null,idilewaContext117=null;
+function idilewaLabels117(item){
+ if(!item)return {};
+ const base=idilewaVocabulary117[item.kind]||[];
+ const names={};
+ idilewaLangKeys117.forEach((k,i)=>names[k]=base[i]||item.kind||'Object');
+ return {...names,...(item.labels||{}),...(idilewaNames[item.id]||{})};
+}
+function idilewaEnsureNames117(){
+ sceneItems.forEach(o=>{if(!o.labels)o.labels=idilewaLabels117(o)});
+}
+function idilewaLabel117(o){return idilewaLabels117(o)[idilewaLabelLanguage]||o.name||o.kind}
+function idilewaUpdateName117(id,lang,val){
+ const o=sceneItems.find(x=>x.id===id);if(!o)return;
+ const name=val.trim().slice(0,80);if(!name)return notify('Enter a name');
+ sceneCheckpoint();o.labels={...idilewaLabels117(o),[lang]:name};o.name=name;
+ idilewaNames[id]={...o.labels};idilewaPersistNames();sceneRefresh();queueSceneAutosave();
+}
+function idilewaCopy117(){
+ const o=sceneSelected();if(!o)return notify('Select an object');
+ idilewaClipboard117=JSON.parse(JSON.stringify(o));notify('Object copied');
+}
+function idilewaPaste117(){
+ if(!idilewaClipboard117)return notify('Copy an object first');
+ sceneCheckpoint();
+ const o=JSON.parse(JSON.stringify(idilewaClipboard117));
+ o.id='copy'+Date.now()+Math.random().toString(16).slice(2);
+ o.x=Math.min(4.5,(o.x||0)+.5);o.z=Math.min(4.5,(o.z||0)+.5);
+ sceneItems.push(o);selectedItem=o.id;scenePanelTab='properties';
+ sceneRefresh();queueSceneAutosave();notify('Object pasted');
+}
+function idilewaSelect117(id){
+ const o=sceneItems.find(x=>x.id===id);if(!o||o.visible===false)return;
+ selectedItem=id;scenePanelTab='properties';sceneRefresh();
+}
+function idilewaContextToolbar117(){
+ let bar=document.getElementById('idilewa-context117');
+ if(!bar){
+  bar=document.createElement('div');bar.id='idilewa-context117';
+  bar.style.cssText='position:absolute;bottom:12px;left:8px;right:8px;z-index:20;display:flex;gap:5px;overflow-x:auto;padding:8px;background:rgba(255,255,255,.96);border:1px solid #cbded0;border-radius:14px;box-shadow:0 4px 14px #0002';
+  const host=V.parentElement;host.style.position='relative';host.appendChild(bar);
+ }
+ if(!sceneMode()){bar.style.display='none';return}
+ bar.style.display='flex';
+ const o=sceneSelected();
+ const btn=(label,fn)=>`<button style="white-space:nowrap;flex-shrink:0;padding:9px;border-radius:10px" onclick="${fn}">${label}</button>`;
+ bar.innerHTML=o?
+  btn('✎ Name','sceneSetPanel("properties")')+
+  btn('⧉ Copy','idilewaCopy117()')+btn('📋 Paste','idilewaPaste117()')+
+  btn('↻ Rotate','sceneAction("rotate")')+btn('＋ Size','sceneAction("grow")')+
+  btn('－ Size','sceneAction("shrink")')+btn('⧉ Duplicate','sceneAction("duplicate")')+
+  btn('🗑 Delete','sceneAction("delete")'):
+  btn('＋ Objects','sceneSetPanel("items")')+
+  btn('📋 Paste','idilewaPaste117()')+
+  btn('☷ Layers','sceneSetPanel("layers")');
+}
+const idilewaScenePropertiesBefore117=sceneProperties;
+sceneProperties=function(){
+ const o=sceneSelected();if(!o)return idilewaScenePropertiesBefore117();
+ const labels=idilewaLabels117(o);
+ const names=`<div style="padding:12px;border:1px solid #cde2d1;border-radius:12px;margin:8px 0">
+ <strong>🏷️ Object names / Orúkọ</strong>
+ <p class="hint">Names are preloaded; edit any translation below.</p>
+ ${idilewaLangKeys117.map(k=>`<label class="field">${idilewaLanguages[k]}<input maxlength="80" aria-label="${idilewaLanguages[k]} object name" value="${esc(labels[k]||'')}" onchange="idilewaUpdateName117('${o.id}','${k}',this.value)"></label>`).join('')}
+ </div>`;
+ return names+idilewaScenePropertiesBefore117();
+};
+const idilewaSceneRefreshBefore117=sceneRefresh;
+sceneRefresh=function(){
+ idilewaEnsureNames117();idilewaSceneRefreshBefore117();
+ idilewaContextToolbar117();
+};
+const idilewaSceneAddBefore117=sceneAdd;
+sceneAdd=function(kind){idilewaSceneAddBefore117(kind);idilewaEnsureNames117();sceneRefresh()};
+const idilewaSceneActionBefore117=sceneAction;
+sceneAction=function(action){idilewaSceneActionBefore117(action);idilewaEnsureNames117();idilewaContextToolbar117()};
+const idilewaDrawBefore117=draw3D;
+draw3D=function(){
+ idilewaDrawBefore117();
+ if(!sceneMode())return;
+ const o=sceneSelected();if(!o)return;
+ const name=idilewaLabel117(o),p=sceneScreenPos(o);
+ vc.save();vc.textAlign='center';vc.font='bold 15px sans-serif';
+ const x=Math.max(70,Math.min(V.width-70,p[0])),y=Math.max(28,p[1]-95);
+ const w=Math.min(V.width-12,vc.measureText(name).width+22);
+ vc.fillStyle='rgba(255,255,255,.96)';vc.fillRect(x-w/2,y-20,w,27);
+ vc.fillStyle='#087b39';vc.fillText(name,x,y);vc.restore();
+};
+const idilewaGoBefore117=go;
+go=function(s){idilewaGoBefore117(s);idilewaContextToolbar117()};
+const idilewaSelectOnPointer117=e=>{
+ if(!sceneMode()||sceneTool==='camera')return;
+ const o=scenePick(e);
+ if(o){selectedItem=o.id;scenePanelTab='properties';requestAnimationFrame(()=>{idilewaContextToolbar117();sceneRefresh()})}
+};
+V.addEventListener('pointerup',idilewaSelectOnPointer117);
+
+/* v11.8: explicit, reliable scene-object transforms and immediate visual feedback */
+function idilewaTransform118(action){
+ const a=sceneSelected();
+ if(!a)return notify('Tap an object first.');
+ if(a.locked)return notify('Unlock this object in Layers before editing.');
+ const previous=Number(a.scale);
+ const oldScale=Number.isFinite(previous)&&previous>0?previous:1;
+ const oldRot=Number(a.rot)||0;
+ sceneCheckpoint();
+ if(action==='grow')a.scale=Math.min(5,Math.round((oldScale+0.25)*100)/100);
+ else if(action==='shrink')a.scale=Math.max(0.2,Math.round((oldScale-0.25)*100)/100);
+ else if(action==='rotate')a.rot=(oldRot+15)%360;
+ else if(action==='left')a.x=Math.max(-5,(Number(a.x)||0)-0.5);
+ else if(action==='right')a.x=Math.min(5,(Number(a.x)||0)+0.5);
+ else if(action==='front')a.z=Math.min(5,(Number(a.z)||0)+0.5);
+ else if(action==='back')a.z=Math.max(-5,(Number(a.z)||0)-0.5);
+ else return;
+ selectedItem=a.id;
+ queueSceneAutosave();
+ draw3D();
+ sceneRefresh();
+ const value=action==='grow'||action==='shrink'?`Size: ${a.scale.toFixed(2)}×`:action==='rotate'?`Rotation: ${a.rot}°`:'Object moved';
+ notify(value);
+}
+const idilewaActionBefore118=sceneAction;
+sceneAction=function(action){
+ if(['grow','shrink','rotate','left','right','front','back'].includes(action)){
+   idilewaTransform118(action);return;
+ }
+ idilewaActionBefore118(action);
+};
+function idilewaContextToolbar118(){
+ let bar=document.getElementById('idilewa-context117');
+ if(!bar||!sceneMode())return;
+ const a=sceneSelected();
+ if(!a)return;
+ bar.innerHTML=`<button onclick="sceneSetPanel('properties')">✎ Name</button>
+ <button onclick="idilewaCopy117()">⧉ Copy</button>
+ <button onclick="idilewaPaste117()">📋 Paste</button>
+ <button onclick="sceneAction('rotate')">↻ Rotate</button>
+ <button onclick="sceneAction('grow')">＋ Size</button>
+ <button onclick="sceneAction('shrink')">－ Size</button>
+ <button onclick="sceneAction('duplicate')">⧉ Duplicate</button>
+ <button onclick="sceneAction('delete')">🗑 Delete</button>`;
+ for(const b of bar.querySelectorAll('button')){
+  b.style.cssText='flex:0 0 auto;white-space:nowrap;min-height:44px;padding:8px 12px;border-radius:10px';
+ }
+}
+const idilewaSceneRefreshBefore118=sceneRefresh;
+sceneRefresh=function(){idilewaSceneRefreshBefore118();idilewaContextToolbar118()};
+
+
+</script></body></html>

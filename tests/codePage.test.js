@@ -17,16 +17,21 @@ import { fileURLToPath } from 'node:url';
 const appSource = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const appModuleSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const engineSource = await readFile(new URL('../src/codeStudioEngine.js', import.meta.url), 'utf8');
+const creativeStudioSource = await readFile(new URL('../creative-studio.html', import.meta.url), 'utf8');
 const rootDirectory = resolve(fileURLToPath(new URL('..', import.meta.url)));
 
-test('standalone Code page is removed while homepage links retain the in-app Code Lab', () => {
+test('the Creative Studio replaces the removed standalone page and retains the in-app Code Lab', () => {
   for (const path of ['code-studio.html', 'src/codeStudio.js', 'styles/code-studio.css']) {
     assert.equal(existsSync(resolve(rootDirectory, path)), false, `${path} should be removed`);
   }
+  assert.equal(existsSync(resolve(rootDirectory, 'creative-studio.html')), true);
   assert.doesNotMatch(appModuleSource, /code-studio\.html/);
-  assert.match(appModuleSource, /routeLink\('codeLab'/);
-  assert.match(appModuleSource, /title: 'Code', description: 'Build & Run'.*route: 'codeLab'/);
+  assert.match(appModuleSource, /title: 'Code', description: 'Build & Create'.*href: '.\/creative-studio\.html'/);
+  assert.match(appModuleSource, /href="\.\/creative-studio\.html"/);
   assert.match(appSource, /id="codeLab"/);
+  assert.match(creativeStudioSource, /CREATIVE STUDIO/);
+  assert.match(creativeStudioSource, /projects stay on this device/i);
+  assert.doesNotMatch(creativeStudioSource, /\bfetch\s*\(/);
 });
 
 test('the integrated coding view includes the supplied games and language controls', () => {

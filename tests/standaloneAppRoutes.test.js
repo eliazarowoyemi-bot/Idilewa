@@ -28,6 +28,7 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assert.match(transformed, /<h2>Source<\/h2>/);
   assert.match(transformed, /urlSearchParams|URLSearchParams/);
   assert.match(transformed, /\/ai-conversation\.html/);
+  assert.match(transformed, /href="\/creative-studio\.html">🎨 Creative Studio<\/a>/);
   assert.match(transformed, /For Tutors/);
   assert.match(transformed, /link\.href = '\/educator-portal\.html'/);
   assert.match(transformed, /Sign in/);
@@ -74,6 +75,17 @@ test('native entry pages retain their app and return home or voice links to cano
   }
 });
 
+test('Creative Studio links back to Home and Code Playground and hardens local project imports', async () => {
+  const source = await readFile(resolve(rootDirectory, 'creative-studio.html'), 'utf8');
+  const transformed = transformEntry('creative-studio.html', source);
+
+  assert.match(transformed, /<title>Creative Studio \| Ìdíléwa<\/title>/);
+  assert.match(transformed, /href="\/">Home<\/a>/);
+  assert.match(transformed, /href="\/\?view=codeLab">Games &amp; Code Playground<\/a>/);
+  assert.match(transformed, /src="\/src\/creativeStudioPage\.js"/);
+  assert.match(transformed, /idilewaCreativeStudioBridge/);
+});
+
 test('every built HTML entry except the homepage points to the standalone app', async () => {
   const files = await readdir(rootDirectory);
   const pages = files.filter((file) => file.endsWith('.html') && file !== 'index.html');
@@ -81,6 +93,7 @@ test('every built HTML entry except the homepage points to the standalone app', 
     'ai-conversation.html',
     'auth-callback.html',
     'consent.html',
+    'creative-studio.html',
     'educator-portal.html',
     'login.html',
     'parents.html',

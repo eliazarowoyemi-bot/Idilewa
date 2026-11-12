@@ -829,7 +829,7 @@ import {
   function renderHome() {
     const experiences = [
       { title: 'Voice Lessons', description: 'Listen & Speak', image: landingFeatureVoiceUrl, alt: 'Learners exploring voice lessons', route: 'voice_lessons', tone: 'voice' },
-      { title: 'Code', description: 'Build & Run', image: landingFeatureCodeUrl, alt: 'A young learner exploring code', route: 'codeLab', tone: 'code' },
+      { title: 'Code', description: 'Build & Create', image: landingFeatureCodeUrl, alt: 'A young learner exploring code', href: './creative-studio.html', tone: 'code' },
       { title: 'AI Conversation', description: 'Chat & Practise', image: landingFeatureAiUrl, alt: 'Learners practising a conversation', route: 'ai-conversation', tone: 'ai' },
       { title: 'Heritage Stories', description: 'Stories & Culture', image: landingFeatureHeritageUrl, alt: 'A family sharing a heritage story', route: 'oral', tone: 'heritage' }
     ];
@@ -846,7 +846,7 @@ import {
           <p>Learn. Speak. Connect.</p>
           <div class="academy-home-actions">
             ${routeLink('voice_lessons', `Start Learning ${icon('arrow', 17)}`, 'button button-primary academy-start-button')}
-            ${routeLink('codeLab', `${icon('code', 17)} Code`, 'academy-code-button')}
+            <a href="./creative-studio.html" class="academy-code-button">${icon('code', 17)} Code</a>
           </div>
         </div>
         <div class="academy-hero-art">

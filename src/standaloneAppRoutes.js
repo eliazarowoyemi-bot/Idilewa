@@ -35,6 +35,7 @@ const nativeAppPages = new Set([
   'ai-conversation',
   'auth-callback',
   'consent',
+  'creative-studio',
   'educator-portal',
   'login',
   'parents',
@@ -92,6 +93,11 @@ const accessibilityStyles = `<style id="idilewa-accessibility-overrides">
 @media(max-width:980px){.premium-mobile-menu nav .premium-auth-link{width:100%;margin-top:5px}}
 @media(max-width:420px){.premium-brand-copy small{display:none}}
 </style>`;
+const codeLabNavigationStyles = `<style id="idilewa-code-lab-navigation">
+#codeLab .labTop{flex-wrap:wrap}
+#codeLab .labTop h1{flex:1 1 100%}
+#codeLab .labTop a.secondary{text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
+</style>`;
 
 function guardBilingualGame(html) {
   for (const [unguarded, guarded] of bilingualRootGuards) {
@@ -148,12 +154,73 @@ document.addEventListener('DOMContentLoaded', () => {
     .concat(tutorAccessibilityStyles, tutorPortalNavigation, nativeAppNavigation, html.slice(closingHeadIndex));
 }
 
+function transformCreativeStudioHtml(html) {
+  const title = '<title>Creative Studio | Ìdíléwa</title>';
+  const navigation = `<nav class="studio-site-nav" aria-label="Ìdíléwa navigation">
+    <a href="/">Home</a>
+    <a href="/?view=codeLab">Games &amp; Code Playground</a>
+  </nav>`;
+  const navigationStyles = `<style id="idilewa-creative-studio-navigation">
+.studio-site-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.studio-site-nav a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 11px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink);font-weight:650;text-decoration:none}
+.studio-site-nav a:hover{text-decoration:underline;text-underline-offset:3px;border-color:var(--g)}
+.studio-site-nav a:focus-visible{outline:2px solid var(--g);outline-offset:2px}
+@media(max-width:650px){.studio-site-nav{order:4;flex-basis:100%}.studio-site-nav a{flex:1}}
+</style>`;
+  const bridge = `<script>
+window.idilewaCreativeStudioBridge = {
+  importScene(state, importedCamera, importedDialogue) {
+    sceneCheckpoint();
+    sceneRestore(JSON.stringify(state));
+    camera = importedCamera;
+    dialogue = importedDialogue;
+    sceneRefresh();
+    draw3D();
+    queueSceneAutosave();
+  },
+  setMotion(motion) {
+    sceneMotion114 = motion.sceneMotion114;
+    sceneSpeed114 = motion.sceneSpeed114;
+    sceneAmount114 = motion.sceneAmount114;
+    studioScenePlaybackControls114();
+  }
+};
+</script>
+<script type="module" src="/src/creativeStudioPage.js"></script>`;
+  const actionsMarker = '<div class="actions">';
+  const titlePattern = /<title>[^<]*<\/title>/i;
+  const bodyMarker = '</body>';
+
+  if (!titlePattern.test(html) || !html.includes(actionsMarker) || !html.toLowerCase().includes(bodyMarker)) {
+    throw new Error('Creative Studio is missing a required document landmark.');
+  }
+
+  const titled = html.replace(titlePattern, title);
+  const withNavigation = titled.replace(actionsMarker, `${navigation}${actionsMarker}`);
+  const closingHeadIndex = withNavigation.toLowerCase().lastIndexOf('</head>');
+  const closingBodyIndex = withNavigation.toLowerCase().lastIndexOf(bodyMarker);
+  if (closingHeadIndex === -1 || closingBodyIndex === -1) {
+    throw new Error('Creative Studio is missing its document boundaries.');
+  }
+
+  const styled = withNavigation.slice(0, closingHeadIndex)
+    .concat(navigationStyles, withNavigation.slice(closingHeadIndex));
+  const adjustedBodyIndex = styled.toLowerCase().lastIndexOf(bodyMarker);
+  return styled.slice(0, adjustedBodyIndex)
+    .concat(bridge, styled.slice(adjustedBodyIndex));
+}
+
 function transformAppHtml(html) {
   if (!html.includes(footerYearAssignment)) {
     throw new Error('Standalone app is missing the expected optional footer-year script.');
   }
   if (!html.includes('<h3>Source</h3>')) {
     throw new Error('Standalone app is missing the expected translation source heading.');
+  }
+  const codeLabHeader = `<div class="labTop"><h1>💻 Code Playground</h1><button class="secondary" onclick="go('home')">← Home</button></div>`;
+  const codeLabHeaderWithStudio = `<div class="labTop"><h1>💻 Code Playground</h1><a class="secondary" href="/creative-studio.html">🎨 Creative Studio</a><button class="secondary" onclick="go('home')">← Home</button></div>`;
+  if (!html.includes(codeLabHeader)) {
+    throw new Error('Standalone app is missing the expected Code Playground navigation.');
   }
 
   const viewBootstrap = `<script>
@@ -202,6 +269,7 @@ function transformAppHtml(html) {
 })();
 </script>`;
   const transformed = html
+    .replace(codeLabHeader, codeLabHeaderWithStudio)
     .replace(footerYearAssignment, '(()=>{const yearElement=document.getElementById("footerYear");if(yearElement)yearElement.textContent=new Date().getFullYear()})();')
     .replace('<h3>Source</h3>', '<h2>Source</h2>');
   const guarded = guardBilingualGame(transformed);
@@ -210,7 +278,7 @@ function transformAppHtml(html) {
     throw new Error('Standalone app is missing its closing head tag.');
   }
   const styled = guarded.slice(0, closingHeadIndex)
-    .concat(accessibilityStyles, guarded.slice(closingHeadIndex));
+    .concat(accessibilityStyles, codeLabNavigationStyles, guarded.slice(closingHeadIndex));
   const closingBodyIndex = styled.toLowerCase().lastIndexOf('</body>');
   if (closingBodyIndex === -1) {
     throw new Error('Standalone app is missing its closing body tag.');
@@ -231,7 +299,11 @@ export function createStandaloneAppPlugin(rootDirectory) {
         if (!context?.filename) return html;
         if (resolve(context.filename) === indexPath) return transformAppHtml(html);
         const route = basename(context.filename).replace(/\.html$/i, '');
-        return nativeAppPages.has(route) ? transformNativeAppHtml(html, route) : renderRouteRedirect(route);
+        if (!nativeAppPages.has(route)) return renderRouteRedirect(route);
+        const nativeHtml = transformNativeAppHtml(html, route);
+        return route === 'creative-studio'
+          ? transformCreativeStudioHtml(nativeHtml)
+          : nativeHtml;
       },
     },
   };
