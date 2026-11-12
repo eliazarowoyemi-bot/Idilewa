@@ -30,6 +30,32 @@ test('Turbo Racers and Balloon Ludo are playable Code Playground choices', () =>
   assert.match(indexHtml, /window\.nextCodeGame = \(\) => \{/);
 });
 
+test('Orbit Breaker keeps its gameplay controls without the removed coding challenge or JSON editor', () => {
+  const arcadeData = indexHtml.match(/const arcadeData='([^']+)'/);
+  assert.ok(arcadeData, 'The built-in arcade games should be available to the game selector');
+  const arcadeHtml = Buffer.from(arcadeData[1], 'base64').toString('utf8');
+  const source = `${indexHtml}\n${arcadeHtml}`;
+
+  for (const removedContent of [
+    'Mini coding challenge',
+    'Edit game settings (JSON)',
+    'Editable game settings JSON',
+    'Safe settings editor',
+    'Apply my code',
+    'function checkChallenge()',
+    'function updateEditor()',
+    'updateEditor()',
+  ]) {
+    assert.ok(!source.includes(removedContent), `${removedContent} should stay removed`);
+  }
+
+  assert.match(source, /id=&quot;size&quot;/);
+  assert.match(source, /id=&quot;speed&quot;/);
+  assert.match(source, /id=&quot;density&quot;/);
+  assert.match(source, /id=&quot;feedback&quot;/);
+  assert.match(source, /role=&quot;status&quot;/);
+});
+
 test('both supplied game pages parse and report only completed-run progress', () => {
   assert.match(racerHtml, /<title>Ìdíléwa Turbo Racers<\/title>/);
   assert.match(racerHtml, /game:'turbo-racers',outcome:win\?'won':'finished'/);
