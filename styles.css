@@ -10545,10 +10545,10 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
   align-items: stretch;
 }
 .tutor-signup-intro {
-  padding: clamp(28px, 4vw, 52px);
+  padding: clamp(24px, 3vw, 38px);
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: flex-start;
   background: linear-gradient(155deg, #fffefa 0%, #f5faf5 58%, #e8f4ec 100%);
 }
 .tutor-signup-badge {
@@ -10640,6 +10640,7 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
   align-self: start;
   padding: clamp(24px, 3vw, 38px);
 }
+.tutor-auth-signup-page .tutor-auth-card > .tutor-eyebrow { margin-top: 0; }
 .tutor-auth-signup-page .tutor-auth-card h1 {
   font-size: clamp(27px, 2.8vw, 35px);
 }
