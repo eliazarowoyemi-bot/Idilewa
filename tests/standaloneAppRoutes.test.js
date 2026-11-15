@@ -29,9 +29,12 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assert.match(transformed, /urlSearchParams|URLSearchParams/);
   assert.match(transformed, /\/ai-conversation\.html/);
   assert.match(transformed, /href="\/creative-studio\.html">🎨 Creative Studio<\/a>/);
-  assert.match(transformed, /For Tutors/);
-  assert.match(transformed, /link\.href = '\/educator-portal\.html'/);
+  assert.match(transformed, /Tutorship/);
+  assert.match(transformed, /link\.href = '\/tutor\.html'/);
   assert.match(transformed, /Sign in/);
+  assert.match(transformed, /\/kids\.html/);
+  assert.match(transformed, /\/about\.html/);
+  assert.match(transformed, /\/login\.html#\/login\?mode=signup/);
 });
 
 test('legacy learning and heritage URLs open their matching standalone views', () => {
@@ -51,10 +54,12 @@ test('native entry pages retain their app and return home or voice links to cano
   for (const filename of [
     'ai-conversation.html',
     'auth-callback.html',
+    'about.html',
     'consent.html',
     'educator-portal.html',
     'login.html',
     'parents.html',
+    'kids.html',
     'tutor.html',
     'trainer.html',
     'voice_lessons.html',
@@ -63,14 +68,30 @@ test('native entry pages retain their app and return home or voice links to cano
     const source = await readFile(resolve(rootDirectory, filename), 'utf8');
     const transformed = transformEntry(filename, source);
     const closingHead = source.toLowerCase().lastIndexOf('</head>');
-    assert.ok(transformed.startsWith(source.slice(0, closingHead)), filename);
-    assert.ok(transformed.endsWith(source.slice(closingHead)), filename);
+    if (!['about.html', 'kids.html', 'tutor.html'].includes(filename)) {
+      assert.ok(transformed.startsWith(source.slice(0, closingHead)), filename);
+      assert.ok(transformed.endsWith(source.slice(closingHead)), filename);
+    }
     assert.match(transformed, /event\.stopImmediatePropagation\(\)/, filename);
     assert.match(transformed, /location\.assign\(link\.getAttribute\('href'\) === '#\/index' \? '\/' : '\/voice_lessons\.html'\)/, filename);
     if (filename === 'tutor.html') {
-      assert.match(transformed, /href = '\/educator-portal\.html'/);
-      assert.match(transformed, /link\.textContent = 'Educator Portal'/);
+      assert.match(transformed, /href = '\/educator-portal\.html#\/tutor-signup'/);
+      assert.match(transformed, /link\.textContent = 'Secure Tutor Sign-up'/);
       assert.match(transformed, /id="idilewa-tutor-accessibility-overrides"/);
+      assert.match(transformed, /href="\/kids\.html">Kids Arcade/);
+    }
+    if (filename === 'kids.html') {
+      assert.match(transformed, /const GAMES=\{racer:"\/games\/turbo-racers\.html",ludo:"\/games\/balloon-ludo\.html"\}/);
+      assert.match(transformed, /frame\.src=GAMES\[which\]/);
+      assert.match(transformed, /src="\/src\/arcadeProgress\.js"/);
+      assert.match(transformed, /href="\/login\.html#\/login\?mode=signup">Create account/);
+    }
+    if (filename === 'about.html') {
+      assert.match(transformed, /href="\/\?view=academy"/);
+      assert.match(transformed, /href="\/\?view=codeLab"/);
+      assert.match(transformed, /href="\/\?view=heritageLab"/);
+      assert.doesNotMatch(transformed, /href="https:\/\/idilewa\.com/);
+      assert.match(transformed, /data-idilewa-route/);
     }
   }
 });
@@ -92,11 +113,13 @@ test('every built HTML entry except the homepage points to the standalone app', 
   const nativePages = new Set([
     'ai-conversation.html',
     'auth-callback.html',
+    'about.html',
     'consent.html',
     'creative-studio.html',
     'educator-portal.html',
     'login.html',
     'parents.html',
+    'kids.html',
     'tutor.html',
     'trainer.html',
     'voice_lessons.html',

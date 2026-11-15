@@ -3,7 +3,6 @@ import { basename, resolve } from 'path';
 const routeViews = {
   'ai-conversation': 'aiChat',
   course: 'learning',
-  kids: 'learning',
   languages: 'academy',
   lesson: 'learning',
   oral: 'heritageLab',
@@ -34,11 +33,13 @@ const validViews = new Set([
 const nativeAppPages = new Set([
   'ai-conversation',
   'auth-callback',
+  'about',
   'consent',
   'creative-studio',
   'educator-portal',
   'login',
   'parents',
+  'kids',
   'tutor',
   'trainer',
   'voice_lessons',
@@ -90,6 +91,9 @@ const accessibilityStyles = `<style id="idilewa-accessibility-overrides">
 .premium-auth-link{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:0 9px;border:1px solid #d5e7d8;border-radius:999px;background:#fff;color:#0b4d2c;font:inherit;font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap;cursor:pointer}
 .premium-auth-link:hover{background:#eff8f1;color:#075c2e}
 .premium-auth-link:focus-visible{outline:3px solid #087a3e;outline-offset:3px}
+.premium-menu a{display:block;padding:10px 12px;border-radius:9px;color:#23452e;font-weight:650;text-decoration:none}
+.premium-menu a:hover,.premium-menu a:focus-visible{background:#e8f3ea;color:#17472a}
+#progressStatus{min-height:1.5em;margin:10px 0;color:#425c49;font-size:14px}
 @media(max-width:980px){.premium-mobile-menu nav .premium-auth-link{width:100%;margin-top:5px}}
 @media(max-width:420px){.premium-brand-copy small{display:none}}
 </style>`;
@@ -98,6 +102,102 @@ const codeLabNavigationStyles = `<style id="idilewa-code-lab-navigation">
 #codeLab .labTop h1{flex:1 1 100%}
 #codeLab .labTop a.secondary{text-decoration:none;display:inline-flex;align-items:center;min-height:44px}
 </style>`;
+const nativeRouteNavigationStyles = `<style id="idilewa-native-route-navigation">
+.idilewa-route-nav{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:8px;padding:12px 16px;background:#f4faf5;border-bottom:1px solid #dcebe0}
+.idilewa-route-nav a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 12px;border:1px solid #d5e7d8;border-radius:999px;background:#fff;color:#0b4d2c;font-size:14px;font-weight:700;text-decoration:none}
+.idilewa-route-nav a:hover{background:#eff8f1;color:#075c2e}
+.idilewa-route-nav a:focus-visible{outline:3px solid #087a3e;outline-offset:3px}
+@media(max-width:560px){.idilewa-route-nav a{flex:1 1 40%}}
+</style>`;
+
+function insertAfterClosingElement(html, tagName, content, message) {
+  const closingTag = `</${tagName}>`;
+  const index = html.toLowerCase().indexOf(closingTag);
+  if (index === -1) throw new Error(message);
+  const insertionPoint = index + closingTag.length;
+  return html.slice(0, insertionPoint).concat(content, html.slice(insertionPoint));
+}
+
+function appendRouteNavigation(html, route) {
+  const links = route === 'kids'
+    ? [
+      ['/', 'Academy'],
+      ['/creative-studio.html', 'Creative Studio'],
+      ['/about.html', 'About'],
+      ['/tutor.html', 'Tutorship'],
+      ['/login.html#/login?mode=signup', 'Create account'],
+    ]
+    : route === 'tutor'
+    ? [
+      ['/', 'Academy'],
+      ['/about.html', 'About'],
+      ['/kids.html', 'Kids Arcade'],
+      ['/parents.html#/parent-signup', 'Parent account'],
+      ['/login.html#/login?mode=signup', 'Learner account'],
+    ]
+    : null;
+  if (!links) return html;
+  const navigation = `<nav class="idilewa-route-nav" aria-label="More Ìdíléwa pages">${links
+    .map(([href, label]) => `<a href="${href}">${label}</a>`)
+    .join('')}</nav>`;
+  return insertAfterClosingElement(
+    html,
+    'header',
+    navigation,
+    `The ${route} page is missing its header.`,
+  );
+}
+
+function transformKidsArcadeHtml(html) {
+  const gamesStart = html.indexOf('const GAMES=');
+  const frameStart = html.indexOf("const frame=document.getElementById('gameFrame')", gamesStart);
+  const gamesEnd = html.lastIndexOf('};', frameStart);
+  if (gamesStart === -1 || frameStart === -1 || gamesEnd < gamesStart) {
+    throw new Error('Kids Arcade is missing its embedded game launcher.');
+  }
+
+  let transformed = html.slice(0, gamesStart)
+    .concat(
+      'const GAMES={racer:"/games/turbo-racers.html",ludo:"/games/balloon-ludo.html"};\n',
+      html.slice(frameStart),
+    );
+  const legacyLauncher = /if\(which==='home'\)frame\.removeAttribute\('srcdoc'\);\s*else frame\.srcdoc=GAMES\[which\];/;
+  if (!legacyLauncher.test(transformed)) {
+    throw new Error('Kids Arcade is missing the expected game-selection behavior.');
+  }
+  transformed = transformed.replace(
+    legacyLauncher,
+    "if(which==='home'){frame.removeAttribute('src');frame.removeAttribute('srcdoc');}\n else frame.src=GAMES[which];",
+  );
+
+  if (!transformed.includes('id="progressStatus"')) {
+    const message = /<div id="message">[\s\S]*?<\/div>/i;
+    if (!message.test(transformed)) {
+      throw new Error('Kids Arcade is missing its game status message.');
+    }
+    transformed = transformed.replace(
+      message,
+      '$&<p id="progressStatus" role="status" aria-live="polite"></p>',
+    );
+  }
+  return transformed;
+}
+
+function transformAboutHtml(html) {
+  const destinations = [
+    ['https://idilewa.com/academy', '/?view=academy'],
+    ['https://idilewa.com/code', '/?view=codeLab'],
+    ['https://idilewa.com/heritage', '/?view=heritageLab'],
+    ['https://idilewa.com/login', '/login.html#/login?mode=signin'],
+    ['https://idilewa.com/signup', '/login.html#/login?mode=signup'],
+    ['https://idilewa.com', '/'],
+  ];
+  let transformed = html;
+  for (const [source, destination] of destinations) {
+    transformed = transformed.replaceAll(`href="${source}"`, `href="${destination}"`);
+  }
+  return transformed;
+}
 
 function guardBilingualGame(html) {
   for (const [unguarded, guarded] of bilingualRootGuards) {
@@ -138,20 +238,44 @@ document.addEventListener('DOMContentLoaded', () => {
   if (!nav) throw new Error('Tutor prototype is missing its navigation container.');
   if (nav.querySelector('[data-idilewa-educator-portal]')) return;
   const link = document.createElement('a');
-  link.href = '/educator-portal.html';
+  link.href = '/educator-portal.html#/tutor-signup';
   link.className = 'ghost';
   link.dataset.idilewaEducatorPortal = 'true';
-  link.textContent = 'Educator Portal';
+  link.textContent = 'Secure Tutor Sign-up';
   nav.append(link);
 });
 </script>`
     : '';
-  const closingHeadIndex = html.toLowerCase().lastIndexOf('</head>');
+  const aboutNavigation = route === 'about'
+    ? `<script>
+document.addEventListener('DOMContentLoaded', () => {
+  const nav = document.getElementById('nav');
+  if (!nav) throw new Error('About page is missing its navigation container.');
+  const links = [
+    ['/kids.html', 'Kids Arcade'],
+    ['/creative-studio.html', 'Creative Studio'],
+    ['/tutor.html', 'Tutorship'],
+  ];
+  for (const [href, label] of links) {
+    const key = href.slice(1).replaceAll('/', '-');
+    if (nav.querySelector('[data-idilewa-route="' + key + '"]')) continue;
+    const link = document.createElement('a');
+    link.href = href;
+    link.dataset.idilewaRoute = key;
+    link.textContent = label;
+    nav.append(link);
+  }
+});
+</script>`
+    : '';
+  const routeNavigation = appendRouteNavigation(html, route);
+  const closingHeadIndex = routeNavigation.toLowerCase().lastIndexOf('</head>');
   if (closingHeadIndex === -1) {
     throw new Error('Native app page is missing its closing head tag.');
   }
-  return html.slice(0, closingHeadIndex)
-    .concat(tutorAccessibilityStyles, tutorPortalNavigation, nativeAppNavigation, html.slice(closingHeadIndex));
+  const styles = ['kids', 'tutor'].includes(route) ? nativeRouteNavigationStyles : '';
+  return routeNavigation.slice(0, closingHeadIndex)
+    .concat(styles, tutorAccessibilityStyles, tutorPortalNavigation, aboutNavigation, nativeAppNavigation, routeNavigation.slice(closingHeadIndex));
 }
 
 function transformCreativeStudioHtml(html) {
@@ -159,6 +283,9 @@ function transformCreativeStudioHtml(html) {
   const navigation = `<nav class="studio-site-nav" aria-label="Ìdíléwa navigation">
     <a href="/">Home</a>
     <a href="/?view=codeLab">Games &amp; Code Playground</a>
+    <a href="/kids.html">Kids Arcade</a>
+    <a href="/about.html">About</a>
+    <a href="/tutor.html">Tutorship</a>
   </nav>`;
   const navigationStyles = `<style id="idilewa-creative-studio-navigation">
 .studio-site-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
@@ -242,25 +369,65 @@ function transformAppHtml(html) {
   const addTutorPortalLink = (navigation) => {
     if (!navigation || navigation.querySelector('[data-idilewa-tutor-link]')) return;
     const link = document.createElement('a');
-    link.href = '/educator-portal.html';
+    link.href = '/tutor.html';
     link.className = 'premium-auth-link';
     link.dataset.idilewaTutorLink = 'true';
-    link.textContent = 'For Tutors';
+    link.textContent = 'Tutorship';
     navigation.append(link);
   };
   const addAccountLink = (navigation) => {
     if (!navigation || navigation.querySelector('[data-idilewa-account-link]')) return;
     const link = document.createElement('a');
-    link.href = '/login.html';
+    link.href = '/login.html#/login?mode=signin';
     link.className = 'premium-auth-link';
     link.dataset.idilewaAccountLink = 'true';
     link.textContent = 'Sign in';
     navigation.append(link);
   };
+  const addCreateAccountLink = (navigation) => {
+    if (!navigation || navigation.querySelector('[data-idilewa-create-account-link]')) return;
+    const link = document.createElement('a');
+    link.href = '/login.html#/login?mode=signup';
+    link.className = 'premium-auth-link';
+    link.dataset.idilewaCreateAccountLink = 'true';
+    link.textContent = 'Create account';
+    navigation.append(link);
+  };
+  const addExploreMenu = (navigation) => {
+    if (!navigation || navigation.querySelector('[data-idilewa-explore-menu]')) return;
+    const menu = document.createElement('div');
+    menu.className = 'premium-dropdown';
+    menu.dataset.idilewaExploreMenu = 'true';
+    menu.innerHTML = '<button type="button" aria-expanded="false">Explore</button><div class="premium-menu"><a href="/kids.html">Kids Arcade</a><a href="/creative-studio.html">Creative Studio</a><a href="/about.html">About</a></div>';
+    const button = menu.querySelector('button');
+    const panel = menu.querySelector('.premium-menu');
+    button.addEventListener('click', () => {
+      const isOpen = panel.classList.toggle('open');
+      button.setAttribute('aria-expanded', String(isOpen));
+    });
+    navigation.append(menu);
+  };
   addTutorPortalLink(document.querySelector('.premium-links'));
   addTutorPortalLink(document.querySelector('.premium-mobile-menu nav'));
+  addExploreMenu(document.querySelector('.premium-links'));
+  const mobileNavigation = document.querySelector('.premium-mobile-menu nav');
+  for (const [key, href, label] of [
+    ['kids', '/kids.html', 'Kids Arcade'],
+    ['studio', '/creative-studio.html', 'Creative Studio'],
+    ['about', '/about.html', 'About'],
+  ]) {
+    if (!mobileNavigation || mobileNavigation.querySelector('[data-idilewa-route-link="' + key + '"]')) continue;
+    const link = document.createElement('a');
+    link.href = href;
+    link.className = 'premium-auth-link';
+    link.dataset.idilewaRouteLink = key;
+    link.textContent = label;
+    mobileNavigation.append(link);
+  }
   addAccountLink(document.querySelector('.premium-links'));
-  addAccountLink(document.querySelector('.premium-mobile-menu nav'));
+  addAccountLink(mobileNavigation);
+  addCreateAccountLink(document.querySelector('.premium-links'));
+  addCreateAccountLink(mobileNavigation);
   if (!view) return;
   if (!${JSON.stringify([...validViews])}.includes(view)) return;
   if (typeof window.go !== 'function') throw new Error('Standalone app view navigation is unavailable.');
@@ -300,7 +467,18 @@ export function createStandaloneAppPlugin(rootDirectory) {
         if (resolve(context.filename) === indexPath) return transformAppHtml(html);
         const route = basename(context.filename).replace(/\.html$/i, '');
         if (!nativeAppPages.has(route)) return renderRouteRedirect(route);
-        const nativeHtml = transformNativeAppHtml(html, route);
+        const routeHtml = route === 'kids'
+          ? transformKidsArcadeHtml(html)
+          : route === 'about'
+          ? transformAboutHtml(html)
+          : html;
+        const nativeHtml = transformNativeAppHtml(routeHtml, route);
+        if (route === 'kids') {
+          const closingBodyIndex = nativeHtml.toLowerCase().lastIndexOf('</body>');
+          if (closingBodyIndex === -1) throw new Error('Kids Arcade is missing its closing body tag.');
+          return nativeHtml.slice(0, closingBodyIndex)
+            .concat('<script type="module" src="/src/arcadeProgress.js"></script>', nativeHtml.slice(closingBodyIndex));
+        }
         return route === 'creative-studio'
           ? transformCreativeStudioHtml(nativeHtml)
           : nativeHtml;

@@ -287,13 +287,13 @@ import {
     { label: 'Home', route: 'index', group: 'home' },
     { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' },
     { label: 'AI Conversation', route: 'ai-conversation', group: 'conversation' },
-    { label: 'For Tutors', route: 'tutor', group: 'tutor' }
+    { label: 'For Tutors', route: 'tutor', href: '/tutor.html', group: 'tutor' }
   ];
   const MENU_NAV = [...NAV,
     { label: 'Mentors', route: 'mentors', group: 'mentors' },
     { label: 'For Parents', route: 'families', group: 'families' },
     { label: 'Read & listen', route: 'oral', group: 'read' },
-    { label: 'About', route: 'about', group: 'about' }
+    { label: 'About', route: 'about', href: '/about.html', group: 'about' }
   ];
 
   const NAV_GROUPS = {

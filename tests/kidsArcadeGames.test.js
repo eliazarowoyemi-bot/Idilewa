@@ -1,12 +1,26 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import { createStandaloneAppPlugin } from '../src/standaloneAppRoutes.js';
+import { verifyGameCompletionMessage } from '../src/gameCompletion.js';
 import test from 'node:test';
 
 const indexHtml = await readFile(new URL('../index.html', import.meta.url), 'utf8');
-const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+const kidsHtml = await readFile(new URL('../kids.html', import.meta.url), 'utf8');
+const progressSource = await readFile(new URL('../src/arcadeProgress.js', import.meta.url), 'utf8');
+const completionSource = await readFile(new URL('../src/gameCompletion.js', import.meta.url), 'utf8');
 const racerHtml = await readFile(new URL('../public/games/turbo-racers.html', import.meta.url), 'utf8');
 const ludoHtml = await readFile(new URL('../public/games/balloon-ludo.html', import.meta.url), 'utf8');
+const rootDirectory = resolve(fileURLToPath(new URL('..', import.meta.url)));
+const plugin = createStandaloneAppPlugin(rootDirectory);
+
+function transformKidsPage() {
+  return plugin.transformIndexHtml.handler(kidsHtml, {
+    filename: resolve(rootDirectory, 'kids.html'),
+  });
+}
 
 function assertInlineScriptsParse(html, filename) {
   let scriptIndex = 0;
@@ -22,38 +36,23 @@ function assertInlineScriptsParse(html, filename) {
   assert.ok(scriptIndex > 0, `${filename} should include playable game logic`);
 }
 
-test('Turbo Racers and Balloon Ludo are playable Code Playground choices', () => {
-  assert.match(indexHtml, /'turbo-racers': \{ title: 'Turbo Racers', path: '\/games\/turbo-racers\.html' \}/);
-  assert.match(indexHtml, /'balloon-ludo': \{ title: 'Balloon Ludo', path: '\/games\/balloon-ludo\.html' \}/);
-  assert.match(indexHtml, /🎮 Select a game · 13 games/);
-  assert.match(indexHtml, /data-idilewa-game-card="\$\{game\.id\}"/);
-  assert.match(indexHtml, /window\.nextCodeGame = \(\) => \{/);
+test('Kids Arcade loads the maintained same-origin game pages and reports progress', () => {
+  const transformed = transformKidsPage();
+  assert.match(transformed, /const GAMES=\{racer:"\/games\/turbo-racers\.html",ludo:"\/games\/balloon-ludo\.html"\}/);
+  assert.match(transformed, /frame\.src=GAMES\[which\]/);
+  assert.match(transformed, /id="progressStatus" role="status" aria-live="polite"/);
+  assert.match(transformed, /src="\/src\/arcadeProgress\.js"/);
+  assert.doesNotMatch(transformed, /const GAMES=\{racer:"<!doctype html>/);
+  assertInlineScriptsParse(transformed, 'kids.html');
+  const transformedHome = plugin.transformIndexHtml.handler(indexHtml, {
+    filename: resolve(rootDirectory, 'index.html'),
+  });
+  assert.match(transformedHome, /\/kids\.html/);
 });
 
-test('Orbit Breaker keeps its gameplay controls without the removed coding challenge or JSON editor', () => {
-  const arcadeData = indexHtml.match(/const arcadeData='([^']+)'/);
-  assert.ok(arcadeData, 'The built-in arcade games should be available to the game selector');
-  const arcadeHtml = Buffer.from(arcadeData[1], 'base64').toString('utf8');
-  const source = `${indexHtml}\n${arcadeHtml}`;
-
-  for (const removedContent of [
-    'Mini coding challenge',
-    'Edit game settings (JSON)',
-    'Editable game settings JSON',
-    'Safe settings editor',
-    'Apply my code',
-    'function checkChallenge()',
-    'function updateEditor()',
-    'updateEditor()',
-  ]) {
-    assert.ok(!source.includes(removedContent), `${removedContent} should stay removed`);
-  }
-
-  assert.match(source, /id=&quot;size&quot;/);
-  assert.match(source, /id=&quot;speed&quot;/);
-  assert.match(source, /id=&quot;density&quot;/);
-  assert.match(source, /id=&quot;feedback&quot;/);
-  assert.match(source, /role=&quot;status&quot;/);
+test('the academy merges the game-vocabulary accordion into the coding challenges', () => {
+  assert.match(indexHtml, /Game words &amp; translations · Àwọn ọ̀rọ̀ eré/);
+  assert.match(indexHtml, /<details class="id-approved-accordion">/);
 });
 
 test('both supplied game pages parse and report only completed-run progress', () => {
@@ -66,13 +65,34 @@ test('both supplied game pages parse and report only completed-run progress', ()
   assert.doesNotMatch(racerHtml + ludoHtml, /https?:\/\/|fetch\(|XMLHttpRequest|WebSocket\(/i);
 });
 
-test('game results are verified against the same-origin arcade iframe before persistence', () => {
-  assert.match(appSource, /payload\.type !== 'idilewa-game-complete'/);
-  assert.match(appSource, /event\.origin !== window\.location\.origin/);
-  assert.match(appSource, /event\.source !== frame\.contentWindow/);
-  assert.match(appSource, /frame\.getAttribute\('src'\) !== gamePaths\[gameId\]/);
-  assert.match(appSource, /Number\.isSafeInteger\(payload\.score\)/);
-  assert.match(appSource, /lessonType: 'coding'/);
-  assert.match(appSource, /lessonId: `kids-arcade-\$\{gameId\}`/);
-  assert.match(appSource, /await saveProgress|void saveProgress/);
+test('game results must match the same-origin game frame and validated completion values', () => {
+  const frame = {
+    contentWindow: {},
+    getAttribute: () => '/games/turbo-racers.html',
+  };
+  const payload = {
+    type: 'idilewa-game-complete',
+    game: 'turbo-racers',
+    outcome: 'won',
+    score: 18,
+    difficulty: 'easy',
+    language: 'yo',
+  };
+  const event = { origin: 'https://idilewa.com', source: frame.contentWindow, data: payload };
+
+  assert.deepEqual(verifyGameCompletionMessage(event, frame, event.origin), {
+    game: 'turbo-racers',
+    outcome: 'won',
+    score: 18,
+    difficulty: 'easy',
+    language: 'yo',
+  });
+  assert.equal(verifyGameCompletionMessage({ ...event, origin: 'https://attacker.example' }, frame, event.origin), null);
+  assert.equal(verifyGameCompletionMessage({ ...event, source: {} }, frame, event.origin), null);
+  assert.equal(verifyGameCompletionMessage({ ...event, data: { ...payload, score: -1 } }, frame, event.origin), null);
+  assert.equal(verifyGameCompletionMessage({ ...event, data: { ...payload, language: 'xx' } }, frame, event.origin), null);
+  assert.equal(verifyGameCompletionMessage({ ...event, data: { ...payload, outcome: 'unknown' } }, frame, event.origin), null);
+  assert.match(progressSource, /lessonType: 'coding'/);
+  assert.match(progressSource, /lessonId: `kids-arcade-\$\{completion\.game\}`/);
+  assert.match(completionSource, /event\.origin !== origin/);
 });
