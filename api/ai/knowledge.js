@@ -94,7 +94,7 @@ async function addNote(req, res, database, user) {
   if (parsedEntry.error) return sendJson(res, 400, { error: parsedEntry.error });
 
   let embedding = null;
-  if (process.env.OLLAMA_EMBEDDING_MODEL?.trim() || process.env.GEMINI_EMBEDDING_MODEL?.trim()) {
+  if (process.env.GEMINI_EMBEDDING_MODEL?.trim()) {
     const config = getAiProviderConfig();
     embedding = await createAiKnowledgeEmbedding(
       `${parsedEntry.value.title}\n${parsedEntry.value.content}`,

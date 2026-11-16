@@ -18,11 +18,14 @@ const GEMINI_TEST_CONFIG = {
 };
 
 test('Gemini configuration defaults, validation and provider selection', () => {
-  assert.equal(resolveAiProvider({}), 'ollama');
+  assert.equal(resolveAiProvider({}), 'gemini');
   assert.equal(resolveAiProvider({ AI_PROVIDER: 'Gemini' }), 'gemini');
   assert.equal(resolveAiProvider({ GEMINI_API_KEY: 'k' }), 'gemini');
   assert.equal(resolveAiProvider({ GOOGLE_AI_API_KEY: 'k' }), 'gemini');
-  assert.equal(resolveAiProvider({ AI_PROVIDER: 'ollama', GEMINI_API_KEY: 'k' }), 'ollama');
+  assert.throws(
+    () => resolveAiProvider({ AI_PROVIDER: 'ollama' }),
+    (error) => error instanceof AiServiceError && /not supported/.test(error.message),
+  );
 
   assert.throws(
     () => getGeminiConfig({}),
@@ -51,7 +54,6 @@ test('Gemini configuration defaults, validation and provider selection', () => {
   );
 
   assert.equal(getAiProviderConfig({ AI_PROVIDER: 'gemini', GEMINI_API_KEY: 'k' }).provider, 'gemini');
-  assert.equal(getAiProviderConfig({ AI_PROVIDER: 'ollama', NODE_ENV: 'development' }).model, 'qwen2.5:7b');
   assert.throws(() => getAiProviderConfig({ AI_PROVIDER: 'openai' }), /not supported/);
 });
 

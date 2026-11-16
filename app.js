@@ -31,8 +31,7 @@ import {
   speakWithDeviceVoice,
   synthesizePlotweaverSpeech,
   transcribeWithPlotweaver,
-  translateWithPlotweaver,
-  translateWithGoogle
+  translateWithPlotweaver
 } from './src/plotweaverClient.js';
 import { loadAiChatConversation, sendAiChatMessage } from './src/aiChatClient.js';
 import {
@@ -4328,16 +4327,11 @@ import {
     if (button) button.disabled = true;
     if (thread) thread.setAttribute('aria-busy', 'true');
     try {
-      const translated = aiChatLanguage().translationProvider === 'google'
-        ? await translateWithGoogle({
-          text: message.translatedText,
-          targetLanguage: 'en',
-        })
-        : await translateWithPlotweaver({
-          text: message.translatedText,
-          sourceLanguage: aiChatLanguage().translationTarget,
-          targetLanguage: 'en',
-        });
+      const translated = await translateWithPlotweaver({
+        text: message.translatedText,
+        sourceLanguage: aiChatLanguage().translationTarget,
+        targetLanguage: 'en',
+      });
       const translatedText = translated.translated_text || translated.translated;
       message.english = translatedText;
       message.plotweaverTranslated = true;
@@ -4347,7 +4341,7 @@ import {
       const translationText = row?.querySelector('.aichat-english span:last-child');
       if (translationText) translationText.textContent = translatedText;
       applyAiChatTranslationVisibility();
-      showToast(`Reply translated with ${aiChatLanguage().translationProvider === 'google' ? 'Google Cloud Translation' : 'Plotweaver'}.`, 'success');
+      showToast('Reply translated with Plotweaver.', 'success');
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'Plotweaver could not translate this reply.', 'error');
     } finally {

@@ -89,7 +89,7 @@ export const AI_CONVERSATION_LANGUAGES = Object.freeze([
     textToSpeechLocale: 'sw-KE',
     textToSpeechLanguage: 'sw',
     translationTarget: 'sw',
-    translationProvider: 'google',
+    translationProvider: 'plotweaver',
   },
   {
     id: 'pcm',

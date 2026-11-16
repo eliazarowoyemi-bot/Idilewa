@@ -300,7 +300,7 @@ export default async function handler(req, res) {
         result.reply,
       )
       : null;
-    const providerLabel = result.provider === 'gemini' ? 'Gemini' : 'Ollama';
+    const providerLabel = 'Gemini';
     return sendJson(res, 200, {
       reply: result.reply,
       language: request.language,

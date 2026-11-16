@@ -39,7 +39,7 @@ test('the language config preserves the requested localized conversation instruc
       ['pcm', 'Send a message to start chatting in Nigerian Pidgin.'],
     ],
   );
-  assert.equal(getAiConversationLanguage('sw').translationProvider, 'google');
+  assert.equal(getAiConversationLanguage('sw').translationProvider, 'plotweaver');
   assert.equal(getAiConversationLanguage('sw').speechRecognitionSupported, false);
   assert.equal(getAiConversationLanguage('pcm').speechRecognitionSupported, true);
   assert.equal(getAiConversationLanguage('unknown').id, 'yo');

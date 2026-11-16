@@ -19,12 +19,12 @@ function createResponse() {
   };
 }
 
-async function withTranslationMocks({ apiKey = 'test-google-key', fetchMock, run }) {
-  const previousKey = process.env.GOOGLE_TRANSLATE_API_KEY;
+async function withTranslationMocks({ apiKey = 'test-plotweaver-key', fetchMock, run }) {
+  const previousKey = process.env.PLOTWEAVER_API_KEY;
   const originalFetch = globalThis.fetch;
   const originalConsoleError = console.error;
-  if (apiKey === null) delete process.env.GOOGLE_TRANSLATE_API_KEY;
-  else process.env.GOOGLE_TRANSLATE_API_KEY = apiKey;
+  if (apiKey === null) delete process.env.PLOTWEAVER_API_KEY;
+  else process.env.PLOTWEAVER_API_KEY = apiKey;
   globalThis.fetch = fetchMock;
   console.error = () => {};
   try {
@@ -32,8 +32,8 @@ async function withTranslationMocks({ apiKey = 'test-google-key', fetchMock, run
   } finally {
     globalThis.fetch = originalFetch;
     console.error = originalConsoleError;
-    if (previousKey === undefined) delete process.env.GOOGLE_TRANSLATE_API_KEY;
-    else process.env.GOOGLE_TRANSLATE_API_KEY = previousKey;
+    if (previousKey === undefined) delete process.env.PLOTWEAVER_API_KEY;
+    else process.env.PLOTWEAVER_API_KEY = previousKey;
   }
 }
 
@@ -41,7 +41,7 @@ test('translation endpoint validates methods, configuration and request bodies',
   await withTranslationMocks({
     apiKey: null,
     fetchMock: async () => {
-      throw new Error('Should not call Google without a configured key.');
+      throw new Error('Translation must not call Plotweaver without a configured key.');
     },
     run: async () => {
       const unconfigured = createResponse();
@@ -63,29 +63,30 @@ test('translation endpoint validates methods, configuration and request bodies',
       for (const [body, expectedStatus] of [
         [{ text: '', target: 'yo' }, 400],
         [{ text: 'Hello', target: 'bad value' }, 400],
-        [{ text: 'x'.repeat(5_001), target: 'yo' }, 413],
+        [{ text: 'Hello', target: 'yo', source: 'bad value' }, 400],
+        [{ text: 'x'.repeat(2_001), target: 'yo' }, 413],
       ]) {
         const response = createResponse();
         await translateHandler({ method: 'POST', headers: {}, body }, response);
-        assert.equal(response.statusCode, expectedStatus);
+        assert.equal(response.statusCode, expectedStatus, JSON.stringify(body));
       }
     },
   });
 });
 
-test('translation endpoint returns supported target languages from Google', async () => {
+test('translation endpoint lists Plotweaver translation languages', async () => {
   await withTranslationMocks({
-    fetchMock: async (url) => {
-      assert.match(String(url), /\/languages\?/);
-      return new Response(JSON.stringify({
-        data: {
-          languages: [
-            { language: 'yo', name: 'Yoruba' },
-            { language: 'en', name: 'English' },
-            { language: '../bad', name: 'Invalid' },
-          ],
-        },
-      }), { status: 200 });
+    fetchMock: async (url, options) => {
+      assert.equal(
+        String(url),
+        'https://api.plotweaver.app/v1/languages?service=translation',
+      );
+      assert.equal(options.headers['X-API-Key'], 'test-plotweaver-key');
+      return new Response(JSON.stringify([
+        { code: 'yo', name: 'Yoruba', services: ['tts', 'translation'] },
+        { code: 'en', name: 'English', services: ['asr', 'translation'] },
+        { code: '../bad', name: 'Invalid', services: ['translation'] },
+      ]), { status: 200 });
     },
     run: async () => {
       const response = createResponse();
@@ -100,21 +101,20 @@ test('translation endpoint returns supported target languages from Google', asyn
   });
 });
 
-test('translation endpoint sends bounded plain text to Google and returns machine translation', async () => {
+test('translation endpoint sends plain text to Plotweaver and returns machine translation', async () => {
   await withTranslationMocks({
     fetchMock: async (url, options) => {
-      assert.match(String(url), /^https:\/\/translation\.googleapis\.com\/language\/translate\/v2\?/);
+      assert.equal(String(url), 'https://api.plotweaver.app/v1/translations');
       assert.equal(options.method, 'POST');
+      assert.equal(options.headers['X-API-Key'], 'test-plotweaver-key');
       assert.equal(options.headers['Content-Type'], 'application/json; charset=utf-8');
       assert.deepEqual(JSON.parse(options.body), {
-        q: 'God is good to everyone today.',
-        source: 'en',
-        target: 'yo',
-        format: 'text',
-        model: 'nmt',
+        text: 'God is good to everyone today.',
+        source_language: 'en',
+        target_language: 'yo',
       });
       return new Response(JSON.stringify({
-        data: { translations: [{ translatedText: 'Ọlọ́run dára sí gbogbo ènìyàn lónìí.' }] },
+        translated_text: 'Ọlọ́run dára sí gbogbo ènìyàn lónìí.',
       }), { status: 200 });
     },
     run: async () => {
@@ -127,11 +127,37 @@ test('translation endpoint sends bounded plain text to Google and returns machin
       assert.equal(response.statusCode, 200);
       assert.deepEqual(response.body, {
         translated: 'Ọlọ́run dára sí gbogbo ènìyàn lónìí.',
+        source: 'en',
         target: 'yo',
-        provider: 'Google Cloud Translation',
+        provider: 'Plotweaver',
         machineTranslated: true,
       });
       assert.equal(response.headers['Cache-Control'], 'no-store');
     },
   });
+});
+
+test('translation endpoint explains Plotweaver account problems instead of claiming success', async () => {
+  const cases = [
+    [403, 503, /not enabled for the configured account/],
+    [401, 503, /credentials/],
+    [429, 429, /rate limit/],
+    [500, 502, /temporarily unavailable/],
+  ];
+  for (const [upstreamStatus, expectedStatus, pattern] of cases) {
+    await withTranslationMocks({
+      fetchMock: async () => new Response('{}', { status: upstreamStatus }),
+      run: async () => {
+        const response = createResponse();
+        await translateHandler({
+          method: 'POST',
+          headers: {},
+          body: { text: 'Hello', target: 'yo' },
+        }, response);
+        assert.equal(response.statusCode, expectedStatus, `upstream ${upstreamStatus}`);
+        assert.match(response.body.error, pattern);
+        assert.equal(response.body.translated, undefined);
+      },
+    });
+  }
 });

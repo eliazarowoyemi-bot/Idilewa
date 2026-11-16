@@ -137,11 +137,10 @@ Still missing — each needs a real credential, there is **no safe default**:
 
 | Variable | Effect while missing |
 | :--- | :--- |
-| `GEMINI_API_KEY` (or `GOOGLE_AI_API_KEY`) | `POST /api/ai/conversation` falls back to Ollama and returns `503 Live AI chat is not configured. Add a private HTTPS Ollama host and model…` |
-| `OLLAMA_BASE_URL` (optional `OLLAMA_MODEL`, `OLLAMA_EMBEDDING_MODEL`, `OLLAMA_API_KEY`) | Only used when `AI_PROVIDER=ollama` or when no Gemini key is set; production requires `https:` |
+| `GEMINI_API_KEY` (or `GOOGLE_AI_API_KEY`) | `POST /api/ai/conversation` and `/api/ai/knowledge` answer `503 Live AI chat is not configured. Add GEMINI_API_KEY to the deployment environment.` |
 | `RESEND_API_KEY`, `RESEND_FROM_EMAIL` | Welcome and verification emails are skipped |
 | `JUDGE0_URL`, `JUDGE0_AUTH_TOKEN` | `GET /api/code/languages` returns `503` |
-| `GOOGLE_TRANSLATE_API_KEY` | Server-side translation unavailable |
+| Plotweaver translations/speech entitlement | `GET /api/translate` still lists languages (the upstream list is public), but `POST /api/translate` and the Plotweaver speech/transcription endpoints answer `503 … not enabled for the configured account …` until those services are enabled for the key |
 | `CANVA_CLIENT_ID`, `CANVA_CLIENT_SECRET`, `CANVA_REDIRECT_URI` | Canva Connect stays disabled |
 
 Deliberately **not** uploaded:
@@ -163,16 +162,14 @@ new production build is required before the API sees them.
 
 ## AI provider — Gemini
 
-`/api/ai/conversation` and `/api/ai/knowledge` dispatch on `resolveAiProvider()`
-in `src/server/aiConversation.js`:
-
-1. `AI_PROVIDER=gemini` → Gemini (REST, `src/server/geminiProvider.js`).
-2. `AI_PROVIDER=ollama` → self-hosted Ollama (HTTPS only in production).
-3. Unset → Gemini **if** `GEMINI_API_KEY`/`GOOGLE_AI_API_KEY` is present,
-   otherwise Ollama.
-
-So adding the key alone is enough to switch provider; `AI_PROVIDER=gemini` just
-pins the choice explicitly (and disables the fallback).
+`/api/ai/conversation` and `/api/ai/knowledge` are Gemini-only. `resolveAiProvider()`
+in `src/server/aiConversation.js` returns `gemini` when `AI_PROVIDER` is unset or
+set to `gemini`, and rejects every other value with
+`503 The configured AI provider is not supported by this deployment. Use gemini.`
+The retired `ollama` value is rejected the same way, so nothing can fall back to a
+local model host. `getAiProviderConfig()` returns the Gemini configuration (REST,
+`src/server/geminiProvider.js`) and fails with `503 Live AI chat is not
+configured. Add GEMINI_API_KEY to the deployment environment.` when no key is set.
 
 ```bash
 npx vercel env add AI_PROVIDER production --scope idilewa1 --value gemini --sensitive
@@ -196,13 +193,23 @@ curl.exe -s -o NUL -w '%{http_code}\n' -X POST https://idilewa.com/api/ai/conver
 
 `200` means Gemini answered; `503` with *"rejected this deployment's
 credentials"* means the key is invalid (`400 API_KEY_INVALID` from Google);
-`503` mentioning Ollama means no Gemini key reached the function.
+`503` saying *Live AI chat is not configured* means no Gemini key reached the
+function.
 
 **Outstanding (2026-11-16):** the key currently in local `.env`
 (`AQ.Ab8RN6…`) is rejected by Google with `API_KEY_INVALID` for both the
 `x-goog-api-key` header and the `?key=` query parameter. A valid key from
 <https://aistudio.google.com/apikey> must be uploaded before chat can serve
-live traffic; until then the endpoint keeps returning the Ollama `503`.
+live traffic; until then the endpoint keeps returning the *not configured* /
+*rejected this deployment's credentials* `503`.
+
+**Outstanding (2026-11-16):** the stored `PLOTWEAVER_API_KEY` is valid —
+`GET /api/plotweaver/languages` and `GET /api/plotweaver/voices` answer `200` —
+but `POST /translations`, `POST /speech` and `POST /transcriptions` answer
+`403 not enabled for the configured account`, so `/api/translate` and
+`/api/plotweaver/*` surface that message instead of a translation. Enabling
+those services for the key's account in the Plotweaver dashboard (or upgrading
+its plan) fixes it; no code change is required.
 
 ## SEO files
 

@@ -1,6 +1,26 @@
 import { getOptionalSessionAccessToken } from './supabaseClient.js';
 
 const SUPPORTED_LANGUAGES = new Set(['yo', 'ig', 'ha', 'sw', 'pcm']);
+const MAX_HISTORY_MESSAGES = 12;
+const MAX_MESSAGE_LENGTH = 1_000;
+
+/**
+ * The conversation endpoint rejects history entries that are empty or
+ * oversized. Local UI state can contain either (for example a guide message
+ * whose translation was cleared), so normalise before sending rather than
+ * letting the request fail with a 400.
+ */
+function normalizeHistory(messages) {
+  if (!Array.isArray(messages)) return [];
+  return messages
+    .filter((item) => item && (item.role === 'user' || item.role === 'assistant'))
+    .map((item) => ({
+      role: item.role,
+      text: typeof item.text === 'string' ? item.text.trim() : '',
+    }))
+    .filter((item) => item.text && item.text.length <= MAX_MESSAGE_LENGTH)
+    .slice(-MAX_HISTORY_MESSAGES);
+}
 
 async function requestConversation(url, options = {}) {
   const accessToken = await getOptionalSessionAccessToken();
@@ -47,7 +67,7 @@ export async function sendAiChatMessage({
       language,
       message: message.trim(),
       conversationId: conversationId || undefined,
-      messages,
+      messages: normalizeHistory(messages),
     }),
     signal,
   });

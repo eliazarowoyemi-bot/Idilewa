@@ -3,15 +3,23 @@ import test from 'node:test';
 import {
   AiServiceError,
   AI_CONVERSATION_LANGUAGES,
+  AI_PROVIDERS,
   createAiKnowledgeEmbedding,
+  DEFAULT_AI_PROVIDER,
   DEFAULT_GEMINI_MODEL,
   generateAiConversationReply,
   getAiProviderConfig,
   getGeminiConfig,
-  getOllamaConfig,
   parseAiConversationRequest,
   resolveAiProvider,
 } from '../src/server/aiConversation.js';
+
+const GEMINI_TEST_CONFIG = {
+  provider: 'gemini',
+  apiKey: 'server-only-test-key',
+  baseUrl: 'https://gemini.example.test/v1beta',
+  model: 'gemini-flash-latest',
+};
 
 test('conversation requests validate supported languages, input size, history and IDs', () => {
   for (const language of Object.keys(AI_CONVERSATION_LANGUAGES)) {
@@ -35,101 +43,85 @@ test('conversation requests validate supported languages, input size, history an
   }).error, /ID is not valid/);
 });
 
-test('production Ollama configuration never assumes a localhost host', () => {
-  assert.throws(() => getOllamaConfig({
-    NODE_ENV: 'production',
-    VERCEL_ENV: 'production',
-  }), (error) => error instanceof AiServiceError && /private HTTPS Ollama host/.test(error.message));
-  assert.equal(getOllamaConfig({
-    NODE_ENV: 'development',
-  }).baseUrl, 'http://127.0.0.1:11434');
-  assert.throws(() => getOllamaConfig({
-    NODE_ENV: 'production',
-    VERCEL_ENV: 'production',
-    OLLAMA_BASE_URL: 'http://ollama.internal:11434',
-  }), /require an HTTPS Ollama host/);
-  assert.equal(getOllamaConfig({
-    NODE_ENV: 'production',
-    VERCEL_ENV: 'production',
-    OLLAMA_BASE_URL: 'https://ollama.example.test',
-    OLLAMA_MODEL: 'qwen2.5:7b',
-  }).model, 'qwen2.5:7b');
+test('the deployment is Gemini-only and never falls back to a local model host', () => {
+  assert.deepEqual([...AI_PROVIDERS], ['gemini']);
+  assert.equal(DEFAULT_AI_PROVIDER, 'gemini');
+  assert.equal(resolveAiProvider({}), 'gemini');
+  assert.throws(
+    () => resolveAiProvider({ AI_PROVIDER: 'ollama' }),
+    (error) => error instanceof AiServiceError && /not supported/.test(error.message),
+  );
+  assert.throws(
+    () => getAiProviderConfig({ AI_PROVIDER: 'ollama', GEMINI_API_KEY: 'k' }),
+    /not supported/,
+  );
+  assert.throws(
+    () => getAiProviderConfig({}),
+    (error) => error instanceof AiServiceError && error.code === 'AI_PROVIDER_NOT_CONFIGURED',
+  );
+  assert.equal(getAiProviderConfig({ GEMINI_API_KEY: 'k' }).provider, 'gemini');
 });
 
-test('Ollama receives selected-language instructions and conversation context', async () => {
+test('Gemini receives mapped history and approved knowledge notes', async () => {
   let received;
   const result = await generateAiConversationReply({
     language: 'yo',
     message: 'Báwo ni?',
     messages: [{ role: 'assistant', content: 'Ẹ káàbọ̀.' }],
     knowledge: [{ title: 'Greetings', content: 'Use tone marks.', source_name: 'Reviewed notes' }],
-    config: {
-      baseUrl: 'http://127.0.0.1:11434',
-      model: 'qwen2.5:7b',
-      apiKey: 'server-only-test-key',
-    },
+    config: GEMINI_TEST_CONFIG,
     fetchImpl: async (url, options) => {
       received = { url, options };
       return new Response(JSON.stringify({
-        message: { content: 'Mo wà dáadáa.' },
-      }), { status: 200 });
+        candidates: [{ content: { parts: [{ text: 'Mo wà dáadáa.' }] } }],
+      }));
     },
   });
   const body = JSON.parse(received.options.body);
-  assert.equal(received.url, 'http://127.0.0.1:11434/api/chat');  assert.ok(received.options.headers.Authorization.startsWith('Bearer '));
-  assert.equal(body.stream, false);
-  assert.equal(body.messages[0].role, 'system');
-  assert.match(body.messages[0].content, /Yorùbá/);
-  assert.match(body.messages[0].content, /Greetings/);
-  assert.deepEqual(body.messages.slice(1), [
-    { role: 'assistant', content: 'Ẹ káàbọ̀.' },
-    { role: 'user', content: 'Báwo ni?' },
-  ]);
+  assert.equal(received.options.headers['x-goog-api-key'], 'server-only-test-key');
+  assert.match(body.systemInstruction.parts[0].text, /Greetings/);
+  assert.deepEqual(body.contents.map((item) => item.role), ['model', 'user']);
   assert.equal(result.reply, 'Mo wà dáadáa.');
-  assert.equal(result.model, 'qwen2.5:7b');
+  assert.equal(result.model, 'gemini-flash-latest');
+  assert.equal(result.provider, 'gemini');
 });
 
-test('every supported language is sent to Ollama with its own response instructions', async () => {
+test('every supported language is sent to Gemini with its own response instructions', async () => {
   for (const [language, languageName] of Object.entries(AI_CONVERSATION_LANGUAGES)) {
     let systemPrompt = '';
     const result = await generateAiConversationReply({
       language,
       message: 'Hello',
-      config: {
-        baseUrl: 'http://127.0.0.1:11434',
-        model: 'qwen2.5:7b',
-        apiKey: '',
-      },
+      config: GEMINI_TEST_CONFIG,
       fetchImpl: async (_url, options) => {
         const request = JSON.parse(options.body);
-        systemPrompt = request.messages[0].content;
+        systemPrompt = request.systemInstruction.parts[0].text;
         return new Response(JSON.stringify({
-          message: { content: `Reply in ${languageName}` },
+          candidates: [{ content: { parts: [{ text: `Reply in ${languageName}` }] } }],
         }));
       },
     });
     assert.match(systemPrompt, new RegExp(languageName));
     assert.equal(result.reply, `Reply in ${languageName}`);
+    assert.equal(result.provider, 'gemini');
   }
 });
 
-test('Ollama failures remain explicit and never produce success-shaped replies', async () => {
-  await assert.rejects(generateAiConversationReply({
+test('AI conversation requests only reach the Gemini endpoint', async () => {
+  const urls = [];
+  await generateAiConversationReply({
     language: 'ha',
     message: 'Sannu',
-    config: { baseUrl: 'https://model.example.test', model: 'model', apiKey: '' },
-    fetchImpl: async () => new Response('', { status: 404 }),
-  }), /configured Ollama model is unavailable/);
-  await assert.rejects(generateAiConversationReply({
-    language: 'ig',
-    message: 'Ndewo',
-    config: { baseUrl: 'https://model.example.test', model: 'model', apiKey: '' },
-    fetchImpl: async () => new Response(JSON.stringify({ message: { content: '' } })),
-  }), /no usable reply/);
-  await assert.rejects(generateAiConversationReply({
-    language: 'sw',
-    message: 'Habari',
-    config: { baseUrl: 'https://model.example.test', model: 'model', apiKey: '' },
-    fetchImpl: async () => { throw new TypeError('network failure'); },
-  }), /could not be reached/);
+    config: GEMINI_TEST_CONFIG,
+    fetchImpl: async (url) => {
+      urls.push(String(url));
+      return new Response(JSON.stringify({
+        candidates: [{ content: { parts: [{ text: 'Sannu da zuwa.' }] } }],
+      }));
+    },
+  });
+  assert.deepEqual(urls.map((url) => new URL(url).pathname), [
+    '/v1beta/models/gemini-flash-latest:generateContent',
+  ]);
+  assert.ok(urls.every((url) => !/\/api\/(chat|embed)/.test(url)), 'no legacy local-model endpoints may be called');
 });

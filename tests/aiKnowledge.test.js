@@ -55,28 +55,32 @@ test('knowledge embeddings are optional but must have the configured 768-value s
   let called = false;
   assert.equal(await createAiKnowledgeEmbedding('hello', {
     embeddingModel: '',
-    baseUrl: 'https://model.example.test',
+    baseUrl: 'https://gemini.example.test/v1beta',
   }, async () => { called = true; }), null);
   assert.equal(called, false);
 
   const embedding = Array.from({ length: 768 }, (_, index) => index / 768);
   const vector = await createAiKnowledgeEmbedding('hello', {
-    embeddingModel: 'nomic-embed-text',
-    baseUrl: 'https://model.example.test',
-    apiKey: '',
+    embeddingModel: 'text-embedding-004',
+    baseUrl: 'https://gemini.example.test/v1beta',
+    apiKey: 'server-only-test-key',
   }, async (url, options) => {
-    assert.equal(url, 'https://model.example.test/api/embed');
+    assert.equal(url, 'https://gemini.example.test/v1beta/models/text-embedding-004:embedContent');
     assert.equal(options.method, 'POST');
-    assert.deepEqual(JSON.parse(options.body), { model: 'nomic-embed-text', input: 'hello' });
-    return new Response(JSON.stringify({ embeddings: [embedding] }));
+    assert.equal(options.headers['x-goog-api-key'], 'server-only-test-key');
+    assert.deepEqual(JSON.parse(options.body), {
+      model: 'models/text-embedding-004',
+      content: { parts: [{ text: 'hello' }] },
+    });
+    return new Response(JSON.stringify({ embedding: { values: embedding } }));
   });
   assert.match(vector, /^\[0,0\.001302/);
   assert.equal(vector.slice(1, -1).split(',').length, 768);
   await assert.rejects(createAiKnowledgeEmbedding('hello', {
     embeddingModel: 'bad-model',
-    baseUrl: 'https://model.example.test',
+    baseUrl: 'https://gemini.example.test/v1beta',
     apiKey: '',
-  }, async () => new Response(JSON.stringify({ embeddings: [[1, 2]] }))), (error) => (
+  }, async () => new Response(JSON.stringify({ embedding: { values: [1, 2] } }))), (error) => (
     error instanceof AiServiceError && /768 numeric values/.test(error.message)
   ));
 });

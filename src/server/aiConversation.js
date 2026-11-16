@@ -140,23 +140,22 @@ export function parseAiConversationRequest(body) {
   };
 }
 
-export const AI_PROVIDERS = Object.freeze(['gemini', 'ollama']);
-export const DEFAULT_AI_PROVIDER = 'ollama';
+export const AI_PROVIDERS = Object.freeze(['gemini']);
+export const DEFAULT_AI_PROVIDER = 'gemini';
 export const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
 
 const GEMINI_DEFAULT_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 const GEMINI_MODEL_PATTERN = /^[a-z0-9][a-z0-9._-]{0,79}$/i;
 
 export function resolveAiProvider(env = process.env) {
-  const configured = env.AI_PROVIDER?.trim().toLowerCase();
-  if (configured) return configured;
-
-  // No explicit choice: prefer Gemini as soon as a key exists, so adding the
-  // secret to the deployment is enough to switch provider without a redeploy
-  // of application code.
-  if (env.GEMINI_API_KEY?.trim() || env.GOOGLE_AI_API_KEY?.trim()) return 'gemini';
-
-  return DEFAULT_AI_PROVIDER;
+  const configured = env.AI_PROVIDER?.trim().toLowerCase() || DEFAULT_AI_PROVIDER;
+  if (!AI_PROVIDERS.includes(configured)) {
+    throw new AiServiceError(
+      `The configured AI provider is not supported by this deployment. Use ${AI_PROVIDERS.join(', ')}.`,
+      500,
+    );
+  }
+  return configured;
 }
 
 /**
@@ -198,78 +197,17 @@ export function getGeminiConfig(env = process.env) {
 }
 
 /**
- * Resolve the active provider from AI_PROVIDER. When AI_PROVIDER is unset the
- * Gemini key presence decides (see resolveAiProvider), otherwise the legacy
- * Ollama path is used.
+ * Resolve the active provider configuration. Idilewa is Gemini-only: the
+ * deployment needs GEMINI_API_KEY and nothing else.
  */
 export function getAiProviderConfig(env = process.env) {
-  const provider = resolveAiProvider(env);
-  if (provider === 'gemini') return getGeminiConfig(env);
-  if (provider === 'ollama') return getOllamaConfig(env);
-  throw new AiServiceError('The configured AI provider is not supported by this deployment.');
-}
-
-export function getOllamaConfig(env = process.env) {
-  const isProduction = env.NODE_ENV === 'production' || Boolean(env.VERCEL_ENV === 'production');
-  const configuredUrl = env.OLLAMA_BASE_URL?.trim();
-  const baseUrl = configuredUrl || (isProduction ? '' : 'http://127.0.0.1:11434');
-  if (!baseUrl) {
-    throw new AiServiceError('Live AI chat is not configured. Add a private HTTPS Ollama host and model to the deployment environment.');
-  }
-
-  let url;
-  try {
-    url = new URL(baseUrl);
-  } catch (error) {
-    throw new AiServiceError('The configured Ollama host is not a valid URL.', 500, { cause: error });
-  }
-  if (!['http:', 'https:'].includes(url.protocol)) {
-    throw new AiServiceError('The configured Ollama host must use HTTP or HTTPS.', 500);
-  }
-  if (isProduction && url.protocol !== 'https:') {
-    throw new AiServiceError('Production AI requests require an HTTPS Ollama host.', 500);
-  }
-
-  return {
-    baseUrl: url.toString().replace(/\/+$/, ''),
-    model: env.OLLAMA_MODEL?.trim() || 'qwen2.5:7b',
-    embeddingModel: env.OLLAMA_EMBEDDING_MODEL?.trim() || '',
-    apiKey: env.OLLAMA_API_KEY?.trim() || '',
-  };
+  resolveAiProvider(env);
+  return getGeminiConfig(env);
 }
 
 export async function createAiKnowledgeEmbedding(text, config, fetchImpl = globalThis.fetch) {
   if (!config.embeddingModel) return null;
-  if (config.provider === 'gemini') return createGeminiEmbedding(text, config, fetchImpl);
-
-  let response;
-  try {
-    const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };    if (config.apiKey) headers.Authorization = ['Bearer', config.apiKey].join(' ');
-    response = await fetchImpl(`${config.baseUrl}/api/embed`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({ model: config.embeddingModel, input: text }),
-      signal: AbortSignal.timeout(12_000),
-    });
-  } catch (error) {
-    throw new AiServiceError('The language knowledge embedding model could not be reached.', 503, { cause: error });
-  }
-  if (!response.ok) {
-    throw new AiServiceError('The language knowledge embedding model is unavailable.', 503);
-  }
-
-  let result;
-  try {
-    result = await response.json();
-  } catch (error) {
-    throw new AiServiceError('The language knowledge embedding response was invalid.', 502, { cause: error });
-  }
-  const embedding = result?.embeddings?.[0];
-  if (!Array.isArray(embedding) || embedding.length !== 768
-    || embedding.some((value) => !Number.isFinite(value))) {
-    throw new AiServiceError('The configured embedding model must return 768 numeric values.', 503);
-  }
-  return `[${embedding.join(',')}]`;
+  return createGeminiEmbedding(text, config, fetchImpl);
 }
 
 function buildSystemPrompt(language, knowledge) {
@@ -290,62 +228,11 @@ export async function generateAiConversationReply({
   config = getAiProviderConfig(),
   fetchImpl = globalThis.fetch,
 }) {
-  if (config.provider === 'gemini') {
-    return requestGeminiReply({
-      systemPrompt: buildSystemPrompt(language, knowledge),
-      message,
-      messages,
-      config,
-      fetchImpl,
-    });
-  }
-
-  const conversation = [
-    { role: 'system', content: buildSystemPrompt(language, knowledge) },
-    ...messages.slice(-MAX_AI_HISTORY_MESSAGES),
-    { role: 'user', content: message },
-  ];
-
-  const headers = { 'Content-Type': 'application/json', Accept: 'application/json' };    if (config.apiKey) headers.Authorization = ['Bearer', config.apiKey].join(' ');
-
-  let response;
-  try {
-    response = await fetchImpl(`${config.baseUrl}/api/chat`, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
-        model: config.model,
-        messages: conversation,
-        stream: false,
-        options: { temperature: 0.4 },
-      }),
-      signal: AbortSignal.timeout(45_000),
-    });
-  } catch (error) {
-    throw new AiServiceError('The AI model host could not be reached. Check the Ollama service and try again.', 503, { cause: error });
-  }
-
-  if (!response.ok) {
-    throw new AiServiceError(
-      response.status === 404
-        ? 'The configured Ollama model is unavailable. Pull the model configured for this deployment.'
-        : response.status === 429
-          ? 'The AI service is busy. Wait a moment and try again.'
-          : 'The AI service could not complete this message. Try again shortly.',
-      response.status === 429 ? 429 : 503,
-    );
-  }
-
-  let result;
-  try {
-    result = await response.json();
-  } catch (error) {
-    throw new AiServiceError('The AI service returned an unreadable response.', 502, { cause: error });
-  }
-
-  const reply = result?.message?.content;
-  if (typeof reply !== 'string' || !reply.trim() || reply.length > 8_000) {
-    throw new AiServiceError('The AI service returned no usable reply. Please try again.', 502);
-  }
-  return { reply: reply.trim(), model: config.model, provider: 'ollama' };
+  return requestGeminiReply({
+    systemPrompt: buildSystemPrompt(language, knowledge),
+    message,
+    messages,
+    config,
+    fetchImpl,
+  });
 }

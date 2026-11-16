@@ -113,7 +113,7 @@ test('AI Conversation uses language configuration for translation and speech set
   assert.match(appSource, /data-speech-recognition-locale="\$\{esc\(language\.speechRecognitionLocale\)\}"/);
   assert.match(appSource, /data-text-to-speech-locale="\$\{esc\(language\.textToSpeechLocale\)\}"/);
   assert.match(aiClientSource, /\/api\/ai\/conversation/);
-  assert.match(appSource, /translateWithGoogle\(\{/);
+  assert.doesNotMatch(appSource, /translateWithGoogle|Google Cloud Translation|GOOGLE_TRANSLATE_API_KEY/);
   assert.match(appSource, /retry\.dataset\.action = 'aichat-retry'/);
   assert.match(appSource, /function changeAiChatLanguage\(languageId\)/);
   assert.match(appSource, /aiConversation\.languageId = nextLanguage\.id/);

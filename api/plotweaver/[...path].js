@@ -190,7 +190,7 @@ async function parseMultipart(body, contentType, path) {
 function errorForUpstreamStatus(status) {
   if (status === 401) return 'Idilewa voice service rejected the configured account credentials.';
   if (status === 402) return 'Idilewa voice service billing or account setup is required.';
-  if (status === 403) return 'This Idilewa voice service is not enabled for the configured account.';
+  if (status === 403) return 'This Idilewa voice service is not enabled for the configured Plotweaver account. Enable it in the Plotweaver dashboard or upgrade the plan, then try again.';
   if (status === 404) return 'The requested Idilewa voice or resource was not found.';
   if (status === 413) return 'The audio upload is too large for this deployment.';
   if (status === 429) return 'Idilewa reached a rate or usage limit. Try again later.';
