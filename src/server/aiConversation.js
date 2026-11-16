@@ -142,16 +142,15 @@ export function parseAiConversationRequest(body) {
 
 export const AI_PROVIDERS = Object.freeze(['gemini']);
 export const DEFAULT_AI_PROVIDER = 'gemini';
-export const DEFAULT_GEMINI_MODEL = 'gemini-flash-latest';
+export const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
 
-// Google retires and overloads individual models without notice, so a single
-// hard-coded model leaves the chat dead. These are tried in order when the
-// primary model is retired (404) or temporarily unavailable (503/500). Both
-// names are published by ListModels today; gemini-flash-latest is avoided in the
-// fallback list because it is the default alias and would duplicate attempt one.
+// Google retires models for new API keys without notice — gemini-2.5-flash now
+// answers 404 "no longer available to new users" and points callers at 3.8-flash.
+// These aliases stay in the list so a future retirement does not take the chat
+// down; they are only tried after the primary model fails with 404/500/503.
 export const GEMINI_FALLBACK_MODELS = Object.freeze([
   'gemini-3.5-flash',
-  'gemini-2.5-flash',
+  'gemini-flash-latest',
 ]);
 
 
