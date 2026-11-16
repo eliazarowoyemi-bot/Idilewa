@@ -74,6 +74,12 @@ test('direct sign-in and signup routes default to the adult email-and-password f
   assert.match(appSource, /case 'login-mode': \{\s*const nextMode = el\.dataset\.mode === 'signup' \? 'signup' : 'signin';\s*if \(state\.loginMode !== nextMode\) state\.authRole = 'adult';/);
 });
 
+test('sign-in confirmation action stays aligned with its email label', () => {
+  assert.match(appSource, /<section class="auth-panel modern-auth-panel" aria-labelledby="authPageHeading">[\s\S]*?<h1 id="authPageHeading" class="auth-title">/);
+  assert.match(appSource, /<div class="form-label-row">\s*<label for="authEmail" class="form-label">Email address<\/label>\s*\$\{!signUp && !isChild \? '<button class="forgot-link" type="button" data-action="resend-signup-confirmation">Resend confirmation email<\/button>' : ''\}/);
+  assert.doesNotMatch(appSource, /<main class="auth-panel modern-auth-panel">/);
+});
+
 test('invalid password sign-in displays guidance inline instead of an overlapping toast', () => {
   assert.match(appSource, /id="authInlineError" class="auth-inline-error" role="alert"/);
   assert.match(appSource, /We couldn’t sign you in with those details\.[\s\S]*?inlineError\.hidden = false/);

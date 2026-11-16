@@ -53,6 +53,37 @@ function setupDrawer() {
   const closeButton = drawer ? drawer.querySelector('[data-id-menu-close]') : null;
   if (!drawer || !backdrop || !openButton) return;
 
+  const drawerLinks = drawer.querySelector('.id-drawer__links');
+  if (!drawerLinks) throw new Error('Navigation drawer is missing its links region.');
+
+  const destinations = [
+    ['/', 'Home'],
+    ['/?view=academy', 'Language Academy'],
+    ['/?view=codeLab', 'Code for Kids'],
+    ['/?view=heritageLab', 'Heritage Library'],
+    ['/kids.html', 'Kids Arcade'],
+    ['/creative-studio.html', 'Creative Studio'],
+    ['/tutor.html', 'Tutorship'],
+    ['/parents.html', 'For Families'],
+    ['/family-tasks.html', 'Family Tasks'],
+    ['/faq.html', 'FAQ'],
+    ['/about.html', 'About Ìdíléwa'],
+    ['/pricing.html', 'Pricing'],
+  ];
+  drawerLinks.replaceChildren(...destinations.map(([href, label]) => {
+    const link = document.createElement('a');
+    link.href = href;
+    link.textContent = label;
+    return link;
+  }));
+
+  if (!openButton.querySelector('.id-menu-btn__label')) {
+    const label = document.createElement('span');
+    label.className = 'id-menu-btn__label';
+    label.textContent = 'Menu';
+    openButton.append(label);
+  }
+
   const focusableSelector = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
   let lastFocused = null;
 
@@ -87,7 +118,7 @@ function setupDrawer() {
   backdrop.addEventListener('click', () => setOpen(false));
 
   drawer.addEventListener('click', (event) => {
-    if (event.target.closest('.id-drawer__links button, .id-drawer__foot button, .id-drawer__foot a')) {
+    if (event.target.closest('.id-drawer__links a, .id-drawer__foot button, .id-drawer__foot a')) {
       setOpen(false);
     }
   });
@@ -161,12 +192,25 @@ function setupSlideshowControl() {
   new MutationObserver(sync).observe(control, { childList: true, characterData: true, subtree: true });
 }
 
+function setupFooterFaq() {
+  if (typeof window.openFooterInfo !== 'function') return;
+  const openFooterInfo = window.openFooterInfo;
+  window.openFooterInfo = (kind, ...args) => {
+    if (kind === 'faq') {
+      window.location.assign('/faq.html');
+      return;
+    }
+    return openFooterInfo(kind, ...args);
+  };
+}
+
 function init() {
   if (nav) nav.dataset.idReady = 'true';
   setupDropdown();
   setupDrawer();
   setupReveal();
   setupSlideshowControl();
+  setupFooterFaq();
 }
 
 if (document.readyState === 'loading') {

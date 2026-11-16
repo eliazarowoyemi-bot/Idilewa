@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#f6fbf7" />
+    <meta name="description" content="A secure family space for shared learning tasks and parent-approved rewards." />
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/family-tasks.css" />
+    <title>Family Tasks · Ìdíléwa</title>
+  </head>
+  <body class="family-task-page">
+    <a class="skip-link" href="#familyTaskMain">Skip to family tasks</a>
+    <div class="ft-layout">
+      <aside class="ft-sidebar">
+        <a class="ft-brand" href="/" aria-label="Ìdíléwa home">
+          <img src="/assets/favicon.svg" alt="" />
+          <span>Ìdíléwa</span>
+        </a>
+        <p class="ft-sidebar-caption">Family tasks</p>
+        <nav id="familyTaskNavigation" class="ft-navigation" aria-label="Family task pages" hidden></nav>
+        <div class="ft-sidebar-bottom">
+          <a href="/parents.html#/parent-dashboard">Family portal</a>
+          <button type="button" data-action="sign-out" hidden>Sign out</button>
+        </div>
+      </aside>
+      <div class="ft-workspace">
+        <header class="ft-topbar">
+          <div>
+            <a href="/parents.html#/parent-dashboard">Family space</a>
+            <span aria-hidden="true">/</span>
+            <strong id="familyTaskRole">Loading account</strong>
+          </div>
+          <button type="button" class="ft-button ft-button-quiet" data-action="refresh">Refresh</button>
+        </header>
+        <main id="familyTaskMain" class="ft-main" tabindex="-1">
+          <p role="status">Loading your family tasks…</p>
+        </main>
+      </div>
+    </div>
+    <script type="module" src="/src/familyTasks.js"></script>
+  </body>
+</html>

@@ -37,6 +37,29 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assert.match(transformed, /\/login\.html#\/login\?mode=signup/);
 });
 
+test('homepage drawer shows its menu label and all primary destinations', async () => {
+  const navigationSource = await readFile(resolve(rootDirectory, 'src/siteNav.js'), 'utf8');
+
+  assert.match(navigationSource, /label\.textContent = 'Menu'/);
+  for (const destination of [
+    "['/', 'Home']",
+    "['/?view=academy', 'Language Academy']",
+    "['/?view=codeLab', 'Code for Kids']",
+    "['/?view=heritageLab', 'Heritage Library']",
+    "['/kids.html', 'Kids Arcade']",
+    "['/creative-studio.html', 'Creative Studio']",
+    "['/tutor.html', 'Tutorship']",
+    "['/parents.html', 'For Families']",
+    "['/family-tasks.html', 'Family Tasks']",
+    "['/faq.html', 'FAQ']",
+    "['/about.html', 'About Ìdíléwa']",
+    "['/pricing.html', 'Pricing']",
+  ]) {
+    assert.ok(navigationSource.includes(destination), `drawer should include ${destination}`);
+  }
+  assert.match(navigationSource, /window\.location\.assign\('\/faq\.html'\)/);
+});
+
 test('legacy learning and heritage URLs open their matching standalone views', () => {
   const destinations = [
     ['oral.html', '/?view=heritageLab'],
@@ -57,6 +80,8 @@ test('native entry pages retain their app and return home or voice links to cano
     'about.html',
     'consent.html',
     'educator-portal.html',
+    'faq.html',
+    'family-tasks.html',
     'login.html',
     'parents.html',
     'kids.html',
@@ -117,6 +142,8 @@ test('every built HTML entry except the homepage points to the standalone app', 
     'consent.html',
     'creative-studio.html',
     'educator-portal.html',
+    'faq.html',
+    'family-tasks.html',
     'login.html',
     'parents.html',
     'kids.html',

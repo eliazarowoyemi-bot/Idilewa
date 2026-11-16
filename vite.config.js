@@ -3,7 +3,7 @@ import { resolve } from 'path';
 import { createStandaloneAppPlugin } from './src/standaloneAppRoutes.js';
 
 const routes = [
-  'auth-callback', 'index', 'parents', 'about', 'connect_students', 'connect_teachers', 'consent', 'course',
+  'auth-callback', 'index', 'parents', 'about', 'faq', 'family-tasks', 'connect_students', 'connect_teachers', 'consent', 'course',
   'ai-conversation',
   'keepers',
   'kids', 'languages', 'lesson', 'login', 'oral', 'oral_genre', 'oriki', 'owe',

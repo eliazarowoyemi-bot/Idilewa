@@ -37,6 +37,8 @@ const nativeAppPages = new Set([
   'consent',
   'creative-studio',
   'educator-portal',
+  'faq',
+  'family-tasks',
   'login',
   'parents',
   'kids',

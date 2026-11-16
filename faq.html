@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#ffffff" />
+    <meta name="description" content="Find answers about Ìdíléwa learning, family accounts, culture, and support." />
+    <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <link rel="stylesheet" href="/faq.css" />
+    <title>Frequently Asked Questions · Ìdíléwa</title>
+  </head>
+  <body class="faq-page">
+    <header class="faq-header">
+      <div class="faq-wrap faq-head">
+        <a class="faq-brand" href="/" aria-label="Ìdíléwa home">Ìdíléwa<span aria-hidden="true">.</span></a>
+        <nav aria-label="Help navigation">
+          <a href="/">Home</a>
+          <a href="/parents.html#/parent-login">Family portal</a>
+          <a href="mailto:support@idilewa.com">Support</a>
+          <label class="faq-language-label" for="faqLanguage">FAQ language</label>
+          <select id="faqLanguage" class="faq-language">
+            <option value="en">English</option>
+            <option value="yo">Yorùbá</option>
+            <option value="ig">Igbo</option>
+            <option value="ha">Hausa</option>
+            <option value="sw">Kiswahili</option>
+          </select>
+        </nav>
+      </div>
+    </header>
+    <section class="faq-hero">
+      <div class="faq-wrap">
+        <p class="faq-eyebrow">ÌDÍLÉWA HELP CENTRE</p>
+        <h1 id="faqTitle">How can we help you?</h1>
+        <p id="faqIntro">Answers about learning, creating, and growing with Ìdíléwa.</p>
+        <label class="faq-search">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+            <circle cx="10.8" cy="10.8" r="6.8"></circle>
+            <path d="m16 16 5 5"></path>
+          </svg>
+          <input id="faqSearch" type="search" autocomplete="off" aria-label="Search frequently asked questions" placeholder="Search questions…" />
+        </label>
+      </div>
+    </section>
+    <main class="faq-wrap faq-main">
+      <div class="faq-intro-row">
+        <div>
+          <h2 id="faqHeading">Frequently asked questions</h2>
+          <p id="faqCaption">Find the answer you need, without the fuss.</p>
+        </div>
+      </div>
+      <nav id="faqCategories" class="faq-categories" aria-label="FAQ categories"></nav>
+      <section id="faqQuestions" class="faq-questions" aria-label="Questions and answers"></section>
+      <section class="faq-support">
+        <h2 id="faqSupportTitle">Still need a little help?</h2>
+        <p id="faqSupportText">Our team can help you find your way.</p>
+        <a id="faqSupportLink" href="mailto:support@idilewa.com">Contact support</a>
+      </section>
+    </main>
+    <footer class="faq-footer">
+      <div class="faq-wrap">
+        <span>© <span id="faqYear"></span> Ìdíléwa · Our heritage. Our technology.</span>
+        <span><a href="/">Website</a><a href="mailto:hello@idilewa.com">Get in touch</a></span>
+      </div>
+    </footer>
+    <script type="module" src="/src/faq.js"></script>
+  </body>
+</html>

@@ -353,9 +353,10 @@
   display: none;
   align-items: center;
   justify-content: center;
-  width: 42px;
+  gap: 8px;
+  width: auto;
   height: 42px;
-  padding: 0;
+  padding: 0 12px;
   border: 1px solid rgba(19, 42, 31, 0.12);
   border-radius: 12px;
   background: #fff;
@@ -367,6 +368,7 @@
 .id-menu-btn:hover { background: rgba(5, 46, 28, 0.06); }
 .id-menu-btn:focus-visible { outline: 2px solid var(--id-forest); outline-offset: 2px; }
 .id-menu-btn svg { width: 20px; height: 20px; }
+.id-menu-btn__label { font-size: 13px; font-weight: 650; }
 
 /* Slide-over drawer ------------------------------------------------------- */
 .id-drawer__backdrop {
@@ -423,7 +425,8 @@
 
 .id-drawer__links { display: flex; flex-direction: column; gap: 2px; }
 
-.id-drawer__links button {
+.id-drawer__links button,
+.id-drawer__links a {
   display: flex;
   align-items: center;
   justify-content: flex-start;
@@ -438,6 +441,7 @@
   font-weight: 560;
   letter-spacing: -0.02em;
   text-align: left;
+  text-decoration: none;
   cursor: pointer;
   transition:
     background-color var(--id-dur-fast) var(--id-ease),
@@ -446,7 +450,9 @@
 }
 
 .id-drawer__links button:hover,
-.id-drawer__links button:focus-visible {
+.id-drawer__links button:focus-visible,
+.id-drawer__links a:hover,
+.id-drawer__links a:focus-visible {
   background: #fff;
   color: var(--id-forest);
   padding-left: 16px;

@@ -4579,7 +4579,7 @@ import {
       : parentDashboardError
         ? `<div class="family-data-state is-error" role="alert">${esc(parentDashboardError)} <button type="button" data-action="parent-refresh">Try again</button></div>`
         : '';
-    return renderParentWorkspace('parent-dashboard', `${renderParentHeading('Your family learning space', `Welcome back, ${name}.`, 'Here’s how your children are growing with Idilewa.', `<a class="family-button family-button-outline" href="#/parent-progress" data-route="parent-progress">View Analytics ${icon('arrow', 14)}</a>`)}
+    return renderParentWorkspace('parent-dashboard', `${renderParentHeading('Your family learning space', `Welcome back, ${name}.`, 'Here’s how your children are growing with Idilewa.', `<a class="family-button family-button-outline" href="/family-tasks.html">Family Tasks</a><a class="family-button family-button-outline" href="#/parent-progress" data-route="parent-progress">View Analytics ${icon('arrow', 14)}</a>`)}
       <section class="family-stat-grid" aria-label="Family learning overview">${stat('My Children', children.length, 'Guardian-approved learners')}${stat('Lessons Completed', totalLessons, 'Across your family', 'is-mint')}${stat('Coding Sessions', totalCoding, 'Saved practice attempts', 'is-blue')}${stat('Average Voice Score', averageVoice, 'When available', 'is-peach')}</section>
       <section class="family-dashboard-section"><div class="family-section-heading"><div><span class="family-eyebrow">Your learners</span><h2>My Children</h2></div><a class="family-text-link" href="#/parent-children" data-route="parent-children">View all ${icon('arrow', 13)}</a></div>${loading}${childSection}</section>
       <section class="family-dashboard-lower"><article class="family-insight-card"><span class="family-insight-icon">${icon('globe', 20)}</span><div><span class="family-eyebrow">A little every day</span><h2>Building a global voice, one child at a time.</h2><p>Celebrate each lesson, story and new word along the way.</p></div><a href="#/parent-progress" data-route="parent-progress" aria-label="Open learning analytics">${icon('arrow', 15)}</a></article><aside class="family-activity-panel"><div class="family-section-heading"><div><span class="family-eyebrow">Family updates</span><h2>Connection requests</h2></div><a class="family-text-link" href="#/parent-messages" data-route="parent-messages">View all ${icon('arrow', 13)}</a></div>${renderParentRequestSummary()}</aside></section>`);
@@ -4797,14 +4797,14 @@ import {
       </aside>
 
       <!-- Left-side sign-in and account creation form -->
-      <main class="auth-panel modern-auth-panel">
+      <section class="auth-panel modern-auth-panel" aria-labelledby="authPageHeading">
         <div class="auth-brand" aria-label="Idilewa">
           ${brandLogo('Idilewa · Language · Culture · Future')}
         </div>
 
         <div class="auth-header-block">
           <span class="section-kicker">${signUp ? 'A learning space for you' : 'Good to see you again'}</span>
-          <h1 class="auth-title">${passwordResetReady ? 'Choose a new password' : pendingOtpEmail ? 'Check your email' : signUp ? 'Create your account' : 'Welcome back'}</h1>
+          <h1 id="authPageHeading" class="auth-title">${passwordResetReady ? 'Choose a new password' : pendingOtpEmail ? 'Check your email' : signUp ? 'Create your account' : 'Welcome back'}</h1>
           <p class="auth-subtitle">${passwordResetReady ? 'Your email is verified. Set a new password to finish recovering your account.' : pendingOtpEmail ? `Enter the verification code sent to ${esc(pendingOtpEmail)}.` : signUp ? 'Save your learning journey and pick up where you left off.' : 'Sign in to continue your language and coding practice.'}</p>
         </div>
 
@@ -4902,11 +4902,13 @@ import {
           ` : ''}
 
           <div class="form-group">
-            <label for="authEmail" class="form-label">Email address</label>
+            <div class="form-label-row">
+              <label for="authEmail" class="form-label">Email address</label>
+              ${!signUp && !isChild ? '<button class="forgot-link" type="button" data-action="resend-signup-confirmation">Resend confirmation email</button>' : ''}
+            </div>
             <div class="input-with-icon">
               <input id="authEmail" type="email" name="email" class="form-input" autocomplete="email" placeholder="learner@example.com" value="${signUp && verifiedGuardianSignup ? esc(verifiedGuardianSignup.email) : !signUp && signupEmailForSignin ? esc(signupEmailForSignin) : ''}" ${signUp && verifiedGuardianSignup ? 'readonly' : ''} required />
             </div>
-            ${!signUp && !isChild ? '<button class="forgot-link" type="button" data-action="resend-signup-confirmation">Resend confirmation email</button>' : ''}
           </div>
 
           ${signUp || !isChild ? `<div class="form-group">
@@ -4995,7 +4997,7 @@ import {
           </div>
         </div>
 
-      </main>
+      </section>
       <section class="auth-layer-guide" aria-labelledby="auth-layer-title" data-access-check-count="${authLayers.length}">
         <div class="auth-layer-guide-heading">
           <span class="section-kicker">Your ${authLayers.length}-step learning journey</span>
