@@ -148,7 +148,15 @@ const GEMINI_DEFAULT_BASE_URL = 'https://generativelanguage.googleapis.com/v1bet
 const GEMINI_MODEL_PATTERN = /^[a-z0-9][a-z0-9._-]{0,79}$/i;
 
 export function resolveAiProvider(env = process.env) {
-  return env.AI_PROVIDER?.trim().toLowerCase() || DEFAULT_AI_PROVIDER;
+  const configured = env.AI_PROVIDER?.trim().toLowerCase();
+  if (configured) return configured;
+
+  // No explicit choice: prefer Gemini as soon as a key exists, so adding the
+  // secret to the deployment is enough to switch provider without a redeploy
+  // of application code.
+  if (env.GEMINI_API_KEY?.trim() || env.GOOGLE_AI_API_KEY?.trim()) return 'gemini';
+
+  return DEFAULT_AI_PROVIDER;
 }
 
 /**
@@ -190,8 +198,9 @@ export function getGeminiConfig(env = process.env) {
 }
 
 /**
- * Resolve the active provider from AI_PROVIDER (defaults to the legacy Ollama path).
- * Gemini is selected with AI_PROVIDER=gemini.
+ * Resolve the active provider from AI_PROVIDER. When AI_PROVIDER is unset the
+ * Gemini key presence decides (see resolveAiProvider), otherwise the legacy
+ * Ollama path is used.
  */
 export function getAiProviderConfig(env = process.env) {
   const provider = resolveAiProvider(env);

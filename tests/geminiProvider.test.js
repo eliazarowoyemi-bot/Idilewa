@@ -20,6 +20,9 @@ const GEMINI_TEST_CONFIG = {
 test('Gemini configuration defaults, validation and provider selection', () => {
   assert.equal(resolveAiProvider({}), 'ollama');
   assert.equal(resolveAiProvider({ AI_PROVIDER: 'Gemini' }), 'gemini');
+  assert.equal(resolveAiProvider({ GEMINI_API_KEY: 'k' }), 'gemini');
+  assert.equal(resolveAiProvider({ GOOGLE_AI_API_KEY: 'k' }), 'gemini');
+  assert.equal(resolveAiProvider({ AI_PROVIDER: 'ollama', GEMINI_API_KEY: 'k' }), 'ollama');
 
   assert.throws(
     () => getGeminiConfig({}),

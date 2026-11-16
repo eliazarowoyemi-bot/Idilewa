@@ -137,7 +137,8 @@ Still missing — each needs a real credential, there is **no safe default**:
 
 | Variable | Effect while missing |
 | :--- | :--- |
-| `OLLAMA_BASE_URL` (optional `OLLAMA_MODEL`, `OLLAMA_EMBEDDING_MODEL`, `OLLAMA_API_KEY`) | `POST /api/ai/conversation` returns `503 Live AI chat is not configured. Add a private HTTPS Ollama host and model…` (`AI_PROVIDER` supports `ollama` only, and production requires `https:`) |
+| `GEMINI_API_KEY` (or `GOOGLE_AI_API_KEY`) | `POST /api/ai/conversation` falls back to Ollama and returns `503 Live AI chat is not configured. Add a private HTTPS Ollama host and model…` |
+| `OLLAMA_BASE_URL` (optional `OLLAMA_MODEL`, `OLLAMA_EMBEDDING_MODEL`, `OLLAMA_API_KEY`) | Only used when `AI_PROVIDER=ollama` or when no Gemini key is set; production requires `https:` |
 | `RESEND_API_KEY`, `RESEND_FROM_EMAIL` | Welcome and verification emails are skipped |
 | `JUDGE0_URL`, `JUDGE0_AUTH_TOKEN` | `GET /api/code/languages` returns `503` |
 | `GOOGLE_TRANSLATE_API_KEY` | Server-side translation unavailable |
@@ -159,6 +160,49 @@ npx vercel env add <NAME> production --scope idilewa1 --force --value '<value>' 
 
 Then redeploy: **environment changes do not reach an existing deployment**, so a
 new production build is required before the API sees them.
+
+## AI provider — Gemini
+
+`/api/ai/conversation` and `/api/ai/knowledge` dispatch on `resolveAiProvider()`
+in `src/server/aiConversation.js`:
+
+1. `AI_PROVIDER=gemini` → Gemini (REST, `src/server/geminiProvider.js`).
+2. `AI_PROVIDER=ollama` → self-hosted Ollama (HTTPS only in production).
+3. Unset → Gemini **if** `GEMINI_API_KEY`/`GOOGLE_AI_API_KEY` is present,
+   otherwise Ollama.
+
+So adding the key alone is enough to switch provider; `AI_PROVIDER=gemini` just
+pins the choice explicitly (and disables the fallback).
+
+```bash
+npx vercel env add AI_PROVIDER production --scope idilewa1 --value gemini --sensitive
+npx vercel env add GEMINI_API_KEY production --scope idilewa1 --sensitive   # paste key
+npx vercel env add GEMINI_MODEL production --scope idilewa1 --value gemini-flash-latest --sensitive
+npx vercel env ls production --scope idilewa1
+npx vercel --prod --yes --scope idilewa1
+```
+
+`GEMINI_MODEL` is optional and defaults to `gemini-2.5-flash` in code. Pin the
+rolling alias `gemini-flash-latest` in production so a dated SKU retirement does
+not take chat down again (`gemini-2.5-flash` already answers `404 no longer
+available` for newly issued keys).
+
+Verify:
+
+```powershell
+curl.exe -s -o NUL -w '%{http_code}\n' -X POST https://idilewa.com/api/ai/conversation `
+  -H 'Content-Type: application/json' -d '{\"language\":\"yo\",\"message\":\"Báwo ni?\"}'
+```
+
+`200` means Gemini answered; `503` with *"rejected this deployment's
+credentials"* means the key is invalid (`400 API_KEY_INVALID` from Google);
+`503` mentioning Ollama means no Gemini key reached the function.
+
+**Outstanding (2026-11-16):** the key currently in local `.env`
+(`AQ.Ab8RN6…`) is rejected by Google with `API_KEY_INVALID` for both the
+`x-goog-api-key` header and the `?key=` query parameter. A valid key from
+<https://aistudio.google.com/apikey> must be uploaded before chat can serve
+live traffic; until then the endpoint keeps returning the Ollama `503`.
 
 ## SEO files
 
