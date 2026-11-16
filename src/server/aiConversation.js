@@ -142,16 +142,17 @@ export function parseAiConversationRequest(body) {
 
 export const AI_PROVIDERS = Object.freeze(['gemini']);
 export const DEFAULT_AI_PROVIDER = 'gemini';
-export const DEFAULT_GEMINI_MODEL = 'gemini-3.5-flash';
+export const DEFAULT_GEMINI_MODEL = 'gemini-3-flash-preview';
 
-// Verified against the live API key: 3.5-flash, 3-flash-preview and
-// flash-lite-latest answer 200, while gemini-2.5-flash answers 404 ("no longer
-// available to new users"), gemini-3.8-flash stalls past the request timeout and
-// gemini-flash-latest intermittently answers 503. The chain is capped at three
-// attempts and only advances on 404/500/503, so a healthy primary is one call.
+// Verified against the live API key: gemini-3-flash-preview answers 200 in a few
+// seconds, while gemini-2.5-flash answers 404 ("no longer available to new
+// users"), gemini-3.8-flash stalls past the request timeout and 3.5-flash /
+// flash-latest intermittently answer 503 from the Vercel region. The chain is
+// capped at three attempts and only advances on 404/500/503, so a healthy
+// primary costs a single call.
 export const GEMINI_FALLBACK_MODELS = Object.freeze([
-  'gemini-3-flash-preview',
   'gemini-flash-lite-latest',
+  'gemini-3.5-flash',
 ]);
 
 
