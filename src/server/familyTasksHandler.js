@@ -4,7 +4,7 @@ import {
   requireAuthenticatedProfile,
   sendApiFailure,
   sendApiJson,
-} from '../../src/server/authenticatedRequest.js';
+} from './authenticatedRequest.js';
 import {
   FAMILY_REWARDS,
   normalizeFamilyRewardSettings,
@@ -13,7 +13,7 @@ import {
   requireFamilyReward,
   requireFamilyTaskId,
   resolveFamilyContext,
-} from '../../src/server/familyTasks.js';
+} from './familyTasks.js';
 
 const taskColumns = 'id,parent_id,child_id,owner_role,title,description,language,points,due_at,repeat_rule,status,feedback,minutes_tracked,started_at,created_at,submitted_at,completed_at';
 const rewardColumns = 'id,parent_id,child_id,reward_code,name,points,extra_minutes,status,created_at,decided_at';

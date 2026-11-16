@@ -1,12 +1,14 @@
 import requestGuardianAccess from '../../src/server/guardianRequestHandler.js';
 import verifyGuardianCode from '../../src/server/guardianVerifyHandler.js';
 import approveGuardianRequest from '../../src/server/guardianApproveHandler.js';
+import familyTasksHandler from '../../src/server/familyTasksHandler.js';
 import { sendGuardianJson } from '../../src/server/guardianConsent.js';
 
 const handlers = {
   request: requestGuardianAccess,
   verify: verifyGuardianCode,
   approve: approveGuardianRequest,
+  'family-tasks': familyTasksHandler,
 };
 
 export const config = { maxDuration: 15 };

@@ -44,6 +44,14 @@ test('guardian router preserves approval endpoint method handling', async () => 
   assert.match(response.body, /Method not allowed\./);
 });
 
+test('guardian router serves family tasks through its existing serverless function', async () => {
+  const response = createResponse();
+  await handler({ method: 'DELETE', url: '/api/guardian/family-tasks' }, response);
+  assert.equal(response.statusCode, 405);
+  assert.equal(response.headers.Allow, 'GET, POST, PATCH');
+  assert.deepEqual(response.body, { error: 'Method not allowed.' });
+});
+
 test('guardian router rejects unknown and nested routes', async () => {
   for (const path of ['/api/guardian/missing', '/api/guardian/request/extra']) {
     const response = createResponse();

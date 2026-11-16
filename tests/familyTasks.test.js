@@ -98,7 +98,7 @@ test('parent task access includes only learners whose current guardian link matc
 });
 
 test('family task API authenticates every request and scopes task writes by verified role', async () => {
-  const apiSource = await readFile(new URL('../api/family/tasks.js', import.meta.url), 'utf8');
+  const apiSource = await readFile(new URL('../src/server/familyTasksHandler.js', import.meta.url), 'utf8');
   const migrationSource = await readFile(new URL('../supabase/migrations/20261112000000_family_tasks.sql', import.meta.url), 'utf8');
   const clientSource = await readFile(new URL('../src/familyTasks.js', import.meta.url), 'utf8');
   const pageSource = await readFile(new URL('../family-tasks.html', import.meta.url), 'utf8');
@@ -113,7 +113,7 @@ test('family task API authenticates every request and scopes task writes by veri
   assert.match(migrationSource, /CREATE OR REPLACE FUNCTION public\.request_family_reward/);
   assert.match(migrationSource, /GRANT EXECUTE ON FUNCTION public\.decide_family_task/);
   assert.match(clientSource, /supabase\.auth\.getSession\(\)/);
-  assert.match(clientSource, /fetch\('\/api\/family\/tasks'/);
+  assert.match(clientSource, /fetch\('\/api\/guardian\/family-tasks'/);
   assert.match(clientSource, /navigation\.hidden = !isAuthenticated/);
   assert.match(clientSource, /signOutButton\.hidden = !isAuthenticated/);
   assert.doesNotMatch(clientSource, /SUPABASE_SERVICE_ROLE_KEY|SUPABASE_SECRET_KEY/);

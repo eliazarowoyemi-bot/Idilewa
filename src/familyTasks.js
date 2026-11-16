@@ -65,7 +65,7 @@ async function requestApi(method = 'GET', body) {
     throw error;
   }
 
-  const response = await fetch('/api/family/tasks', {
+  const response = await fetch('/api/guardian/family-tasks', {
     method,
     headers: {
       Authorization: `Bearer ${token}`,
