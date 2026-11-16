@@ -6,7 +6,9 @@
  */
 import { AiServiceError, MAX_AI_HISTORY_MESSAGES } from './aiConversation.js';
 
-const REQUEST_TIMEOUT_MS = 45_000;
+const REQUEST_TIMEOUT_MS = 25_000;
+const FALLBACK_TIMEOUT_MS = 15_000;
+const MAX_MODEL_ATTEMPTS = 3;
 const MAX_REPLY_LENGTH = 8_000;
 
 function toGeminiRole(role) {
@@ -31,17 +33,38 @@ function geminiHttpError(status) {
   if (status === 404) {
     return new AiServiceError('The configured Gemini model is unavailable. Check GEMINI_MODEL.', 503);
   }
+  if (status === 503) {
+    return new AiServiceError('The AI model is overloaded right now. Try again in a moment.', 503);
+  }
   return new AiServiceError('The AI service could not complete this message. Try again shortly.', 503);
 }
 
-export async function requestGeminiReply({
-  systemPrompt,
-  message,
-  messages = [],
-  config,
-  fetchImpl = globalThis.fetch,
-}) {
-  const requestUrl = [config.baseUrl, 'models', encodeURIComponent(config.model) + ':generateContent'].join('/');
+// A retired model (404) or an overloaded model (503/500) is worth retrying with
+// the next model in the chain, as is a timed-out or unreachable host. Credential,
+// quota and request errors are final.
+const RETRYABLE_MODEL_STATUSES = new Set([404, 500, 503]);
+
+function markRetryable(error, retryable) {
+  error.retryableWithAnotherModel = retryable;
+  return error;
+}
+
+/**
+ * Ordered, de-duplicated list of models to try: the configured model first,
+ * then its fallbacks.
+ */
+export function geminiModelChain(config) {
+  const candidates = [config?.model, ...(Array.isArray(config?.fallbackModels) ? config.fallbackModels : [])];
+  const chain = [];
+  for (const candidate of candidates) {
+    const name = typeof candidate === 'string' ? candidate.trim().replace(/^models\//i, '') : '';
+    if (name && !chain.includes(name)) chain.push(name);
+  }
+  return chain;
+}
+
+async function requestGeminiModel({ model, systemPrompt, message, messages, config, fetchImpl, timeoutMs }) {
+  const requestUrl = [config.baseUrl, 'models', encodeURIComponent(model) + ':generateContent'].join('/');
 
   let response;
   try {
@@ -57,13 +80,18 @@ export async function requestGeminiReply({
         contents: toGeminiContents(messages, message),
         generationConfig: { temperature: 0.4, maxOutputTokens: 2048 },
       }),
-      signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     });
   } catch (error) {
-    throw new AiServiceError('The AI model host could not be reached. Try again shortly.', 503, { cause: error });
+    throw markRetryable(
+      new AiServiceError('The AI model host could not be reached. Try again shortly.', 503, { cause: error }),
+      true,
+    );
   }
 
-  if (!response.ok) throw geminiHttpError(response.status);
+  if (!response.ok) {
+    throw markRetryable(geminiHttpError(response.status), RETRYABLE_MODEL_STATUSES.has(response.status));
+  }
 
   let result;
   try {
@@ -88,7 +116,33 @@ export async function requestGeminiReply({
     );
   }
 
-  return { reply, model: config.model, provider: 'gemini' };
+  return { reply, model, provider: 'gemini' };
+}
+
+export async function requestGeminiReply({
+  systemPrompt,
+  message,
+  messages = [],
+  config,
+  fetchImpl = globalThis.fetch,
+}) {
+  const chain = geminiModelChain(config).slice(0, MAX_MODEL_ATTEMPTS);
+  if (!chain.length) {
+    throw new AiServiceError('The configured Gemini model name is not valid.', 500);
+  }
+
+  let lastError;
+  for (const [index, model] of chain.entries()) {
+    const timeoutMs = index === 0 ? REQUEST_TIMEOUT_MS : FALLBACK_TIMEOUT_MS;
+    try {
+      return await requestGeminiModel({ model, systemPrompt, message, messages, config, fetchImpl, timeoutMs });
+    } catch (error) {
+      lastError = error;
+      if (!error?.retryableWithAnotherModel) throw error;
+    }
+  }
+
+  throw lastError || new AiServiceError('The AI service could not complete this message. Try again shortly.', 503);
 }
 
 export async function createGeminiEmbedding(text, config, fetchImpl = globalThis.fetch) {

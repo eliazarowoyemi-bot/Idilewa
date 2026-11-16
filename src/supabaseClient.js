@@ -26,8 +26,25 @@ function normalizeSupabaseUrl(value) {
   }
 }
 
-const supabaseUrl = normalizeSupabaseUrl(readEnvValue('VITE_SUPABASE_URL', 'SUPABASE_URL', 'SUPABASE_PUBLIC_URL', 'NEXT_PUBLIC_SUPABASE_URL'));
-const supabaseAnonKey = readEnvValue('VITE_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY', 'NEXT_PUBLIC_SUPABASE_ANON_KEY');
+/**
+ * Public, RLS-protected client configuration.
+ *
+ * These two values ship to every browser by design (the anon key is the public
+ * API key; row-level security enforces access), so they are safe to keep here.
+ * They exist as a fallback because a deployment build without SUPABASE_URL /
+ * SUPABASE_ANON_KEY left isSupabaseConfigured false, which silently disabled
+ * sign-up and sign-in on the live site. The service-role key must never appear
+ * in this file.
+ */
+const PUBLIC_SUPABASE_FALLBACK = Object.freeze({
+  url: "https://jimiykxrjetomvpeoaeu.supabase.co",
+  anonKey: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImppbWl5a3hyamV0b212cGVvYWV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTIyMTY4MTQsImV4cCI6MjEwNzc5MjgxNH0.RPeP1kqoLMFRMzVKykWtrrL1yUEkiVdTT6EbrdyHsqc",
+});
+
+const supabaseUrl = normalizeSupabaseUrl(readEnvValue('VITE_SUPABASE_URL', 'SUPABASE_URL', 'SUPABASE_PUBLIC_URL', 'NEXT_PUBLIC_SUPABASE_URL'))
+  || PUBLIC_SUPABASE_FALLBACK.url;
+const supabaseAnonKey = readEnvValue('VITE_SUPABASE_ANON_KEY', 'SUPABASE_ANON_KEY', 'NEXT_PUBLIC_SUPABASE_ANON_KEY')
+  || PUBLIC_SUPABASE_FALLBACK.anonKey;
 
 export const isSupabaseConfigured = Boolean(supabaseUrl && supabaseAnonKey);
 export const supabase = isSupabaseConfigured
@@ -39,6 +56,41 @@ export const supabase = isSupabaseConfigured
     },
   })
   : null;
+
+let googleProviderEnabled = null;
+let googleProviderProbe = null;
+
+/**
+ * Supabase publishes which social providers a project has enabled. Google OAuth
+ * is optional for Idilewa, so a "Continue with Google" button must never be shown
+ * when the provider is switched off: it can only end in an error message.
+ */
+export async function isGoogleAuthEnabled(fetchImpl = globalThis.fetch) {
+  if (googleProviderEnabled !== null) return googleProviderEnabled;
+  if (!isSupabaseConfigured) {
+    googleProviderEnabled = false;
+    return false;
+  }
+  if (!googleProviderProbe) {
+    googleProviderProbe = (async () => {
+      try {
+        const response = await fetchImpl(`${supabaseUrl}/auth/v1/settings`, {
+          headers: { apikey: supabaseAnonKey, Accept: 'application/json' },
+          signal: AbortSignal.timeout(8000),
+        });
+        if (!response.ok) return false;
+        const settings = await response.json();
+        return settings?.external?.google === true;
+      } catch {
+        return false;
+      }
+    })().then((enabled) => {
+      googleProviderEnabled = enabled;
+      return enabled;
+    });
+  }
+  return googleProviderProbe;
+}
 
 const LOCAL_STORAGE_KEY_USER = 'idilewa_auth_user';
 const LOCAL_STORAGE_KEY_PROGRESS = 'idilewa_db_progress';

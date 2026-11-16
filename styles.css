@@ -10504,6 +10504,7 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .tutor-auth-submit { width: 100%; margin-top: 3px; }
 .tutor-auth-error { margin: 0; padding: 8px 10px; border-radius: 8px; color: #a63c30; background: #fff2ef; font-size: 9px; line-height: 1.45; }
 .tutor-google-auth { margin-top: 16px; }
+.tutor-google-auth[data-google-auth][hidden] { display: none !important; }
 .tutor-google-divider { height: 1px; margin-bottom: 14px; position: relative; display: grid; place-items: center; background: #e4ebe6; }
 .tutor-google-divider span { padding: 0 10px; color: #68786f; background: #fff; font-size: 11px; }
 .tutor-google-button {

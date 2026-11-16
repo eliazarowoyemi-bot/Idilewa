@@ -237,7 +237,7 @@ function transformNativeAppHtml(html, route) {
     ? `<script>
 document.addEventListener('DOMContentLoaded', () => {
   const nav = document.getElementById('nav');
-  if (!nav) throw new Error('Tutor prototype is missing its navigation container.');
+  if (!nav) throw new Error('Tutor page is missing its navigation container.');
   if (nav.querySelector('[data-idilewa-educator-portal]')) return;
   const link = document.createElement('a');
   link.href = '/educator-portal.html#/tutor-signup';

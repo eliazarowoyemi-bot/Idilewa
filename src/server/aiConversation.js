@@ -142,7 +142,17 @@ export function parseAiConversationRequest(body) {
 
 export const AI_PROVIDERS = Object.freeze(['gemini']);
 export const DEFAULT_AI_PROVIDER = 'gemini';
-export const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
+export const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
+
+// Google retires and overloads individual models without notice, so a single
+// hard-coded model leaves the chat dead. These are tried in order when the
+// primary model is retired (404) or temporarily unavailable (503/500).
+export const GEMINI_FALLBACK_MODELS = Object.freeze([
+  'gemini-3.5-flash',
+  'gemini-flash-latest',
+  'gemini-2.5-flash',
+]);
+
 
 const GEMINI_DEFAULT_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
 const GEMINI_MODEL_PATTERN = /^[a-z0-9][a-z0-9._-]{0,79}$/i;
@@ -159,6 +169,21 @@ export function resolveAiProvider(env = process.env) {
 }
 
 /**
+ * Ordered list of extra Gemini models to try when the primary one is retired or
+ * temporarily unavailable. Override with GEMINI_FALLBACK_MODELS="a,b,c".
+ */
+export function parseGeminiFallbackModels(env = process.env) {
+  const configured = typeof env.GEMINI_FALLBACK_MODELS === 'string'
+    ? env.GEMINI_FALLBACK_MODELS.split(',')
+    : [];
+  const names = configured
+    .map((name) => name.trim().replace(/^models\//i, ''))
+    .filter((name) => GEMINI_MODEL_PATTERN.test(name));
+  const chain = names.length ? names : [...GEMINI_FALLBACK_MODELS];
+  return chain.filter((name, index) => chain.indexOf(name) === index).slice(0, 4);
+}
+
+/**
  * Gemini (Google Generative Language) configuration.
  * Uses the public REST API through fetch so the deployment needs no extra SDK.
  */
@@ -172,10 +197,11 @@ export function getGeminiConfig(env = process.env) {
     throw missing;
   }
 
-  const model = (env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL).replace(/^models\//i, '');
-  if (!GEMINI_MODEL_PATTERN.test(model)) {
+  const requested = (env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL).replace(/^models\//i, '');
+  if (!GEMINI_MODEL_PATTERN.test(requested)) {
     throw new AiServiceError('The configured Gemini model name is not valid.', 500);
   }
+  const fallbackModels = parseGeminiFallbackModels(env).filter((name) => name !== requested);
 
   const configuredBaseUrl = env.GEMINI_BASE_URL?.trim() || GEMINI_DEFAULT_BASE_URL;
   let baseUrl;
@@ -191,7 +217,8 @@ export function getGeminiConfig(env = process.env) {
     provider: 'gemini',
     apiKey,
     baseUrl,
-    model,
+    model: requested,
+    fallbackModels,
     embeddingModel: env.GEMINI_EMBEDDING_MODEL?.trim() || '',
   };
 }
