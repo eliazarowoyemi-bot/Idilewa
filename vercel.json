@@ -4,62 +4,8 @@
   "cleanUrls": true,
   "redirects": [
     {
-      "source": "/",
-      "has": [{ "type": "host", "value": "idlewa.com" }],
-      "destination": "https://www.idilewa.com/",
-      "permanent": true
-    },
-    {
-      "source": "/",
-      "has": [{ "type": "host", "value": "www.idlewa.com" }],
-      "destination": "https://www.idilewa.com/",
-      "permanent": true
-    },
-    {
-      "source": "/",
-      "has": [{ "type": "host", "value": "idilewa.com" }],
-      "destination": "https://www.idilewa.com/",
-      "permanent": true
-    },
-    {
-      "source": "/",
-      "has": [{ "type": "host", "value": "idilewa-com.vercel.app" }],
-      "destination": "https://www.idilewa.com/",
-      "permanent": true
-    },
-    {
-      "source": "/",
-      "has": [{ "type": "host", "value": "idilewa-com-tapee2.vercel.app" }],
-      "destination": "https://www.idilewa.com/",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [{ "type": "host", "value": "idlewa.com" }],
-      "destination": "https://www.idilewa.com/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [{ "type": "host", "value": "www.idlewa.com" }],
-      "destination": "https://www.idilewa.com/:path*",
-      "permanent": true
-    },
-    {
       "source": "/:path*",
       "has": [{ "type": "host", "value": "idilewa.com" }],
-      "destination": "https://www.idilewa.com/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [{ "type": "host", "value": "idilewa-com.vercel.app" }],
-      "destination": "https://www.idilewa.com/:path*",
-      "permanent": true
-    },
-    {
-      "source": "/:path*",
-      "has": [{ "type": "host", "value": "idilewa-nwxk3xs7i-tapee2.vercel.app" }],
       "destination": "https://www.idilewa.com/:path*",
       "permanent": true
     }
