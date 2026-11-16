@@ -1,0 +1,19 @@
+# https://idilewa.com/robots.txt
+# Ìdíléwa Language Academy — crawler policy
+
+User-agent: *
+Allow: /
+
+# Account-only and transactional routes (no crawl value, avoid indexing)
+Disallow: /api/
+Disallow: /auth-callback
+Disallow: /consent
+Disallow: /educator-portal
+Disallow: /login
+Disallow: /profile
+Disallow: /lesson
+Disallow: /owe_add
+Disallow: /owe_detail
+
+# Marketing site redirects .html -> clean URLs, so keep crawlers on clean paths
+Sitemap: https://idilewa.com/sitemap.xml

@@ -120,21 +120,51 @@ A `404` whose body reads `The deployment could not be found on Vercel.
 DEPLOYMENT_NOT_FOUND` means the hostname reached Vercel but is not attached to
 the project.
 
-## Server env vars not currently set
+## Server env vars (Vercel Production)
 
-`vercel env ls production` lists only `POSTGRES_*`, `SUPABASE_*` and
-`NEXT_PUBLIC_SUPABASE_*`. These are referenced by the code but absent from the
-project:
+Verified 2026-11-16 with `npx vercel env ls production --scope idilewa1`.
+`POSTGRES_*`, `SUPABASE_*` and `NEXT_PUBLIC_SUPABASE_*` were already present;
+these application variables were added on top of them (all stored **Encrypted**,
+marked sensitive so `vercel env pull` will not print them back):
+
+| Variable | Value / source | Unblocks |
+| :--- | :--- | :--- |
+| `APP_BASE_URL` | `https://idilewa.com` | `getProductionOrigin()` no longer throws `503 Guardian approval is not configured yet` |
+| `GUARDIAN_TOKEN_SECRET` | 32-byte random hex, generated once and kept in local `.env` | Signing guardian-consent and educator-invite links |
+| `PLOTWEAVER_API_KEY` | `pw_dev_…` from local `.env` | `/api/plotweaver/*` — voices, transcription, translation |
+
+Still missing — each needs a real credential, there is **no safe default**:
 
 | Variable | Effect while missing |
 | :--- | :--- |
-| `APP_BASE_URL` | `getProductionOrigin()` throws `503 Guardian approval is not configured yet`; set it to `https://idilewa.com` |
-| `GUARDIAN_TOKEN_SECRET` | Guardian consent links cannot be signed |
+| `OLLAMA_BASE_URL` (optional `OLLAMA_MODEL`, `OLLAMA_EMBEDDING_MODEL`, `OLLAMA_API_KEY`) | `POST /api/ai/conversation` returns `503 Live AI chat is not configured. Add a private HTTPS Ollama host and model…` (`AI_PROVIDER` supports `ollama` only, and production requires `https:`) |
 | `RESEND_API_KEY`, `RESEND_FROM_EMAIL` | Welcome and verification emails are skipped |
-| `PLOTWEAVER_API_KEY` | Voice synthesis, transcription and translation unavailable |
 | `JUDGE0_URL`, `JUDGE0_AUTH_TOKEN` | `GET /api/code/languages` returns `503` |
 | `GOOGLE_TRANSLATE_API_KEY` | Server-side translation unavailable |
 | `CANVA_CLIENT_ID`, `CANVA_CLIENT_SECRET`, `CANVA_REDIRECT_URI` | Canva Connect stays disabled |
 
-Add each with `vercel env add <NAME> production` and redeploy.
+Deliberately **not** uploaded:
+
+| Name | Why |
+| :--- | :--- |
+| `ZOO_API_KEY` | Local Continue/MCP credential (`.continue/mcpServers/new-mcp-server.yaml`). No application code reads it — it is not an `idilewa` runtime variable. |
+| `GITHUB_TOKEN`, `VERCEL_TOKEN` | Local CLI tokens; never project environment variables |
+| `AI_RATE_LIMIT_HMAC_KEY` | Optional — `api/ai/conversation.js` falls back to `SUPABASE_SERVICE_ROLE_KEY` |
+
+Rotate or add a value with:
+
+```bash
+npx vercel env add <NAME> production --scope idilewa1 --force --value '<value>' --sensitive
+```
+
+Then redeploy: **environment changes do not reach an existing deployment**, so a
+new production build is required before the API sees them.
+
+## SEO files
+
+`public/robots.txt` and `public/sitemap.xml` are copied into the static build.
+`vercel.json` sets `cleanUrls: true`, so `/about.html` answers `308` → `/about`;
+both files therefore advertise clean URLs only (never `<page>.html`). When a new
+public page is added at the repo root as `<name>.html`, add
+`https://idilewa.com/<name>` to the sitemap and re-run the route sweep.
 
