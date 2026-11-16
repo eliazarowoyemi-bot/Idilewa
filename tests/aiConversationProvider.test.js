@@ -3,9 +3,14 @@ import test from 'node:test';
 import {
   AiServiceError,
   AI_CONVERSATION_LANGUAGES,
+  createAiKnowledgeEmbedding,
+  DEFAULT_GEMINI_MODEL,
   generateAiConversationReply,
+  getAiProviderConfig,
+  getGeminiConfig,
   getOllamaConfig,
   parseAiConversationRequest,
+  resolveAiProvider,
 } from '../src/server/aiConversation.js';
 
 test('conversation requests validate supported languages, input size, history and IDs', () => {

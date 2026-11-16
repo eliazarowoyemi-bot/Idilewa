@@ -1,3 +1,5 @@
+import { createGeminiEmbedding, requestGeminiReply } from './geminiProvider.js';
+
 export const AI_CONVERSATION_LANGUAGES = Object.freeze({
   yo: 'Yorùbá',
   ig: 'Igbo',
@@ -138,12 +140,67 @@ export function parseAiConversationRequest(body) {
   };
 }
 
-export function getOllamaConfig(env = process.env) {
-  const provider = env.AI_PROVIDER?.trim().toLowerCase() || 'ollama';
-  if (provider !== 'ollama') {
-    throw new AiServiceError('The configured AI provider is not supported by this deployment.');
+export const AI_PROVIDERS = Object.freeze(['gemini', 'ollama']);
+export const DEFAULT_AI_PROVIDER = 'ollama';
+export const DEFAULT_GEMINI_MODEL = 'gemini-2.5-flash';
+
+const GEMINI_DEFAULT_BASE_URL = 'https://generativelanguage.googleapis.com/v1beta';
+const GEMINI_MODEL_PATTERN = /^[a-z0-9][a-z0-9._-]{0,79}$/i;
+
+export function resolveAiProvider(env = process.env) {
+  return env.AI_PROVIDER?.trim().toLowerCase() || DEFAULT_AI_PROVIDER;
+}
+
+/**
+ * Gemini (Google Generative Language) configuration.
+ * Uses the public REST API through fetch so the deployment needs no extra SDK.
+ */
+export function getGeminiConfig(env = process.env) {
+  const apiKey = env.GEMINI_API_KEY?.trim() || env.GOOGLE_AI_API_KEY?.trim() || '';
+  if (!apiKey) {
+    const missing = new AiServiceError(
+      'Live AI chat is not configured. Add GEMINI_API_KEY to the deployment environment.',
+    );
+    missing.code = 'AI_PROVIDER_NOT_CONFIGURED';
+    throw missing;
   }
 
+  const model = (env.GEMINI_MODEL?.trim() || DEFAULT_GEMINI_MODEL).replace(/^models\//i, '');
+  if (!GEMINI_MODEL_PATTERN.test(model)) {
+    throw new AiServiceError('The configured Gemini model name is not valid.', 500);
+  }
+
+  const configuredBaseUrl = env.GEMINI_BASE_URL?.trim() || GEMINI_DEFAULT_BASE_URL;
+  let baseUrl;
+  try {
+    const url = new URL(configuredBaseUrl);
+    if (!['http:', 'https:'].includes(url.protocol)) throw new Error('Unsupported protocol');
+    baseUrl = url.toString().replace(/\/+$/, '');
+  } catch (error) {
+    throw new AiServiceError('The configured Gemini API host is not a valid URL.', 500, { cause: error });
+  }
+
+  return {
+    provider: 'gemini',
+    apiKey,
+    baseUrl,
+    model,
+    embeddingModel: env.GEMINI_EMBEDDING_MODEL?.trim() || '',
+  };
+}
+
+/**
+ * Resolve the active provider from AI_PROVIDER (defaults to the legacy Ollama path).
+ * Gemini is selected with AI_PROVIDER=gemini.
+ */
+export function getAiProviderConfig(env = process.env) {
+  const provider = resolveAiProvider(env);
+  if (provider === 'gemini') return getGeminiConfig(env);
+  if (provider === 'ollama') return getOllamaConfig(env);
+  throw new AiServiceError('The configured AI provider is not supported by this deployment.');
+}
+
+export function getOllamaConfig(env = process.env) {
   const isProduction = env.NODE_ENV === 'production' || Boolean(env.VERCEL_ENV === 'production');
   const configuredUrl = env.OLLAMA_BASE_URL?.trim();
   const baseUrl = configuredUrl || (isProduction ? '' : 'http://127.0.0.1:11434');
@@ -174,6 +231,7 @@ export function getOllamaConfig(env = process.env) {
 
 export async function createAiKnowledgeEmbedding(text, config, fetchImpl = globalThis.fetch) {
   if (!config.embeddingModel) return null;
+  if (config.provider === 'gemini') return createGeminiEmbedding(text, config, fetchImpl);
 
   let response;
   try {
@@ -220,9 +278,19 @@ export async function generateAiConversationReply({
   message,
   messages = [],
   knowledge = [],
-  config = getOllamaConfig(),
+  config = getAiProviderConfig(),
   fetchImpl = globalThis.fetch,
 }) {
+  if (config.provider === 'gemini') {
+    return requestGeminiReply({
+      systemPrompt: buildSystemPrompt(language, knowledge),
+      message,
+      messages,
+      config,
+      fetchImpl,
+    });
+  }
+
   const conversation = [
     { role: 'system', content: buildSystemPrompt(language, knowledge) },
     ...messages.slice(-MAX_AI_HISTORY_MESSAGES),
@@ -270,5 +338,5 @@ export async function generateAiConversationReply({
   if (typeof reply !== 'string' || !reply.trim() || reply.length > 8_000) {
     throw new AiServiceError('The AI service returned no usable reply. Please try again.', 502);
   }
-  return { reply: reply.trim(), model: config.model };
+  return { reply: reply.trim(), model: config.model, provider: 'ollama' };
 }

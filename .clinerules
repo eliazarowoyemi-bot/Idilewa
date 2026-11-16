@@ -1,0 +1,77 @@
+# Ìdíléwa — workspace rules
+
+## Rule 0 — verify the stack before applying a brief
+
+This repository is a **static HTML/CSS/JS site** bundled by Vite:
+
+- `index.html` + ~31 sibling `.html` pages (in-page sections switched by the
+  global `go(id)` helper, standalone pages linked as `/login`, `/pricing`, …).
+- `app.js` — vanilla router/renderers for the Vue-less shell pages.
+- `styles.css` — legacy shared styles. `design-system.css` — the current layer.
+- `src/server/*` + `api/*` — serverless AI endpoints (Node, ESM).
+- Dependencies: `@supabase/supabase-js`, `canvas-confetti`, `convex`, `three`,
+  `vite`. **No React, no JSX, no Tailwind, no Framer Motion, no lucide-react.**
+
+If an instruction assumes React/Tailwind, translate it into the vanilla
+equivalent and say so in the response. Never install a package that no bundle
+imports.
+
+## Design work
+
+`AWESOME_DESIGN.md` is the source of truth. Read it before touching UI.
+
+- **UI/UX Pro Max** → hierarchy, spacing rhythm, contrast, responsive states.
+  Apply via the tokens in `design-system.css` (`--id-*`). No new raw hex values
+  in component rules.
+- **Impeccable** → motion discipline. CSS transitions only, `--id-ease` /
+  `--id-ease-spring`, animate `opacity`/`transform`, always ship a
+  `prefers-reduced-motion` fallback.
+- **Taste Skill** → anti-slop. No neon, no emoji in buttons or nav, no raw
+  Unicode arrows, no filler marketing verbs, no decorative "developer notes" in
+  body copy.
+- **Framer Motion is not available.** Use CSS transitions + `IntersectionObserver`
+  (see `setupReveal` in `src/siteNav.js`) for stagger/entrance.
+- **lucide-react is not available.** Use inline `<svg>` (24×24, stroke 2, round
+  caps) or a `mask-image` data-URI, as in the `.featureTile` icon chips.
+- Exactly three button tiers: `.id-btn--primary`, `.id-btn--outline`,
+  `.id-btn--ghost`, plus `.id-icon-btn` for icon-only controls. One primary
+  button per view.
+- Interactive behaviour for the header/drawer/reveals belongs in
+  `src/siteNav.js`; markup hooks are `data-id-*`, `data-open`, `data-state`.
+  Keep every hook guarded — the script runs on pages without a header.
+
+## Editing conventions
+
+- `index.html` and `app.js` contain very long single-line blocks with inline
+  base64 images. Prefer exact-string PowerShell `.Replace()` (with a match
+  count check) or `IndexOf`/`Substring` edits over line-based rewrites.
+- Preserve Yorùbá diacritics exactly in user-facing strings.
+- `go(id)` only accepts ids of `main > section` elements that exist in the page
+  (`home`, `academy`, `studio`, `tutors`, `codeLab`, `aiChat`, `progress`,
+  `heritageLab`, `discoveryGames`, …). Added `voices` routes exist only in
+  `app.js`-driven shells — do not call `go('voices')` from `index.html`.
+- No secrets in client code. AI keys stay server-side in `api/*` + `src/server/*`
+  and are read from `process.env` inside the handler.
+
+## AI providers
+
+- `src/server/aiConversation.js` dispatches by `AI_PROVIDER` (`gemini` |
+  `ollama`, default `ollama`). Gemini transport lives in
+  `src/server/geminiProvider.js` (REST, `x-goog-api-key`, no SDK).
+- Env: `AI_PROVIDER`, `GEMINI_API_KEY` (or `GOOGLE_AI_API_KEY`), `GEMINI_MODEL`,
+  optional `GEMINI_BASE_URL`, `GEMINI_EMBEDDING_MODEL`. Never log the key.
+- Failures must surface as explicit non-success responses (429 rate limit, 400
+  rejected credentials, 404 retired/unavailable model, 5xx upstream). Never
+  fabricate a reply.
+- `.env` is local-only and git-ignored. Production values live in Vercel.
+
+## Verification before finishing
+
+```powershell
+npm test        # must stay green (162 tests)
+npm run build   # Vite must exit 0
+```
+
+Add tests for new behaviour (`node --test`, `node:assert/strict`, `fetchImpl`
+injection for network calls). Then check `git status` for stray temp files
+(`_*.ps1`, `_*.mjs`, `_*.txt`) and delete them before committing.

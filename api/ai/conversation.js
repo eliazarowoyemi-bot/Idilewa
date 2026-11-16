@@ -5,7 +5,7 @@ import {
   AI_CONVERSATION_LANGUAGES,
   createAiKnowledgeEmbedding,
   generateAiConversationReply,
-  getOllamaConfig,
+  getAiProviderConfig,
   parseAiConversationRequest,
 } from '../../src/server/aiConversation.js';
 
@@ -272,7 +272,7 @@ export default async function handler(req, res) {
       return sendJson(res, 401, { error: 'Sign in to continue a saved conversation.' });
     }
 
-    const providerConfig = getOllamaConfig();
+    const providerConfig = getAiProviderConfig();
     await enforceRateLimit(database, req, user?.id);
 
     let messages = request.messages;
@@ -300,12 +300,13 @@ export default async function handler(req, res) {
         result.reply,
       )
       : null;
+    const providerLabel = result.provider === 'gemini' ? 'Gemini' : 'Ollama';
     return sendJson(res, 200, {
       reply: result.reply,
       language: request.language,
       conversationId,
       persisted: Boolean(conversationId),
-      provider: `Ollama · ${result.model}`,
+      provider: providerLabel + ' · ' + result.model,
       sources: knowledge.map(({ id, title, source_name, source_url }) => ({
         id, title, name: source_name, url: source_url,
       })),

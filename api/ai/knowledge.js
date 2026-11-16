@@ -2,7 +2,7 @@ import { createClient } from '@supabase/supabase-js';
 import {
   AiServiceError,
   createAiKnowledgeEmbedding,
-  getOllamaConfig,
+  getAiProviderConfig,
   parseAiKnowledgeEntry,
   parseAiKnowledgeReview,
 } from '../../src/server/aiConversation.js';
@@ -94,8 +94,8 @@ async function addNote(req, res, database, user) {
   if (parsedEntry.error) return sendJson(res, 400, { error: parsedEntry.error });
 
   let embedding = null;
-  if (process.env.OLLAMA_EMBEDDING_MODEL?.trim()) {
-    const config = getOllamaConfig();
+  if (process.env.OLLAMA_EMBEDDING_MODEL?.trim() || process.env.GEMINI_EMBEDDING_MODEL?.trim()) {
+    const config = getAiProviderConfig();
     embedding = await createAiKnowledgeEmbedding(
       `${parsedEntry.value.title}\n${parsedEntry.value.content}`,
       config,
