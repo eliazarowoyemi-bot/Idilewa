@@ -13,3 +13,9 @@ supabase/.temp/
 
 .env*.local
 .env*
+.vercel
+
+# Local agent tooling state (may contain MCP configs and provider API keys)
+.continue/
+.yoke/
+
