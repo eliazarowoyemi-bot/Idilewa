@@ -7,6 +7,11 @@ build/
 *.log
 scratch/
 
+# Throwaway local scripts and captured command output (_deploy.txt, _test_out.txt, …)
+_*.ps1
+_*.mjs
+_*.txt
+
 .vercel
 
 supabase/.temp/
