@@ -10,68 +10,75 @@ Vercel project changes.
 | Production host | Vercel |
 | Vercel team | `idilewa1` (`team_jzWxJAvAEblhtwFiugbn6pYA`) |
 | Vercel project | `idilewa` (`prj_5fqiqzVLmDyVhIiieubEKiJJ7Tj7`) |
-| Production alias | https://idilewa.vercel.app |
+| Production aliases | `https://idilewa.com`, `https://www.idilewa.com`, `https://idilewa.vercel.app` |
 | Source repository | https://github.com/eliazarowoyemi-bot/Idilewa (`main`) |
 | DNS host | 123-reg / `ns0.phase8.net`, `ns1.phase8.net`, `ns2.phase8.net` |
-| Canonical origin | `https://www.idilewa.com` (`APP_BASE_URL`) |
+| Canonical origin | `https://idilewa.com` (apex); `www` redirects here |
 
-## Step 1 — Fix the `_vercel` TXT record (the actual blocker)
+## Current status (verified 2026-11-16)
 
-`vercel domains verify idilewa.com` reports:
+| Host | Vercel status | Live behaviour |
+| :--- | :--- | :--- |
+| `idilewa.com` | ✔ Valid Configuration — verified for project `idilewa` | `200` on every route |
+| `www.idilewa.com` | ⚠ Verification Required | `307` → `https://idilewa.com/...`, then `200` |
+| `idilewa.vercel.app` | ✔ Valid Configuration | `200` |
+
+`vercel domains verify idilewa.com` answers:
 
 ```
-DNS Configuration    ✔ Valid Configuration (A record)
-Project              ☐ Verification Needed for idilewa
-Ownership            ☐ Not accessible under idilewa1
-
-Last attempt: Domain _vercel.idilewa.com has incorrect TXT Record.
-Expecting "vc-domain-verify=idilewa.com,722f42c870be84a523c3"
+Success! Valid Configuration: idilewa.com is configured (A record) and verified for project idilewa
 ```
 
-The TXT values currently in DNS (`b61f25b8839a9cf5cd36` and the malformed
-`://idilewa.com,47d1fc404b806637b434a`) belong to **older verification
-attempts**, so ownership can never be proven. At the DNS provider, **delete
-both existing `_vercel` TXT rows** and add exactly one:
+## Step 1 — Clear the `www` verification badge (only remaining task)
+
+`vercel domains verify www.idilewa.com` reports `Verification Needed for idilewa`
+/ `Not accessible under idilewa1` and asks for one DNS record:
 
 | Host | Type | Value |
 | :--- | :--- | :--- |
-| `_vercel` | `TXT` | `vc-domain-verify=idilewa.com,722f42c870be84a523c3` |
+| `_vercel` | `TXT` | `vc-domain-verify=www.idilewa.com,d5cfe3c0646b78ad4810` |
 
-Enter the value verbatim: no `https://`, no `://`, no quotes, no trailing slash.
+Keep the existing apex row (`vc-domain-verify=idilewa.com,722f42c870be84a523c3`):
+TXT allows several values at one name. Enter the new value verbatim — no
+`https://`, no `://`, no quotes, no trailing slash. Delete the old malformed
+`vc-domain-verify=://idilewa.com,...` row if it is still present.
 
-Then re-run the check and attach the domain:
+Then press **Refresh** on the `www.idilewa.com` row in **Settings → Domains**, or
+run:
 
 ```bash
-vercel domains verify idilewa.com     # Ownership should become ✔
-vercel domains add idilewa.com idilewa
+vercel domains verify www.idilewa.com
 ```
 
-If Vercel prints a **different** token after a new attempt, use the newest value
-it reports — the expected token is the one Vercel echoes back in
-`Last attempt: ... Expecting "..."`.
+If Vercel prints a different token on a later attempt, use the newest value — the
+expected one is always echoed in `Last attempt: ... missing required TXT Record
+"..."`. The badge is cosmetic today because `www` already redirects to the apex,
+but it leaves the domain only partially attached.
 
-`idilewa.com` is currently registered under another Vercel context (the old
-deployment aliases `idilewa-com-tapee2.vercel.app` /
-`idilewa-nwxk3xs7i-tapee2.vercel.app` point at a team named `tapee2`), which is
-why the CLI answers `Error: The domain idilewa.com already exists under a
-different context.` Verifying ownership with the TXT record above transfers it
-to `idilewa1`. Alternatively, sign in to that other scope → **Domains** →
-remove `idilewa.com` and `www.idilewa.com`, then add them to `idilewa1` →
-project `idilewa` → **Settings → Domains**.
-
-## Step 2 — DNS records
+## DNS records at 123-reg
 
 | Host | Type | Value | Notes |
 | :--- | :--- | :--- | :--- |
-| `@` | `A` | `216.198.79.1` | Vercel anycast address — already correct and verified |
-| `www` | `CNAME` | `<hash>.vercel-dns-017.com` | Currently `d46bc70b0c0880ee.vercel-dns-017.com`, which belongs to the **old** project. Replace it with the value Vercel shows once `www.idilewa.com` is added. `cname.vercel-dns.com` also works as a generic target. |
-| `_vercel` | `TXT` | `vc-domain-verify=idilewa.com,<token>` | One value only, copied verbatim from Vercel. Removable after verification. |
+| `@` | `A` | `216.198.79.1` | Vercel anycast address — `✔ Valid Configuration` |
+| `www` | `CNAME` | `d46bc70b0c0880ee.vercel-dns-017.com` | Resolves through Vercel and `307`s to the apex. Leave as-is unless Vercel prints a new target. |
+| `_vercel` | `TXT` | `vc-domain-verify=idilewa.com,722f42c870be84a523c3` | Apex ownership — verified; removable once `www` verifies. |
+| `_vercel` | `TXT` | `vc-domain-verify=www.idilewa.com,d5cfe3c0646b78ad4810` | Pending — see Step 1. |
 
-Both `idilewa.com` and `www.idilewa.com` must be added to the project. The apex
-answers `308` to `https://www.idilewa.com/...` (see `redirects` in
-`vercel.json`), so a broken `www` makes the apex appear broken too — finish the
-`www` CNAME before going live.
+## Do not re-add an apex → www redirect
 
+`vercel.json` must **not** redirect `idilewa.com` to `www.idilewa.com`. Vercel's
+domain settings already send `www` → apex with a `307`, so an app-level
+apex → `www` rule produces an infinite redirect loop on every non-root path:
+
+```
+https://idilewa.com/pricing  → 308 → https://www.idilewa.com/pricing
+                             → 307 → https://idilewa.com/pricing  → …
+```
+
+That state made every deep link fail with `ERR_TOO_MANY_REDIRECTS` while `/`
+still returned `200`, which hid the bug during spot checks. To make `www`
+canonical instead, first set `www.idilewa.com` as the primary domain in
+**Settings → Domains**; never add the redirect rule on its own.
 
 ## Deploy
 
@@ -82,21 +89,52 @@ npx vercel --prod --yes      # build and promote on Vercel
 ```
 
 `.vercel/` is gitignored; `vercel link --yes --project idilewa` recreates the
-local link on a fresh clone.
+local link on a fresh clone. `.vercelignore` excludes `.env*`, so builds use the
+Vercel project environment variables rather than your local `.env`.
+
+The browser bundle reads Supabase config through `envPrefix` in `vite.config.js`
+(`VITE_SUPABASE_URL` → `SUPABASE_URL` → `SUPABASE_PUBLIC_URL` →
+`NEXT_PUBLIC_SUPABASE_URL`, plus the matching anon keys). Production supplies
+`SUPABASE_URL` and `SUPABASE_ANON_KEY`, which is why client auth works without
+`VITE_*` variables.
 
 ## Verify
 
 ```powershell
+vercel domains verify idilewa.com
+vercel domains verify www.idilewa.com
 nslookup -type=TXT _vercel.idilewa.com 8.8.8.8
-nslookup idilewa.com 8.8.8.8
-nslookup www.idilewa.com 8.8.8.8
-vercel domains ls
+
+foreach ($p in '/', '/pricing', '/login', '/creative-studio') {
+  curl.exe -s -o NUL -L --max-redirs 4 -w '%{http_code} hops=%{num_redirects}\n' "https://idilewa.com$p"
+  curl.exe -s -o NUL -L --max-redirs 4 -w '%{http_code} hops=%{num_redirects}\n' "https://www.idilewa.com$p"
+}
 ```
 
-Expected: `idilewa.com` → `216.198.79.1`, `www` → a `vercel-dns-0xx.com`
-CNAME, `vercel domains ls` lists both names, and both URLs return `200`
-(`idilewa.com` answers `308` to `https://www.idilewa.com/...`).
+Expected: both `verify` commands report `Valid Configuration`, and every route
+returns `200` with `hops=0` on the apex and `hops=1` on `www`. A `hops=4`, or
+`curl: (47) Maximum (4) redirects followed`, means the redirect loop above has
+come back.
 
 A `404` whose body reads `The deployment could not be found on Vercel.
 DEPLOYMENT_NOT_FOUND` means the hostname reached Vercel but is not attached to
-the project — go back to Step 1.
+the project.
+
+## Server env vars not currently set
+
+`vercel env ls production` lists only `POSTGRES_*`, `SUPABASE_*` and
+`NEXT_PUBLIC_SUPABASE_*`. These are referenced by the code but absent from the
+project:
+
+| Variable | Effect while missing |
+| :--- | :--- |
+| `APP_BASE_URL` | `getProductionOrigin()` throws `503 Guardian approval is not configured yet`; set it to `https://idilewa.com` |
+| `GUARDIAN_TOKEN_SECRET` | Guardian consent links cannot be signed |
+| `RESEND_API_KEY`, `RESEND_FROM_EMAIL` | Welcome and verification emails are skipped |
+| `PLOTWEAVER_API_KEY` | Voice synthesis, transcription and translation unavailable |
+| `JUDGE0_URL`, `JUDGE0_AUTH_TOKEN` | `GET /api/code/languages` returns `503` |
+| `GOOGLE_TRANSLATE_API_KEY` | Server-side translation unavailable |
+| `CANVA_CLIENT_ID`, `CANVA_CLIENT_SECRET`, `CANVA_REDIRECT_URI` | Canva Connect stays disabled |
+
+Add each with `vercel env add <NAME> production` and redeploy.
+
