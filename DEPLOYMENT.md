@@ -174,17 +174,17 @@ configured. Add GEMINI_API_KEY to the deployment environment.` when no key is se
 ```bash
 npx vercel env add AI_PROVIDER production --scope idilewa1 --value gemini --sensitive
 npx vercel env add GEMINI_API_KEY production --scope idilewa1 --sensitive   # paste key
-npx vercel env add GEMINI_MODEL production --scope idilewa1 --value gemini-3.8-flash --sensitive
-npx vercel env add GEMINI_FALLBACK_MODELS production --scope idilewa1 --value gemini-3.5-flash,gemini-flash-latest,gemini-2.5-flash --sensitive
+npx vercel env add GEMINI_MODEL production --scope idilewa1 --value gemini-3-flash-preview --sensitive
+npx vercel env add GEMINI_FALLBACK_MODELS production --scope idilewa1 --value gemini-flash-lite-latest,gemini-3.5-flash --sensitive
 npx vercel env ls production --scope idilewa1
 npx vercel --prod --yes --scope idilewa1
 ```
 
-`GEMINI_MODEL` is optional and defaults to `gemini-3.8-flash` in code. When a
-model answers `404 no longer available` or `503 UNAVAILABLE`, the provider walks
-the ordered `GEMINI_FALLBACK_MODELS` chain (default
-`gemini-3.5-flash,gemini-flash-latest,gemini-2.5-flash`) before surfacing an
-error, so a single retired or overloaded SKU cannot take chat down again.
+`GEMINI_MODEL` is optional and defaults to `gemini-3-flash-preview` in code. When
+a model answers `404 no longer available`, `500`, or `503 UNAVAILABLE`, the
+provider walks the ordered `GEMINI_FALLBACK_MODELS` chain (default
+`gemini-flash-lite-latest,gemini-3.5-flash`) before surfacing an error, so a
+single retired or overloaded SKU cannot take chat down again.
 
 Verify:
 
