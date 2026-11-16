@@ -15,58 +15,63 @@ Vercel project changes.
 | DNS host | 123-reg / `ns0.phase8.net`, `ns1.phase8.net`, `ns2.phase8.net` |
 | Canonical origin | `https://www.idilewa.com` (`APP_BASE_URL`) |
 
-## Step 1 — Attach the domain to the project (required)
+## Step 1 — Fix the `_vercel` TXT record (the actual blocker)
 
-The project **does not currently own `idilewa.com`**. Vercel answers the domain
-with `DEPLOYMENT_NOT_FOUND` (HTTP 404) because no project is mapped to the
-hostname, and the CLI refuses to attach it:
+`vercel domains verify idilewa.com` reports:
 
 ```
+DNS Configuration    ✔ Valid Configuration (A record)
+Project              ☐ Verification Needed for idilewa
+Ownership            ☐ Not accessible under idilewa1
+
+Last attempt: Domain _vercel.idilewa.com has incorrect TXT Record.
+Expecting "vc-domain-verify=idilewa.com,722f42c870be84a523c3"
+```
+
+The TXT values currently in DNS (`b61f25b8839a9cf5cd36` and the malformed
+`://idilewa.com,47d1fc404b806637b434a`) belong to **older verification
+attempts**, so ownership can never be proven. At the DNS provider, **delete
+both existing `_vercel` TXT rows** and add exactly one:
+
+| Host | Type | Value |
+| :--- | :--- | :--- |
+| `_vercel` | `TXT` | `vc-domain-verify=idilewa.com,722f42c870be84a523c3` |
+
+Enter the value verbatim: no `https://`, no `://`, no quotes, no trailing slash.
+
+Then re-run the check and attach the domain:
+
+```bash
+vercel domains verify idilewa.com     # Ownership should become ✔
 vercel domains add idilewa.com idilewa
-# Error: Not authorized to use idilewa.com (403)
 ```
 
-A brand-new domain can be added with the same command, so this is **not** a
-permission problem — `idilewa.com` is claimed by a *different Vercel scope*
-(the old deployment targets `idilewa-com-tapee2.vercel.app` and
-`idilewa-nwxk3xs7i-tapee2.vercel.app` point at a team named `tapee2`).
+If Vercel prints a **different** token after a new attempt, use the newest value
+it reports — the expected token is the one Vercel echoes back in
+`Last attempt: ... Expecting "..."`.
 
-Fix one of these ways, then continue:
-
-1. **Release it from the owning scope** — sign in to the Vercel account/team
-   that owns `idilewa.com` (`tapee2`, or the personal account used for the
-   earlier deployments) → **Domains** → select `idilewa.com` and
-   `www.idilewa.com` → **Remove**. Then, inside team `idilewa1` → project
-   `idilewa` → **Settings → Domains**, add both.
-2. **Prove ownership instead** — if the dashboard for `idilewa1` shows the TXT
-   challenge, make `_vercel` match the record the dashboard requests (see
-   Step 2), then press **Verify**. Ownership verification transfers the domain
-   to `idilewa1` automatically.
+`idilewa.com` is currently registered under another Vercel context (the old
+deployment aliases `idilewa-com-tapee2.vercel.app` /
+`idilewa-nwxk3xs7i-tapee2.vercel.app` point at a team named `tapee2`), which is
+why the CLI answers `Error: The domain idilewa.com already exists under a
+different context.` Verifying ownership with the TXT record above transfers it
+to `idilewa1`. Alternatively, sign in to that other scope → **Domains** →
+remove `idilewa.com` and `www.idilewa.com`, then add them to `idilewa1` →
+project `idilewa` → **Settings → Domains**.
 
 ## Step 2 — DNS records
 
-Replace the values below with the exact ones the Vercel dashboard prints after
-the domain is added; the apex value is stable, the `www` target is
-project-specific.
-
 | Host | Type | Value | Notes |
 | :--- | :--- | :--- | :--- |
-| `@` | `A` | `216.198.79.1` | Vercel anycast address — already correct |
-| `www` | `CNAME` | `<hash>.vercel-dns-017.com` | Currently `d46bc70b0c0880ee.vercel-dns-017.com`, which belongs to the **old** project and must be replaced. `cname.vercel-dns.com` also works as a generic target. |
-| `_vercel` | `TXT` | `vc-domain-verify=idilewa.com,<token>` | Only while Vercel asks for ownership verification. |
+| `@` | `A` | `216.198.79.1` | Vercel anycast address — already correct and verified |
+| `www` | `CNAME` | `<hash>.vercel-dns-017.com` | Currently `d46bc70b0c0880ee.vercel-dns-017.com`, which belongs to the **old** project. Replace it with the value Vercel shows once `www.idilewa.com` is added. `cname.vercel-dns.com` also works as a generic target. |
+| `_vercel` | `TXT` | `vc-domain-verify=idilewa.com,<token>` | One value only, copied verbatim from Vercel. Removable after verification. |
 
-### Known DNS problems to clean up
+Both `idilewa.com` and `www.idilewa.com` must be added to the project. The apex
+answers `308` to `https://www.idilewa.com/...` (see `redirects` in
+`vercel.json`), so a broken `www` makes the apex appear broken too — finish the
+`www` CNAME before going live.
 
-`_vercel.idilewa.com` currently resolves to two TXT values:
-
-```
-"vc-domain-verify=idilewa.com,b61f25b8839a9cf5cd36"        # keep, or replace with the value the dashboard shows
-"vc-domain-verify=://idilewa.com,47d1fc404b806637b434a"    # BROKEN — delete it
-```
-
-The second value contains a stray `://`, so it can never match what Vercel
-expects. Delete that row. Keep exactly one TXT value, copied verbatim from the
-dashboard (no `https://`, no trailing slash, no quotes).
 
 ## Deploy
 
