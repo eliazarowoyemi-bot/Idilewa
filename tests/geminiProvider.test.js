@@ -243,7 +243,7 @@ test('Gemini reports an overload message only after the whole model chain fails'
 test('Gemini configuration exposes an ordered, de-duplicated fallback chain', () => {
   const config = getGeminiConfig({ GEMINI_API_KEY: 'placeholder-key' });
   assert.equal(config.model, DEFAULT_GEMINI_MODEL);
-  assert.deepEqual(config.fallbackModels, ['gemini-3.5-flash', 'gemini-flash-latest']);
+  assert.deepEqual(config.fallbackModels, ['gemini-3-flash-preview', 'gemini-flash-lite-latest']);
   assert.ok(!config.fallbackModels.includes(config.model));
 
   const pinned = getGeminiConfig({ GEMINI_API_KEY: 'k', GEMINI_MODEL: 'gemini-3.5-flash' });
@@ -252,9 +252,9 @@ test('Gemini configuration exposes an ordered, de-duplicated fallback chain', ()
 
   const custom = getGeminiConfig({
     GEMINI_API_KEY: 'k',
-    GEMINI_FALLBACK_MODELS: 'models/gemini-3.5-flash, gemini-2.5-pro',
+    GEMINI_FALLBACK_MODELS: 'models/gemini-2.5-pro, gemini-3-flash-preview',
   });
-  assert.deepEqual(custom.fallbackModels, ['gemini-3.5-flash', 'gemini-2.5-pro']);
+  assert.deepEqual(custom.fallbackModels, ['gemini-2.5-pro', 'gemini-3-flash-preview']);
 
   assert.deepEqual(geminiModelChain({ model: 'primary-model', fallbackModels: ['primary-model', 'second-model', '  '] }), [
     'primary-model',

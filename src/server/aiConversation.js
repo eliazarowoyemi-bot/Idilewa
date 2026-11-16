@@ -142,15 +142,16 @@ export function parseAiConversationRequest(body) {
 
 export const AI_PROVIDERS = Object.freeze(['gemini']);
 export const DEFAULT_AI_PROVIDER = 'gemini';
-export const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
+export const DEFAULT_GEMINI_MODEL = 'gemini-3.5-flash';
 
-// Google retires models for new API keys without notice — gemini-2.5-flash now
-// answers 404 "no longer available to new users" and points callers at 3.8-flash.
-// These aliases stay in the list so a future retirement does not take the chat
-// down; they are only tried after the primary model fails with 404/500/503.
+// Verified against the live API key: 3.5-flash, 3-flash-preview and
+// flash-lite-latest answer 200, while gemini-2.5-flash answers 404 ("no longer
+// available to new users"), gemini-3.8-flash stalls past the request timeout and
+// gemini-flash-latest intermittently answers 503. The chain is capped at three
+// attempts and only advances on 404/500/503, so a healthy primary is one call.
 export const GEMINI_FALLBACK_MODELS = Object.freeze([
-  'gemini-3.5-flash',
-  'gemini-flash-latest',
+  'gemini-3-flash-preview',
+  'gemini-flash-lite-latest',
 ]);
 
 
