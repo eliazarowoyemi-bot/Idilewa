@@ -112,6 +112,11 @@ const nativeRouteNavigationStyles = `<style id="idilewa-native-route-navigation"
 .idilewa-route-nav a:focus-visible{outline:3px solid #087a3e;outline-offset:3px}
 @media(max-width:560px){.idilewa-route-nav a{flex:1 1 40%}}
 </style>`;
+const aboutHeaderNavigationStyles = `<style id="idilewa-about-header-navigation">
+#nav{display:none!important}
+#menu{display:inline-flex!important;align-items:center;justify-content:center;gap:8px;min-width:88px;min-height:44px}
+#menu::before{content:"☰";font-size:18px;line-height:1}
+</style>`;
 
 function insertAfterClosingElement(html, tagName, content, message) {
   const closingTag = `</${tagName}>`;
@@ -252,8 +257,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const aboutNavigation = route === 'about'
     ? `<script>
 document.addEventListener('DOMContentLoaded', () => {
-  const nav = document.getElementById('nav');
-  if (!nav) throw new Error('About page is missing its navigation container.');
+  const nav = document.querySelector('.drawer-nav');
+  if (!nav) throw new Error('About page is missing its navigation drawer.');
   const links = [
     ['/kids.html', 'Kids Arcade'],
     ['/creative-studio.html', 'Creative Studio'],
@@ -276,7 +281,11 @@ document.addEventListener('DOMContentLoaded', () => {
   if (closingHeadIndex === -1) {
     throw new Error('Native app page is missing its closing head tag.');
   }
-  const styles = ['kids', 'tutor'].includes(route) ? nativeRouteNavigationStyles : '';
+  const styles = ['kids', 'tutor'].includes(route)
+    ? nativeRouteNavigationStyles
+    : route === 'about'
+      ? aboutHeaderNavigationStyles
+      : '';
   const withHeadContent = routeNavigation.slice(0, closingHeadIndex)
     .concat(styles, tutorAccessibilityStyles, tutorPortalNavigation, aboutNavigation, nativeAppNavigation, routeNavigation.slice(closingHeadIndex));
   const closingBodyIndex = withHeadContent.toLowerCase().lastIndexOf('</body>');

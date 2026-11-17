@@ -121,6 +121,10 @@ test('native entry pages retain their app and return home or voice links to cano
       assert.match(transformed, /href="\/\?view=codeLab"/);
       assert.match(transformed, /href="\/\?view=heritageLab"/);
       assert.doesNotMatch(transformed, /href="https:\/\/idilewa\.com/);
+      assert.match(transformed, /idilewa-about-header-navigation/);
+      assert.match(transformed, /#nav\{display:none!important\}/);
+      assert.match(transformed, /#menu\{display:inline-flex!important/);
+      assert.match(transformed, /document\.querySelector\('\.drawer-nav'\)/);
       assert.match(transformed, /data-idilewa-route/);
     }
   }

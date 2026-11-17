@@ -10,6 +10,8 @@ test('FAQ route includes the supplied search, category, language, and accordion 
   assert.match(page, /id="faqSearch"/);
   assert.match(page, /id="faqCategories"/);
   assert.match(page, /id="faqLanguage"/);
+  assert.match(page, /faqLanguageSelect\.dispatchEvent\(new Event\('change', \{ bubbles: true \}\)\)/);
+  assert.match(page, /faqLanguageMobile\.addEventListener\('change'/);
   assert.match(client, /setAttribute\('aria-expanded'/);
   assert.match(client, /No matching questions/);
   assert.match(client, /English answer shown|fallback/);

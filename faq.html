@@ -111,7 +111,10 @@
       const faqLanguageMobile = document.getElementById('faqLanguageMobile');
       if (faqLanguageSelect && faqLanguageMobile) {
         faqLanguageSelect.addEventListener('change', () => syncFaqLanguage(faqLanguageSelect, faqLanguageMobile));
-        faqLanguageMobile.addEventListener('change', () => syncFaqLanguage(faqLanguageMobile, faqLanguageSelect));
+        faqLanguageMobile.addEventListener('change', () => {
+          syncFaqLanguage(faqLanguageMobile, faqLanguageSelect);
+          faqLanguageSelect.dispatchEvent(new Event('change', { bubbles: true }));
+        });
       }
     </script>
   </body>
