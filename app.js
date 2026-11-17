@@ -6059,10 +6059,7 @@ import {
       .replace(/Voice Studio/gi, 'Voice Lessons');
     if (page === 'ai-conversation' || page.startsWith('tutor') || page.startsWith('parent') || page === 'families') {
       document.body.dataset.page = page;
-      const standaloneMarkup = page === 'ai-conversation'
-        ? `${pageMarkup}${renderFooter()}`
-        : pageMarkup;
-      document.getElementById('main').innerHTML = standaloneMarkup;
+      document.getElementById('main').innerHTML = pageMarkup;
     } else if (page === 'index') {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = `${pageMarkup}${renderFooter()}`;

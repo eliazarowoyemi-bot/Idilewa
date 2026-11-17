@@ -36,7 +36,6 @@ test('the AI conversation page is a first-class route with its own shell', async
 
   assert.match(appSource, /page === 'ai-conversation' \|\| page\.startsWith\('tutor'\) \|\| page\.startsWith\('parent'\) \|\| page === 'families'/, 'the shared site header should be hidden on AI chat and family auth');
   assert.match(appSource, /page === 'ai-conversation' \|\| page\.startsWith\('tutor'\)/, 'AI chat renders its own full-bleed layout');
-  assert.match(appSource, /page === 'ai-conversation'[\s\S]*?`\$\{pageMarkup\}\$\{renderFooter\(\)\}`/, 'AI chat should include the shared footer');
   assert.match(appSource, /if \(page === 'ai-conversation'\) initializeAiConversation\(\)/);
   assert.match(stylesSource, /body\[data-page="ai-conversation"\]/);
 });

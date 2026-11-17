@@ -104,6 +104,9 @@ test('native entry pages retain their app and return home or voice links to cano
     }
     assert.match(transformed, /event\.stopImmediatePropagation\(\)/, filename);
     assert.match(transformed, /src="\/src\/siteFooter\.js"/, filename);
+    if (filename === 'ai-conversation.html') {
+      assert.equal((transformed.match(/src="\/src\/siteFooter\.js"/g) || []).length, 1);
+    }
     assert.match(transformed, /location\.assign\(link\.getAttribute\('href'\) === '#\/index' \? '\/' : '\/voice_lessons\.html'\)/, filename);
     if (filename === 'tutor.html') {
       assert.match(transformed, /href = '\/educator-portal\.html#\/tutor-signup'/);
