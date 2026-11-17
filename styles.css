@@ -13138,3 +13138,235 @@ body.academy-reference-shell ::selection { background: #c9eed2; color: #075e2b; 
 @media (max-width: 420px) {
   .aichat-error { gap: 7px; margin-left: 44px; width: calc(100% - 44px); padding: 8px 9px; font-size: 12px; }
 }
+
+/* ==========================================================================
+   iOS app-shell layer
+   Applied over the legacy rules above: translucent sticky bar with a scroll
+   state, a single-line breadcrumb trail, tactile press feedback, restrained
+   card elevation and a footer that keeps its columns on desktop but stacks
+   into tidy sections on narrow screens. Colours reuse existing tokens.
+   ========================================================================== */
+
+:root {
+  --bc-chevron: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.4' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 6 6 6-6 6'/%3E%3C/svg%3E");
+  --press-ease: cubic-bezier(.2, .8, .2, 1);
+}
+
+/* 1. Translucent app bar -------------------------------------------------- */
+.site-header {
+  background: color-mix(in srgb, var(--paper) 74%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  backdrop-filter: saturate(180%) blur(16px);
+  border-bottom: 1px solid color-mix(in srgb, var(--green) 14%, transparent);
+  transition:
+    background-color .15s var(--press-ease),
+    border-color .15s var(--press-ease),
+    box-shadow .15s var(--press-ease);
+}
+
+.site-header[data-scrolled="true"] {
+  background: color-mix(in srgb, var(--paper) 93%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--green) 22%, transparent);
+  box-shadow: 0 14px 30px -28px color-mix(in srgb, var(--ink) 60%, transparent);
+}
+
+@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+  .site-header { background: var(--paper); }
+}
+
+.nav-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  transition: color .15s var(--press-ease), transform .15s var(--press-ease);
+}
+
+.nav-link:active { transform: scale(.97); }
+
+.icon-button { transition: background .15s var(--press-ease), transform .15s var(--press-ease); }
+.icon-button:hover { transform: none; }
+.icon-button:active { transform: scale(.94); }
+
+/* 2. Buttons: three tiers, one press feel --------------------------------- */
+.button {
+  transition:
+    transform .15s var(--press-ease),
+    box-shadow .15s var(--press-ease),
+    background .15s var(--press-ease),
+    border-color .15s var(--press-ease),
+    color .15s var(--press-ease);
+}
+
+.button:hover:not(:disabled) { transform: translateY(-1px); }
+.button:active:not(:disabled) { transform: scale(.97); box-shadow: none; }
+.button-outline { border-color: color-mix(in srgb, var(--green) 20%, transparent); }
+
+/* 3. Breadcrumbs ---------------------------------------------------------- */
+.breadcrumbs {
+  --bc-fade-start: 0px;
+  --bc-fade-end: 0px;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 2px;
+  max-width: 100%;
+  min-height: 44px;
+  margin: 0 0 18px;
+  padding-inline: 2px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scrollbar-width: none;
+  color: var(--muted-2);
+  font-size: 13px;
+  line-height: 1.35;
+  -webkit-mask-image: linear-gradient(to right, transparent 0, black var(--bc-fade-start), black calc(100% - var(--bc-fade-end)), transparent 100%);
+  mask-image: linear-gradient(to right, transparent 0, black var(--bc-fade-start), black calc(100% - var(--bc-fade-end)), transparent 100%);
+}
+
+.breadcrumbs::-webkit-scrollbar { display: none; }
+.breadcrumbs[data-scroll-start="true"] { --bc-fade-start: 24px; }
+.breadcrumbs[data-scroll-end="true"] { --bc-fade-end: 24px; }
+.breadcrumbs > * { flex: none; }
+
+.breadcrumbs a,
+.breadcrumbs strong {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 6px;
+  border-radius: 8px;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: color .15s var(--press-ease), background-color .15s var(--press-ease);
+}
+
+.breadcrumbs a { color: var(--muted); font-weight: 600; }
+.breadcrumbs a:hover { color: var(--green-dark); background: color-mix(in srgb, var(--green) 8%, transparent); }
+.breadcrumbs strong { color: var(--ink-soft); font-weight: 700; }
+
+.breadcrumb-sep {
+  width: 13px;
+  height: 13px;
+  flex: none;
+  background: currentColor;
+  opacity: .34;
+  -webkit-mask: var(--bc-chevron) center / contain no-repeat;
+  mask: var(--bc-chevron) center / contain no-repeat;
+}
+/* 4. Cards & grids -------------------------------------------------------- */
+.cards-grid,
+.feature-grid { container-type: inline-size; }
+
+.feature-grid { grid-template-columns: repeat(auto-fit, minmax(min(100%, 255px), 1fr)); }
+
+@container (max-width: 480px) {
+  .cards-grid > *,
+  .feature-grid > * { min-width: 0; }
+}
+
+.card,
+.feature-card,
+.proverb-card,
+.lesson-card,
+.coding-card,
+.oral-card,
+.stat-card,
+.pricing-card {
+  border: 1px solid color-mix(in srgb, var(--green) 12%, transparent);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  transition:
+    transform .15s var(--press-ease),
+    box-shadow .15s var(--press-ease),
+    border-color .15s var(--press-ease);
+}
+
+.card:hover,
+.feature-card:hover,
+.proverb-card:hover,
+.lesson-card:hover,
+.coding-card:hover,
+.oral-card:hover,
+.stat-card:hover,
+.pricing-card:hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--green) 24%, transparent);
+  box-shadow: var(--shadow);
+}
+
+/* 5. Footer ---------------------------------------------------------------- */
+.site-footer { border-top: 1px solid color-mix(in srgb, var(--green) 14%, transparent); }
+
+.footer-main {
+  gap: clamp(28px, 4vw, 56px);
+  padding-top: clamp(32px, 4vw, 48px);
+  padding-bottom: clamp(24px, 3vw, 36px);
+}
+
+.footer-links { gap: 2px; }
+
+.footer-links a {
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+  margin-inline: -8px;
+  padding: 0 8px;
+  border-radius: 8px;
+  font-size: 13px;
+  transition: color .15s var(--press-ease), background-color .15s var(--press-ease);
+}
+
+.footer-links a:hover { background: color-mix(in srgb, var(--green) 8%, transparent); }
+.footer-bottom { padding: 14px 0; }
+
+@media (max-width: 760px) {
+  .footer-main { grid-template-columns: 1fr; gap: 26px; }
+  .footer-contact { max-width: none; }
+  .footer-directory { grid-template-columns: 1fr; gap: 18px; }
+  .footer-links { padding-top: 16px; border-top: 1px solid color-mix(in srgb, var(--green) 12%, transparent); }
+  .footer-links h2 { margin-bottom: 6px; }
+}
+
+/* 6. Mobile bottom navigation --------------------------------------------- */
+.mobile-nav.mobile-bottom-navigation {
+  background: color-mix(in srgb, var(--paper) 88%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  backdrop-filter: saturate(180%) blur(16px);
+  border-top: 1px solid color-mix(in srgb, var(--green) 14%, transparent);
+}
+
+.mobile-nav .mobile-tab:active { transform: scale(.96); }
+
+/* 7. Reduced motion -------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  .site-header,
+  .nav-link,
+  .button,
+  .icon-button,
+  .footer-links a,
+  .breadcrumbs a,
+  .breadcrumbs strong,
+  .card,
+  .feature-card,
+  .proverb-card,
+  .lesson-card,
+  .coding-card,
+  .oral-card,
+  .stat-card,
+  .pricing-card { transition-duration: 1ms !important; }
+
+  .button:hover:not(:disabled),
+  .button:active:not(:disabled),
+  .nav-link:active,
+  .icon-button:active,
+  .mobile-nav .mobile-tab:active { transform: none !important; }
+
+  .card:hover,
+  .feature-card:hover,
+  .proverb-card:hover,
+  .lesson-card:hover,
+  .coding-card:hover,
+  .oral-card:hover,
+  .stat-card:hover,
+  .pricing-card:hover { transform: none; }
+}

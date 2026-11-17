@@ -1,10 +1,60 @@
 /**
- * Ìdíléwa site chrome: navigation dropdown, slide-over drawer and scroll reveal.
+ * Ìdíléwa site chrome: navigation dropdown, contextual "More" popover,
+ * slide-over sheet and scroll reveal.
+ *
  * Vanilla ES module - the app is plain HTML/CSS/JS (no React), so the motion
  * layer lives in CSS (see design-system.css) and this file only toggles state.
+ * The sheet is a native <dialog> opened with showModal(), so the browser owns
+ * the focus trap, Escape handling and the inert background; the script keeps
+ * the aria state and body scroll lock in sync.
  */
 
 const nav = document.querySelector('[data-id-nav]');
+
+const SHEET_DESTINATIONS = [
+  ['Learn', [
+    ['/', 'Home'],
+    ['/?view=academy', 'Language Academy'],
+    ['/?view=codeLab', 'Code for Kids'],
+    ['/kids.html', 'Kids Arcade'],
+  ]],
+  ['Explore', [
+    ['/?view=heritageLab', 'Heritage Library'],
+    ['/creative-studio.html', 'Creative Studio'],
+    ['/faq.html', 'FAQ'],
+    ['/about.html', 'About Ìdíléwa'],
+    ['/pricing.html', 'Pricing'],
+  ]],
+  ['Family', [
+    ['/parents.html', 'For Families'],
+    ['/family-tasks.html', 'Family Tasks'],
+    ['/tutor.html', 'Tutorship'],
+  ]],
+];
+
+function renderSheetLinks(drawer) {
+  const region = drawer.querySelector('.id-drawer__links');
+  if (!region) return;
+
+  region.replaceChildren(...SHEET_DESTINATIONS.map(([label, links]) => {
+    const group = document.createElement('div');
+    group.className = 'id-sheet__group';
+
+    const heading = document.createElement('p');
+    heading.className = 'id-sheet__label';
+    heading.textContent = label;
+    group.append(heading);
+
+    links.forEach(([href, text]) => {
+      const link = document.createElement('a');
+      link.href = href;
+      link.textContent = text;
+      group.append(link);
+    });
+
+    return group;
+  }));
+}
 
 function setupDropdown() {
   const dropdown = document.querySelector('[data-id-dropdown]');
@@ -46,36 +96,12 @@ function setupDropdown() {
   });
 }
 
-function setupDrawer() {
+function setupSheet() {
   const drawer = document.getElementById('idDrawer');
-  const backdrop = document.querySelector('[data-id-backdrop]');
   const openButton = document.querySelector('[data-id-menu-open]');
-  const closeButton = drawer ? drawer.querySelector('[data-id-menu-close]') : null;
-  if (!drawer || !backdrop || !openButton) return;
+  if (!drawer || !openButton) return;
 
-  const drawerLinks = drawer.querySelector('.id-drawer__links');
-  if (!drawerLinks) throw new Error('Navigation drawer is missing its links region.');
-
-  const destinations = [
-    ['/', 'Home'],
-    ['/?view=academy', 'Language Academy'],
-    ['/?view=codeLab', 'Code for Kids'],
-    ['/?view=heritageLab', 'Heritage Library'],
-    ['/kids.html', 'Kids Arcade'],
-    ['/creative-studio.html', 'Creative Studio'],
-    ['/tutor.html', 'Tutorship'],
-    ['/parents.html', 'For Families'],
-    ['/family-tasks.html', 'Family Tasks'],
-    ['/faq.html', 'FAQ'],
-    ['/about.html', 'About Ìdíléwa'],
-    ['/pricing.html', 'Pricing'],
-  ];
-  drawerLinks.replaceChildren(...destinations.map(([href, label]) => {
-    const link = document.createElement('a');
-    link.href = href;
-    link.textContent = label;
-    return link;
-  }));
+  renderSheetLinks(drawer);
 
   if (!openButton.querySelector('.id-menu-btn__label')) {
     const label = document.createElement('span');
@@ -84,75 +110,159 @@ function setupDrawer() {
     openButton.append(label);
   }
 
-  const focusableSelector = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
-  let lastFocused = null;
+  const isDialog = drawer.tagName === 'DIALOG' && typeof drawer.showModal === 'function';
+  const closeButton = drawer.querySelector('[data-id-menu-close]');
+  const backdrop = document.querySelector('[data-id-backdrop]');
 
-  const setOpen = (open) => {
-    drawer.dataset.open = open ? 'true' : 'false';
-    backdrop.dataset.open = open ? 'true' : 'false';
-    backdrop.hidden = !open;
-    openButton.setAttribute('aria-expanded', open ? 'true' : 'false');
-    document.body.classList.toggle('id-drawer-open', open);
-
-    if (open) {
-      lastFocused = document.activeElement;
-      drawer.hidden = false;
-      window.requestAnimationFrame(() => {
-        const first = drawer.querySelector(focusableSelector);
-        if (first) first.focus();
-      });
-    } else {
-      window.setTimeout(() => {
-        if (drawer.dataset.open !== 'true') drawer.hidden = true;
-      }, 520);
-      if (lastFocused && typeof lastFocused.focus === 'function') lastFocused.focus();
-    }
+  const syncOpen = () => {
+    openButton.setAttribute('aria-expanded', 'true');
+    drawer.dataset.open = 'true';
+    document.body.classList.add('id-drawer-open');
   };
 
-  drawer.hidden = true;
-  backdrop.hidden = true;
-  setOpen(false);
+  const syncClosed = () => {
+    openButton.setAttribute('aria-expanded', 'false');
+    drawer.dataset.open = 'false';
+    document.body.classList.remove('id-drawer-open');
+  };
 
-  openButton.addEventListener('click', () => setOpen(true));
-  if (closeButton) closeButton.addEventListener('click', () => setOpen(false));
-  backdrop.addEventListener('click', () => setOpen(false));
-
-  drawer.addEventListener('click', (event) => {
-    if (event.target.closest('.id-drawer__links a, .id-drawer__foot button, .id-drawer__foot a')) {
-      setOpen(false);
-    }
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (drawer.dataset.open !== 'true') return;
-
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      setOpen(false);
+  const open = () => {
+    if (isDialog) {
+      if (!drawer.open) drawer.showModal();
+      syncOpen();
       return;
     }
-
-    if (event.key !== 'Tab') return;
-
-    const items = Array.from(drawer.querySelectorAll(focusableSelector))
-      .filter((element) => element.offsetParent !== null);
-    if (!items.length) return;
-
-    const first = items[0];
-    const last = items[items.length - 1];
-
-    if (event.shiftKey && document.activeElement === first) {
-      event.preventDefault();
-      last.focus();
-    } else if (!event.shiftKey && document.activeElement === last) {
-      event.preventDefault();
-      first.focus();
+    drawer.hidden = false;
+    if (backdrop) {
+      backdrop.hidden = false;
+      backdrop.dataset.open = 'true';
     }
+    syncOpen();
+  };
+
+  const close = () => {
+    if (isDialog) {
+      if (drawer.open) drawer.close();
+      syncClosed();
+      return;
+    }
+    drawer.hidden = true;
+    if (backdrop) {
+      backdrop.hidden = true;
+      backdrop.dataset.open = 'false';
+    }
+    syncClosed();
+  };
+
+  if (!isDialog) {
+    drawer.hidden = true;
+    if (backdrop) backdrop.hidden = true;
+  }
+  syncClosed();
+
+  openButton.addEventListener('click', open);
+  if (closeButton) closeButton.addEventListener('click', close);
+
+  if (isDialog) {
+    // Escape and the close button both end in the native close event.
+    drawer.addEventListener('close', syncClosed);
+
+    // The backdrop is part of the dialog element, so compare against its box.
+    drawer.addEventListener('click', (event) => {
+      const box = drawer.getBoundingClientRect();
+      const outside = event.clientX < box.left || event.clientX > box.right
+        || event.clientY < box.top || event.clientY > box.bottom;
+      if (outside) close();
+    });
+  } else {
+    if (backdrop) backdrop.addEventListener('click', close);
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && drawer.dataset.open === 'true') close();
+    });
+  }
+
+  drawer.addEventListener('click', (event) => {
+    if (event.target.closest('.id-drawer__links a, .id-drawer__foot a')) close();
   });
 }
 
+function setupActionPopover() {
+  const trigger = document.querySelector('[data-id-more-trigger]');
+  const menu = document.getElementById('idMoreMenu');
+  if (!trigger || !menu) return;
+
+  const supportsPopover = typeof menu.showPopover === 'function' && menu.hasAttribute('popover');
+
+  // Browsers without CSS anchor positioning get a measured position instead.
+  const place = () => {
+    if (typeof CSS !== 'undefined' && CSS.supports && CSS.supports('anchor-name: --id-anchor')) return;
+    const box = trigger.getBoundingClientRect();
+    const width = menu.offsetWidth || 240;
+    const left = Math.max(12, Math.min(box.left, window.innerWidth - width - 12));
+    menu.style.insetBlockStart = `${Math.round(box.bottom + 10)}px`;
+    menu.style.insetInlineStart = `${Math.round(left)}px`;
+  };
+
+  const syncExpanded = () => {
+    const open = supportsPopover ? menu.matches(':popover-open') : menu.dataset.open === 'true';
+    trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+  };
+
+  if (supportsPopover) {
+    menu.addEventListener('toggle', (event) => {
+      if (event.newState === 'open') place();
+      syncExpanded();
+    });
+  } else {
+    menu.hidden = true;
+
+    const setOpen = (open) => {
+      menu.hidden = !open;
+      menu.dataset.open = open ? 'true' : 'false';
+      if (open) place();
+      syncExpanded();
+    };
+
+    trigger.addEventListener('click', () => setOpen(menu.hidden));
+    document.addEventListener('click', (event) => {
+      if (menu.hidden) return;
+      if (menu.contains(event.target) || trigger.contains(event.target)) return;
+      setOpen(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key !== 'Escape' || menu.hidden) return;
+      setOpen(false);
+      trigger.focus();
+    });
+  }
+
+  menu.addEventListener('click', (event) => {
+    if (!event.target.closest('.id-popover__item')) return;
+    if (supportsPopover && menu.matches(':popover-open')) menu.hidePopover();
+    else menu.dataset.open = 'false';
+  });
+
+  window.addEventListener('resize', () => {
+    const open = supportsPopover ? menu.matches(':popover-open') : menu.dataset.open === 'true';
+    if (open) place();
+  }, { passive: true });
+
+  syncExpanded();
+}
+
+function setupStickyHeader() {
+  if (!nav) return;
+
+  const sync = () => {
+    nav.dataset.idScrolled = window.scrollY > 8 ? 'true' : 'false';
+  };
+
+  sync();
+  window.addEventListener('scroll', sync, { passive: true });
+}
+
 function setupReveal() {
-  const items = Array.from(document.querySelectorAll('.featureTile, .tutorCard'));
+  const items = Array.from(document.querySelectorAll('.featureTile, .tutorCard, .id-card'));
   items.forEach((item, index) => {
     item.classList.add('id-reveal');
     if (!item.style.getPropertyValue('--id-delay')) {
@@ -207,7 +317,9 @@ function setupFooterFaq() {
 function init() {
   if (nav) nav.dataset.idReady = 'true';
   setupDropdown();
-  setupDrawer();
+  setupSheet();
+  setupActionPopover();
+  setupStickyHeader();
   setupReveal();
   setupSlideshowControl();
   setupFooterFaq();

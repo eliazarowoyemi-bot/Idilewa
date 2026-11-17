@@ -370,43 +370,9 @@
 .id-menu-btn svg { width: 20px; height: 20px; }
 .id-menu-btn__label { font-size: 13px; font-weight: 650; }
 
-/* Slide-over drawer ------------------------------------------------------- */
-.id-drawer__backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 200;
-  background: rgba(5, 26, 16, 0.38);
-  backdrop-filter: blur(6px);
-  -webkit-backdrop-filter: blur(6px);
-  opacity: 0;
-  transition: opacity var(--id-dur) var(--id-ease);
-}
-
-.id-drawer__backdrop[data-open="true"] { opacity: 1; }
-
-.id-drawer {
-  position: fixed;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 210;
-  display: flex;
-  flex-direction: column;
-  gap: 22px;
-  width: min(360px, 92vw);
-  padding: 20px 20px 26px;
-  background: var(--id-cream);
-  border-left: 1px solid var(--id-stone-200);
-  box-shadow: -24px 0 60px -30px rgba(19, 42, 31, 0.45);
-  transform: translateX(100%);
-  visibility: hidden;
-  overflow-y: auto;
-  transition:
-    transform var(--id-dur-slow) var(--id-ease-spring),
-    visibility var(--id-dur-slow) var(--id-ease);
-}
-
-.id-drawer[data-open="true"] { transform: translateX(0); visibility: visible; }
+/* Slide-over sheet (dialog.id-drawer) --------------------------------------
+   The backdrop and the panel's own chrome live on the native <dialog> below,
+   so there is no separate backdrop element to style or reposition. */
 
 .id-drawer__head {
   display: flex;
@@ -780,10 +746,10 @@ body.id-drawer-open { overflow: hidden; }
 }
 
 /* Responsive -------------------------------------------------------------- */
-/* The drawer is the deliberate secondary navigation at every breakpoint. */
-.id-menu-btn { display: inline-flex; }
-
+/* Below the inline-nav breakpoint the drawer becomes the primary secondary
+   navigation, so the menu button only appears once the links have folded. */
 @media (max-width: 1080px) {
+  .id-menu-btn { display: inline-flex; }
   .id-nav__links { display: none; }
   .id-nav__inner { justify-content: space-between; }
 }
@@ -817,6 +783,468 @@ body.id-drawer-open { overflow: hidden; }
   .featureTile:hover,
   .tutorCard:hover { transform: none; }
 }
+
+/* ==========================================================================
+   iOS chrome layer
+   Translucent app bar, contextual action popover, slide-over sheet,
+   breadcrumbs, grouped cards and footer. Every colour is derived from an
+   existing --id-* token through color-mix(), so the palette stays locked to
+   AWESOME_DESIGN.md: no new raw hex values are introduced here.
+   ========================================================================== */
+
+:root {
+  --id-chrome-shadow: 0 12px 28px -26px color-mix(in srgb, var(--id-ink) 70%, transparent);
+}
+
+/* Translucent app bar ----------------------------------------------------- */
+.premium-header.id-nav,
+.id-nav {
+  background: color-mix(in srgb, var(--id-cream) 70%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(16px);
+  backdrop-filter: saturate(180%) blur(16px);
+  border-bottom: 1px solid color-mix(in srgb, var(--id-ink) 8%, transparent);
+  transition:
+    background-color var(--id-dur) var(--id-ease),
+    border-color var(--id-dur) var(--id-ease),
+    box-shadow var(--id-dur) var(--id-ease);
+}
+
+.id-nav[data-id-scrolled="true"] {
+  background: color-mix(in srgb, var(--id-cream) 88%, transparent);
+  border-bottom-color: color-mix(in srgb, var(--id-ink) 12%, transparent);
+  box-shadow: var(--id-chrome-shadow);
+}
+
+/* Without backdrop-filter a see-through bar would hurt contrast, so go opaque. */
+@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+  .premium-header.id-nav,
+  .id-nav { background: var(--id-cream); }
+}
+
+.id-nav__link {
+  min-height: 44px;
+  border-radius: 9px;
+  transition:
+    color var(--id-dur-fast) var(--id-ease),
+    background-color var(--id-dur-fast) var(--id-ease),
+    transform var(--id-dur-fast) var(--id-ease);
+}
+
+.id-nav__link:active { transform: scale(0.97); }
+
+/* Contextual "More" popover ----------------------------------------------- */
+.id-more {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.id-more__trigger .id-chevron { transition: transform var(--id-dur) var(--id-ease); }
+.id-more__trigger[aria-expanded="true"] .id-chevron { transform: rotate(180deg); }
+
+.id-popover {
+  position: fixed;
+  inset: 76px 16px auto auto;
+  z-index: 140;
+  min-width: 236px;
+  max-width: min(88vw, 330px);
+  margin: 0;
+  padding: 6px;
+  border: 1px solid color-mix(in srgb, var(--id-ink) 10%, transparent);
+  border-radius: var(--id-radius-md);
+  background: color-mix(in srgb, var(--id-ivory) 92%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  backdrop-filter: saturate(180%) blur(18px);
+  box-shadow: var(--id-shadow-lift);
+  color: var(--id-ink);
+  opacity: 0;
+  transform: translateY(-6px) scale(0.98);
+  transition:
+    opacity var(--id-dur-fast) var(--id-ease),
+    transform var(--id-dur) var(--id-ease-spring),
+    overlay var(--id-dur) allow-discrete,
+    display var(--id-dur) allow-discrete;
+}
+
+.id-popover:popover-open {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .id-popover:popover-open {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+}
+
+@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+  .id-popover { background: var(--id-ivory); }
+}
+
+/* Anchor the popover to its trigger; the script only positions the fallback. */
+@supports (anchor-name: --id-anchor) {
+  .id-more__trigger { anchor-name: --id-more-trigger; }
+
+  .id-popover {
+    position-anchor: --id-more-trigger;
+    inset: auto;
+    inset-block-start: anchor(--id-more-trigger bottom);
+    inset-inline-start: anchor(--id-more-trigger left);
+    margin-block-start: 10px;
+    position-try-fallbacks: flip-inline, flip-block;
+  }
+}
+
+.id-popover__group { display: flex; flex-direction: column; gap: 2px; }
+
+.id-popover__group + .id-popover__group {
+  margin-top: 4px;
+  padding-top: 6px;
+  border-top: 1px solid color-mix(in srgb, var(--id-ink) 9%, transparent);
+}
+
+.id-popover__label {
+  margin: 0;
+  padding: 8px 12px 4px;
+  color: var(--id-ink-soft);
+  font-size: 11.5px;
+  font-weight: 620;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.id-popover__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 44px;
+  padding: 0 12px;
+  border: 0;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--id-ink);
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color var(--id-dur-fast) var(--id-ease),
+    color var(--id-dur-fast) var(--id-ease),
+    transform var(--id-dur-fast) var(--id-ease);
+}
+
+.id-popover__item:hover,
+.id-popover__item:focus-visible {
+  background: color-mix(in srgb, var(--id-forest) 7%, transparent);
+  color: var(--id-forest);
+  outline: none;
+}
+
+.id-popover__item:active { transform: scale(0.97); }
+.id-popover__item:focus-visible { outline: 2px solid var(--id-forest); outline-offset: -2px; }
+
+/* Slide-over sheet on a native <dialog> ------------------------------------
+   showModal() gives the browser's own focus trap, Escape handling, inert
+   background and top-layer backdrop, so the script no longer has to. */
+dialog.id-drawer {
+  position: fixed;
+  inset-block: 0;
+  inset-inline: auto 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  width: min(380px, 92vw);
+  max-width: none;
+  max-height: none;
+  height: 100dvh;
+  margin: 0;
+  padding: max(20px, env(safe-area-inset-top)) 20px max(26px, env(safe-area-inset-bottom));
+  border: 0;
+  border-inline-start: 1px solid color-mix(in srgb, var(--id-ink) 10%, transparent);
+  border-start-start-radius: 22px;
+  border-end-start-radius: 22px;
+  background: color-mix(in srgb, var(--id-cream) 97%, transparent);
+  -webkit-backdrop-filter: saturate(180%) blur(24px);
+  backdrop-filter: saturate(180%) blur(24px);
+  color: var(--id-ink);
+  box-shadow: -30px 0 70px -34px color-mix(in srgb, var(--id-ink) 55%, transparent);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  visibility: visible;
+  transform: translateX(100%);
+  transition:
+    transform var(--id-dur-slow) var(--id-ease-spring),
+    overlay var(--id-dur-slow) allow-discrete,
+    display var(--id-dur-slow) allow-discrete;
+}
+
+dialog.id-drawer[open] { transform: translateX(0); }
+
+@starting-style {
+  dialog.id-drawer[open] { transform: translateX(100%); }
+}
+
+dialog.id-drawer::backdrop {
+  background: color-mix(in srgb, var(--id-emerald-950) 44%, transparent);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  opacity: 1;
+  transition:
+    opacity var(--id-dur) var(--id-ease),
+    overlay var(--id-dur) allow-discrete,
+    display var(--id-dur) allow-discrete;
+}
+
+dialog.id-drawer:not([open])::backdrop { opacity: 0; }
+
+@starting-style {
+  dialog.id-drawer[open]::backdrop { opacity: 0; }
+}
+
+@supports not ((backdrop-filter: blur(2px)) or (-webkit-backdrop-filter: blur(2px))) {
+  dialog.id-drawer { background: var(--id-cream); }
+  dialog.id-drawer::backdrop { background: color-mix(in srgb, var(--id-emerald-950) 56%, transparent); }
+}
+
+.id-sheet__group { display: flex; flex-direction: column; gap: 2px; }
+.id-sheet__group + .id-sheet__group {
+  padding-top: 14px;
+  border-top: 1px solid color-mix(in srgb, var(--id-ink) 9%, transparent);
+}
+
+.id-sheet__label {
+  margin: 0;
+  padding: 0 12px 6px;
+  color: var(--id-ink-soft);
+  font-size: 11.5px;
+  font-weight: 620;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.id-drawer__links :is(a, button):active { transform: scale(0.985); }
+
+/* Breadcrumbs (SPA shells) ------------------------------------------------
+   The router in app.js renders the trail as `.breadcrumbs` and the standalone
+   shell pages load only styles.css, so that component — one line, horizontal
+   scroll, edge fade, masked chevrons — lives in the app-shell layer of
+   styles.css. This file does not redeclare it. */
+
+/* Grouped cards & container-query grid ------------------------------------
+   auto-fit resolves 1 column on phones, 2 on tablets and 3–4 on desktop
+   without media-query breakpoints; a container query then loosens the card
+   rhythm once the grid itself has room. */
+.id-card-grid {
+  container-type: inline-size;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 258px), 1fr));
+  align-items: stretch;
+  gap: clamp(12px, 1.6vw, 18px);
+}
+
+.id-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding: clamp(16px, 2vw, 20px);
+  border: 1px solid color-mix(in srgb, var(--id-ink) 9%, transparent);
+  border-radius: var(--id-radius-lg);
+  background: var(--id-ivory);
+  box-shadow: var(--id-shadow-ambient);
+  transition:
+    transform var(--id-dur) var(--id-ease),
+    box-shadow var(--id-dur) var(--id-ease),
+    border-color var(--id-dur) var(--id-ease);
+}
+
+@container (min-width: 720px) {
+  .id-card { padding: clamp(18px, 2.4vw, 24px); gap: 12px; }
+}
+
+/* One card-wide hit area instead of a row of competing buttons. */
+.id-card:has(.id-card__link):hover {
+  transform: translateY(-2px);
+  border-color: color-mix(in srgb, var(--id-forest) 22%, transparent);
+  box-shadow: var(--id-shadow-lift);
+}
+
+.id-card__link { color: inherit; text-decoration: none; }
+
+.id-card__link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+}
+
+.id-card :is(a, button):not(.id-card__link) { position: relative; z-index: 1; }
+.id-card__link:focus-visible { outline: none; }
+
+.id-card:has(.id-card__link:focus-visible) {
+  outline: 2px solid var(--id-forest);
+  outline-offset: 3px;
+}
+
+/* Footer: grouped columns on desktop, tidy stacked sections on mobile ------ */
+.idFooter { text-align: left; }
+
+.idFooterInner {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.85fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(24px, 4vw, 56px);
+  padding: clamp(34px, 4.6vw, 56px) clamp(18px, 3vw, 34px) clamp(26px, 3.4vw, 40px);
+}
+
+.idFootRule { display: none; }
+
+.idFooter h2 {
+  margin: 0 0 12px;
+  color: var(--id-ink-soft);
+  font-size: 11.5px;
+  font-weight: 620;
+  letter-spacing: 0.075em;
+  text-transform: uppercase;
+}
+
+.idFootBrand { padding-bottom: 12px; font-size: clamp(20px, 2.2vw, 26px); }
+.idFootAbout { padding: 0; }
+
+.idFootAbout p {
+  max-width: 48ch;
+  margin: 0 0 20px;
+  color: var(--id-ink-soft);
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.idFootValues {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  justify-content: start;
+}
+
+.idFootValues > div {
+  flex: initial;
+  flex-direction: row;
+  align-items: center;
+  max-width: none;
+  padding: 12px;
+  border: 1px solid color-mix(in srgb, var(--id-ink) 9%, transparent);
+  border-radius: var(--id-radius-md);
+  background: var(--id-ivory);
+  color: var(--id-ink-soft);
+  font-size: 12.5px;
+  line-height: 1.35;
+  text-align: left;
+}
+
+.idFootQuick,
+.idFootConnect { padding: 0; }
+
+.idFootQuick nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  max-width: none;
+  margin: 0;
+  justify-content: start;
+}
+
+.idFootQuick :is(button, a) {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 10px;
+  border-radius: 9px;
+  color: var(--id-ink-soft);
+  font-size: 14px;
+  text-decoration: none;
+  transition:
+    background-color var(--id-dur-fast) var(--id-ease),
+    color var(--id-dur-fast) var(--id-ease);
+}
+
+.idFootQuick :is(button, a):hover {
+  background: color-mix(in srgb, var(--id-forest) 7%, transparent);
+  color: var(--id-forest);
+  text-decoration: none;
+}
+
+.idSocialRow { justify-content: flex-start; gap: 8px; }
+
+@media (max-width: 900px) {
+  .idFooterInner { grid-template-columns: 1fr; gap: 0; }
+  .idFooterInner > * + * { border-top: 1px solid color-mix(in srgb, var(--id-ink) 8%, transparent); }
+  .idFooterInner > section,
+  .idFootBrand { padding-block: 20px; }
+  .idFootAbout p { margin-bottom: 16px; }
+  .idFootValues { grid-template-columns: repeat(auto-fit, minmax(92px, 1fr)); }
+}
+
+/* Feature tiles: auto-fit columns, hairline border and a single affordance.
+   The raw arrow glyph inside .featureArrow is decorative; the masked arrow in
+   .featureTile::after already carries that cue, so the duplicate is hidden. */
+.featureGrid {
+  container-type: inline-size;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+}
+
+.featureTile {
+  border-color: color-mix(in srgb, var(--id-ink) 10%, transparent);
+  border-radius: 20px;
+  padding: clamp(18px, 2vw, 22px);
+  transition:
+    transform var(--id-dur) var(--id-ease),
+    box-shadow var(--id-dur) var(--id-ease),
+    border-color var(--id-dur) var(--id-ease);
+}
+
+.featureTile:hover,
+.featureTile:focus-visible {
+  border-color: color-mix(in srgb, var(--id-forest) 24%, transparent);
+}
+
+.featureTile .featureArrow { display: none; }
+
+@container (max-width: 560px) {
+  .featureGrid > .featureTile { padding: 18px; }
+}
+
+/* Tactile press ----------------------------------------------------------- */
+.id-btn:active,
+.featureTile:active,
+.id-card__link:active { transform: scale(0.97); }
+
+@media (prefers-reduced-motion: reduce) {
+  dialog.id-drawer,
+  dialog.id-drawer::backdrop,
+  .id-popover,
+  .id-nav,
+  .id-card,
+  .featureTile {
+    transition-duration: 1ms !important;
+  }
+
+  dialog.id-drawer,
+  dialog.id-drawer[open],
+  .id-popover,
+  .id-btn:active,
+  .featureTile:active,
+  .featureTile:hover,
+  .id-nav__link:active { transform: none !important; }
+}
+
+
+
 
 
 
