@@ -23,4 +23,7 @@ supabase/.temp/
 # Local agent tooling state (may contain MCP configs and provider API keys)
 .continue/
 .yoke/
+.agents/
+.claude/
+skills-lock.json
 
