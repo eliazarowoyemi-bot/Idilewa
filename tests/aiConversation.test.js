@@ -36,8 +36,19 @@ test('the AI conversation page is a first-class route with its own shell', async
 
   assert.match(appSource, /page === 'ai-conversation' \|\| page\.startsWith\('tutor'\) \|\| page\.startsWith\('parent'\) \|\| page === 'families'/, 'the shared site header should be hidden on AI chat and family auth');
   assert.match(appSource, /page === 'ai-conversation' \|\| page\.startsWith\('tutor'\)/, 'AI chat renders its own full-bleed layout');
+  assert.match(appSource, /page === 'ai-conversation'[\s\S]*?`\$\{pageMarkup\}\$\{renderFooter\(\)\}`/, 'AI chat should include the shared footer');
   assert.match(appSource, /if \(page === 'ai-conversation'\) initializeAiConversation\(\)/);
   assert.match(stylesSource, /body\[data-page="ai-conversation"\]/);
+});
+
+test('AI conversation keeps its full-height workspace while allowing the footer to scroll into view', () => {
+  const pageStyles = stylesSource.match(/body\[data-page="ai-conversation"\] \{[\s\S]*?\n\}/)?.[0] || '';
+  const mainStyles = stylesSource.match(/body\[data-page="ai-conversation"\] \.main-content \{[\s\S]*?\n\}/)?.[0] || '';
+
+  assert.match(pageStyles, /min-height: 100svh;/);
+  assert.doesNotMatch(pageStyles, /overflow:\s*hidden/);
+  assert.match(mainStyles, /flex-direction: column;/);
+  assert.match(stylesSource, /\.aichat-page\s*\{[\s\S]*?flex: 0 0 auto;/);
 });
 
 test('the AI conversation screen renders the guide card, thread, composer, and tabs', async () => {
@@ -152,7 +163,7 @@ test('the AI conversation page reflows into a rail and thread workspace on wide 
   assert.match(stylesSource, /\.aichat-thread\.is-scrolled \{/);
   assert.match(desktop, /width: 100%;/);
   assert.match(desktop, /max-width: 1680px;/);
-  assert.match(desktop, /height: 100%;/);
+  assert.match(desktop, /height: min\(1000px, calc\(100svh - 64px\)\);/);
   assert.match(desktop, /\.aichat-thread \{[\s\S]*?padding: clamp\(18px, 1\.8vw, 30px\) clamp\(20px, 2vw, 34px\);/);
   assert.match(desktop, /\.aichat-bubble-guide \{ max-width: min\(84%, 820px\);/);
   assert.match(desktop, /\.aichat-bubble-user \{ max-width: min\(74%, 640px\);/);

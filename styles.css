@@ -10609,9 +10609,8 @@ body[data-page="ai-conversation"] {
   background: #e8f7ee;
   display: flex;
   flex-direction: column;
-  height: 100svh;
   min-height: 100svh;
-  overflow: hidden;
+  overflow-x: clip;
 }
 body[data-page="ai-conversation"] .site-header,
 body[data-page="ai-conversation"] .mobile-nav,
@@ -10631,6 +10630,7 @@ body[data-page="ai-conversation"] #app.app-shell {
 body[data-page="ai-conversation"] .main-content {
   display: flex;
   flex: 1 1 auto;
+  flex-direction: column;
   width: 100%;
   max-width: none;
   min-height: 0;
@@ -10652,6 +10652,7 @@ body[data-page="ai-conversation"] .main-content {
   flex-direction: column;
   width: 100%;
   height: 100svh;
+  flex: 0 0 auto;
   min-height: 0;
   margin: 0 auto;
   overflow: hidden;
@@ -11403,7 +11404,8 @@ body[data-page="ai-conversation"] .main-content {
       "rail comp";
     width: 100%;
     max-width: 1680px;
-    height: 100%;
+    height: min(1000px, calc(100svh - 64px));
+    flex: 0 0 auto;
     min-height: 0;
     border-radius: 32px;
     box-shadow: 0 30px 72px rgba(12, 52, 32, .2);
