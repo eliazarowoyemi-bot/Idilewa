@@ -24,12 +24,12 @@ function installStudioNavigationMenu() {
   const close = (restoreFocus = false) => {
     menu.hidden = true;
     toggle.setAttribute('aria-expanded', 'false');
-    if (restoreFocus) requestAnimationFrame(() => toggle.focus());
+    if (restoreFocus) queueMicrotask(() => toggle.focus());
   };
 
   menu.addEventListener('click', (event) => {
     if (!(event.target instanceof Element) || !event.target.closest('.tabs button')) return;
-    requestAnimationFrame(() => {
+    queueMicrotask(() => {
       if (menu.hidden) toggle.focus();
     });
   }, true);
