@@ -14,7 +14,8 @@
     <header class="faq-header">
       <div class="faq-wrap faq-head">
         <a class="faq-brand" href="/" aria-label="Ìdíléwa home">Ìdíléwa<span aria-hidden="true">.</span></a>
-        <nav aria-label="Help navigation">
+        <button class="faq-menu-toggle" id="faqMenuToggle" type="button" aria-expanded="false" aria-controls="faqDrawer" aria-label="Open help menu">Menu</button>
+        <nav class="faq-nav" aria-label="Help navigation">
           <a href="/">Home</a>
           <a href="/parents.html#/parent-login">Family portal</a>
           <a href="mailto:support@idilewa.com">Support</a>
@@ -29,6 +30,26 @@
         </nav>
       </div>
     </header>
+    <div class="faq-drawer" id="faqDrawer" aria-hidden="true">
+      <div class="faq-drawer-backdrop" data-close="true"></div>
+      <nav class="faq-drawer-nav" aria-label="Mobile help navigation">
+        <div class="faq-drawer-head">
+          <strong>Menu</strong>
+          <button class="faq-drawer-close" type="button" aria-label="Close help menu">Close</button>
+        </div>
+        <a href="/">Home</a>
+        <a href="/parents.html#/parent-login">Family portal</a>
+        <a href="mailto:support@idilewa.com">Support</a>
+        <label class="faq-language-label" for="faqLanguageMobile">FAQ language</label>
+        <select id="faqLanguageMobile" class="faq-language faq-language-mobile">
+          <option value="en">English</option>
+          <option value="yo">Yorùbá</option>
+          <option value="ig">Igbo</option>
+          <option value="ha">Hausa</option>
+          <option value="sw">Kiswahili</option>
+        </select>
+      </nav>
+    </div>
     <section class="faq-hero">
       <div class="faq-wrap">
         <p class="faq-eyebrow">ÌDÍLÉWA HELP CENTRE</p>
@@ -65,5 +86,33 @@
       </div>
     </footer>
     <script type="module" src="/src/faq.js"></script>
+    <script>
+      const faqMenuToggle = document.getElementById('faqMenuToggle');
+      const faqDrawer = document.getElementById('faqDrawer');
+      const faqDrawerClose = document.querySelector('.faq-drawer-close');
+      const faqDrawerBackdrop = faqDrawer.querySelector('[data-close="true"]');
+      const setFaqDrawerState = (open) => {
+        faqDrawer.classList.toggle('is-open', open);
+        faqDrawer.setAttribute('aria-hidden', String(!open));
+        faqMenuToggle.setAttribute('aria-expanded', String(open));
+        document.body.style.overflow = open ? 'hidden' : '';
+      };
+      faqMenuToggle.addEventListener('click', () => setFaqDrawerState(!faqDrawer.classList.contains('is-open')));
+      faqDrawerClose.addEventListener('click', () => setFaqDrawerState(false));
+      faqDrawerBackdrop.addEventListener('click', () => setFaqDrawerState(false));
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && faqDrawer.classList.contains('is-open')) setFaqDrawerState(false);
+      });
+      const syncFaqLanguage = (source, target) => {
+        if (!source || !target) return;
+        target.value = source.value;
+      };
+      const faqLanguageSelect = document.getElementById('faqLanguage');
+      const faqLanguageMobile = document.getElementById('faqLanguageMobile');
+      if (faqLanguageSelect && faqLanguageMobile) {
+        faqLanguageSelect.addEventListener('change', () => syncFaqLanguage(faqLanguageSelect, faqLanguageMobile));
+        faqLanguageMobile.addEventListener('change', () => syncFaqLanguage(faqLanguageMobile, faqLanguageSelect));
+      }
+    </script>
   </body>
 </html>

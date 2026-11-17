@@ -47,6 +47,97 @@
   text-underline-offset: 3px;
 }
 
+.faq-menu-toggle {
+  display: none;
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #d5e4d9;
+  border-radius: 10px;
+  background: #fff;
+  color: #1b3a2a;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.faq-drawer {
+  display: none;
+}
+
+.faq-drawer.is-open {
+  display: block;
+}
+
+.faq-drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(17, 35, 23, 0.38);
+  z-index: 60;
+}
+
+.faq-drawer-nav {
+  position: fixed;
+  top: 14px;
+  right: 14px;
+  width: min(320px, calc(100vw - 28px));
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 18px 16px 16px;
+  border: 1px solid #dfeae1;
+  border-radius: 20px;
+  background: #fff;
+  box-shadow: 0 20px 60px rgba(17, 35, 22, 0.18);
+  z-index: 70;
+}
+
+.faq-drawer-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e4ede6;
+}
+
+.faq-drawer-head strong {
+  color: #21472f;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.faq-drawer-close {
+  min-height: 36px;
+  padding: 0 10px;
+  border: 1px solid #d7e5d9;
+  border-radius: 10px;
+  background: #edf9f0;
+  color: #21472f;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.faq-drawer-nav a {
+  padding: 12px 10px;
+  border-radius: 12px;
+  color: #254c3a;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.faq-drawer-nav a:hover {
+  background: #edf9f0;
+}
+
+.faq-language-mobile {
+  margin-top: 4px;
+  width: 100%;
+}
+
 .faq-language-label {
   position: absolute;
   width: 1px;
@@ -333,11 +424,20 @@
   }
 
   .faq-head nav {
-    gap: 10px;
+    display: none;
   }
 
-  .faq-head nav > a {
-    display: none;
+  .faq-menu-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .faq-menu-toggle::before {
+    content: "☰";
+    font-size: 16px;
+    line-height: 1;
   }
 
   .faq-hero {
