@@ -5,11 +5,11 @@
   "rewrites": [
     {
       "source": "/code",
-      "destination": "/development-center.html"
+      "destination": "/development-center"
     },
     {
       "source": "/milestones",
-      "destination": "/milestone-achievement.html"
+      "destination": "/milestone-achievement"
     },
     {
       "source": "/api/canva/status",

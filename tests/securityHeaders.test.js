@@ -34,8 +34,8 @@ test('retired studio and payment entry points are gone from the deployment confi
 test('new learning experiences have clean production aliases and sitemap entries', () => {
   const rewrites = new Map((vercel.rewrites || []).map(({ source, destination }) => [source, destination]));
 
-  assert.equal(rewrites.get('/code'), '/development-center.html');
-  assert.equal(rewrites.get('/milestones'), '/milestone-achievement.html');
+  assert.equal(rewrites.get('/code'), '/development-center');
+  assert.equal(rewrites.get('/milestones'), '/milestone-achievement');
   assert.match(sitemap, /<loc>https:\/\/idilewa\.com\/code<\/loc>/);
   assert.match(sitemap, /<loc>https:\/\/idilewa\.com\/milestones<\/loc>/);
 });
