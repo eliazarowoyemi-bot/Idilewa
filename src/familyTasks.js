@@ -270,7 +270,7 @@ function renderLoggedOut(message) {
   roleLabel.textContent = 'Sign in required';
   navigation.replaceChildren();
   main.innerHTML = `<section class="ft-auth-panel"><h1>Sign in to open family tasks.</h1><p>${escapeHtml(message || 'Use your existing Ìdíléwa account. Parents can manage tasks; linked learners can complete them.')}</p>
-    <div class="ft-auth-links"><a href="/parents.html#/parent-login">Parent sign in</a><a href="/login.html#/login?mode=signin">Learner sign in</a><a href="/login.html#/login?mode=signup">Create an account</a></div></section>`;
+    <div class="ft-auth-links"><a href="/parents.html#/parent-login">Parent sign in</a><a href="/parents.html#/parent-signup">Create a family account</a></div></section>`;
 }
 
 function render() {

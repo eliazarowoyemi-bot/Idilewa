@@ -25,7 +25,7 @@ test('signup requires email confirmation and the frontend has no signup code ste
   assert.match(config, /^\[auth\.email\]\s*[\s\S]*?^enable_confirmations = true$/m);
   assert.doesNotMatch(app, /signup-otp|verifySignupOtp|resendSignupOtp/);
   assert.match(template, /{{ \.ConfirmationURL }}/);
-  assert.match(app, /data-action="resend-signup-confirmation"/);
+  assert.match(app, /Account created\. Confirm your email/);
   assert.match(template, /https:\/\/www\.idilewa\.com\/assets\/idilewa-email-logo\.png\?v=4/);
   assert.match(template, /alt="Idilewa · Language · Culture · Future"/);
   assert.doesNotMatch(template, /Learn · Speak · Grow|African languages, stories, culture/);

@@ -110,7 +110,7 @@ async function initializeAuthCallback() {
     const redirectUrl = destination === 'tutor-login'
       ? '/educator-portal.html#/tutor-login'
       : destination === 'login'
-        ? '/#/login?mode=signin'
+        ? '/parents.html#/parent-login'
         : `/#/${destination}`;
     window.location.replace(redirectUrl);
   }

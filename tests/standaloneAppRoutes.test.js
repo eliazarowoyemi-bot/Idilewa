@@ -34,7 +34,8 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assert.match(transformed, /Sign in/);
   assert.match(transformed, /\/kids\.html/);
   assert.match(transformed, /\/about\.html/);
-  assert.match(transformed, /\/login\.html#\/login\?mode=signup/);
+  assert.match(transformed, /link\.href = '\/parents\.html#\/parent-login'/);
+  assert.match(transformed, /link\.href = '\/parents\.html#\/parent-signup'/);
 });
 
 test('homepage drawer shows its menu label and all primary destinations', async () => {
@@ -109,7 +110,7 @@ test('native entry pages retain their app and return home or voice links to cano
       assert.match(transformed, /const GAMES=\{racer:"\/games\/turbo-racers\.html",ludo:"\/games\/balloon-ludo\.html"\}/);
       assert.match(transformed, /frame\.src=GAMES\[which\]/);
       assert.match(transformed, /src="\/src\/arcadeProgress\.js"/);
-      assert.match(transformed, /href="\/login\.html#\/login\?mode=signup">Create account/);
+      assert.match(transformed, /href="\/parents\.html#\/parent-signup">Family account/);
     }
     if (filename === 'about.html') {
       assert.match(transformed, /href="\/\?view=academy"/);

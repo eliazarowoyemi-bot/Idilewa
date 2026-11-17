@@ -55,7 +55,7 @@ The application incorporates a restrained, performant Three.js 3D engine integra
 3. **Route 3D Stages:**
    - **Coding (`#/coding`):** 3D Yoruba Hologram Matrix Cube & Rotating Glyphs (`init3DCodingCanvas`).
    - **Oral traditions (`#/oral`):** cultural context, proverbs, and praise poetry.
-   - **Auth & Consent (`#/login`, `#/consent`):** 3D Sacred Shield & Gateway Key (`init3DAuthCanvas`).
+   - **Auth & Consent (`#/parent-login`, `#/consent`):** 3D Sacred Shield & Gateway Key (`init3DAuthCanvas`).
    - **Audio Studio (`#/trainer`):** 3D Waveform Audio Visualizer (`init3DAudioVisualizer`).
 4. **Interactive 3D Perspective Card Tilt (`init3DTiltEngine`):**
    - Dynamic 3D depth and radial light glare on cards during mouse hover.
@@ -100,7 +100,7 @@ The HTML entries declared in the active `vite.config.js` are supported:
 | | `#/tutor` (`tutor.html`) | Local-only learner-facing tutoring prototype with sample profiles, messages, lessons, rates, and payment displays; no real bookings or charges are made. |
 | | `/educator-portal.html` | Existing educator portal with invitation sign-in, guardian-approved learner connections, lessons, messages, profile, availability, and settings. |
 | | `#/profile` (`profile.html`) | Learner progress dashboard, points, streaks, badges (stored in local browser state). |
-| | `#/login` (`login.html`) | Persona-based authentication (child, adult, parent, educator) with 3D shield and Supabase notice. |
+| | `#/parent-login` (`parents.html`) | Family authentication for parents and guardians; `#/parent-signup` creates a parent account. `#/login` and `login.html` now redirect here. |
 | | `#/pricing` (`pricing.html`) | Preview family/explorer plans; explicitly non-billing demonstration. |
 | **Voice & Speech** | `#/trainer` (`trainer.html`) | Voice African Language Trainer: 6 languages, 60 audio lessons, Do-Re-Mi soundboard, 3D visualizer. |
 | | `#/voice_lessons` (`voice_lessons.html`) | Voice Trainer studio with age-adaptive lessons, speaking practice, and Plotweaver speech tools. |

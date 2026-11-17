@@ -66,12 +66,8 @@ import {
   isGoogleAuthEnabled,
   signUp as signUpAccount,
   verifyEducatorInvite,
-  resendSignupConfirmation,
   restoreAuthSession,
-  requestSigninOtp,
-  verifySigninOtp,
   sendAuthActivityEmail,
-  updateAccountPassword,
   isSignupPasswordValid,
   saveProgress,
   getUserProgress,
@@ -396,8 +392,6 @@ import {
     teacherFilter: 'all',
     interested: [],
     available: { yoruba: true, igbo: true, hausa: true, swahili: true, twi: false, wolof: false, zulu: false, fulfulde: false },
-    loginMode: 'signin',
-    authRole: 'adult',
     billing: 'monthly',
     consent: {
       requestCode: '', approvedCode: '', approved: false,
@@ -520,14 +514,12 @@ import {
         teacherReplies: Array.isArray(stored.teacherReplies) ? stored.teacherReplies : [],
         teacherFilter: typeof stored.teacherFilter === 'string' ? stored.teacherFilter : 'all',
         reflectionFeeling: typeof stored.reflectionFeeling === 'string' ? stored.reflectionFeeling : '',
-        authRole: stored.authRole === 'child' ? 'child' : 'adult',
         completed: Array.isArray(stored.completed) ? stored.completed : defaults.completed.slice(),
         interested: Array.isArray(stored.interested) ? stored.interested : []
       };
     } catch (_) { return { ...defaults, available: { ...defaults.available }, trainer: { ...defaults.trainer } }; }
   }
   const state = readState();
-  let pendingSignupEmail = '';
   for (const key of [
     'idilewa-pending-signup-email',
     'idilewa-pending-signin-otp',
@@ -536,9 +528,6 @@ import {
   ]) {
     try { sessionStorage.removeItem(key); } catch (_) {}
   }
-  let signupEmailForSignin = '';
-  let pendingSignin = null;
-  let passwordResetVerified = false;
   let verifiedGuardianSignup = (() => {
     try {
       const saved = JSON.parse(sessionStorage.getItem('idilewa-guardian-signup') || 'null');
@@ -567,25 +556,17 @@ import {
     return planned ? { ...planned, native: planned.name, tint: 'peach', greeting: '', hello: '', translation: '', lessons: 'Learning materials in preparation', upcoming: true } : LANGUAGES[0];
   };
 
-  let defaultAuthEntryInitialized = false;
-  let authRouteInitialized = false;
-  let authIntroPending = !window.location.hash;
   function parseLocation() {
     const hash = window.location.hash.replace(/^#\/?/, '');
     if (!hash) {
-      const defaultPage = document.body?.dataset?.defaultRoute || 'login';
+      const defaultPage = document.body?.dataset?.defaultRoute || 'index';
       if (OWE_ROUTE_SECTIONS[defaultPage]) {
         const section = OWE_ROUTE_SECTIONS[defaultPage];
         history.replaceState(null, '', `${window.location.pathname}${window.location.search}#/owe?section=${section}`);
         return { page: 'owe', params: { section }, removedRoute: false };
       }
-      if (defaultPage === 'login' && !defaultAuthEntryInitialized) {
-        state.loginMode = 'signin';
-        state.authRole = 'adult';
-        defaultAuthEntryInitialized = true;
-        authRouteInitialized = true;
-      }
-      return { page: ROUTES.includes(defaultPage) ? defaultPage : 'index', params: {}, removedRoute: false };
+      const entryPage = defaultPage === 'login' ? 'parent-login' : defaultPage;
+      return { page: ROUTES.includes(entryPage) ? entryPage : 'index', params: {}, removedRoute: false };
     }
     const [path, query = ''] = hash.split('?');
     let page = path.split('/')[0] || 'index';
@@ -600,10 +581,9 @@ import {
       history.replaceState(null, '', `${window.location.pathname}${window.location.search}#/owe?section=${encodeURIComponent(params.section)}`);
     }
     if (page === 'login') {
-      const nextMode = ['signin', 'signup'].includes(params.mode) ? params.mode : 'signin';
-      if (!authRouteInitialized || state.loginMode !== nextMode) state.authRole = 'adult';
-      state.loginMode = nextMode;
-      authRouteInitialized = true;
+      page = params.mode === 'signup' ? 'parent-signup' : 'parent-login';
+      delete params.mode;
+      history.replaceState(null, '', `${window.location.pathname}${window.location.search}#/${page}`);
     }
     return {
       page: REMOVED_ROUTES.has(page) || !ROUTES.includes(page) ? 'index' : page,
@@ -613,6 +593,8 @@ import {
   }
 
   function navigate(route, params = {}, replace = false) {
+    if (route === 'login') route = params.mode === 'signup' ? 'parent-signup' : 'parent-login';
+    if (route === 'parent-login' || route === 'parent-signup') params = {};
     const section = OWE_ROUTE_SECTIONS[route];
     if (section) {
       route = 'owe';
@@ -649,7 +631,7 @@ import {
   function renderHeader(page) {
     const academyShell = page === 'index' || page === 'voice_lessons' || page.startsWith('voice-');
     document.body.classList.toggle('academy-reference-shell', academyShell);
-    if (page === 'login' || page === 'ai-conversation' || page.startsWith('tutor') || page.startsWith('parent') || page === 'families') {
+    if (page === 'ai-conversation' || page.startsWith('tutor') || page.startsWith('parent') || page === 'families') {
       document.getElementById('site-header').innerHTML = '';
       return;
     }
@@ -683,8 +665,8 @@ import {
     const accountActions = currentUser
       ? `<a class="header-profile ${page === 'profile' ? 'active' : ''}" href="#/profile" data-route="profile" aria-label="Open profile"${page === 'profile' ? ' aria-current="page"' : ''}><span class="header-avatar">${profileAvatar}</span><span class="header-profile-label">${esc(currentUser.name || 'Profile')}</span></a><button class="header-signout" type="button" data-action="account-sign-out">Sign out</button>`
       : academyShell
-        ? `${routeLink('login', 'Log in', 'header-signin', 'data-mode="signin"')}${routeLink('voice_lessons', 'Start Learning', 'button button-primary header-cta')}`
-        : `${routeLink('login', 'Log in', 'header-signin', 'data-mode="signin"')}${routeLink('login', 'Get started', 'button button-primary header-cta', 'data-mode="signup"')}`;
+        ? `${routeLink('parent-login', 'Log in', 'header-signin')}${routeLink('voice_lessons', 'Start Learning', 'button button-primary header-cta')}`
+        : `${routeLink('parent-login', 'Log in', 'header-signin')}${routeLink('parent-signup', 'Get started', 'button button-primary header-cta')}`;
     const mobileShortcuts = [
       { route: 'profile', label: 'Profile', ico: 'user' }
     ].map((item) => `<a class="mobile-menu-link ${page === item.route ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.ico, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('');
@@ -715,7 +697,7 @@ import {
           <div class="mobile-menu-list">${menu}${routeLink('contact', `${icon('send', 19)}<span>Contact</span>${icon('arrow', 16)}`, 'mobile-menu-link')}${routeLink('privacy', `${icon('lock', 19)}<span>Privacy</span>${icon('arrow', 16)}`, 'mobile-menu-link')}</div>
           <div class="mobile-menu-bottom">${currentUser
             ? `${routeLink('profile', `${icon('user', 15)} Open your profile ${icon('arrow', 14)}`, 'button button-primary')}<button class="button button-outline" type="button" data-action="account-sign-out">Sign out</button>`
-            : `${routeLink('login', 'Log in', 'button button-outline', 'data-mode="signin"')}${routeLink('login', 'Get started', 'button button-primary', 'data-mode="signup"')}`}</div>
+            : `${routeLink('parent-login', 'Log in', 'button button-outline')}${routeLink('parent-signup', 'Get started', 'button button-primary')}`}</div>
         </div>
       </div>`;
     const mobileMenu = document.getElementById('mobile-menu');
@@ -734,7 +716,7 @@ import {
       document.body.classList.remove('has-mobile-bottom-navigation');
       return;
     }
-    if (page === 'login' || page === 'ai-conversation' ||
+    if (page === 'ai-conversation' ||
       page.startsWith('tutor') || page === 'families' ||
       (page.startsWith('parent') && !familyDashboard) || (currentUser?.role === 'parent' && !familyDashboard) || currentUser?.role === 'educator') {
       mobileNav.replaceChildren();
@@ -3276,7 +3258,7 @@ import {
   }
 
   function renderPricing() {
-    return `<div class="container route-page pricing-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span class="breadcrumb-sep" aria-hidden="true"></span><strong>Plans</strong></div><section class="pricing-hero page-depth-reveal"><span class="section-kicker">Free to start · no checkout</span><h1>More language.<br /><em>More belonging.</em></h1><p>All current learning plans are free. No payment details are collected and no subscription is started.</p><div class="pricing-free-note">${icon('check', 16)} Family: $0 USD/month <span aria-hidden="true">·</span> School: $0 USD/month</div></section>${renderStepper(['Explore plans', 'Choose learning paths', 'Review as a family', 'Begin together'], 0)}<div class="pricing-grid"><article class="pricing-card"><span class="pricing-label">Begin here</span><h2>Explorer</h2><p>For learners ready to try a first path.</p><div class="pricing-cost"><strong>Free</strong><small>to get started</small></div><ul><li>${icon('check', 15)} Explore available languages</li><li>${icon('check', 15)} Try sample lessons & stories</li><li>${icon('check', 15)} Follow a personal learning path</li></ul>${routeLink('languages', 'Start exploring ' + icon('arrow', 15), 'button button-outline')}</article><article class="pricing-card pricing-featured"><span class="popular-pill">Made for together</span><span class="pricing-label">For home</span><h2>Family</h2><p>Free access to the current language, culture and story learning previews.</p><div class="pricing-cost"><strong>$0</strong><small>USD · per month</small></div><ul><li>${icon('check', 15)} Explore available family learning paths</li><li>${icon('check', 15)} Try sample stories and activities</li><li>${icon('check', 15)} Learn without a card</li></ul>${routeLink('login', `Create a free account ${icon('arrow', 15)}`, 'button button-primary', 'data-mode="signup"')}</article><article class="pricing-card"><span class="pricing-label">For educators</span><h2>School</h2><p>Free preview of classroom learning paths; no school service or student roster is active.</p><div class="pricing-cost"><strong>$0</strong><small>USD · per month</small></div><ul><li>${icon('check', 15)} Explore sample language modules</li><li>${icon('check', 15)} Preview culture and coding activities</li><li>${icon('lock', 15)} Student connections are not available</li></ul>${routeLink('curriculum', 'Explore curriculum ' + icon('arrow', 15), 'button button-outline')}</article></div><p class="pricing-footnote">Current plan prices are $0. No Paystack checkout is started for free plans. ${routeLink('payment', 'View payment information ' + icon('arrow', 14), 'text-link')}. If prices change, confirm the new amount and billing terms before enabling payments.</p></div>`;
+    return `<div class="container route-page pricing-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span class="breadcrumb-sep" aria-hidden="true"></span><strong>Plans</strong></div><section class="pricing-hero page-depth-reveal"><span class="section-kicker">Free to start · no checkout</span><h1>More language.<br /><em>More belonging.</em></h1><p>All current learning plans are free. No payment details are collected and no subscription is started.</p><div class="pricing-free-note">${icon('check', 16)} Family: $0 USD/month <span aria-hidden="true">·</span> School: $0 USD/month</div></section>${renderStepper(['Explore plans', 'Choose learning paths', 'Review as a family', 'Begin together'], 0)}<div class="pricing-grid"><article class="pricing-card"><span class="pricing-label">Begin here</span><h2>Explorer</h2><p>For learners ready to try a first path.</p><div class="pricing-cost"><strong>Free</strong><small>to get started</small></div><ul><li>${icon('check', 15)} Explore available languages</li><li>${icon('check', 15)} Try sample lessons & stories</li><li>${icon('check', 15)} Follow a personal learning path</li></ul>${routeLink('languages', 'Start exploring ' + icon('arrow', 15), 'button button-outline')}</article><article class="pricing-card pricing-featured"><span class="popular-pill">Made for together</span><span class="pricing-label">For home</span><h2>Family</h2><p>Free access to the current language, culture and story learning previews.</p><div class="pricing-cost"><strong>$0</strong><small>USD · per month</small></div><ul><li>${icon('check', 15)} Explore available family learning paths</li><li>${icon('check', 15)} Try sample stories and activities</li><li>${icon('check', 15)} Learn without a card</li></ul>${routeLink('parent-signup', `Create a free account ${icon('arrow', 15)}`, 'button button-primary')}</article><article class="pricing-card"><span class="pricing-label">For educators</span><h2>School</h2><p>Free preview of classroom learning paths; no school service or student roster is active.</p><div class="pricing-cost"><strong>$0</strong><small>USD · per month</small></div><ul><li>${icon('check', 15)} Explore sample language modules</li><li>${icon('check', 15)} Preview culture and coding activities</li><li>${icon('lock', 15)} Student connections are not available</li></ul>${routeLink('curriculum', 'Explore curriculum ' + icon('arrow', 15), 'button button-outline')}</article></div><p class="pricing-footnote">Current plan prices are $0. No Paystack checkout is started for free plans. ${routeLink('payment', 'View payment information ' + icon('arrow', 14), 'text-link')}. If prices change, confirm the new amount and billing terms before enabling payments.</p></div>`;
   }
 
   const MENTOR_PREVIEWS = [
@@ -3361,7 +3343,7 @@ import {
     const percent = Math.min(100, Math.round((completedCount / 8) * 100));
     const lang = getLanguage(state.currentLang);
     const journeyStep = completedCount >= 8 ? 3 : state.streak >= 3 ? 2 : completedCount ? 1 : 0;
-    return `<div class="container route-page profile-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span class="breadcrumb-sep" aria-hidden="true"></span><strong>My progress</strong></div>${renderStepper(['Choose a path', 'Practice a lesson', 'Build a streak', 'Celebrate progress'], journeyStep)}<section class="profile-welcome page-depth-reveal"><div class="profile-photo-wrap"><div class="profile-avatar">${profilePhoto ? `<img src="${esc(profilePhoto)}" alt="Your profile photo" />` : icon('user', 27)}</div><label class="profile-photo-button" for="profile-photo-input">${icon('edit', 15)} Choose photo</label><input id="profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp" /></div><div><span class="section-kicker">Your learning space</span><h1>A good day to keep going.</h1><p>Your progress is saved to your account when you sign in, and to this browser otherwise.</p><small class="profile-photo-note">Profile photos are resized and stored only in this browser on this device.</small></div><button class="button button-outline" data-route="login">${icon('user', 16)} Account settings</button></section><div class="profile-overview-grid"><article class="progress-main-card"><div class="progress-main-head"><div><span class="section-kicker">Current path</span><h2>${lang.name} · ${state.level.charAt(0).toUpperCase() + state.level.slice(1)}</h2><p>Keep building confidence, one small lesson at a time.</p></div><span class="progress-medallion">${icon('leaf', 23)}</span></div><div class="large-progress"><div><span style="width:${percent}%"></span></div><strong>${percent}%</strong></div><div class="progress-foot"><span>${completedCount} lessons completed</span>${routeLink('course', 'Continue learning ' + icon('arrow', 14), 'text-link')}</div></article><div class="stat-card stat-streak"><span>${icon('sparkles', 20)}</span><small>Learning streak</small><strong>${state.streak} <em>days</em></strong><p>Showing up is a win.</p></div><div class="stat-card stat-points"><span>${icon('star', 20)}</span><small>Practice points</small><strong>${state.points}</strong><p>Earned by trying new things.</p></div></div><div class="profile-lower-grid"><section class="profile-card"><div class="section-heading compact-heading"><div><span class="section-kicker">Your recent steps</span><h2>Learning timeline</h2></div>${routeLink('course', 'View path ' + icon('arrow', 14), 'text-link')}</div><div class="timeline-row"><span class="timeline-check">${icon('check', 15)}</span><div><strong>Start with a greeting</strong><small>${lang.name} · First lesson</small></div><span class="timeline-status">${state.completed.includes(`${lang.id}-greetings-intro`) ? 'Complete' : 'Ready'}</span></div><div class="timeline-row timeline-next"><span class="timeline-num">02</span><div><strong>People close to us</strong><small>Next module · Words for family</small></div><button class="text-link" data-action="open-module" data-module="family" data-lang="${lang.id}" data-level="${state.level}">Open ${icon('arrow', 14)}</button></div><div class="timeline-row timeline-next"><span class="timeline-num">03</span><div><strong>Culture & memory</strong><small>Explore oral traditions and listen for new words</small></div>${routeLink('oral', 'Explore oral traditions ' + icon('arrow', 14), 'text-link')}</div></section><aside class="profile-badges"><span class="section-kicker">Small things worth celebrating</span><h2>Your first badges</h2><div class="badge-list"><div class="badge-item"><span class="badge-icon badge-green">${icon('leaf', 18)}</span><div><strong>First steps</strong><small>Opened your learning path</small></div></div><div class="badge-item"><span class="badge-icon badge-yellow">${icon('volume', 18)}</span><div><strong>Good listener</strong><small>Practiced a spoken phrase</small></div></div><div class="badge-item badge-locked"><span class="badge-icon">${icon('trophy', 18)}</span><div><strong>Culture keeper</strong><small>Explore oral traditions</small></div></div></div></aside></div><div class="profile-privacy-note">${icon('lock', 16)} Guest progress stays on this device. Sign in to keep progress across devices.</div></div>`;
+    return `<div class="container route-page profile-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span class="breadcrumb-sep" aria-hidden="true"></span><strong>My progress</strong></div>${renderStepper(['Choose a path', 'Practice a lesson', 'Build a streak', 'Celebrate progress'], journeyStep)}<section class="profile-welcome page-depth-reveal"><div class="profile-photo-wrap"><div class="profile-avatar">${profilePhoto ? `<img src="${esc(profilePhoto)}" alt="Your profile photo" />` : icon('user', 27)}</div><label class="profile-photo-button" for="profile-photo-input">${icon('edit', 15)} Choose photo</label><input id="profile-photo-input" type="file" accept="image/jpeg,image/png,image/webp" /></div><div><span class="section-kicker">Your learning space</span><h1>A good day to keep going.</h1><p>Your progress is saved to your account when you sign in, and to this browser otherwise.</p><small class="profile-photo-note">Profile photos are resized and stored only in this browser on this device.</small></div><button class="button button-outline" data-route="parent-login">${icon('user', 16)} Account settings</button></section><div class="profile-overview-grid"><article class="progress-main-card"><div class="progress-main-head"><div><span class="section-kicker">Current path</span><h2>${lang.name} · ${state.level.charAt(0).toUpperCase() + state.level.slice(1)}</h2><p>Keep building confidence, one small lesson at a time.</p></div><span class="progress-medallion">${icon('leaf', 23)}</span></div><div class="large-progress"><div><span style="width:${percent}%"></span></div><strong>${percent}%</strong></div><div class="progress-foot"><span>${completedCount} lessons completed</span>${routeLink('course', 'Continue learning ' + icon('arrow', 14), 'text-link')}</div></article><div class="stat-card stat-streak"><span>${icon('sparkles', 20)}</span><small>Learning streak</small><strong>${state.streak} <em>days</em></strong><p>Showing up is a win.</p></div><div class="stat-card stat-points"><span>${icon('star', 20)}</span><small>Practice points</small><strong>${state.points}</strong><p>Earned by trying new things.</p></div></div><div class="profile-lower-grid"><section class="profile-card"><div class="section-heading compact-heading"><div><span class="section-kicker">Your recent steps</span><h2>Learning timeline</h2></div>${routeLink('course', 'View path ' + icon('arrow', 14), 'text-link')}</div><div class="timeline-row"><span class="timeline-check">${icon('check', 15)}</span><div><strong>Start with a greeting</strong><small>${lang.name} · First lesson</small></div><span class="timeline-status">${state.completed.includes(`${lang.id}-greetings-intro`) ? 'Complete' : 'Ready'}</span></div><div class="timeline-row timeline-next"><span class="timeline-num">02</span><div><strong>People close to us</strong><small>Next module · Words for family</small></div><button class="text-link" data-action="open-module" data-module="family" data-lang="${lang.id}" data-level="${state.level}">Open ${icon('arrow', 14)}</button></div><div class="timeline-row timeline-next"><span class="timeline-num">03</span><div><strong>Culture & memory</strong><small>Explore oral traditions and listen for new words</small></div>${routeLink('oral', 'Explore oral traditions ' + icon('arrow', 14), 'text-link')}</div></section><aside class="profile-badges"><span class="section-kicker">Small things worth celebrating</span><h2>Your first badges</h2><div class="badge-list"><div class="badge-item"><span class="badge-icon badge-green">${icon('leaf', 18)}</span><div><strong>First steps</strong><small>Opened your learning path</small></div></div><div class="badge-item"><span class="badge-icon badge-yellow">${icon('volume', 18)}</span><div><strong>Good listener</strong><small>Practiced a spoken phrase</small></div></div><div class="badge-item badge-locked"><span class="badge-icon">${icon('trophy', 18)}</span><div><strong>Culture keeper</strong><small>Explore oral traditions</small></div></div></div></aside></div><div class="profile-privacy-note">${icon('lock', 16)} Guest progress stays on this device. Sign in to keep progress across devices.</div></div>`;
   }
 
   const PROFILE_DETAILS_KEY = 'idilewa-profile-details';
@@ -3394,7 +3376,7 @@ import {
         <fieldset class="profile-layer"><legend><span>01</span> About you</legend><div class="profile-field-grid"><label>Display name<input name="name" autocomplete="name" maxlength="60" required value="${esc(profile.name)}" placeholder="What should we call you?" /></label><label>Email<input value="${esc(profile.email)}" readonly placeholder="Sign in to connect your account" /></label></div></fieldset>
         <fieldset class="profile-layer"><legend><span>02</span> Your story</legend><label>Short bio<textarea name="bio" rows="3" maxlength="500" placeholder="Share a little about yourself and what you enjoy learning.">${esc(profile.bio)}</textarea></label><label>Learning goal<textarea name="goal" rows="2" maxlength="240" placeholder="What would you like to be able to do?">${esc(profile.goal)}</textarea></label></fieldset>
         <fieldset class="profile-layer"><legend><span>03</span> Learning preferences</legend><div class="profile-field-grid"><label>Primary language<select name="language">${LANGUAGES.map((language) => `<option value="${language.id}" ${profile.language === language.id ? 'selected' : ''}>${language.name}</option>`).join('')}</select></label><label>Experience level<select name="level">${[['beginner','Beginning'],['intermediate','Growing'],['advanced','Confident']].map(([value,label]) => `<option value="${value}" ${profile.level === value ? 'selected' : ''}>${label}</option>`).join('')}</select></label></div><div class="profile-interest-list"><span>I'm interested in</span>${interests.map(([value,label]) => `<label><input type="checkbox" name="interests" value="${value}" ${profile.interests.includes(value) ? 'checked' : ''} />${label}</label>`).join('')}</div></fieldset>
-        <fieldset class="profile-layer"><legend><span>04</span> Account & privacy</legend><p>${user ? `Signed in as ${esc(user.email || '')}. Your profile details are saved to your Idilewa account.` : 'You are browsing as a guest. Save these details on this device, or sign in to connect them to an account.'}</p><div class="profile-account-actions">${user ? '<button type="button" class="button button-outline" data-action="profile-sign-out">Sign out</button>' : `${routeLink('login', 'Sign in', 'button button-outline', 'data-mode="signin"')}${routeLink('login', 'Create account', 'button button-primary', 'data-mode="signup"')}`}</div></fieldset>
+        <fieldset class="profile-layer"><legend><span>04</span> Account & privacy</legend><p>${user ? `Signed in as ${esc(user.email || '')}. Your profile details are saved to your Idilewa account.` : 'You are browsing as a guest. Save these details on this device, or sign in to connect them to an account.'}</p><div class="profile-account-actions">${user ? '<button type="button" class="button button-outline" data-action="profile-sign-out">Sign out</button>' : `${routeLink('parent-login', 'Sign in', 'button button-outline')}${routeLink('parent-signup', 'Create account', 'button button-primary')}`}</div></fieldset>
         <div class="profile-editor-submit"><small>Profile photo is managed above and stays on this device.</small><button type="submit" class="button button-primary">Save profile ${icon('check', 15)}</button></div>
       </form>
     </section>`;
@@ -3429,7 +3411,7 @@ import {
           <div class="profile-identity-tags"><span>${esc(language.name)}</span><span>${esc(profile.level.charAt(0).toUpperCase() + profile.level.slice(1))}</span></div>
           <p class="profile-identity-goal">${profile.goal ? esc(profile.goal) : 'Your learning goals and interests belong here.'}</p>
           <div class="profile-identity-actions">
-            ${getCurrentUser() ? '<button class="button button-outline" data-action="profile-sign-out">Sign out</button>' : routeLink('login', 'Sign in to sync', 'button button-primary', 'data-mode="signin"')}
+            ${getCurrentUser() ? '<button class="button button-outline" data-action="profile-sign-out">Sign out</button>' : routeLink('parent-login', 'Sign in to sync', 'button button-primary')}
           </div>
           <small class="profile-photo-note">Your photo stays on this device.</small>
         </aside>
@@ -3539,7 +3521,7 @@ import {
             <label class="tutor-signup-span">Qualifications and experience<textarea name="qualifications" maxlength="600" rows="3" placeholder="Share relevant teaching experience or qualifications (optional)"></textarea></label>
             <label class="tutor-signup-span">Password<span class="tutor-password-field"><input id="tutor-password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Create a password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-password" aria-label="Show password">${icon('eye', 15)}</button></span></label>
             <label class="tutor-signup-span">Confirm password<span class="tutor-password-field"><input id="tutor-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Confirm your password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-confirm-password" aria-label="Show password">${icon('eye', 15)}</button></span></label>
-          </div><small class="tutor-password-guidance">Use 12–128 characters, including uppercase and lowercase letters, a number, and a symbol.</small><label class="tutor-check-label tutor-signup-terms"><input type="checkbox" name="agreement" data-google-required required /> I agree to follow Idilewa’s child-safeguarding and privacy requirements.</label>` : `<label>Email Address<input name="email" type="email" autocomplete="email" placeholder="Enter your email" required /></label><label>Password<span class="tutor-password-field"><input id="tutor-password" name="password" type="password" autocomplete="current-password" minlength="12" maxlength="128" placeholder="Enter your password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-password" aria-label="Show password">${icon('eye', 15)}</button></span></label><div class="tutor-auth-options"><label class="tutor-check-label"><input type="checkbox" name="remember" /> Remember me</label><a href="#/login?mode=signin" data-route="login" data-mode="signin">Forgot password?</a></div>`}
+          </div><small class="tutor-password-guidance">Use 12–128 characters, including uppercase and lowercase letters, a number, and a symbol.</small><label class="tutor-check-label tutor-signup-terms"><input type="checkbox" name="agreement" data-google-required required /> I agree to follow Idilewa’s child-safeguarding and privacy requirements.</label>` : `<label>Email Address<input name="email" type="email" autocomplete="email" placeholder="Enter your email" required /></label><label>Password<span class="tutor-password-field"><input id="tutor-password" name="password" type="password" autocomplete="current-password" minlength="12" maxlength="128" placeholder="Enter your password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-password" aria-label="Show password">${icon('eye', 15)}</button></span></label><div class="tutor-auth-options"><label class="tutor-check-label"><input type="checkbox" name="remember" /> Remember me</label></div>`}
           <p class="tutor-auth-error" role="alert" aria-live="polite" hidden></p>
           <button type="submit" class="tutor-button tutor-button-primary tutor-auth-submit">${signup ? 'Create Account' : 'Login'} ${icon('arrow', 15)}</button>
         </form>
@@ -4490,14 +4472,14 @@ import {
           <span class="family-eyebrow">${signup ? 'Join the Idilewa family' : 'Welcome back'}</span>
           <h1>${signup ? 'Create Parent Account' : 'Parent Login'}</h1>
           <p>${signup ? 'Create your account and give your child the gift of a global voice.' : 'Welcome back. Please log in to your account to continue.'}</p>
-          <form class="family-auth-form" data-form="parent-auth" data-mode="${signup ? 'signup' : 'login'}">
+          <form class="family-auth-form" data-form="parent-auth" data-mode="${signup ? 'signup' : 'signin'}">
             ${signup ? `<label>Full Name<input name="name" autocomplete="name" maxlength="60" placeholder="Enter your full name" required /></label>` : ''}
             <label>Email Address<input id="authEmail" name="email" type="email" autocomplete="email" maxlength="254" placeholder="Enter your email" required /></label>
             ${signup ? `<label>Phone Number<input name="phone" type="tel" autocomplete="tel" maxlength="24" placeholder="Enter your phone number" required /></label>` : ''}
             <label>Password<input id="authPassword" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="${signup ? '12' : '1'}" maxlength="128" placeholder="${signup ? 'Create a password' : 'Enter your password'}" required /></label>
             ${signup
               ? '<small class="family-password-note">Use 12 or more characters, including uppercase and lowercase letters, a number and a symbol.</small>'
-              : `<div class="family-auth-options"><label class="family-remember"><input type="checkbox" name="remember" /> Remember me</label><a href="#/login?mode=signin" data-route="login" data-mode="signin">Forgot password?</a></div>`}
+              : `<div class="family-auth-options"><label class="family-remember"><input type="checkbox" name="remember" /> Remember me</label></div>`}
             <p class="family-auth-error" role="alert" hidden></p>
             <button type="submit" class="family-button family-button-primary family-auth-submit">${signup ? 'Create Account' : 'Login'} ${icon('arrow', 15)}</button>
           </form>
@@ -4740,286 +4722,6 @@ import {
     </div>`;
   }
 
-  function renderLogin() {
-    const signUp = state.loginMode === 'signup';
-    const passwordResetReady = Boolean(pendingSignin?.purpose === 'password-reset' && passwordResetVerified);
-    const pendingOtpEmail = passwordResetReady ? '' : pendingSignin?.email || '';
-    const pendingOtpRole = pendingSignin?.role || state.authRole;
-    const authStepPending = Boolean(pendingOtpEmail || passwordResetReady);
-    const activeGrant = consentCodeIsActive();
-    const role = state.authRole === 'adult' ? 'adult' : 'child';
-    const isChild = role === 'child';
-    const authConfigured = isSupabaseConfigured && Boolean(supabase);
-
-    const loginJourneyStep = activeGrant ? (signUp ? 2 : 1) : 0;
-    const authLayers = [
-      { title: 'Choose your learning path', text: 'Adults sign in with email and password. Child sign-in passcodes go to the approved parent or guardian.', action: '<button class="auth-layer-action" type="button" data-action="login-mode" data-mode="signup">Create an account</button>' },
-      { title: 'Keep child accounts protected', text: 'A parent or guardian approves a child account and receives the child’s one-time sign-in passcodes.', action: routeLink('consent', 'Visit the family consent center') },
-      { title: 'Recover your password', text: 'Email verification codes are only used when an adult requests password recovery or a parent receives a child sign-in passcode.', action: '<button class="auth-layer-action" type="button" data-action="request-password-reset">Recover your password</button>' },
-      { title: 'Explore before creating an account', text: 'You can browse language lessons and learning activities without signing in. Account features require a configured sign-in service.', action: routeLink('languages', 'Browse learning languages') }
-    ];
-
-    const introSplash = authIntroPending ? `<div class="auth-intro-screen">${brandLogo('Idilewa · Language · Culture · Future')}</div>` : '';
-    authIntroPending = false;
-    return `${introSplash}<div class="container route-page auth-page modern-auth-page">
-      <!-- Right-side learning artwork -->
-      <aside class="auth-art modern-auth-art" aria-label="Children exploring languages, stories and technology">
-        <div class="auth-scene-shell">
-          <img class="auth-scene-photo" src="./assets/auth-learning-reference.png" alt="" />
-          <div class="auth-globe-orbit" aria-hidden="true">
-            <svg class="auth-globe-spin" viewBox="0 0 240 160" role="presentation">
-              <defs>
-                <radialGradient id="auth-globe-fill" cx="38%" cy="32%" r="70%">
-                  <stop offset="0%" stop-color="#c8ffe2" stop-opacity=".38" />
-                  <stop offset="100%" stop-color="#138d69" stop-opacity=".16" />
-                </radialGradient>
-                <clipPath id="auth-globe-clip"><ellipse cx="120" cy="80" rx="110" ry="68" /></clipPath>
-              </defs>
-              <ellipse cx="120" cy="80" rx="110" ry="68" fill="url(#auth-globe-fill)" stroke="#e1fff0" stroke-opacity=".78" stroke-width="2" />
-              <g class="auth-globe-longitudes" clip-path="url(#auth-globe-clip)" fill="none" stroke="#dcfff0" stroke-opacity=".62">
-                <ellipse cx="120" cy="80" rx="78" ry="67" stroke-width="1.4" />
-                <ellipse cx="120" cy="80" rx="38" ry="67" stroke-width="1.4" />
-                <path d="M10 80h220M19 54h202M19 106h202" stroke-width="1.2" />
-                <path d="M16 67h208M16 93h208" stroke-opacity=".38" />
-              </g>
-              <g class="auth-globe-land" clip-path="url(#auth-globe-clip)" fill="#71dda7" fill-opacity=".2">
-                <path d="M45 47l12-13 19 2 7 10 15 4 2 11-12 6-5 15-10 7-4 19-10 7-9-13 2-17-8-11 5-12-7-7zM111 38l12-8 17 5 3 10 17 5-3 10-12 5-2 13-11 7-4 16-10 9-8-13 4-15-7-12 5-11-8-8zM160 92l13-5 13 7 9 16-7 11-13-2-7-12-10-4z" />
-              </g>
-            </svg>
-          </div>
-          <span class="auth-artifact auth-artifact-book" aria-hidden="true"><span class="auth-artifact-glyph">📖</span></span>
-          <span class="auth-artifact auth-artifact-headset" aria-hidden="true"><span class="auth-artifact-glyph">🎧</span></span>
-          <span class="auth-artifact auth-artifact-gamepad" aria-hidden="true"><span class="auth-artifact-glyph">🎮</span></span>
-          <span class="auth-artifact auth-artifact-mask" aria-hidden="true"><span class="auth-artifact-glyph"><svg viewBox="0 0 32 36" role="presentation"><path d="M5 4 16 1l11 3v14c0 8-5 13-11 17C10 31 5 26 5 18z" fill="#c66d3d" stroke="#77402d" stroke-width="1.5"/><path d="M9 14c2-3 5-3 7 0-2 2-5 3-7 0Zm8 0c2-3 5-3 7 0-2 2-5 3-7 0Z" fill="#f6dfb5"/><circle cx="13" cy="14" r="1.2" fill="#332b24"/><circle cx="20" cy="14" r="1.2" fill="#332b24"/><path d="M12 22c2 2 6 2 8 0" fill="none" stroke="#472b24" stroke-linecap="round" stroke-width="2"/></svg></span></span>
-          <span class="auth-artifact auth-artifact-code" aria-hidden="true"><span class="auth-artifact-glyph">&lt;/&gt;</span></span>
-          <span class="auth-laptop-screen-glow" aria-hidden="true"></span>
-          <span class="auth-laptop-pointer" aria-hidden="true"></span>
-        </div>
-      </aside>
-
-      <!-- Left-side sign-in and account creation form -->
-      <section class="auth-panel modern-auth-panel" aria-labelledby="authPageHeading">
-        <div class="auth-brand" aria-label="Idilewa">
-          ${brandLogo('Idilewa · Language · Culture · Future')}
-        </div>
-
-        <div class="auth-header-block">
-          <span class="section-kicker">${signUp ? 'A learning space for you' : 'Good to see you again'}</span>
-          <h1 id="authPageHeading" class="auth-title">${passwordResetReady ? 'Choose a new password' : pendingOtpEmail ? 'Check your email' : signUp ? 'Create your account' : 'Welcome back'}</h1>
-          <p class="auth-subtitle">${passwordResetReady ? 'Your email is verified. Set a new password to finish recovering your account.' : pendingOtpEmail ? `Enter the verification code sent to ${esc(pendingOtpEmail)}.` : signUp ? 'Save your learning journey and pick up where you left off.' : 'Sign in to continue your language and coding practice.'}</p>
-        </div>
-
-        <!-- Mode Selector Switcher Tabs -->
-        <div class="auth-toggle modern-auth-tabs" role="tablist" ${authStepPending ? 'hidden' : ''}>
-          <button type="button" class="auth-tab-btn ${!signUp ? 'active' : ''}" data-action="login-mode" data-mode="signin" role="tab" aria-selected="${!signUp}">
-            ${icon('user', 15)} Sign In
-          </button>
-          <button type="button" class="auth-tab-btn ${signUp ? 'active' : ''}" data-action="login-mode" data-mode="signup" role="tab" aria-selected="${signUp}">
-            ${icon('plus', 15)} Create Account
-          </button>
-        </div>
-
-        <!-- Persona Role Selector Cards -->
-        <!-- Modern Auth Form -->
-        ${pendingOtpEmail ? `
-        <form class="auth-form modern-auth-form" data-form="signin-otp" data-otp-role="${esc(pendingOtpRole)}">
-          <div class="form-group">
-            <label for="signupOtp" class="form-label">${pendingSignin?.purpose === 'child-signin' ? 'Parent-issued child sign-in passcode' : 'Password recovery code'}</label>
-            <div class="input-with-icon">
-              <input id="signupOtp" type="text" name="token" class="form-input" inputmode="numeric" autocomplete="one-time-code" pattern="[0-9]{6,8}" minlength="6" maxlength="8" placeholder="6–8 digit code" required />
-            </div>
-            <p class="form-helper-text">${pendingSignin?.purpose === 'child-signin' ? 'Ask your parent or guardian for the one-time passcode sent to their approved email address.' : 'This code verifies access to your account. You can choose a new password after confirming it.'}</p>
-          </div>
-          <button class="button button-primary modern-auth-submit" type="submit">
-            <span>${pendingSignin?.purpose === 'child-signin' ? 'Sign in as child' : 'Verify code and continue'}</span>${icon('arrow', 16)}
-          </button>
-          <button class="button button-outline" type="button" data-action="resend-signin-otp">${pendingSignin?.purpose === 'child-signin' ? 'Send another passcode to my parent' : 'Send a new recovery code'}</button>
-          <button class="text-link" type="button" data-action="cancel-auth-otp">Back to sign in</button>
-        </form>
-        ` : passwordResetReady ? `
-        <form class="auth-form modern-auth-form" data-form="password-reset">
-          <div class="form-group">
-            <label for="newAuthPassword" class="form-label">New password</label>
-            <input id="newAuthPassword" type="password" name="password" class="form-input" autocomplete="new-password" minlength="12" maxlength="128" placeholder="At least 12 characters" required />
-          </div>
-          <div class="form-group">
-            <label for="confirmAuthPassword" class="form-label">Confirm new password</label>
-            <input id="confirmAuthPassword" type="password" name="confirmPassword" class="form-input" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Enter the new password again" required />
-            <p class="form-helper-text password-guidance">Use at least 12 characters with uppercase and lowercase letters, a number and a symbol. Example: <span>River!Drum7Leaf</span>. Do not reuse this sample.</p>
-          </div>
-          <button class="button button-primary modern-auth-submit" type="submit">
-            <span>Update password and sign in</span>${icon('arrow', 16)}
-          </button>
-          <button class="text-link" type="button" data-action="cancel-auth-otp">Cancel recovery</button>
-        </form>
-        ` : `
-        <form class="auth-form modern-auth-form" data-form="login">
-          <input type="hidden" name="accountType" id="authAccountType" value="${role}" />
-
-          ${!signUp ? `
-          <div class="auth-role-selector">
-            <span class="auth-role-label" id="auth-role-label">Choose your account type</span>
-            <div class="auth-role-grid" role="radiogroup" aria-labelledby="auth-role-label">
-              <button type="button" class="auth-role-card ${isChild ? 'is-selected' : ''}" data-action="auth-role-select" data-role="child" role="radio" aria-checked="${isChild}">
-                <span class="role-icon tone-green">${icon('smile', 16)}</span>
-                <span class="role-title">Child Learner</span>
-                <span class="role-tag">Parent passcode</span>
-              </button>
-              <button type="button" class="auth-role-card ${!isChild ? 'is-selected' : ''}" data-action="auth-role-select" data-role="adult" role="radio" aria-checked="${!isChild}">
-                <span class="role-icon tone-blue">${icon('book', 16)}</span>
-                <span class="role-title">Adult / Family</span>
-                <span class="role-tag">Email + password</span>
-              </button>
-            </div>
-          </div>
-          ` : ''}
-
-          ${signUp ? `
-          <div class="auth-role-selector">
-            <span class="auth-role-label" id="auth-role-label">Choose an account type</span>
-            <div class="auth-role-grid" role="radiogroup" aria-labelledby="auth-role-label">
-              <button type="button" class="auth-role-card ${isChild ? 'is-selected' : ''}" data-action="auth-role-select" data-role="child" role="radio" aria-checked="${isChild}">
-                <span class="role-icon tone-green">${icon('smile', 16)}</span>
-                <span class="role-title">Child Learner</span>
-                <span class="role-tag">Guardian approval</span>
-              </button>
-              <button type="button" class="auth-role-card ${!isChild ? 'is-selected' : ''}" data-action="auth-role-select" data-role="adult" role="radio" aria-checked="${!isChild}">
-                <span class="role-icon tone-blue">${icon('book', 16)}</span>
-                <span class="role-title">Adult Learner</span>
-                <span class="role-tag">No parent consent</span>
-              </button>
-            </div>
-            <p class="form-helper-text">${isChild ? 'Child accounts need a parent or guardian to approve sign-up, then must confirm their email before signing in.' : 'Adult accounts do not need parent or guardian approval, but must confirm their email before signing in.'}</p>
-          </div>
-          ` : ''}
-
-          ${signUp ? `
-          <div class="form-group">
-            <label for="authName" class="form-label">Name or Learner Alias</label>
-            <div class="input-with-icon">
-              <input id="authName" type="text" name="name" class="form-input" autocomplete="name" placeholder="${isChild ? 'e.g. Ayo B. (Use nickname for safety)' : 'e.g. Samuel Owoyemi'}" required />
-            </div>
-          </div>
-          ` : ''}
-
-          <div class="form-group">
-            <div class="form-label-row">
-              <label for="authEmail" class="form-label">Email address</label>
-              ${!signUp && !isChild ? '<button class="forgot-link" type="button" data-action="resend-signup-confirmation">Resend confirmation email</button>' : ''}
-            </div>
-            <div class="input-with-icon">
-              <input id="authEmail" type="email" name="email" class="form-input" autocomplete="email" placeholder="learner@example.com" value="${signUp && verifiedGuardianSignup ? esc(verifiedGuardianSignup.email) : !signUp && signupEmailForSignin ? esc(signupEmailForSignin) : ''}" ${signUp && verifiedGuardianSignup ? 'readonly' : ''} required />
-            </div>
-          </div>
-
-          ${signUp || !isChild ? `<div class="form-group">
-            <div class="form-label-row">
-              <label for="authPassword" class="form-label">Password</label>
-              ${!signUp && !isChild ? `<button class="forgot-link" type="button" data-action="request-password-reset">Forgot password?</button>` : ''}
-            </div>
-            <div class="input-with-icon">
-              <input id="authPassword" type="password" name="password" class="form-input" autocomplete="${signUp ? 'new-password' : 'current-password'}" ${signUp ? 'minlength="12" maxlength="128"' : ''} placeholder="${signUp ? 'At least 12 characters' : 'Enter your password'}" required />
-              <button type="button" class="password-toggle-btn" data-action="toggle-password-visibility" aria-label="Toggle password visibility">
-                ${icon('eye', 16)}
-              </button>
-            </div>
-            ${signUp ? '<p class="form-helper-text password-guidance">Use at least 12 characters, including uppercase and lowercase letters, a number and a symbol. Example: <span>River!Drum7Leaf</span>. Do not reuse this sample.</p>' : ''}
-          </div>` : ''}
-
-          ${!signUp && isChild ? '<p class="form-helper-text child-signin-guidance">Your parent or guardian will receive your one-time sign-in passcode at their approved email address.</p>' : ''}
-
-          ${isChild && signUp ? verifiedGuardianSignup ? `
-          <div class="form-group consent-form-group guardian-approved-state">
-            <p class="form-helper-text">${icon('check', 14)} Parent approval verified for ${esc(verifiedGuardianSignup.email)}. Finish creating the child account before the approval expires.</p>
-            <button class="text-link" type="button" data-action="guardian-use-another-email">Use a different learner email</button>
-          </div>
-          ` : `
-          <div class="form-group consent-form-group">
-            <label for="guardianEmail" class="form-label">Parent or guardian email</label>
-            <div class="input-with-icon">
-              <input id="guardianEmail" type="email" name="guardianEmail" class="form-input" autocomplete="email" placeholder="parent@example.com" required />
-            </div>
-            <p class="form-helper-text">We’ll email your parent or guardian a private approval link. After approval, confirm your email using the link sent to the address above.</p>
-            <button class="button button-outline" type="button" data-action="request-guardian-approval">Email my parent for approval</button>
-          </div>
-          <div class="form-group consent-form-group">
-            <label for="guardianAccessCode" class="form-label">Parent-approved one-time passcode</label>
-            <div class="input-with-icon">
-              <input id="guardianAccessCode" type="text" inputmode="numeric" pattern="[0-9]{6}" name="guardianAccessCode" class="form-input" maxlength="6" autocomplete="one-time-code" placeholder="Enter 6-digit passcode" />
-            </div>
-            <button class="button button-outline" type="button" data-action="verify-guardian-code">Verify parent-approved code</button>
-            <p class="form-helper-text">The code is single-use and expires after 15 minutes. Never share it with anyone.</p>
-          </div>
-          ` : ''}
-
-          ${signUp ? `
-          <label class="consent-check modern-consent-check">
-            <input type="checkbox" name="demoOnly" value="yes" required checked />
-            <span>I agree to the <a href="#/privacy" data-route="privacy">privacy notice</a> and understand learning progress may be stored in this browser. ${isChild ? 'For a child account, parent approval is required before creation.' : 'Adult accounts do not require parent or guardian approval.'}</span>
-          </label>
-          ` : `
-          <div class="form-options-row">
-            <label class="consent-check modern-consent-check">
-              <input type="checkbox" name="rememberMe" value="yes" checked />
-              <span>Remember this device</span>
-            </label>
-            <span class="auth-security-badge">${icon('shield', 12)} ${authConfigured ? 'Account protected' : 'Sign-in unavailable'}</span>
-          </div>
-          `}
-
-          <p id="authInlineError" class="auth-inline-error" role="alert" aria-live="polite" hidden></p>
-          ${!signUp && isChild ? `
-          <button class="button button-primary modern-auth-submit" type="button" data-action="request-child-signin-code" ${authConfigured ? '' : 'disabled'}>
-            <span>Send a passcode to my parent</span>${icon('arrow', 16)}
-          </button>
-          ` : `<button class="button button-primary modern-auth-submit" type="submit" ${authConfigured && (!signUp || !isChild || verifiedGuardianSignup) ? '' : 'disabled'}>
-            <span>${signUp ? isChild ? 'Create Child Learning Space' : 'Create Adult Learning Space' : 'Sign In to Learning Space'}</span>
-            ${icon('arrow', 16)}
-          </button>`}
-        </form>
-        `}
-
-        <!-- Trust & Privacy Sandbox Note -->
-        <div class="auth-safe-note modern-auth-safe-note">
-          <span class="safe-note-icon">${icon('lock', 16)}</span>
-          <div>
-            <strong>${authConfigured ? 'Your account is protected by Supabase Auth' : 'Account service is not configured'}</strong>
-            <span>${authConfigured ? pendingOtpEmail ? pendingSignin?.purpose === 'child-signin' ? 'Your parent or guardian receives a one-time passcode for child sign-in.' : 'Password recovery codes are one-time and expire shortly.' : isChild && !signUp ? 'Child sign-in uses a one-time passcode delivered to the approved parent or guardian.' : 'Adults use their email and password. Sign-in does not require an email confirmation code.' : 'Add the Supabase URL and public anon key to the deployment environment to enable sign up and sign in. You can still explore as a guest.'}</span>
-          </div>
-        </div>
-
-        <div class="auth-separator"><span>or explore freely</span></div>
-
-        <div class="auth-alt-links">
-          ${routeLink('languages', 'Continue as Guest without signing in ' + icon('arrow', 14), 'button button-soft auth-guest-btn')}
-          <div class="auth-sub-links">
-            ${routeLink('consent', `${icon('heart', 13)} Parent & Guardian Consent Center`, 'text-link')}
-            ${routeLink('voice_lessons', `${icon('mic', 13)} Voice Lessons`, 'text-link')}
-          </div>
-        </div>
-
-      </section>
-      <section class="auth-layer-guide" aria-labelledby="auth-layer-title" data-access-check-count="${authLayers.length}">
-        <div class="auth-layer-guide-heading">
-          <span class="section-kicker">Your ${authLayers.length}-step learning journey</span>
-          <h2 id="auth-layer-title">A safer, clearer way to get started.</h2>
-          <p>Know what to expect from account verification to continuing as a guest.</p>
-        </div>
-        <div class="auth-layer-guide-grid">
-          ${authLayers.map((layer, index) => `
-            <article class="auth-layer-card">
-              <span>0${index + 1}</span>
-              <div>
-                <h3>${layer.title}</h3>
-                <p>${layer.text}</p>
-                ${layer.action}
-              </div>
-            </article>
-          `).join('')}
-        </div>
-      </section>
-    </div>`;
-  }
 
   const TEACHER_PROFILES = [
     {
@@ -5827,7 +5529,6 @@ import {
       case 'profile': return renderProfile();
       case 'contact': return renderContact();
       case 'privacy': return renderPrivacy();
-      case 'login': return renderLogin();
       case 'consent': return renderConsent();
       default: return renderGeneric(page);
     }
@@ -6291,9 +5992,6 @@ import {
   }
 
   function clearPendingAuthFlow() {
-    pendingSignupEmail = '';
-    pendingSignin = null;
-    passwordResetVerified = false;
     let storageError = null;
     for (const key of [
       'idilewa-pending-signup-email',
@@ -6374,11 +6072,6 @@ import {
     } else if (page === 'index') {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = `${pageMarkup}${renderFooter(page)}`;
-    } else if (page === 'login') {
-      document.body.dataset.page = page;
-      document.getElementById('main').innerHTML = `${pageMarkup}${renderFooter(page)}`;
-      const intro = document.querySelector('.auth-intro-screen');
-      if (intro) window.setTimeout(() => intro.remove(), 1450);
     } else {
       document.body.dataset.page = page;
       document.getElementById('main').innerHTML = `${pageMarkup}${renderPageInformationLayers(page)}${renderFooter(page)}`;
@@ -6537,52 +6230,6 @@ import {
       showToast('Parent approval verified. Finish creating the child account now.', 'success');
     } catch (error) {
       showToast(error instanceof Error ? error.message : 'The parent-approved code could not be verified.', 'error');
-    } finally {
-      if (button.isConnected) {
-        button.disabled = false;
-        button.textContent = previousText;
-      }
-    }
-  }
-
-  async function requestPasswordResetCode(button) {
-    const emailInput = document.getElementById('authEmail');
-    if (!emailInput?.reportValidity()) return;
-    const email = emailInput.value.trim().toLowerCase();
-    button.disabled = true;
-    const previousText = button.textContent;
-    button.textContent = 'Sending recovery code…';
-    try {
-      await requestSigninOtp(email, 'password-reset');
-      pendingSignin = { email, purpose: 'password-reset' };
-      passwordResetVerified = false;
-      state.loginMode = 'signin';
-      render();
-      showToast('If the account can receive email codes, a verification code is on its way.', 'success');
-    } catch (error) {
-      showToast(error instanceof Error ? error.message : 'A password recovery code could not be sent.', 'error');
-    } finally {
-      if (button.isConnected) {
-        button.disabled = false;
-        button.textContent = previousText;
-      }
-    }
-  }
-
-  async function requestChildSigninCode(button) {
-    const emailInput = document.getElementById('authEmail');
-    if (!emailInput?.reportValidity()) return;
-    const email = emailInput.value.trim().toLowerCase();
-    button.disabled = true;
-    const previousText = button.textContent;
-    button.textContent = 'Sending passcode…';
-    try {
-      await requestSigninOtp(email, 'child-signin');
-      pendingSignin = { email, role: 'child', purpose: 'child-signin' };
-      render();
-      showToast('If this is an approved child account, a one-time passcode has been sent to the parent or guardian email.', 'success');
-    } catch (error) {
-      showToast(error instanceof Error ? error.message : 'The parent passcode could not be sent. Please try again.', 'error');
     } finally {
       if (button.isConnected) {
         button.disabled = false;
@@ -6829,9 +6476,7 @@ import {
         break;
       }
       case 'start-consent-request':
-        state.authRole = 'child'; state.loginMode = 'signup'; saveState(); navigate('login'); break;
-      case 'consent-signup':
-        state.authRole = 'child'; state.loginMode = 'signup'; saveState(); navigate('login'); break;
+      case 'consent-signup': navigate('parent-signup'); break;
       
       case 'ide-set-lang': {
         const lang = el.dataset.lang || 'yoruba';
@@ -7369,75 +7014,12 @@ import {
       }
       case 'billing-period': state.billing = el.dataset.period; saveState(); render(); break;
       case 'choose-plan': openModal(`${el.dataset.plan || 'Family'} updates`, 'Your interest has been noted. The Idilewa team will confirm final plans and pricing before launch.'); break;
-      case 'login-mode': {
-        const nextMode = el.dataset.mode === 'signup' ? 'signup' : 'signin';
-        if (state.loginMode !== nextMode) state.authRole = 'adult';
-        state.loginMode = nextMode;
-        const [path, query = ''] = window.location.hash.replace(/^#\/?/, '').split('?');
-        const params = new URLSearchParams(query);
-        params.set('mode', state.loginMode);
-        const nextHash = `#/${path || 'login'}?${params.toString()}`;
-        if (window.location.hash === nextHash) render();
-        else window.location.hash = nextHash;
-        break;
-      }
-      case 'auth-role-select': {
-        state.authRole = el.dataset.role === 'adult' ? 'adult' : 'child';
-        if (state.authRole !== 'child') {
-          verifiedGuardianSignup = null;
-        }
-        render();
-        break;
-      }
       case 'request-guardian-approval': void submitGuardianRequest(el); break;
       case 'verify-guardian-code': void verifyGuardianCode(el); break;
-      case 'request-password-reset': void requestPasswordResetCode(el); break;
-      case 'resend-signup-confirmation':
-        {
-        const emailInput = document.getElementById('authEmail');
-        if (!emailInput?.reportValidity()) break;
-        el.disabled = true;
-        void resendSignupConfirmation(emailInput.value)
-          .then(() => showToast('If this account still needs confirmation, a new link has been sent. Check your inbox and spam folder.', 'success'))
-          .catch((error) => showToast(error instanceof Error ? error.message : 'A confirmation email could not be sent.', 'error'))
-          .finally(() => { if (el.isConnected) el.disabled = false; });
-        break;
-        }
-      case 'request-child-signin-code': void requestChildSigninCode(el); break;
-      case 'resend-signin-otp':
-        if (!pendingSignin?.email) break;
-        el.disabled = true;
-        void requestSigninOtp(pendingSignin.email, pendingSignin.purpose)
-          .then(() => showToast(pendingSignin?.purpose === 'child-signin' ? 'A new passcode has been sent to your parent or guardian.' : 'A new recovery code has been sent.', 'success'))
-          .catch((error) => showToast(error instanceof Error ? error.message : 'A new code could not be sent.', 'error'))
-          .finally(() => { if (el.isConnected) el.disabled = false; });
-        break;
-      case 'cancel-auth-otp':
-        state.loginMode = pendingSignin ? 'signin' : 'signup';
-        pendingSignupEmail = '';
-        pendingSignin = null;
-        passwordResetVerified = false;
-        render();
-        break;
       case 'guardian-use-another-email':
         verifiedGuardianSignup = null;
         render();
         break;
-      case 'toggle-password-visibility': {
-        const passInput = document.getElementById('authPassword');
-        if (passInput) {
-          const isPassword = passInput.type === 'password';
-          passInput.type = isPassword ? 'text' : 'password';
-          el.innerHTML = icon(isPassword ? 'eyeOff' : 'eye', 16);
-          el.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
-        }
-        break;
-      }
-      case 'forgot-password': {
-        const resetButton = document.querySelector('[data-action="request-password-reset"]');
-        if (resetButton) void requestPasswordResetCode(resetButton);
-        break;
-      }
       case 'complete-profile':
         document.getElementById('modal-root').innerHTML = '';
         navigate('profile');
@@ -7446,10 +7028,7 @@ import {
       case 'profile-sign-out':
         const authStorageError = clearPendingAuthFlow();
         void signOutAccount().then((result) => {
-          state.loginMode = 'signin';
-          state.authRole = 'adult';
-          navigate(parseLocation().page.startsWith('tutor') ? 'tutor-login' : 'login', parseLocation().page.startsWith('tutor') ? {} : { mode: 'signin' }, true);
-          if (returnToParentPortal) navigate('parent-login', {}, true);
+          navigate(parseLocation().page.startsWith('tutor') ? 'tutor-login' : 'parent-login', {}, true);
           parentDashboardData = null;
           parentDashboardError = '';
           parentDashboardLoading = false;
@@ -7461,10 +7040,7 @@ import {
               : 'You have signed out.';
           showToast(notice, authStorageError || result.activityEmailError ? 'error' : 'success');
         }).catch((error) => {
-          state.loginMode = 'signin';
-          state.authRole = 'adult';
-          navigate(parseLocation().page.startsWith('tutor') ? 'tutor-login' : 'login', parseLocation().page.startsWith('tutor') ? {} : { mode: 'signin' }, true);
-          if (returnToParentPortal) navigate('parent-login', {}, true);
+          navigate(parseLocation().page.startsWith('tutor') ? 'tutor-login' : 'parent-login', {}, true);
           parentDashboardData = null;
           parentDashboardError = '';
           parentDashboardLoading = false;
@@ -7472,7 +7048,6 @@ import {
           const message = error instanceof Error ? error.message : 'Signed out on this device, but Supabase could not confirm the session revocation.';
           showToast(authStorageError ? `${message} Pending sign-in state could not be fully cleared.` : message, 'error');
         });
-        const returnToParentPortal = parseLocation().page.startsWith('parent');
         break;
       case 'close-search': document.getElementById('modal-root').innerHTML = ''; break;
       case 'trainer-set-lang': {
@@ -8057,72 +7632,6 @@ import {
     } else if (type === 'guardian-consent' || type === 'child-consent-check' || type === 'tutor-consent-check') {
       showToast('Local consent codes are disabled. Use the verified parent-email approval flow for child accounts.', 'error');
       return;
-    } else if (type === 'password-reset') {
-      const password = String(data.get('password') || '');
-      const confirmation = String(data.get('confirmPassword') || '');
-      if (password !== confirmation) {
-        showToast('The passwords do not match. Re-enter them and try again.', 'error');
-        return;
-      }
-      if (!isSignupPasswordValid(password)) {
-        showToast('Use 12–128 characters with uppercase and lowercase letters, a number, and a symbol.', 'error');
-        return;
-      }
-      try {
-        await updateAccountPassword(password);
-        pendingSignin = null;
-        passwordResetVerified = false;
-        await syncAccountLessonProgress();
-        navigate(roleHomeRoute(getCurrentUser()?.role || state.authRole));
-        try {
-          await sendAuthActivityEmail('sign-in');
-          showToast('Your password has been updated and you are signed in.', 'success');
-        } catch (activityError) {
-          showToast(`Your password was updated and you are signed in, but ${activityError instanceof Error ? activityError.message : 'the sign-in notification email could not be sent.'}`, 'error');
-        }
-      } catch (error) {
-        showToast(error instanceof Error ? error.message : 'Your password could not be updated. Please try again.', 'error');
-      }
-      return;
-    } else if (type === 'signin-otp') {
-      const token = String(data.get('token') || '').trim();
-      try {
-        const purpose = pendingSignin?.purpose || 'child-signin';
-        await verifySigninOtp({
-          email: pendingSignin?.email || '',
-          token,
-          expectedRole: purpose === 'child-signin' ? 'child' : pendingSignin?.role,
-          purpose,
-        });
-        const signedInRole = getCurrentUser()?.role || 'child';
-        state.authRole = signedInRole;
-        if (signedInRole === 'child') {
-          state.consent.childVerified = true;
-          saveState();
-        }
-        if (purpose === 'password-reset') {
-          passwordResetVerified = true;
-          render();
-          showToast('Email verified. Choose a new password to finish recovery.', 'success');
-          return;
-        }
-        pendingSignin = null;
-        await syncAccountLessonProgress();
-        navigate(roleHomeRoute(signedInRole));
-        let activityEmailError = '';
-        try {
-          await sendAuthActivityEmail('sign-in');
-        } catch (activityError) {
-          activityEmailError = activityError instanceof Error ? activityError.message : 'The sign-in notification email could not be sent.';
-        }
-        showToast(
-          activityEmailError ? `You are signed in, but ${activityEmailError}` : 'Your parent-issued passcode was verified and you are signed in.',
-          activityEmailError ? 'error' : 'success'
-        );
-      } catch (error) {
-        showToast(error instanceof Error ? error.message : 'Email sign-in failed. Check the code and try again.', 'error');
-      }
-      return;
     } else if (type === 'coding-run') {
       const code = String(data.get('code') || '').slice(0, 1200);
       const tech = CODE_PATHS.find((item) => item.id === form.dataset.tech) || CODE_PATHS[0];
@@ -8238,116 +7747,7 @@ import {
       } finally {
         if (submitButton?.isConnected) submitButton.disabled = false;
       }
-    } else if (type === 'login') {
-      const accountType = data.get('accountType') === 'adult' ? 'adult' : 'child';
-      state.authRole = accountType;
-      const email = String(data.get('email') || '').trim();
-      if (state.loginMode !== 'signup' && accountType === 'child') {
-        showToast('Child sign-in uses a one-time passcode sent to the approved parent or guardian. Select “Send a passcode to my parent.”', 'error');
-        return;
-      }
-      if (state.loginMode === 'signup' && accountType === 'child'
-        && (!verifiedGuardianSignup || verifiedGuardianSignup.email !== email.trim().toLowerCase())) {
-        showToast('A verified guardian email code for this exact learner email is required before child sign-up.', 'error');
-        return;
-      }
-      if (!isSupabaseConfigured || !supabase) {
-        showToast('Account authentication is not configured on this deployment. Continue as a guest.', 'error');
-        return;
-      }
-
-      const password = String(data.get('password') || '');
-      let welcomeEmailError = '';
-      try {
-        if (state.loginMode === 'signup') {
-          if (!isSignupPasswordValid(password)) {
-            showToast('Use 12–128 characters with uppercase and lowercase letters, a number, and a symbol.', 'error');
-            document.getElementById('authPassword')?.focus();
-            return;
-          }
-          const name = String(data.get('name') || '').trim();
-          const {
-            session,
-            welcomeEmailError: deliveryError,
-          } = await signUpAccount({
-            email,
-            password,
-            name,
-            role: accountType,
-            guardianAccessRequestId: accountType === 'child' ? verifiedGuardianSignup?.approvalId : undefined,
-          });
-          welcomeEmailError = deliveryError;
-          if (!session) {
-            verifiedGuardianSignup = null;
-            try { sessionStorage.removeItem('idilewa-guardian-signup'); } catch (_) {}
-            state.loginMode = 'signin';
-            navigate('login', { mode: 'signin' }, true);
-            showToast('Account created. Check your email to confirm it; the link will return you to Idilewa.', 'success');
-            return;
-          }
-          signupEmailForSignin = email.toLowerCase();
-          verifiedGuardianSignup = null;
-          try { sessionStorage.removeItem('idilewa-guardian-signup'); } catch (_) {}
-        } else {
-          await signInAccount({ email, password, expectedRole: 'adult' });
-        }
-      } catch (error) {
-        const message = error instanceof Error ? error.message : 'Account authentication failed. Try again.';
-        const userMessage =
-          state.loginMode !== 'signup' && /invalid login credentials|wrong password|incorrect password/i.test(message)
-            ? 'We couldn’t sign you in with those details. Check that you selected Adult / Family and use Forgot password if needed. New here? Choose Create Account.'
-            : message;
-        const inlineError = document.getElementById('authInlineError');
-        if (inlineError) {
-          inlineError.textContent = userMessage;
-          inlineError.hidden = false;
-        } else {
-          showToast(userMessage, 'error');
-        }
-        return;
-      }
-
-      const signedInRole = getCurrentUser()?.role || accountType;
-      let activityEmailError = '';
-      if (state.loginMode !== 'signup') {
-        try {
-          await sendAuthActivityEmail('sign-in');
-        } catch (activityError) {
-          activityEmailError = activityError instanceof Error ? activityError.message : 'The sign-in notification email could not be sent.';
-        }
-      }
-      if (signedInRole === 'child') {
-        state.consent.childVerified = true;
-        saveState();
-      }
-      await syncAccountLessonProgress();
-      showToast(
-        activityEmailError
-          ? `You are signed in, but ${activityEmailError}`
-          : welcomeEmailError
-          ? `Your Idilewa account is ready. ${welcomeEmailError}`
-          : state.loginMode === 'signup' ? 'Your Idilewa account is ready.' : 'Signed in successfully.',
-        activityEmailError || welcomeEmailError ? 'error' : 'success'
-      );
-      verifiedGuardianSignup = null;
-      try { sessionStorage.removeItem('idilewa-guardian-signup'); } catch (_) {}
-      navigate(roleHomeRoute(signedInRole));
-      if (['adult', 'child'].includes(signedInRole)) {
-        const profile = getProfileDetails();
-        if (!profile.bio || !profile.goal) window.setTimeout(openProfileCompletionPrompt, 120);
-      }
-    }
-  });
-
-  document.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape') {
-      closeModal();
-      closeMobileMenu();
-      closeAiChatPopovers();
-    }
-    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
-      event.preventDefault(); openSearch();
-    }
+}
   });
 
   window.addEventListener('message', (event) => {
@@ -8406,3 +7806,4 @@ import {
   }
   render();
 })();
+

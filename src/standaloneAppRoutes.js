@@ -127,15 +127,15 @@ function appendRouteNavigation(html, route) {
       ['/creative-studio.html', 'Creative Studio'],
       ['/about.html', 'About'],
       ['/tutor.html', 'Tutorship'],
-      ['/login.html#/login?mode=signup', 'Create account'],
+      ['/parents.html#/parent-signup', 'Family account'],
     ]
     : route === 'tutor'
     ? [
       ['/', 'Academy'],
       ['/about.html', 'About'],
       ['/kids.html', 'Kids Arcade'],
-      ['/parents.html#/parent-signup', 'Parent account'],
-      ['/login.html#/login?mode=signup', 'Learner account'],
+      ['/parents.html#/parent-login', 'Parent sign in'],
+      ['/parents.html#/parent-signup', 'Family account'],
     ]
     : null;
   if (!links) return html;
@@ -190,8 +190,8 @@ function transformAboutHtml(html) {
     ['https://idilewa.com/academy', '/?view=academy'],
     ['https://idilewa.com/code', '/?view=codeLab'],
     ['https://idilewa.com/heritage', '/?view=heritageLab'],
-    ['https://idilewa.com/login', '/login.html#/login?mode=signin'],
-    ['https://idilewa.com/signup', '/login.html#/login?mode=signup'],
+    ['https://idilewa.com/login', '/parents.html#/parent-login'],
+    ['https://idilewa.com/signup', '/parents.html#/parent-signup'],
     ['https://idilewa.com', '/'],
   ];
   let transformed = html;
@@ -380,7 +380,7 @@ function transformAppHtml(html) {
   const addAccountLink = (navigation) => {
     if (!navigation || navigation.querySelector('[data-idilewa-account-link]')) return;
     const link = document.createElement('a');
-    link.href = '/login.html#/login?mode=signin';
+    link.href = '/parents.html#/parent-login';
     link.className = 'premium-auth-link';
     link.dataset.idilewaAccountLink = 'true';
     link.textContent = 'Sign in';
@@ -389,7 +389,7 @@ function transformAppHtml(html) {
   const addCreateAccountLink = (navigation) => {
     if (!navigation || navigation.querySelector('[data-idilewa-create-account-link]')) return;
     const link = document.createElement('a');
-    link.href = '/login.html#/login?mode=signup';
+    link.href = '/parents.html#/parent-signup';
     link.className = 'premium-auth-link';
     link.dataset.idilewaCreateAccountLink = 'true';
     link.textContent = 'Create account';

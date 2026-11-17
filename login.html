@@ -4,20 +4,26 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#F9FBF9" />
-  <meta name="description" content="Idilewa brings African languages, stories, culture and technology together in one welcoming learning space." />
+  <meta name="description" content="Sign in to your Idilewa family account." />
   <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-  <title>Idilewa — Keep your language close</title>
-  <link rel="stylesheet" href="./styles.css" />
-  <script type="module" src="./app.js"></script>
+  <link rel="canonical" href="https://www.idilewa.com/parents.html#/parent-login" />
+  <meta name="robots" content="noindex" />
+  <title>Sign in · Idilewa</title>
+  <script>
+    (() => {
+      const params = new URLSearchParams(window.location.search);
+      const hash = window.location.hash.replace(/^#\/?/, '');
+      const hashMode = new URLSearchParams(hash.split('?')[1] || '').get('mode');
+      const signup = params.get('mode') === 'signup' || hashMode === 'signup';
+      window.location.replace(`/parents.html#/${signup ? 'parent-signup' : 'parent-login'}`);
+    })();
+  </script>
+  <noscript><meta http-equiv="refresh" content="0; url=/parents.html#/parent-login" /></noscript>
 </head>
-<body data-default-route="login">
-  <a class="skip-link" href="#main">Skip to content</a>
-  <div id="app" class="app-shell">
-    <header id="site-header" class="site-header"></header>
-    <main id="main" class="main-content" tabindex="-1"></main>
-    <nav id="mobile-nav" class="mobile-nav" aria-label="Quick navigation"></nav>
-    <div id="modal-root"></div>
-    <div id="toast-root" class="toast-root" aria-live="polite" aria-atomic="true"></div>
-  </div>
+<body>
+  <main>
+    <h1>Sign in to Idilewa</h1>
+    <p>Sign-in now lives on the family pages. <a href="/parents.html#/parent-login">Continue to parent login</a> or <a href="/parents.html#/parent-signup">create a parent account</a>.</p>
+  </main>
 </body>
 </html>

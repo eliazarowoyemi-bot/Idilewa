@@ -79,7 +79,7 @@ The Vite configuration includes **28 HTML entry files**. Most files are small sh
 | `kids.html` / `kids` | Audience page for children. Emphasizes short phrases, shared stories, playful practice, and coding, with links into the learning paths. |
 | `tutor.html` / `tutor` | General editorial page introducing tutor-led learning, guided conversation, cultural context, and learning-path continuity. It is informational; the actual sample directory is `connect_teachers`. |
 | `profile.html` / `profile` | Learner progress dashboard concept. Shows current language/level, completion progress, a learning streak, points, and a timeline. The page explicitly describes progress as saved in the current browser for the prototype. |
-| `login.html` / `login` | Simplified sign-in/create-account interface with persona selection (child, adult, parent, educator) and consent-oriented child flow. Auth uses Supabase Auth only when its public URL and anon key are configured; otherwise account submission is disabled and guest exploration remains available. |
+| `login.html` / `login` | Legacy sign-in entry that redirects to the family auth screens: `#/parent-login` (`parents.html`) for sign-in and `#/parent-signup` when `mode=signup`. Parent and learner accounts now share one family authentication flow built on Supabase Auth. |
 | `pricing.html` / `pricing` | Plans preview with monthly/yearly selection and Explorer/Family-style plan concepts. The page calls out that final scope/details are not set; it does not implement a live subscription or payment service. |
 
 ### B. Voice, language sound, and pronunciation
