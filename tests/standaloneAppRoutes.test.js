@@ -133,6 +133,13 @@ test('Creative Studio links back to Home and Code Playground and hardens local p
   assert.match(transformed, /<title>Creative Studio \| Ìdíléwa<\/title>/);
   assert.match(transformed, /href="\/">Home<\/a>/);
   assert.match(transformed, /href="\/\?view=codeLab">Games &amp; Code Playground<\/a>/);
+  assert.match(transformed, /id="studioMenuToggle" type="button" aria-expanded="false" aria-controls="studioNavigationMenu"/);
+  assert.match(transformed, /id="studioNavigationMenu" role="region" aria-label="Creative Studio and site navigation" hidden/);
+  assert.match(transformed, /<h2 id="studioToolsLabel">Creative Studio<\/h2>\s*<nav class="tabs" id="tabs" aria-label="Creative Studio tools"><\/nav>/);
+  assert.match(transformed, /<h2 id="studioPagesLabel">Ìdíléwa pages<\/h2>[\s\S]*<nav class="studio-site-nav" aria-label="Ìdíléwa navigation">/);
+  assert.match(transformed, /href="\/kids\.html">Kids Arcade<\/a>/);
+  assert.match(transformed, /href="\/about\.html">About<\/a>/);
+  assert.match(transformed, /href="\/tutor\.html">Tutorship<\/a>/);
   assert.match(transformed, /src="\/src\/creativeStudioPage\.js"/);
   assert.match(transformed, /src="\/src\/siteFooter\.js"/);
   assert.match(transformed, /idilewaCreativeStudioBridge/);

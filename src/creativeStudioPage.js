@@ -12,6 +12,54 @@ function readJsonFile(file, maxBytes) {
   return file.text().then((text) => JSON.parse(text));
 }
 
+function installStudioNavigationMenu() {
+  const toggle = document.getElementById('studioMenuToggle');
+  const menu = document.getElementById('studioNavigationMenu');
+  const tabs = document.getElementById('tabs');
+  if (!toggle || !menu || !tabs) {
+    throw new Error('Creative Studio navigation menu is missing a required control.');
+  }
+
+  const isOpen = () => toggle.getAttribute('aria-expanded') === 'true';
+  const close = (restoreFocus = false) => {
+    menu.hidden = true;
+    toggle.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) requestAnimationFrame(() => toggle.focus());
+  };
+
+  menu.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element) || !event.target.closest('.tabs button')) return;
+    requestAnimationFrame(() => {
+      if (menu.hidden) toggle.focus();
+    });
+  }, true);
+
+  toggle.addEventListener('click', () => {
+    const open = !isOpen();
+    menu.hidden = !open;
+    toggle.setAttribute('aria-expanded', String(open));
+  });
+
+  menu.addEventListener('click', (event) => {
+    if (!(event.target instanceof Element)) return;
+    if (event.target.closest('.tabs button')) close(true);
+    else if (event.target.closest('.studio-site-nav a')) close();
+  });
+
+  menu.addEventListener('focusout', (event) => {
+    if (!menu.contains(event.relatedTarget) && event.relatedTarget !== toggle) close();
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!(event.target instanceof Node) || !isOpen()) return;
+    if (!toggle.contains(event.target) && !menu.contains(event.target)) close();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && isOpen()) close(true);
+  });
+}
+
 function installLearnerProjectImport() {
   const input = document.getElementById('studioImport114');
   if (!input) throw new Error('Creative Studio project-import control is missing.');
@@ -103,5 +151,6 @@ function installSceneImport() {
   };
 }
 
+installStudioNavigationMenu();
 installLearnerProjectImport();
 installSceneImport();

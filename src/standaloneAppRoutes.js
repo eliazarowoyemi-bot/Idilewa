@@ -296,12 +296,36 @@ function transformCreativeStudioHtml(html) {
     <a href="/about.html">About</a>
     <a href="/tutor.html">Tutorship</a>
   </nav>`;
+  const menu = `<button class="studio-menu-toggle" id="studioMenuToggle" type="button" aria-expanded="false" aria-controls="studioNavigationMenu">
+    <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2"></path></svg>
+    <span>Menu</span>
+  </button>
+  <div class="studio-menu-panel" id="studioNavigationMenu" role="region" aria-label="Creative Studio and site navigation" hidden>
+    <section class="studio-menu-group" aria-labelledby="studioToolsLabel">
+      <h2 id="studioToolsLabel">Creative Studio</h2>
+      <nav class="tabs" id="tabs" aria-label="Creative Studio tools"></nav>
+    </section>
+    <section class="studio-menu-group" aria-labelledby="studioPagesLabel">
+      <h2 id="studioPagesLabel">Ìdíléwa pages</h2>
+      ${navigation}
+    </section>
+  </div>`;
   const navigationStyles = `<style id="idilewa-creative-studio-navigation">
-.studio-site-nav{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
-.studio-site-nav a{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:8px 11px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink);font-weight:650;text-decoration:none}
-.studio-site-nav a:hover{text-decoration:underline;text-underline-offset:3px;border-color:var(--g)}
-.studio-site-nav a:focus-visible{outline:2px solid var(--g);outline-offset:2px}
-@media(max-width:650px){.studio-site-nav{order:4;flex-basis:100%}.studio-site-nav a{flex:1}}
+.top{position:relative;z-index:20}
+.studio-menu-toggle{display:inline-flex;align-items:center;justify-content:center;gap:9px;min-height:44px;padding:9px 14px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink);font-weight:700}
+.studio-menu-toggle:hover{border-color:var(--g)}
+.studio-menu-toggle:focus-visible,.studio-menu-panel :focus-visible{outline:3px solid var(--g);outline-offset:3px}
+.studio-menu-toggle svg{width:20px;height:20px;flex:none}
+.studio-menu-panel{position:absolute;top:calc(100% + 6px);right:12px;z-index:60;width:min(520px,calc(100vw - 24px));max-height:min(76vh,640px);overflow:auto;padding:20px;border:1px solid var(--line);border-radius:16px;background:#fff;box-shadow:0 12px 30px #163a2830}
+.studio-menu-panel[hidden]{display:none}
+.studio-menu-group+.studio-menu-group{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+.studio-menu-group h2{margin:0 0 10px;color:var(--ink);font-size:14px}
+.studio-menu-panel .tabs{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:8px;width:100%;min-width:0;flex:none;order:0;overflow:visible;flex-wrap:wrap}
+.studio-menu-panel .tabs button{width:100%;min-height:44px;padding:10px 12px;border:1px solid var(--line);text-align:left;white-space:normal}
+.studio-menu-panel .studio-site-nav{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.studio-menu-panel .studio-site-nav a{display:flex;min-height:44px;align-items:center;justify-content:flex-start;padding:8px 11px;border:1px solid var(--line);border-radius:11px;background:#fff;color:var(--ink);font-weight:650;text-align:left;text-decoration:none}
+.studio-menu-panel .studio-site-nav a:hover{border-color:var(--g);text-decoration:underline;text-underline-offset:3px}
+.studio-menu-panel .studio-site-nav a:focus-visible{outline:3px solid var(--g);outline-offset:3px}
 </style>`;
   const bridge = `<script>
 window.idilewaCreativeStudioBridge = {
@@ -324,15 +348,17 @@ window.idilewaCreativeStudioBridge = {
 </script>
 <script type="module" src="/src/creativeStudioPage.js"></script>`;
   const actionsMarker = '<div class="actions">';
+  const tabsMarker = '<nav class="tabs" id="tabs"></nav>';
   const titlePattern = /<title>[^<]*<\/title>/i;
   const bodyMarker = '</body>';
 
-  if (!titlePattern.test(html) || !html.includes(actionsMarker) || !html.toLowerCase().includes(bodyMarker)) {
+  if (!titlePattern.test(html) || !html.includes(actionsMarker) || !html.includes(tabsMarker) || !html.toLowerCase().includes(bodyMarker)) {
     throw new Error('Creative Studio is missing a required document landmark.');
   }
 
   const titled = html.replace(titlePattern, title);
-  const withNavigation = titled.replace(actionsMarker, `${navigation}${actionsMarker}`);
+  const withTabsRemoved = titled.replace(tabsMarker, '');
+  const withNavigation = withTabsRemoved.replace(actionsMarker, `${menu}${actionsMarker}`);
   const closingHeadIndex = withNavigation.toLowerCase().lastIndexOf('</head>');
   const closingBodyIndex = withNavigation.toLowerCase().lastIndexOf(bodyMarker);
   if (closingHeadIndex === -1 || closingBodyIndex === -1) {
