@@ -1,5 +1,7 @@
 import { defineConfig } from 'vite';
 import { resolve } from 'path';
+import react from '@vitejs/plugin-react';
+import tailwindcss from '@tailwindcss/vite';
 import { createStandaloneAppPlugin } from './src/standaloneAppRoutes.js';
 
 const routes = [
@@ -9,12 +11,13 @@ const routes = [
   'kids', 'languages', 'lesson', 'login', 'oral', 'oral_genre', 'oriki', 'owe',
   'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'pricing', 'profile',
   'trainer', 'tutor', 'educator-portal', 'voices', 'voice_lessons', 'creative-studio',
+  'development-center', 'milestone-achievement',
 ];
 
 const input = Object.fromEntries(routes.map((route) => [route, resolve(__dirname, `${route}.html`)]));
 
 export default defineConfig({
-  plugins: [createStandaloneAppPlugin(__dirname)],
+  plugins: [react(), tailwindcss(), createStandaloneAppPlugin(__dirname)],
   envPrefix: [
     'VITE_PLOTWEAVER_API_BASE_URL',
     'VITE_CONVEX_URL',

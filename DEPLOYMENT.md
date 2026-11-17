@@ -217,7 +217,9 @@ its plan) fixes it; no code change is required.
 
 `public/robots.txt` and `public/sitemap.xml` are copied into the static build.
 `vercel.json` sets `cleanUrls: true`, so `/about.html` answers `308` → `/about`;
-both files therefore advertise clean URLs only (never `<page>.html`). When a new
-public page is added at the repo root as `<name>.html`, add
+both files therefore advertise clean URLs only (never `<page>.html`). The
+Development Center and Milestone Achievement are published at `/code` and
+`/milestones`; keep both rewrites and sitemap entries in sync. When a new public
+page is added at the repo root as `<name>.html`, add
 `https://idilewa.com/<name>` to the sitemap and re-run the route sweep.
 

@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 
 const repoRoot = fileURLToPath(new URL('..', import.meta.url));
 const vercel = JSON.parse(readFileSync(join(repoRoot, 'vercel.json'), 'utf8'));
+const sitemap = readFileSync(join(repoRoot, 'public', 'sitemap.xml'), 'utf8');
 
 function headerValue(source, key) {
   const block = (vercel.headers || []).find((entry) => entry.source === source);
@@ -28,4 +29,13 @@ test('retired studio and payment entry points are gone from the deployment confi
   for (const retired of ['/studio', '/studio.html', '/curriculum', '/payment']) {
     assert.equal(sources.includes(retired), false, `${retired} should no longer be served`);
   }
+});
+
+test('new learning experiences have clean production aliases and sitemap entries', () => {
+  const rewrites = new Map((vercel.rewrites || []).map(({ source, destination }) => [source, destination]));
+
+  assert.equal(rewrites.get('/code'), '/development-center.html');
+  assert.equal(rewrites.get('/milestones'), '/milestone-achievement.html');
+  assert.match(sitemap, /<loc>https:\/\/idilewa\.com\/code<\/loc>/);
+  assert.match(sitemap, /<loc>https:\/\/idilewa\.com\/milestones<\/loc>/);
 });

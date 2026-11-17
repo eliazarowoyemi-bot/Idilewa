@@ -1,0 +1,159 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    font-family: "Helvetica Neue", "Plus Jakarta Sans", Helvetica, Arial, sans-serif;
+    background-color: #E8F3EB;
+    color: #1F3A2B;
+    -webkit-font-smoothing: antialiased;
+  }
+}
+
+/* Workspace Dotted Grid blended with Idilewa */
+.scratch-workspace-grid {
+  background-color: #FAFBF9;
+  background-image: radial-gradient(#C8DDD0 1.25px, transparent 1.25px);
+  background-size: 24px 24px;
+}
+
+/* Scratch Paint Editor Transparency Checkerboard */
+.scratch-checkerboard {
+  background-color: #FFFFFF;
+  background-image:
+    linear-gradient(45deg, #F0F2F5 25%, transparent 25%),
+    linear-gradient(-45deg, #F0F2F5 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #F0F2F5 75%),
+    linear-gradient(-45deg, transparent 75%, #F0F2F5 75%);
+  background-size: 16px 16px;
+  background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
+}
+
+/* Custom clean Scratch-style scrollbars */
+.scratch-scroll::-webkit-scrollbar {
+  width: 7px;
+  height: 7px;
+}
+
+.scratch-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scratch-scroll::-webkit-scrollbar-thumb {
+  background: rgba(87, 94, 117, 0.25);
+  border-radius: 9999px;
+}
+
+.scratch-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(87, 94, 117, 0.4);
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+html,
+body,
+#root {
+  min-width: 320px;
+  min-height: 100%;
+}
+
+.scratch-app {
+  min-height: 100dvh;
+}
+
+.scratch-stage-column {
+  min-width: 0;
+}
+
+@media (max-width: 980px) {
+  .scratch-app {
+    height: auto;
+    min-height: 100dvh;
+    overflow: visible;
+  }
+
+  .scratch-menu-bar {
+    height: auto;
+    min-height: 3rem;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    padding-block: 0.25rem;
+  }
+
+  .scratch-menu-primary,
+  .scratch-menu-account {
+    min-width: 0;
+    width: 100%;
+    flex: 1 1 100%;
+  }
+
+  .scratch-menu-account {
+    justify-content: flex-end;
+  }
+
+  .scratch-main {
+    flex: 0 0 auto;
+    flex-direction: column;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .scratch-code {
+    height: min(68dvh, 680px);
+    min-height: 460px;
+    flex: 0 0 auto;
+  }
+
+  .scratch-stage-column {
+    width: 100% !important;
+    min-height: 0;
+  }
+
+  .scratch-sprite-pane {
+    min-height: 28rem;
+    flex: 0 0 auto;
+    flex-direction: column;
+  }
+
+  .scratch-sprite-pane > div {
+    min-width: 0;
+    min-height: 13rem;
+    flex: 1 1 auto;
+  }
+}
+
+@media (max-width: 640px) {
+  .scratch-menu-bar {
+    padding-inline: 0.4rem;
+  }
+
+  .scratch-menu-primary {
+    overflow-x: auto;
+    overscroll-behavior-inline: contain;
+    scrollbar-width: thin;
+  }
+
+  .scratch-menu-primary > a > span:last-child {
+    display: none;
+  }
+
+  .scratch-menu-account {
+    overflow-x: auto;
+    justify-content: flex-start;
+    scrollbar-width: thin;
+  }
+
+  .scratch-sprite-pane {
+    gap: 0.5rem;
+  }
+
+  .scratch-tutorial-card {
+    inset-inline: 0.75rem !important;
+    inset-block-start: 4.75rem !important;
+    width: auto !important;
+    max-width: none !important;
+    max-height: calc(100dvh - 5.5rem);
+    overflow-y: auto;
+  }
+}

@@ -194,17 +194,74 @@ function transformKidsArcadeHtml(html) {
 function transformAboutHtml(html) {
   const destinations = [
     ['https://idilewa.com/academy', '/?view=academy'],
-    ['https://idilewa.com/code', '/?view=codeLab'],
+    ['https://idilewa.com/code', '/development-center.html'],
     ['https://idilewa.com/heritage', '/?view=heritageLab'],
     ['https://idilewa.com/login', '/parents.html#/parent-login'],
     ['https://idilewa.com/signup', '/parents.html#/parent-signup'],
     ['https://idilewa.com', '/'],
   ];
-  let transformed = html;
+  const heroPattern = /<div class="hero-art"[^>]*>[\s\S]*?<\/div>/;
+  if (!heroPattern.test(html)) {
+    throw new Error('About page is missing its hero image container.');
+  }
+  let transformed = html.replace(
+    heroPattern,
+    '<div class="hero-art"><img src="/assets/page-about-1.jpg" alt="A grandparent and child sharing an African language learning book" width="1264" height="848" fetchpriority="high"></div>',
+  );
+  const closingHeadIndex = transformed.toLowerCase().lastIndexOf('</head>');
+  if (closingHeadIndex === -1) throw new Error('About page is missing its closing head tag.');
+  transformed = transformed.slice(0, closingHeadIndex)
+    .concat(`<style id="idilewa-about-hero-photo">
+.hero-art{padding:0;overflow:hidden}
+.hero-art img{display:block;width:100%;height:100%;min-height:340px;aspect-ratio:1264/848;object-fit:cover;object-position:center}
+@media(max-width:800px){.hero-art img{min-height:250px}}
+</style>`, transformed.slice(closingHeadIndex));
   for (const [source, destination] of destinations) {
     transformed = transformed.replaceAll(`href="${source}"`, `href="${destination}"`);
   }
   return transformed;
+}
+
+const milestoneStorageBootstrap = `<script id="idilewa-milestone-storage-bootstrap">
+(() => {
+  const progressKey = 'idilewa-v25-progress';
+  const nativeSetItem = Storage.prototype.setItem;
+  Storage.prototype.setItem = function (key, value) {
+    let storedValue = value;
+    let detail = null;
+    if (key === progressKey) {
+      const savedAt = Date.now();
+      storedValue = JSON.stringify({ ...JSON.parse(String(value)), savedAt });
+      detail = { value: storedValue, savedAt };
+    }
+    nativeSetItem.call(this, key, storedValue);
+    if (detail) window.dispatchEvent(new CustomEvent('idilewa:milestone-progress-saved', { detail }));
+  };
+})();
+</script>`;
+
+function transformMilestoneAchievementHtml(html) {
+  const closingHeadIndex = html.toLowerCase().lastIndexOf('</head>');
+  const closingBodyIndex = html.toLowerCase().lastIndexOf('</body>');
+  if (closingHeadIndex === -1 || closingBodyIndex === -1 || closingBodyIndex < closingHeadIndex) {
+    throw new Error('Milestone Achievement is missing its document boundary tags.');
+  }
+  const withStorageBootstrap = html.slice(0, closingHeadIndex)
+    .concat(milestoneStorageBootstrap, html.slice(closingHeadIndex));
+  const adjustedBodyIndex = withStorageBootstrap.toLowerCase().lastIndexOf('</body>');
+  const bridge = `<script id="idilewa-milestone-progress-bridge">
+window.idilewaMilestoneProgress = {
+  read: () => state,
+  apply: (progress, persist = true) => {
+    state = { ...state, ...progress, seen: { ...progress.seen }, recent: [...progress.recent] };
+    if (persist) save();
+    if (active) render();
+  }
+};
+</script>
+<script type="module" src="/src/milestoneAchievementProgress.js"></script>`;
+  return withStorageBootstrap.slice(0, adjustedBodyIndex)
+    .concat(bridge, withStorageBootstrap.slice(adjustedBodyIndex));
 }
 
 function guardBilingualGame(html) {
@@ -300,7 +357,7 @@ function transformCreativeStudioHtml(html) {
   const title = '<title>Creative Studio | Ìdíléwa</title>';
   const navigation = `<nav class="studio-site-nav" aria-label="Ìdíléwa navigation">
     <a href="/">Home</a>
-    <a href="/?view=codeLab">Games &amp; Code Playground</a>
+    <a href="/development-center.html">Development Center</a>
     <a href="/kids.html">Kids Arcade</a>
     <a href="/about.html">About</a>
     <a href="/tutor.html">Tutorship</a>
@@ -510,6 +567,8 @@ export function createStandaloneAppPlugin(rootDirectory) {
         if (!context?.filename) return html;
         if (resolve(context.filename) === indexPath) return transformAppHtml(html);
         const route = basename(context.filename).replace(/\.html$/i, '');
+        if (route === 'development-center') return html;
+        if (route === 'milestone-achievement') return transformMilestoneAchievementHtml(html);
         if (!nativeAppPages.has(route)) return renderRouteRedirect(route);
         const routeHtml = route === 'kids'
           ? transformKidsArcadeHtml(html)

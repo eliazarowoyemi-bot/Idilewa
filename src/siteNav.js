@@ -15,11 +15,12 @@ const SHEET_DESTINATIONS = [
   ['Learn', [
     ['/', 'Home'],
     ['/?view=academy', 'Language Academy'],
-    ['/?view=codeLab', 'Code for Kids'],
+    ['/development-center.html', 'Development Center'],
     ['/kids.html', 'Kids Arcade'],
   ]],
   ['Explore', [
     ['/?view=heritageLab', 'Heritage Library'],
+    ['/milestone-achievement.html', 'Milestone Achievement'],
     ['/creative-studio.html', 'Creative Studio'],
     ['/faq.html', 'FAQ'],
     ['/about.html', 'About Ìdíléwa'],

@@ -19,6 +19,6 @@ test('shared footer delegates app routes while keeping static-page fallbacks', (
 
   assert.match(footer, /href="#\/index" data-route="index"/);
   assert.match(footer, /href="\/faq\.html"/);
-  assert.match(footer, /href="\/\?view=codeLab"/);
+  assert.match(footer, /href="\/development-center\.html"/);
   assert.match(footer, /href="\/parents\.html#\/privacy"/);
 });

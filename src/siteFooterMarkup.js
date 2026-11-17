@@ -4,7 +4,7 @@ const footerLinks = [
   { key: 'faq', label: 'FAQ', href: '/faq.html', route: 'faq' },
   { key: 'pricing', label: 'Pricing', href: '/pricing.html', route: 'pricing', info: 'pricing' },
   { key: 'lessons', label: 'Lessons', href: '/?view=academy', route: 'voice_lessons', view: 'academy' },
-  { key: 'code', label: 'Code', href: '/?view=codeLab', view: 'codeLab' },
+  { key: 'code', label: 'Code', href: '/development-center.html' },
   { key: 'heritage', label: 'Heritage', href: '/?view=heritageLab', route: 'oral', view: 'heritageLab' },
   { key: 'privacy', label: 'Privacy', href: '/parents.html#/privacy', route: 'privacy' },
 ];

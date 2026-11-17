@@ -46,7 +46,8 @@ test('homepage drawer shows its menu label and all primary destinations', async 
   for (const destination of [
     "['/', 'Home']",
     "['/?view=academy', 'Language Academy']",
-    "['/?view=codeLab', 'Code for Kids']",
+    "['/development-center.html', 'Development Center']",
+    "['/milestone-achievement.html', 'Milestone Achievement']",
     "['/?view=heritageLab', 'Heritage Library']",
     "['/kids.html', 'Kids Arcade']",
     "['/creative-studio.html', 'Creative Studio']",
@@ -118,8 +119,11 @@ test('native entry pages retain their app and return home or voice links to cano
     }
     if (filename === 'about.html') {
       assert.match(transformed, /href="\/\?view=academy"/);
-      assert.match(transformed, /href="\/\?view=codeLab"/);
+      assert.match(transformed, /href="\/development-center\.html"/);
       assert.match(transformed, /href="\/\?view=heritageLab"/);
+      assert.match(transformed, /<div class="hero-art"><img src="\/assets\/page-about-1\.jpg"/);
+      assert.match(transformed, /fetchpriority="high"/);
+      assert.match(transformed, /alt="A grandparent and child sharing an African language learning book"/);
       assert.doesNotMatch(transformed, /href="https:\/\/idilewa\.com/);
       assert.match(transformed, /idilewa-about-header-navigation/);
       assert.match(transformed, /#nav\{display:none!important\}/);
@@ -136,7 +140,7 @@ test('Creative Studio links back to Home and Code Playground and hardens local p
 
   assert.match(transformed, /<title>Creative Studio \| Ìdíléwa<\/title>/);
   assert.match(transformed, /href="\/">Home<\/a>/);
-  assert.match(transformed, /href="\/\?view=codeLab">Games &amp; Code Playground<\/a>/);
+  assert.match(transformed, /href="\/development-center\.html">Development Center<\/a>/);
   assert.match(transformed, /id="studioMenuToggle" type="button" aria-expanded="false" aria-controls="studioNavigationMenu"/);
   assert.match(transformed, /id="studioNavigationMenu" role="region" aria-label="Creative Studio and site navigation" hidden/);
   assert.match(transformed, /<h2 id="studioToolsLabel">Creative Studio<\/h2>\s*<nav class="tabs" id="tabs" aria-label="Creative Studio tools"><\/nav>/);
@@ -149,6 +153,18 @@ test('Creative Studio links back to Home and Code Playground and hardens local p
   assert.match(transformed, /idilewaCreativeStudioBridge/);
 });
 
+test('the supplied editor route stays intact and the milestone route receives account-sync hooks', async () => {
+  const editor = await readFile(resolve(rootDirectory, 'development-center.html'), 'utf8');
+  const milestone = await readFile(resolve(rootDirectory, 'milestone-achievement.html'), 'utf8');
+  const transformedEditor = transformEntry('development-center.html', editor);
+  const transformedMilestone = transformEntry('milestone-achievement.html', milestone);
+
+  assert.equal(transformedEditor, editor);
+  assert.match(transformedEditor, /src="\/src\/development-center\/main\.tsx"/);
+  assert.match(transformedMilestone, /idilewa-milestone-progress-bridge/);
+  assert.match(transformedMilestone, /src="\/src\/milestoneAchievementProgress\.js"/);
+});
+
 test('every built HTML entry except the homepage points to the standalone app', async () => {
   const files = await readdir(rootDirectory);
   const pages = files.filter((file) => file.endsWith('.html') && file !== 'index.html');
@@ -156,6 +172,8 @@ test('every built HTML entry except the homepage points to the standalone app', 
     'ai-conversation.html',
     'auth-callback.html',
     'about.html',
+    'development-center.html',
+    'milestone-achievement.html',
     'consent.html',
     'creative-studio.html',
     'educator-portal.html',
