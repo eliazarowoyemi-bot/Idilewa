@@ -1,5 +1,7 @@
 import * as THREE from 'three';
 import brandLogoUrl from './assets/idilewa-brand.png';
+import './styles/site-footer.css';
+import { createSiteFooterMarkup } from './src/siteFooterMarkup.js';
 import landingHomeHeroUrl from './assets/landing-home-hero.webp';
 import landingFeatureVoiceUrl from './assets/landing-feature-voice.webp';
 import landingFeatureCodeUrl from './assets/landing-feature-code.webp';
@@ -741,32 +743,21 @@ import {
     }).join('');
   }
 
-  function renderFooter(page) {
-    if (page === 'index' || page === 'voice_lessons' || page.startsWith('voice-')) {
-      return `<footer class="academy-footer"><div class="academy-footer-inner"><span>Ìdíléwa · Learn. Speak. Connect.</span><nav aria-label="Footer navigation">${routeLink('index', 'Home')}${routeLink('voice_lessons', 'Voice Lessons')}${routeLink('privacy', 'Privacy')}</nav></div></footer>`;
-    }
-    return `<footer class="site-footer">
-      <div class="container footer-main">
-        <section class="footer-contact">
-          <span class="footer-kicker">Contact us</span>
-          <h2>Let’s learn together.</h2>
-          <p>Questions about language, culture or learning? We’d love to hear from you.</p>
-          ${routeLink('contact', `Talk with our team ${icon('arrow', 15)}`, 'button button-primary footer-contact-button')}
-          <div class="footer-email">
-            <span class="footer-kicker">Or email us at</span>
-            <a href="mailto:idilewa2026@gmail.com?subject=Idilewa%20support">idilewa2026@gmail.com</a>
-          </div>
-        </section>
-        <nav class="footer-directory" aria-label="Footer navigation">
-          <section class="footer-links"><h2>Quick links</h2>${routeLink('index', 'Home')}${routeLink('languages', 'Languages')}${routeLink('voice_lessons', 'Voice lessons')}${routeLink('oral', 'Oral traditions')}</section>
-          <section class="footer-links"><h2>Information</h2>${routeLink('about', 'About Idilewa')}${routeLink('families', 'Parent portal')}${routeLink('privacy', 'Privacy policy')}</section>
-        </nav>
-      </div>
-      <div class="footer-bottom"><div class="container footer-bottom-inner">
-        <p>© Idilewa · Language · Culture · Future</p>
-        ${routeLink('contact', 'Contact Idilewa', 'footer-bottom-link')}
-      </div></div>
-    </footer>`;
+  function renderFooter() {
+    const appRoutes = {
+      home: 'index',
+      about: 'about',
+      faq: 'faq',
+      pricing: 'pricing',
+      lessons: 'voice_lessons',
+      heritage: 'oral',
+      privacy: 'privacy',
+    };
+    return createSiteFooterMarkup((item, fallback) => (
+      appRoutes[item.key]
+        ? routeLink(appRoutes[item.key], item.label, 'idFootLink')
+        : fallback(item)
+    ));
   }
 
   function pill(text, tone = 'soft') { return `<span class="pill pill-${tone}">${text}</span>`; }
@@ -6071,10 +6062,10 @@ import {
       document.getElementById('main').innerHTML = pageMarkup;
     } else if (page === 'index') {
       document.body.dataset.page = page;
-      document.getElementById('main').innerHTML = `${pageMarkup}${renderFooter(page)}`;
+      document.getElementById('main').innerHTML = `${pageMarkup}${renderFooter()}`;
     } else {
       document.body.dataset.page = page;
-      document.getElementById('main').innerHTML = `${pageMarkup}${renderPageInformationLayers(page)}${renderFooter(page)}`;
+      document.getElementById('main').innerHTML = `${pageMarkup}${renderPageInformationLayers(page)}${renderFooter()}`;
     }
     const mainElement = document.getElementById('main');
     mainElement.classList.remove('route-enter');

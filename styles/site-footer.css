@@ -1,0 +1,276 @@
+.idilewa-site-footer {
+  width: 100%;
+  margin-top: 44px;
+  border-top: 1px solid #dce9df;
+  background: linear-gradient(160deg, #fffef9 0%, #f7fbf4 80%, #f3fbf0 100%);
+  color: #172b24;
+  text-align: left;
+}
+
+.idilewa-site-footer .idFooterInner {
+  display: grid;
+  width: min(1120px, 100%);
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 0.85fr) minmax(0, 1fr);
+  align-items: start;
+  gap: clamp(24px, 4vw, 56px);
+  margin: 0 auto;
+  padding: clamp(34px, 4.6vw, 56px) clamp(18px, 3vw, 34px) 28px;
+}
+
+.idilewa-site-footer :is(.idFootAbout, .idFootQuick, .idFootConnect) {
+  min-width: 0;
+  padding: 0;
+}
+
+.idilewa-site-footer .idFootBrand {
+  display: inline-flex;
+  width: min(220px, 100%);
+  align-items: center;
+  margin: 0 0 20px;
+  text-decoration: none;
+}
+
+.idilewa-footer-logo {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.idilewa-site-footer h2 {
+  margin: 0 0 12px;
+  color: #146d37;
+  font-size: 15px;
+  font-weight: 750;
+  letter-spacing: 0;
+  line-height: 1.35;
+  text-transform: none;
+}
+
+.idilewa-site-footer .idFootAbout p {
+  max-width: 42ch;
+  margin: 0 0 18px;
+  color: #465b4d;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.idilewa-site-footer .idFootValues {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  justify-content: start;
+}
+
+.idilewa-site-footer .idFootValues > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 9px;
+  max-width: none;
+  padding: 10px 8px;
+  border: 1px solid #dce9df;
+  border-radius: 12px;
+  background: #fff;
+  color: #465b4d;
+  font-size: 11px;
+  font-weight: 650;
+  line-height: 1.4;
+  text-align: left;
+}
+
+.idilewa-site-footer .valueIcon {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  border-radius: 50%;
+  background: #e3f6df;
+  color: #087437;
+  font-size: 17px;
+}
+
+.idilewa-site-footer .idFootQuick nav {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 2px;
+  max-width: none;
+  margin: 0;
+}
+
+.idilewa-site-footer .idFootLink {
+  display: flex;
+  min-width: 0;
+  min-height: 42px;
+  align-items: center;
+  padding: 0 9px;
+  border-radius: 8px;
+  color: #465b4d;
+  font-size: 13px;
+  text-decoration: none;
+  transition: background-color 140ms ease, color 140ms ease;
+}
+
+.idilewa-site-footer .idFootLink:hover {
+  background: #e9f4e9;
+  color: #075c2e;
+}
+
+.idilewa-site-footer .idFootLink:focus-visible,
+.idilewa-site-footer .idSocialIcon:focus-visible,
+.idilewa-site-footer .idFootStart:focus-visible,
+.idFootBrand:focus-visible {
+  outline: 3px solid #168246;
+  outline-offset: 3px;
+}
+
+.idilewa-site-footer .idSocialRow {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: 8px;
+}
+
+.idilewa-site-footer .idSocialIcon {
+  display: inline-flex;
+  width: 40px;
+  height: 40px;
+  align-items: center;
+  justify-content: center;
+  padding: 9px;
+  border: 1px solid #d7e5da;
+  border-radius: 50%;
+  background: #fff;
+  color: #146d37;
+  cursor: pointer;
+  transition: background-color 140ms ease, color 140ms ease, border-color 140ms ease;
+}
+
+.idilewa-site-footer .idSocialIcon:hover {
+  border-color: #146d37;
+  background: #e9f4e9;
+}
+
+.idilewa-site-footer .idSocialIcon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.idilewa-site-footer .socialNote {
+  margin: 12px 0 0;
+  color: #596e60;
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.idilewa-site-footer .idFootBottom {
+  display: flex;
+  width: min(1120px, 100%);
+  min-height: 68px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0 auto;
+  padding: 12px clamp(18px, 3vw, 34px);
+  border-top: 1px solid #dce9df;
+  background: #006b34;
+  color: #fff;
+  font-size: 12px;
+}
+
+.idilewa-site-footer .idFootStart {
+  display: inline-flex;
+  min-height: 42px;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 15px;
+  border-radius: 999px;
+  background: #fff;
+  color: #075c2e;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background-color 140ms ease;
+}
+
+.idilewa-site-footer .idFootStart:hover {
+  background: #e9f4e9;
+}
+
+.idilewa-brand-lockup {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+}
+
+.idilewa-brand-lockup--stacked {
+  align-items: flex-start;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.idilewa-brand-logo {
+  display: block;
+  width: min(210px, 42vw);
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+body.has-mobile-bottom-navigation .idilewa-site-footer {
+  padding-bottom: calc(68px + env(safe-area-inset-bottom));
+}
+
+@media (max-width: 900px) {
+  .idilewa-site-footer .idFooterInner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+  }
+
+  .idilewa-site-footer .idFootQuick,
+  .idilewa-site-footer .idFootConnect {
+    padding-block: 20px;
+    border-top: 1px solid #dce9df;
+  }
+
+  .idilewa-site-footer .idFootAbout {
+    padding-bottom: 24px;
+  }
+
+  .idilewa-site-footer .idFootValues {
+    grid-template-columns: repeat(auto-fit, minmax(92px, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .idilewa-site-footer .idFooterInner {
+    padding: 30px 18px 22px;
+  }
+
+  .idilewa-site-footer .idFootBottom {
+    min-height: 0;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+    padding: 16px 18px calc(18px + env(safe-area-inset-bottom));
+  }
+
+  .idilewa-site-footer .idFootStart {
+    width: 100%;
+  }
+
+  .idilewa-brand-logo {
+    width: min(190px, 58vw);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .idilewa-site-footer .idFootLink,
+  .idilewa-site-footer .idSocialIcon,
+  .idilewa-site-footer .idFootStart {
+    transition-duration: 1ms;
+  }
+}

@@ -49,6 +49,7 @@ const nativeAppPages = new Set([
 ]);
 
 const footerYearAssignment = 'document.getElementById("footerYear").textContent=new Date().getFullYear();';
+const siteFooterBootstrap = '<script type="module" src="/src/siteFooter.js"></script>';
 const guardedBilingualRoot = "const root=document.querySelector('.bilingualGame'), sel=root.querySelector(";
 const safeBilingualRoot = "const root=document.querySelector('.bilingualGame');if(!root)return;const sel=root.querySelector(";
 const escapedBilingualRoot = 'const root=document.querySelector(&#x27;.bilingualGame&#x27;), sel=root.querySelector(';
@@ -276,8 +277,14 @@ document.addEventListener('DOMContentLoaded', () => {
     throw new Error('Native app page is missing its closing head tag.');
   }
   const styles = ['kids', 'tutor'].includes(route) ? nativeRouteNavigationStyles : '';
-  return routeNavigation.slice(0, closingHeadIndex)
+  const withHeadContent = routeNavigation.slice(0, closingHeadIndex)
     .concat(styles, tutorAccessibilityStyles, tutorPortalNavigation, aboutNavigation, nativeAppNavigation, routeNavigation.slice(closingHeadIndex));
+  const closingBodyIndex = withHeadContent.toLowerCase().lastIndexOf('</body>');
+  if (closingBodyIndex === -1) {
+    throw new Error('Native app page is missing its closing body tag.');
+  }
+  return withHeadContent.slice(0, closingBodyIndex)
+    .concat(siteFooterBootstrap, withHeadContent.slice(closingBodyIndex));
 }
 
 function transformCreativeStudioHtml(html) {
@@ -454,7 +461,7 @@ function transformAppHtml(html) {
   }
 
   return styled.slice(0, closingBodyIndex)
-    .concat(viewBootstrap, styled.slice(closingBodyIndex));
+    .concat(viewBootstrap, siteFooterBootstrap, styled.slice(closingBodyIndex));
 }
 
 export function createStandaloneAppPlugin(rootDirectory) {

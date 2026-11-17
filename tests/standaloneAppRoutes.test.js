@@ -36,6 +36,7 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assert.match(transformed, /\/about\.html/);
   assert.match(transformed, /link\.href = '\/parents\.html#\/parent-login'/);
   assert.match(transformed, /link\.href = '\/parents\.html#\/parent-signup'/);
+  assert.match(transformed, /src="\/src\/siteFooter\.js"/);
 });
 
 test('homepage drawer shows its menu label and all primary destinations', async () => {
@@ -96,9 +97,12 @@ test('native entry pages retain their app and return home or voice links to cano
     const closingHead = source.toLowerCase().lastIndexOf('</head>');
     if (!['about.html', 'kids.html', 'tutor.html'].includes(filename)) {
       assert.ok(transformed.startsWith(source.slice(0, closingHead)), filename);
-      assert.ok(transformed.endsWith(source.slice(closingHead)), filename);
+      const closingBody = source.toLowerCase().lastIndexOf('</body>');
+      assert.ok(transformed.includes(source.slice(closingHead, closingBody)), filename);
+      assert.ok(transformed.endsWith(source.slice(closingBody)), filename);
     }
     assert.match(transformed, /event\.stopImmediatePropagation\(\)/, filename);
+    assert.match(transformed, /src="\/src\/siteFooter\.js"/, filename);
     assert.match(transformed, /location\.assign\(link\.getAttribute\('href'\) === '#\/index' \? '\/' : '\/voice_lessons\.html'\)/, filename);
     if (filename === 'tutor.html') {
       assert.match(transformed, /href = '\/educator-portal\.html#\/tutor-signup'/);
@@ -130,6 +134,7 @@ test('Creative Studio links back to Home and Code Playground and hardens local p
   assert.match(transformed, /href="\/">Home<\/a>/);
   assert.match(transformed, /href="\/\?view=codeLab">Games &amp; Code Playground<\/a>/);
   assert.match(transformed, /src="\/src\/creativeStudioPage\.js"/);
+  assert.match(transformed, /src="\/src\/siteFooter\.js"/);
   assert.match(transformed, /idilewaCreativeStudioBridge/);
 });
 
