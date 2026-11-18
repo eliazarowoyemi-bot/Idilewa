@@ -8,7 +8,7 @@ test('homepage follows the supplied language academy design', () => {
   assert.match(appSource, /<title>Ìdíléwa Language Academy<\/title>/);
   assert.match(appSource, /Our Language\./);
   assert.match(appSource, /Our Future\./);
-  assert.match(appSource, /Learn\. Speak\. Connect\./);
+  assert.doesNotMatch(appSource, /Learn\. Speak\. Connect\./);
   assert.match(appSource, /Choose your language/);
   assert.match(appSource, /Voice Lessons/);
   assert.match(appSource, /Heritage Stories/);
