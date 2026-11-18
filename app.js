@@ -665,9 +665,7 @@ import {
       : esc(avatarLabel);
     const accountActions = currentUser
       ? `<a class="header-profile ${page === 'profile' ? 'active' : ''}" href="#/profile" data-route="profile" aria-label="Open profile"${page === 'profile' ? ' aria-current="page"' : ''}><span class="header-avatar">${profileAvatar}</span><span class="header-profile-label">${esc(currentUser.name || 'Profile')}</span></a><button class="header-signout" type="button" data-action="account-sign-out">Sign out</button>`
-      : academyShell
-        ? `${routeLink('parent-login', 'Log in', 'header-signin')}${routeLink('voice_lessons', 'Start Learning', 'button button-primary header-cta')}`
-        : `${routeLink('parent-login', 'Log in', 'header-signin')}${routeLink('parent-signup', 'Get started', 'button button-primary header-cta')}`;
+      : `${routeLink('parent-login', 'Log in', 'header-signin')}<sakuga-button type="button" class="header-cta" data-route="${academyShell ? 'voice_lessons' : 'parent-signup'}">${academyShell ? 'Start Learning' : 'Get started'}</sakuga-button>`;
     const mobileShortcuts = [
       { route: 'profile', label: 'Profile', ico: 'user' }
     ].map((item) => `<a class="mobile-menu-link ${page === item.route ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.ico, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('');
@@ -4471,7 +4469,7 @@ import {
               ? '<small class="family-password-note">Use 12 or more characters, including uppercase and lowercase letters, a number and a symbol.</small>'
               : `<div class="family-auth-options"><label class="family-remember"><input type="checkbox" name="remember" /> Remember me</label></div>`}
             <p class="family-auth-error" role="alert" hidden></p>
-            <button type="submit" class="family-button family-button-primary family-auth-submit">${signup ? 'Create Account' : 'Login'} ${icon('arrow', 15)}</button>
+            <sakuga-button type="submit" class="family-auth-submit">${signup ? 'Create Account' : 'Login'} ${icon('arrow', 15)}</sakuga-button>
           </form>
           <p class="family-auth-switch">${signup ? 'Already have an account?' : 'Don’t have an account?'} <a href="#/parent-${signup ? 'login' : 'signup'}" data-route="parent-${signup ? 'login' : 'signup'}">${signup ? 'Log in' : 'Sign up'}</a></p>
           <small class="family-auth-safe-note">${icon('lock', 13)} Your account is protected by Idilewa sign-in.</small>
@@ -4622,7 +4620,7 @@ import {
     const user = getCurrentUser() || {};
     const preferences = getParentPreferences();
     const requests = Array.isArray(parentDashboardData?.connectionRequests) ? parentDashboardData.connectionRequests : [];
-    const toggler = (key, title, description) => `<div class="family-setting-row"><div><strong>${title}</strong><p>${description}</p></div><button type="button" class="family-toggle ${preferences[key] ? 'is-on' : ''}" role="switch" aria-checked="${preferences[key]}" aria-label="${title}" data-action="parent-toggle-preference" data-setting="${key}"><span></span></button></div>`;
+    const toggler = (key, title, description) => `<div class="family-setting-row"><div><strong>${title}</strong><p>${description}</p></div><sakuga-toggle class="sakuga-setting-toggle" label="${esc(title)}" data-sakuga-toggle="parent-preference" data-setting="${key}"${preferences[key] ? ' checked' : ''}></sakuga-toggle></div>`;
     const connectionRows = parentDashboardLoading && !parentDashboardData
       ? '<p class="family-empty-inline">Loading your connections…</p>'
       : requests.length
@@ -4630,7 +4628,7 @@ import {
       : '<p class="family-empty-inline">No active educator connections.</p>';
     return renderParentWorkspace('parent-settings', `${renderParentHeading('Manage your account and preferences', 'Settings', 'Keep your family account details up to date.')}
       <div class="family-settings-layout"><section class="family-panel"><div class="family-section-heading"><div><span class="family-eyebrow">Profile information</span><h2>Account details</h2></div></div>
-        <form class="family-profile-form" data-form="parent-profile"><label>Full Name<input name="name" value="${esc(user.name || '')}" maxlength="60" autocomplete="name" required /></label><label>Email Address<input type="email" value="${esc(user.email || '')}" readonly /></label><label>Phone Number<input name="phone" type="tel" value="${esc(user.phone || '')}" maxlength="24" autocomplete="tel" /></label><p class="family-auth-error" role="alert" hidden></p><button type="submit" class="family-button family-button-primary">${icon('check', 14)} Save Changes</button></form>
+        <form class="family-profile-form" data-form="parent-profile"><label>Full Name<input name="name" value="${esc(user.name || '')}" maxlength="60" autocomplete="name" required /></label><label>Email Address<input type="email" value="${esc(user.email || '')}" readonly /></label><label>Phone Number<input name="phone" type="tel" value="${esc(user.phone || '')}" maxlength="24" autocomplete="tel" /></label><p class="family-auth-error" role="alert" hidden></p><sakuga-button type="submit" class="family-auth-submit">${icon('check', 14)} Save Changes</sakuga-button></form>
       </section><section class="family-panel family-settings-card"><div class="family-section-heading"><div><span class="family-eyebrow">Personal preferences</span><h2>Notifications</h2></div></div>
         ${toggler('emailUpdates', 'Email updates', 'Receive important account and family connection updates.')}${toggler('learningReminders', 'Learning reminders', 'Keep a local preference for family learning reminders.')}${toggler('weeklySummary', 'Weekly summary', 'Choose whether you would like a weekly learning summary.')}
         <div class="family-settings-subsection"><span class="family-eyebrow">Consent and privacy</span>${connectionRows}<a class="family-text-link" href="#/consent" data-route="consent">Review family approval ${icon('arrow', 13)}</a></div>
@@ -7229,6 +7227,23 @@ import {
 
   document.addEventListener('change', (event) => {
     const el = event.target;
+    if (el.matches('sakuga-toggle[data-sakuga-toggle="parent-preference"]')) {
+      const key = el.dataset.setting;
+      if (!['emailUpdates', 'learningReminders', 'weeklySummary'].includes(key)) return;
+      const preferences = getParentPreferences();
+      const previous = preferences[key];
+      preferences[key] = el.checked;
+      try {
+        localStorage.setItem(PARENT_PREFERENCES_KEY, JSON.stringify(preferences));
+      } catch (error) {
+        el.checked = previous;
+        showToast(error instanceof Error ? error.message : 'Your family preferences could not be saved.', 'error');
+        return;
+      }
+      render();
+      showToast('Your preferences were saved in this browser.');
+      return;
+    }
     if (el.matches('.aichat-focus-select')) {
       changeAiChatLanguage(el.value);
       return;
@@ -7362,7 +7377,10 @@ import {
     if (type === 'parent-auth') {
       if (!form.reportValidity()) return;
       const errorElement = form.querySelector('.family-auth-error');
-      const submitButton = form.querySelector('button[type="submit"]');
+      const submitButton = form.querySelector('button[type="submit"], sakuga-button[type="submit"]');
+      const showSubmitSuccess = () => {
+        if (typeof submitButton?.done === 'function') submitButton.done();
+      };
       const fail = (message) => {
         if (errorElement) {
           errorElement.textContent = message;
@@ -7395,6 +7413,7 @@ import {
             role: 'parent',
             redirectRoute: 'parent-dashboard'
           });
+          showSubmitSuccess();
           parentDashboardData = null;
           parentDashboardError = '';
           parentDashboardLoading = false;
@@ -7410,6 +7429,7 @@ import {
           return;
         }
         await signInAccount({ email, password, expectedRole: 'parent' });
+        showSubmitSuccess();
         parentDashboardData = null;
         parentDashboardError = '';
         parentDashboardLoading = false;
@@ -7432,7 +7452,7 @@ import {
     if (type === 'parent-profile') {
       if (!form.reportValidity()) return;
       const errorElement = form.querySelector('.family-auth-error');
-      const submitButton = form.querySelector('button[type="submit"]');
+      const submitButton = form.querySelector('button[type="submit"], sakuga-button[type="submit"]');
       if (submitButton) submitButton.disabled = true;
       try {
         const name = String(data.get('name') || '').trim();
@@ -7440,6 +7460,7 @@ import {
         if (!name) throw new Error('Enter your name before saving.');
         if (phone && !/^\+?[0-9\s()-]{7,24}$/.test(phone)) throw new Error('Enter a valid phone number.');
         await updateUserProfile({ name, phone });
+        if (typeof submitButton?.done === 'function') submitButton.done();
         if (errorElement) {
           errorElement.textContent = '';
           errorElement.hidden = true;

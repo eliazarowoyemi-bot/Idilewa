@@ -425,8 +425,8 @@ function studioShowAssetControls(){
   <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px">
   ${['spin','bounce','sway','slide','pulse'].map(m=>`<button onclick="studioDrawingMotion='${m}';studioShowAssetControls();draw3D()" ${studioDrawingMotion===m?'style="background:#087b39;color:white"':''}>${m}</button>`).join('')}
   </div>
-  <label style="display:block;margin-top:10px">Speed <input type="range" min=".25" max="4" step=".25" value="${studioDrawingSpeed}" oninput="studioDrawingSpeed=+this.value;document.getElementById('studioSpeed113').textContent=this.value+'×'"> <b id="studioSpeed113">${studioDrawingSpeed}×</b></label>
-  <label style="display:block;margin-top:8px">Movement amount <input type="range" min=".1" max="2" step=".1" value="${studioDrawingAmplitude}" oninput="studioDrawingAmplitude=+this.value"></label>
+  <label style="display:block;margin-top:10px">Speed <sakuga-slider class="sakuga-studio-slider" label="Animation speed" value="${studioDrawingSpeed}" min=".25" max="4" step=".25" unit="×" oninput="studioDrawingSpeed=+this.value;document.getElementById('studioSpeed113').textContent=this.value+'×'"></sakuga-slider> <b id="studioSpeed113">${studioDrawingSpeed}×</b></label>
+  <label style="display:block;margin-top:8px">Movement amount <sakuga-slider class="sakuga-studio-slider" label="Animation movement amount" value="${studioDrawingAmplitude}" min=".1" max="2" step=".1" unit="" oninput="studioDrawingAmplitude=+this.value"></sakuga-slider></label>
   <div style="margin-top:8px">Press <b>Play</b> on the animation timeline to animate your drawing.</div>`:''}
   <p style="font-size:13px;color:#486657;margin-bottom:0">My drawing is independent from the toon. Choose “My drawing” to work without a character.</p>`;
 }

@@ -16,8 +16,28 @@ const routes = [
 
 const input = Object.fromEntries(routes.map((route) => [route, resolve(__dirname, `${route}.html`)]));
 
+function sakugaVfxPlugin() {
+  const scripts = ['button.js', 'toggle.js', 'slider.js'];
+  return {
+    name: 'idilewa-sakuga-vfx',
+    transformIndexHtml: {
+      order: 'post',
+      handler() {
+        return [
+          { tag: 'link', attrs: { rel: 'stylesheet', href: '/sakuga-vfx/brand-theme.css' }, injectTo: 'head' },
+          ...scripts.map((script) => ({
+            tag: 'script',
+            attrs: { src: `/sakuga-vfx/${script}`, defer: true },
+            injectTo: 'head',
+          })),
+        ];
+      },
+    },
+  };
+}
+
 export default defineConfig({
-  plugins: [react(), tailwindcss(), createStandaloneAppPlugin(__dirname)],
+  plugins: [react(), tailwindcss(), createStandaloneAppPlugin(__dirname), sakugaVfxPlugin()],
   envPrefix: [
     'VITE_PLOTWEAVER_API_BASE_URL',
     'VITE_CONVEX_URL',

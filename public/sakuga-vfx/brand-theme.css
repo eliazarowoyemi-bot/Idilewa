@@ -1,0 +1,58 @@
+:root {
+  --sk-card: #ffffff;
+  --sk-ink: #15291f;
+  --sk-dim: #58675f;
+  --sk-soft: #d7e9dc;
+  --sk-pri: #136443;
+  --sk-pri-ink: #ffffff;
+  --sk-acc: #f59e0b;
+  --sk-track: #d7e9dc;
+  --sk-r: 999px;
+  --sk-bw: 2.4px;
+  --sk-sh: 0 5px 13px rgba(17, 91, 54, 0.22);
+  --sk-btn-sh: var(--sk-sh);
+  --sk-btn-line: var(--sk-pri);
+  --sk-alt-sh: 0 3px 8px rgba(21, 41, 31, 0.12);
+  --sk-alt-line: var(--sk-ink);
+  --sk-tick: var(--sk-ink);
+  --sk-fill: var(--sk-acc);
+  --sk-on-pri: #ffffff;
+  --sk-slider-width: min(100%, 22rem);
+}
+
+:where(sakuga-button:not(:defined), sakuga-toggle:not(:defined), sakuga-slider:not(:defined)) {
+  visibility: hidden;
+  animation: sakuga-vfx-defined-fallback 0s 2s forwards;
+}
+
+@keyframes sakuga-vfx-defined-fallback {
+  to {
+    visibility: visible;
+  }
+}
+
+sakuga-toggle {
+  display: inline-block !important;
+  margin: 0 !important;
+  vertical-align: middle;
+}
+
+sakuga-slider {
+  display: block;
+  width: min(100%, 22rem);
+  max-width: 100%;
+  margin: 0 !important;
+}
+
+sakuga-slider::part(slider) {
+  width: 100%;
+}
+
+sakuga-button.family-auth-submit {
+  display: block;
+  width: 100%;
+}
+
+sakuga-button.family-auth-submit::part(button) {
+  width: 100%;
+}

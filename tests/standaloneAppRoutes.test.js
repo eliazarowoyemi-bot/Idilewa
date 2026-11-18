@@ -46,6 +46,8 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assert.match(transformed, /\/about\.html/);
   assert.match(transformed, /link\.href = '\/parents\.html#\/parent-login'/);
   assert.match(transformed, /link\.href = '\/parents\.html#\/parent-signup'/);
+  assert.match(transformed, /<sakuga-button type="button" class="sakuga-hero-primary" onclick="go\('academy'\)">/);
+  assert.match(transformed, /<sakuga-button type="button" variant="secondary" class="sakuga-hero-secondary" onclick="go\('codeLab'\)">/);
   assert.match(transformed, /src="\/src\/siteFooter\.js"/);
   assertSupportAssistant(transformed);
 });
@@ -57,7 +59,7 @@ test('homepage drawer shows its menu label and all primary destinations', async 
   assert.match(appSource, /class="id-menu-btn"[^>]*popovertarget="idDrawer"/);
   assert.match(appSource, /<nav aria-labelledby="idDrawerTitle" class="id-drawer id-popover"[^>]*id="idDrawer" popover/);
   assert.doesNotMatch(appSource, /<dialog[^>]*id="idDrawer"/);
-  assert.match(appSource, /class="id-drawer__foot"><a[^>]*>Sign in<\/a><button[^>]*>Get Started<\/button><\/div>/);
+  assert.match(appSource, /class="id-drawer__foot"><a[^>]*>Sign in<\/a><sakuga-button[^>]*>Get Started<\/sakuga-button><\/div>/);
   for (const destination of [
     "['/', 'Home']",
     "['/?view=academy', 'Language Academy']",
