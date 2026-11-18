@@ -218,7 +218,7 @@
   width: 34px;
   height: 34px;
   flex: 0 0 auto;
-  object-fit: cover;
+  object-fit: contain;
   border-radius: 8px;
 }
 

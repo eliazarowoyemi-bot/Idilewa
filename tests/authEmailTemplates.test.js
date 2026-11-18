@@ -35,8 +35,8 @@ test('signup requires email confirmation and the frontend has no signup code ste
 test('homepage brand mark is a real PNG that can be served from public assets', async () => {
   const logo = await readFile(new URL('../public/assets/idilewa-mark.png', import.meta.url));
   assert.deepEqual([...logo.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
-  assert.equal(logo.readUInt32BE(16), 88);
-  assert.equal(logo.readUInt32BE(20), 88);
+  assert.equal(logo.readUInt32BE(16), 49);
+  assert.equal(logo.readUInt32BE(20), 54);
 });
 
 test('Supabase project config deploys all four branded authentication templates', async () => {
