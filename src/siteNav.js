@@ -1,17 +1,15 @@
 /**
- * Ìdíléwa site chrome: navigation dropdown, contextual "More" popover,
- * slide-over sheet and scroll reveal.
+ * Ìdíléwa site chrome: navigation popovers, contextual "More" popover
+ * and scroll reveal.
  *
  * Vanilla ES module - the app is plain HTML/CSS/JS (no React), so the motion
- * layer lives in CSS (see design-system.css) and this file only toggles state.
- * The sheet is a native <dialog> opened with showModal(), so the browser owns
- * the focus trap, Escape handling and the inert background; the script keeps
- * the aria state and body scroll lock in sync.
+ * layer lives in CSS (see design-system.css) and this file keeps navigation
+ * popover state and its non-Popover fallback in sync.
  */
 
 const nav = document.querySelector('[data-id-nav]');
 
-const SHEET_DESTINATIONS = [
+const NAVIGATION_DESTINATIONS = [
   ['Learn', [
     ['/', 'Home'],
     ['/?view=academy', 'Language Academy'],
@@ -35,21 +33,22 @@ const SHEET_DESTINATIONS = [
   ]],
 ];
 
-function renderSheetLinks(drawer) {
+function renderNavigationLinks(drawer) {
   const region = drawer.querySelector('.id-drawer__links');
   if (!region) return;
 
-  region.replaceChildren(...SHEET_DESTINATIONS.map(([label, links]) => {
+  region.replaceChildren(...NAVIGATION_DESTINATIONS.map(([label, links]) => {
     const group = document.createElement('div');
-    group.className = 'id-sheet__group';
+    group.className = 'id-popover__group';
 
     const heading = document.createElement('p');
-    heading.className = 'id-sheet__label';
+    heading.className = 'id-popover__label';
     heading.textContent = label;
     group.append(heading);
 
     links.forEach(([href, text]) => {
       const link = document.createElement('a');
+      link.className = 'id-popover__item';
       link.href = href;
       link.textContent = text;
       group.append(link);
@@ -99,12 +98,12 @@ function setupDropdown() {
   });
 }
 
-function setupSheet() {
+function setupNavigationPopover() {
   const drawer = document.getElementById('idDrawer');
   const openButton = document.querySelector('[data-id-menu-open]');
   if (!drawer || !openButton) return;
 
-  renderSheetLinks(drawer);
+  renderNavigationLinks(drawer);
 
   if (!openButton.querySelector('.id-menu-btn__label')) {
     const label = document.createElement('span');
@@ -113,80 +112,84 @@ function setupSheet() {
     openButton.append(label);
   }
 
-  const isDialog = drawer.tagName === 'DIALOG' && typeof drawer.showModal === 'function';
-  const closeButton = drawer.querySelector('[data-id-menu-close]');
-  const backdrop = document.querySelector('[data-id-backdrop]');
+  const supportsPopover = typeof drawer.showPopover === 'function'
+    && typeof drawer.hidePopover === 'function';
+  const supportsAnchorPositioning = typeof CSS !== 'undefined'
+    && CSS.supports?.('position-area: block-end');
 
-  const syncOpen = () => {
-    openButton.setAttribute('aria-expanded', 'true');
-    drawer.dataset.open = 'true';
-    document.body.classList.add('id-drawer-open');
+  const isOpen = () => supportsPopover
+    ? drawer.matches(':popover-open')
+    : drawer.dataset.open === 'true';
+
+  const syncState = (open) => {
+    openButton.setAttribute('aria-expanded', open ? 'true' : 'false');
+    openButton.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+    drawer.dataset.open = open ? 'true' : 'false';
   };
 
-  const syncClosed = () => {
-    openButton.setAttribute('aria-expanded', 'false');
-    drawer.dataset.open = 'false';
-    document.body.classList.remove('id-drawer-open');
+  const placeFallback = () => {
+    if (supportsAnchorPositioning || !isOpen()) return;
+    const triggerBox = openButton.getBoundingClientRect();
+    const width = drawer.offsetWidth || Math.min(360, window.innerWidth - 24);
+    const height = drawer.offsetHeight;
+    const left = Math.max(12, Math.min(triggerBox.right - width, window.innerWidth - width - 12));
+    const top = Math.max(12, Math.min(triggerBox.bottom + 8, window.innerHeight - height - 12));
+    drawer.style.insetBlockStart = `${Math.round(top)}px`;
+    drawer.style.insetInlineStart = `${Math.round(left)}px`;
+    drawer.style.insetInlineEnd = 'auto';
   };
 
-  const open = () => {
-    if (isDialog) {
-      if (!drawer.open) drawer.showModal();
-      syncOpen();
-      return;
-    }
-    drawer.hidden = false;
-    if (backdrop) {
-      backdrop.hidden = false;
-      backdrop.dataset.open = 'true';
-    }
-    syncOpen();
-  };
-
-  const close = () => {
-    if (isDialog) {
-      if (drawer.open) drawer.close();
-      syncClosed();
+  const close = ({ restoreFocus = false } = {}) => {
+    if (supportsPopover) {
+      if (isOpen()) drawer.hidePopover();
+      if (restoreFocus) openButton.focus();
       return;
     }
     drawer.hidden = true;
-    if (backdrop) {
-      backdrop.hidden = true;
-      backdrop.dataset.open = 'false';
-    }
-    syncClosed();
+    syncState(false);
+    if (restoreFocus) openButton.focus();
   };
 
-  if (!isDialog) {
+  if (!supportsPopover) {
     drawer.hidden = true;
-    if (backdrop) backdrop.hidden = true;
   }
-  syncClosed();
+  syncState(false);
 
-  openButton.addEventListener('click', open);
-  if (closeButton) closeButton.addEventListener('click', close);
-
-  if (isDialog) {
-    // Escape and the close button both end in the native close event.
-    drawer.addEventListener('close', syncClosed);
-
-    // The backdrop is part of the dialog element, so compare against its box.
-    drawer.addEventListener('click', (event) => {
-      const box = drawer.getBoundingClientRect();
-      const outside = event.clientX < box.left || event.clientX > box.right
-        || event.clientY < box.top || event.clientY > box.bottom;
-      if (outside) close();
+  if (supportsPopover) {
+    drawer.addEventListener('toggle', () => {
+      const open = isOpen();
+      syncState(open);
+      if (open) placeFallback();
     });
   } else {
-    if (backdrop) backdrop.addEventListener('click', close);
-    document.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape' && drawer.dataset.open === 'true') close();
+    openButton.addEventListener('click', () => {
+      const open = drawer.hidden;
+      drawer.hidden = !open;
+      syncState(open);
+      if (open) placeFallback();
     });
+
+    document.addEventListener('click', (event) => {
+      if (!isOpen() || drawer.contains(event.target) || openButton.contains(event.target)) return;
+      close();
+    });
+
   }
 
-  drawer.addEventListener('click', (event) => {
-    if (event.target.closest('.id-drawer__links a, .id-drawer__foot a')) close();
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Escape' || !isOpen()) return;
+    event.preventDefault();
+    close({ restoreFocus: true });
   });
+
+  drawer.addEventListener('click', (event) => {
+    if (event.target.closest('.id-drawer__links a, .id-drawer__foot a, .id-drawer__foot button')) {
+      close();
+    }
+  });
+
+  window.addEventListener('resize', placeFallback, { passive: true });
+  window.addEventListener('scroll', placeFallback, { passive: true });
 }
 
 function setupActionPopover() {
@@ -320,7 +323,7 @@ function setupFooterFaq() {
 function init() {
   if (nav) nav.dataset.idReady = 'true';
   setupDropdown();
-  setupSheet();
+  setupNavigationPopover();
   setupActionPopover();
   setupStickyHeader();
   setupReveal();
