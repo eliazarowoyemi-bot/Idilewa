@@ -1,4 +1,5 @@
 import { faqCategories, faqEntries } from './faqKnowledge.js';
+import { supportPageKnowledge, supportFaqKnowledge } from './supportAssistantKnowledge.js';
 
 const stopWords = new Set([
   'a', 'about', 'an', 'and', 'are', 'can', 'do', 'does', 'for', 'how', 'i',
@@ -142,4 +143,68 @@ export function searchFaq(query, limit = 3) {
   return sortedEntries
     .filter((entry) => entry.score >= relevanceThreshold)
     .slice(0, Math.max(0, limit));
+}
+
+export function searchSupportKnowledge(query, limit = 8) {
+  const terms = getTerms(query);
+  if (!terms.length) return [];
+
+  const normalizedQuery = normalize(query);
+  const broadTerms = new Set([
+    'child', 'children', 'family', 'families', 'get', 'help', 'idilewa', 'learn',
+    'learner', 'learners', 'page', 'pages', 'parent', 'parents', 'start', 'started',
+  ]);
+
+  const documents = [
+    ...supportFaqKnowledge.map((document) => ({ ...document, sourceType: 'faq' })),
+    ...supportPageKnowledge.map((document) => ({ ...document, sourceType: 'page' })),
+  ];
+  const rankedDocuments = documents
+    .map((document, index) => {
+      const titleTerms = new Set(getTerms(document.title));
+      const contentTerms = new Set(getTerms(document.content));
+      const keywordTerms = new Set(getTerms(document.keywords || ''));
+      const titleMatches = terms.filter((term) => titleTerms.has(term)).length;
+      const contentMatches = terms.filter((term) => contentTerms.has(term)).length;
+      const keywordMatches = terms.filter((term) => keywordTerms.has(term)).length;
+      const matchedTermCount = terms.filter((term) => titleTerms.has(term)
+        || contentTerms.has(term) || keywordTerms.has(term)).length;
+      const focusedMatch = terms.some((term) => !broadTerms.has(term)
+        && (titleTerms.has(term) || contentTerms.has(term) || keywordTerms.has(term)));
+      const gettingStartedTitleMatch = terms.some((term) => ['get', 'start', 'started'].includes(term)
+        && titleTerms.has(term));
+      const phraseMatch = normalizedQuery.length > 3
+        && normalize(`${document.title} ${document.content}`).includes(normalizedQuery);
+      const score = titleMatches * 4
+        + contentMatches * 1.4
+        + keywordMatches * 2
+        + (document.sourceType === 'page' ? 2.5 : 0)
+        + (phraseMatch ? 6 : 0);
+
+      return {
+        ...document,
+        score,
+        index,
+        matchedTermCount,
+        focusedMatch,
+        gettingStartedTitleMatch,
+        phraseMatch,
+      };
+    })
+    .filter((document) => document.score >= 2.5
+      && (terms.length < 2
+        || document.matchedTermCount >= 2
+        || document.focusedMatch
+        || document.gettingStartedTitleMatch
+        || document.phraseMatch))
+    .sort((left, right) => right.score - left.score || left.index - right.index);
+  const pageResults = rankedDocuments.filter((document) => document.sourceType === 'page')
+    .slice(0, Math.ceil(Math.min(12, limit) / 2));
+  const faqResults = rankedDocuments.filter((document) => document.sourceType === 'faq')
+    .slice(0, Math.floor(Math.min(12, limit) / 2));
+
+  return [...pageResults, ...faqResults]
+    .sort((left, right) => right.score - left.score || left.index - right.index)
+    .slice(0, Math.max(0, Math.min(12, limit)))
+    .map(({ title, content, url, label, score }) => ({ title, content, url, label, score }));
 }

@@ -1,7 +1,8 @@
 import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
-import { searchFaq } from '../src/supportAssistantSearch.js';
+import { searchFaq, searchSupportKnowledge } from '../src/supportAssistantSearch.js';
+import { supportPageKnowledge } from '../src/supportAssistantKnowledge.js';
 
 test('local FAQ search matches accents and returns the relevant product route', () => {
   const results = searchFaq('Which languages can I learn?');
@@ -11,6 +12,8 @@ test('local FAQ search matches accents and returns the relevant product route', 
   assert.equal(result.url, '/?view=academy');
   assert.equal(results.length, 1);
   assert.equal(results[0].url, '/?view=academy');
+  assert.match(result.answer, /Yorùbá, Igbo, Hausa, and Kiswahili/);
+  assert.match(result.answer, /Nigerian Pidgin is available in AI Conversation/);
 });
 
 test('local FAQ search prioritizes language coverage for a named language', () => {
@@ -37,10 +40,48 @@ test('local FAQ search returns no answer when the maintained dataset has no rele
   assert.deepEqual(searchFaq('quantum payroll forecasting'), []);
 });
 
-test('assistant discloses its curated scope and does not send or persist messages', async () => {
+test('site knowledge search returns sources across a multi-part Idilewa question', () => {
+  const results = searchSupportKnowledge(
+    'How can my child learn Yoruba, practise speaking, and explore coding?',
+    10,
+  );
+  const titles = results.map((result) => result.title);
+
+  assert.ok(titles.includes('Language Academy'));
+  assert.ok(titles.includes('Voice Lessons and pronunciation'));
+  assert.ok(titles.includes('Code Playground and Development Center'));
+  assert.ok(results.every((result) => result.url.startsWith('/')));
+});
+
+test('site knowledge search avoids unrelated pages on broad family questions', () => {
+  const results = searchSupportKnowledge('How can my family get started?');
+  const urls = results.map((result) => result.url);
+
+  assert.ok(urls.includes('/'));
+  assert.ok(urls.includes('/about'));
+  assert.ok(!urls.includes('/family-tasks'));
+});
+
+test('assistant uses the live AI client and accurately discloses Gemini processing', async () => {
   const assistant = await readFile(new URL('../src/supportAssistant.js', import.meta.url), 'utf8');
 
-  assert.match(assistant, /not live AI/);
-  assert.match(assistant, /not sent to a service or saved/);
-  assert.doesNotMatch(assistant, /fetch\s*\(|localStorage|sessionStorage|XMLHttpRequest|WebSocket/);
+  assert.match(assistant, /AI guide for Idilewa/);
+  assert.match(assistant, /Messages go to Gemini/);
+  assert.match(assistant, /aren’t stored by Ìdíléwa/);
+  assert.doesNotMatch(assistant, /not live AI|not sent to a service or saved/);
+  assert.match(assistant, /sendSupportAssistantMessage/);
+});
+
+test('site knowledge includes every public sitemap route or its canonical replacement', async () => {
+  const sitemap = await readFile(new URL('../public/sitemap.xml', import.meta.url), 'utf8');
+  const sitemapRoutes = [...sitemap.matchAll(/<loc>(https:\/\/idilewa\.com[^<]+)<\/loc>/g)]
+    .map(([, value]) => new URL(value).pathname);
+  const indexedRoutes = new Set(supportPageKnowledge.map((page) => page.url));
+  const canonicalRoutes = new Map([['/trainer', '/voice_lessons']]);
+
+  assert.ok(sitemapRoutes.length >= 20);
+  assert.deepEqual(
+    sitemapRoutes.filter((route) => !indexedRoutes.has(canonicalRoutes.get(route) || route)),
+    [],
+  );
 });

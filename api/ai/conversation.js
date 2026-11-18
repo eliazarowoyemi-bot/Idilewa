@@ -5,9 +5,12 @@ import {
   AI_CONVERSATION_LANGUAGES,
   createAiKnowledgeEmbedding,
   generateAiConversationReply,
+  generateSupportAssistantReply,
   getAiProviderConfig,
   parseAiConversationRequest,
+  parseSupportAssistantRequest,
 } from '../../src/server/aiConversation.js';
+import { searchSupportKnowledge } from '../../src/supportAssistantSearch.js';
 
 const MAX_BODY_BYTES = 16 * 1024;
 const MAX_KNOWLEDGE_ITEMS = 4;
@@ -98,7 +101,7 @@ function safeSourceUrl(value) {
   }
 }
 
-async function enforceRateLimit(database, req, userId = '') {
+async function enforceRateLimit(database, req, userId = '', maxRequests = 20) {
   const hmacKey = process.env.AI_RATE_LIMIT_HMAC_KEY?.trim()
     || process.env.SUPABASE_SERVICE_ROLE_KEY?.trim();
   if (!hmacKey) {
@@ -109,7 +112,7 @@ async function enforceRateLimit(database, req, userId = '') {
     .digest('hex');
   const { data, error } = await database.rpc('consume_ai_conversation_rate_limit', {
     p_bucket_hash: bucketHash,
-    p_max_requests: 20,
+    p_max_requests: maxRequests,
     p_window_seconds: 60,
   });
   if (error) {
@@ -266,14 +269,33 @@ export default async function handler(req, res) {
 
     const parsedBody = parseBody(req);
     if (parsedBody.error) return sendJson(res, parsedBody.error.status, { error: parsedBody.error.message });
-    const request = parseAiConversationRequest(parsedBody.body);
+    const isSupportRequest = parsedBody.body?.mode === 'support';
+    const request = isSupportRequest
+      ? parseSupportAssistantRequest(parsedBody.body)
+      : parseAiConversationRequest(parsedBody.body);
     if (request.error) return sendJson(res, 400, { error: request.error });
-    if (request.conversationId && !user) {
+    if (!isSupportRequest && request.conversationId && !user) {
       return sendJson(res, 401, { error: 'Sign in to continue a saved conversation.' });
     }
 
     const providerConfig = getAiProviderConfig();
-    await enforceRateLimit(database, req, user?.id);
+    await enforceRateLimit(database, req, isSupportRequest ? '' : user?.id, isSupportRequest ? 10 : 20);
+
+    if (isSupportRequest) {
+      const knowledge = searchSupportKnowledge(request.message);
+      const result = await generateSupportAssistantReply({
+        message: request.message,
+        messages: request.messages,
+        knowledge,
+        config: providerConfig,
+      });
+      return sendJson(res, 200, {
+        reply: result.reply,
+        persisted: false,
+        provider: 'Gemini · ' + result.model,
+        sources: knowledge.map(({ title, label, url }) => ({ title, label, url })),
+      });
+    }
 
     let messages = request.messages;
     if (request.conversationId && user) {

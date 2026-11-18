@@ -1,5 +1,5 @@
 import './supportAssistant.css';
-import { searchFaq } from './supportAssistantSearch.js';
+import { sendSupportAssistantMessage } from './supportAssistantClient.js';
 
 const assistantId = 'idilewa-support-assistant';
 if (!document.getElementById(assistantId)) {
@@ -17,7 +17,7 @@ if (!document.getElementById(assistantId)) {
       <header class="id-support-header">
         <div>
           <h2 id="id-support-title">Ask Ìdíléwa</h2>
-          <p>Answers from our Help Centre</p>
+          <p>AI guide for Idilewa</p>
         </div>
         <button class="id-support-close" type="button" aria-label="Close help assistant">
           <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
@@ -25,21 +25,21 @@ if (!document.getElementById(assistantId)) {
           </svg>
         </button>
       </header>
-      <p class="id-support-note">This assistant searches curated FAQs; it is not live AI. Your message is not sent to a service or saved by this assistant.</p>
-      <div class="id-support-log" role="log" aria-label="Help conversation" aria-relevant="additions">
+      <p class="id-support-note">AI answers draw on Idilewa pages. Messages go to Gemini and aren’t stored by Ìdíléwa. Don’t share passwords or private details.</p>
+      <div class="id-support-log" role="log" aria-label="Idilewa assistant conversation" aria-relevant="additions">
       </div>
       <div class="id-support-suggestions" role="group" aria-label="Suggested questions">
         <p>Try asking</p>
         <button type="button">Which languages can I learn?</button>
-        <button type="button">Is tutor booking available?</button>
-        <button type="button">How do family tasks work?</button>
+        <button type="button">How can my family get started?</button>
+        <button type="button">What can I do in Code and Creative Studio?</button>
       </div>
       <form class="id-support-form">
         <label for="id-support-input">Your question</label>
-        <p id="id-support-hint">Search the current, verified Help Centre answers.</p>
+        <p id="id-support-hint">Ask about pages, features, plans, or how they work together.</p>
         <div class="id-support-compose">
-          <input id="id-support-input" type="search" maxlength="250" required autocomplete="off" enterkeyhint="search" aria-describedby="id-support-hint" placeholder="Type a question">
-          <button type="submit" aria-label="Search Help Centre">
+          <textarea id="id-support-input" name="message" rows="2" maxlength="1000" required aria-describedby="id-support-hint" placeholder="Ask anything about Idilewa"></textarea>
+          <button type="submit" aria-label="Send message">
             <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
               <path d="M3 10h13M10 4l6 6-6 6"></path>
             </svg>
@@ -61,55 +61,85 @@ if (!document.getElementById(assistantId)) {
   const form = host.querySelector('.id-support-form');
   const input = host.querySelector('#id-support-input');
   const suggestions = host.querySelector('.id-support-suggestions');
+  const submitButton = form.querySelector('button[type="submit"]');
+  const suggestionButtons = [...suggestions.querySelectorAll('button')];
+  const messageHistory = [];
+  let isSubmitting = false;
 
   function appendTextMessage(text, kind) {
     const message = document.createElement('p');
     message.className = `id-support-message id-support-message--${kind}`;
     message.textContent = text;
+    if (kind === 'status') message.setAttribute('role', 'status');
     log.append(message);
     log.scrollTop = log.scrollHeight;
   }
 
-  function appendResult(result) {
-    const article = document.createElement('article');
-    article.className = 'id-support-result';
-    const heading = document.createElement('h3');
-    heading.textContent = result.question;
-    const answer = document.createElement('p');
-    answer.textContent = result.answer;
-    const source = document.createElement('a');
-    source.href = result.url;
-    source.textContent = `More: ${result.label}`;
-    article.append(heading, answer, source);
-    log.append(article);
+  function appendSources(sources) {
+    if (!sources.length) return;
+    const container = document.createElement('div');
+    container.className = 'id-support-sources';
+    const label = document.createElement('p');
+    label.textContent = 'Explore related pages';
+    const links = document.createElement('div');
+    links.className = 'id-support-source-links';
+    sources.slice(0, 5).forEach((source) => {
+      const link = document.createElement('a');
+      link.href = source.url;
+      link.textContent = source.title;
+      links.append(link);
+    });
+    container.append(label, links);
+    log.append(container);
     log.scrollTop = log.scrollHeight;
   }
 
-  function submitQuestion(question) {
+  async function submitQuestion(question) {
     const trimmedQuestion = question.trim();
-    if (!trimmedQuestion) return;
+    if (!trimmedQuestion || isSubmitting) return;
 
     appendTextMessage(trimmedQuestion, 'user');
-    const results = searchFaq(trimmedQuestion);
-    if (!results.length) {
+    input.value = '';
+    isSubmitting = true;
+    submitButton.disabled = true;
+    suggestionButtons.forEach((button) => { button.disabled = true; });
+    form.setAttribute('aria-busy', 'true');
+    const status = document.createElement('p');
+    status.className = 'id-support-message id-support-message--status';
+    status.setAttribute('role', 'status');
+    status.textContent = 'Thinking…';
+    log.append(status);
+    log.scrollTop = log.scrollHeight;
+
+    try {
+      const result = await sendSupportAssistantMessage({
+        message: trimmedQuestion,
+        messages: messageHistory,
+      });
+      status.remove();
+      appendTextMessage(result.reply, 'assistant');
+      appendSources(result.sources);
+      messageHistory.push(
+        { role: 'user', text: trimmedQuestion },
+        { role: 'assistant', text: result.reply },
+      );
+      if (messageHistory.length > 8) messageHistory.splice(0, messageHistory.length - 8);
+    } catch (error) {
+      status.remove();
       appendTextMessage(
-        'I could not find a verified answer for that yet, so I will not guess. Try another topic, browse the Help Centre, or email support@idilewa.com.',
+        error instanceof Error ? error.message : 'The assistant could not complete this request. Please try again.',
         'assistant',
       );
-      return;
+    } finally {
+      isSubmitting = false;
+      submitButton.disabled = false;
+      suggestionButtons.forEach((button) => { button.disabled = false; });
+      form.removeAttribute('aria-busy');
     }
-
-    appendTextMessage(
-      results.length === 1
-        ? 'Here is the closest verified answer I found:'
-        : `Here are ${results.length} relevant answers from the Help Centre:`,
-      'assistant',
-    );
-    results.forEach(appendResult);
   }
 
   appendTextMessage(
-    'Hello! Ask about learning, family accounts, culture, tutors, plans, or support. I can only answer from the curated FAQs shown on this site.',
+    'Hi! I’m Ìdíléwa’s AI guide. Ask about our pages and features, or how different parts of the site work together.',
     'assistant',
   );
 
@@ -135,8 +165,7 @@ if (!document.getElementById(assistantId)) {
 
   form.addEventListener('submit', (event) => {
     event.preventDefault();
-    submitQuestion(input.value);
-    input.value = '';
+    void submitQuestion(input.value);
   });
 
   suggestions.addEventListener('click', (event) => {

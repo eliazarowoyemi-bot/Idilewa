@@ -14,7 +14,7 @@ export const faqEntries = [
   ['Who is Ìdíléwa for?', 'Children, parents, families, and adult learners can explore African languages, culture, and technology. Activities are designed for different ages and abilities.', 1],
   ['How do I get started?', 'Explore the academy, choose a language or activity, and create an account when you are ready to save your learning progress.', 1],
   ['Do I need prior knowledge of an African language?', 'No. The language activities welcome beginners as well as learners who already know some words and expressions.', 1],
-  ['Which languages does the Language Academy cover?', 'The academy includes Yorùbá, Igbo, Hausa, Kiswahili, and Nigerian Pidgin learning experiences.', 2],
+  ['Which languages does the Language Academy cover?', 'The Language Academy currently highlights Yorùbá, Igbo, Hausa, and Kiswahili. Nigerian Pidgin is available in AI Conversation and selected Plotweaver voice tools where supported; language availability varies by service.', 2],
   ['Are lessons suitable for different ages?', 'Learning activities are designed to support children and learners at different stages. Families should choose content appropriate for each child.', 2],
   ['Can I practise pronunciation?', 'Voice Lessons and listening activities support pronunciation practice. Microphone-based features depend on your browser permissions and device.', 2],
   ['Can I see English translations with lessons?', 'Many learning activities include English explanations or translations alongside the language content.', 2],

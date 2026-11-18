@@ -11,13 +11,15 @@
 }
 
 #idilewa-support-assistant button,
-#idilewa-support-assistant input {
+#idilewa-support-assistant input,
+#idilewa-support-assistant textarea {
   font: inherit;
 }
 
 #idilewa-support-assistant button:focus-visible,
 #idilewa-support-assistant a:focus-visible,
-#idilewa-support-assistant input:focus-visible {
+#idilewa-support-assistant input:focus-visible,
+#idilewa-support-assistant textarea:focus-visible {
   outline: 3px solid #287747;
   outline-offset: 3px;
 }
@@ -175,6 +177,12 @@
   overflow-wrap: anywhere;
 }
 
+#idilewa-support-assistant .id-support-message--status {
+  align-self: flex-start;
+  color: var(--support-muted);
+  font-style: italic;
+}
+
 #idilewa-support-assistant .id-support-result {
   padding: 11px 12px 12px;
   border: 1px solid var(--support-line);
@@ -204,6 +212,45 @@
   font-size: 13px;
   font-weight: 700;
   text-underline-offset: 3px;
+}
+
+#idilewa-support-assistant .id-support-sources {
+  display: grid;
+  align-self: flex-start;
+  gap: 6px;
+  max-width: 100%;
+}
+
+#idilewa-support-assistant .id-support-sources > p {
+  margin: 0;
+  color: var(--support-muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+#idilewa-support-assistant .id-support-source-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+#idilewa-support-assistant .id-support-source-links a {
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  padding: 5px 9px;
+  border: 1px solid #d5e0d5;
+  border-radius: 999px;
+  background: #fff;
+  color: var(--support-forest);
+  font-size: 12px;
+  font-weight: 700;
+  text-underline-offset: 3px;
+  overflow-wrap: anywhere;
+}
+
+#idilewa-support-assistant .id-support-source-links a:hover {
+  background: #f1f7f0;
 }
 
 #idilewa-support-assistant .id-support-suggestions {
@@ -264,19 +311,22 @@
   gap: 8px;
 }
 
-#idilewa-support-assistant .id-support-compose input {
+#idilewa-support-assistant .id-support-compose textarea {
   width: 100%;
   min-width: 0;
-  min-height: 46px;
-  padding: 0 12px;
+  min-height: 54px;
+  max-height: 120px;
+  padding: 10px 12px;
   border: 1px solid #aebdaf;
   border-radius: 11px;
   background: #fff;
   color: var(--support-ink);
   font-size: 14px;
+  line-height: 1.4;
+  resize: vertical;
 }
 
-#idilewa-support-assistant .id-support-compose input::placeholder {
+#idilewa-support-assistant .id-support-compose textarea::placeholder {
   color: #5c6e62;
   opacity: 1;
 }
@@ -296,6 +346,12 @@
 
 #idilewa-support-assistant .id-support-compose button:hover {
   background: var(--support-forest-dark);
+}
+
+#idilewa-support-assistant .id-support-compose button:disabled,
+#idilewa-support-assistant .id-support-suggestions button:disabled {
+  cursor: wait;
+  opacity: 0.65;
 }
 
 #idilewa-support-assistant .id-support-footer {
