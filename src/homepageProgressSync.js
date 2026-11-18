@@ -3,6 +3,7 @@ import {
   restoreAuthSession,
   saveProgress,
 } from './supabaseClient.js';
+import { installHomepageLearningView } from './homepageLearningView.js';
 
 const LESSON_TYPE = 'homepage-academy-stage';
 const TOTAL_STAGES = 20;
@@ -240,5 +241,6 @@ export function installHomepageProgressSync({
 }
 
 if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+  installHomepageLearningView();
   installHomepageProgressSync();
 }
