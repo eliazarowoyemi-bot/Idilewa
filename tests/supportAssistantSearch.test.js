@@ -79,14 +79,16 @@ test('multi-part language questions include the matching Pidgin tools without un
   assert.equal(academyFaq.url, '/?view=academy');
 });
 
-test('assistant uses the live AI client and accurately discloses Gemini processing', async () => {
+test('assistant provides a Privacy link and documents support processing in the policy', async () => {
   const assistant = await readFile(new URL('../src/supportAssistant.js', import.meta.url), 'utf8');
+  const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 
   assert.match(assistant, /AI guide for Idilewa/);
-  assert.match(assistant, /Messages go to Gemini/);
-  assert.match(assistant, /aren’t stored by Ìdíléwa/);
+  assert.match(assistant, /href="\/parents\.html#\/privacy">Privacy<\/a>/);
   assert.doesNotMatch(assistant, /not live AI|not sent to a service or saved/);
   assert.match(assistant, /sendSupportAssistantMessage/);
+  assert.match(app, /question and recent messages are sent to Gemini by Google/);
+  assert.match(app, /Idilewa does not save support chats/);
 });
 
 test('site knowledge includes every public sitemap route or its canonical replacement', async () => {

@@ -25,7 +25,6 @@ if (!document.getElementById(assistantId)) {
           </svg>
         </button>
       </header>
-      <p class="id-support-note">AI answers draw on Idilewa pages. Messages go to Gemini and aren’t stored by Ìdíléwa. Don’t share passwords or private details.</p>
       <div class="id-support-log" role="log" aria-label="Idilewa assistant conversation" aria-relevant="additions">
       </div>
       <div class="id-support-suggestions" role="group" aria-label="Suggested questions">
@@ -48,6 +47,7 @@ if (!document.getElementById(assistantId)) {
       </form>
       <footer class="id-support-footer">
         <a href="/faq.html">Browse FAQs</a>
+        <a href="/parents.html#/privacy">Privacy</a>
         <a href="mailto:support@idilewa.com">Email support</a>
       </footer>
     </aside>

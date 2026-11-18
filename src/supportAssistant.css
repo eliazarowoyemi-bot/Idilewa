@@ -133,15 +133,6 @@
   stroke-width: 1.8;
 }
 
-#idilewa-support-assistant .id-support-note {
-  margin: 0;
-  padding: 10px 18px;
-  background: #f5f8f3;
-  color: #385445;
-  font-size: 12px;
-  line-height: 1.45;
-}
-
 #idilewa-support-assistant .id-support-log {
   display: flex;
   min-height: 118px;
@@ -384,8 +375,7 @@
 }
 
 @media (max-height: 520px) {
-  #idilewa-support-assistant .id-support-suggestions,
-  #idilewa-support-assistant .id-support-note {
+  #idilewa-support-assistant .id-support-suggestions {
     display: none;
   }
 }

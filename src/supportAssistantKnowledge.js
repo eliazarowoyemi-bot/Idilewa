@@ -160,7 +160,7 @@ export const supportPageKnowledge = Object.freeze([
     label: 'Privacy',
     url: '/parents.html#/privacy',
     keywords: 'privacy data accounts children browser storage Supabase review delete',
-    content: 'The Privacy page says signed-in learner progress, code submissions, and voice practice can be saved to the account, while guest drafts, preferences, and profile photos stay in the current browser. Child accounts require guardian email approval, and tutor connections require separate approval. Do not enter sensitive child details. Families can clear browser data or contact Idilewa to request review or deletion of account data.',
+    content: 'The Privacy page says signed-in learner progress, code submissions, and voice practice can be saved to the account, while guest drafts, preferences, and profile photos stay in the current browser. Questions and recent messages sent to the site support assistant are processed by Gemini to generate replies; Idilewa does not save support chats. Child accounts require guardian email approval, and tutor connections require separate approval. Do not enter sensitive child details. Families can clear browser data or contact Idilewa to request review or deletion of account data.',
   },
   {
     title: 'Contact the Idilewa team',
