@@ -50,15 +50,7 @@ const nativeAppPages = new Set([
 
 const footerYearAssignment = 'document.getElementById("footerYear").textContent=new Date().getFullYear();';
 const siteFooterBootstrap = '<script type="module" src="/src/siteFooter.js"></script>';
-const agentencyWidgetBootstrap = `<script
-  src="https://agentency.com/js/chatbot-widget.js"
-  defer
-  data-widget-token="wt_9lw7ShUsUYqiB3BYBb0HC4NZKxKHFkkOCvLzQogrkhX1vtoU"
-  data-api-base-url="https://api.agentency.com"
-  data-language="default"
-  referrerpolicy="strict-origin-when-cross-origin"
-  crossorigin="anonymous">
-</script>`;
+const supportAssistantBootstrap = '<script type="module" src="/src/supportAssistant.js"></script>';
 const guardedBilingualRoot = "const root=document.querySelector('.bilingualGame'), sel=root.querySelector(";
 const safeBilingualRoot = "const root=document.querySelector('.bilingualGame');if(!root)return;const sel=root.querySelector(";
 const escapedBilingualRoot = 'const root=document.querySelector(&#x27;.bilingualGame&#x27;), sel=root.querySelector(';
@@ -565,14 +557,14 @@ function transformAppHtml(html) {
     .concat(viewBootstrap, siteFooterBootstrap, styled.slice(closingBodyIndex));
 }
 
-function injectAgentencyWidget(html) {
-  if (/data-widget-token="wt_[^"]+"/.test(html)) return html;
+function injectSupportAssistant(html) {
+  if (/src="\/src\/supportAssistant\.js"/.test(html)) return html;
   const closingBodyIndex = html.toLowerCase().lastIndexOf('</body>');
   if (closingBodyIndex === -1) {
     throw new Error('Public page is missing its closing body tag.');
   }
   return html.slice(0, closingBodyIndex)
-    .concat(agentencyWidgetBootstrap, html.slice(closingBodyIndex));
+    .concat(supportAssistantBootstrap, html.slice(closingBodyIndex));
 }
 
 export function createStandaloneAppPlugin(rootDirectory) {
@@ -585,13 +577,14 @@ export function createStandaloneAppPlugin(rootDirectory) {
       handler(html, context) {
         if (!context?.filename) return html;
         if (resolve(context.filename) === indexPath) {
-          return injectAgentencyWidget(transformAppHtml(html));
+          return injectSupportAssistant(transformAppHtml(html));
         }
         const route = basename(context.filename).replace(/\.html$/i, '');
-        if (route === 'development-center') return injectAgentencyWidget(html);
+        if (route === 'development-center') return injectSupportAssistant(html);
         if (route === 'milestone-achievement') {
-          return injectAgentencyWidget(transformMilestoneAchievementHtml(html));
+          return injectSupportAssistant(transformMilestoneAchievementHtml(html));
         }
+        if (route === 'pricing') return injectSupportAssistant(html);
         if (!nativeAppPages.has(route)) return renderRouteRedirect(route);
         const routeHtml = route === 'kids'
           ? transformKidsArcadeHtml(html)
@@ -602,13 +595,13 @@ export function createStandaloneAppPlugin(rootDirectory) {
         if (route === 'kids') {
           const closingBodyIndex = nativeHtml.toLowerCase().lastIndexOf('</body>');
           if (closingBodyIndex === -1) throw new Error('Kids Arcade is missing its closing body tag.');
-          return injectAgentencyWidget(nativeHtml.slice(0, closingBodyIndex)
+          return injectSupportAssistant(nativeHtml.slice(0, closingBodyIndex)
             .concat('<script type="module" src="/src/arcadeProgress.js"></script>', nativeHtml.slice(closingBodyIndex)));
         }
         const transformed = route === 'creative-studio'
           ? transformCreativeStudioHtml(nativeHtml)
           : nativeHtml;
-        return injectAgentencyWidget(transformed);
+        return injectSupportAssistant(transformed);
       },
     },
   };

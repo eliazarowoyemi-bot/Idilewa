@@ -13,18 +13,14 @@ function transformEntry(filename, html = '') {
   return plugin.transformIndexHtml.handler(html, { filename: resolve(rootDirectory, filename) });
 }
 
-function assertAgentencyWidget(html) {
-  const widgetScripts = html.match(
-    /<script\b(?=[^>]*src="https:\/\/agentency\.com\/js\/chatbot-widget\.js")[^>]*>/g,
+function assertSupportAssistant(html) {
+  const assistantScripts = html.match(
+    /<script\b(?=[^>]*src="\/src\/supportAssistant\.js")[^>]*>/g,
   ) || [];
 
-  assert.equal(widgetScripts.length, 1);
-  assert.match(widgetScripts[0], /\bdefer\b/);
-  assert.match(widgetScripts[0], /data-widget-token="wt_[^"]+"/);
-  assert.match(widgetScripts[0], /data-api-base-url="https:\/\/api\.agentency\.com"/);
-  assert.match(widgetScripts[0], /data-language="default"/);
-  assert.match(widgetScripts[0], /referrerpolicy="strict-origin-when-cross-origin"/);
-  assert.match(widgetScripts[0], /crossorigin="anonymous"/);
+  assert.equal(assistantScripts.length, 1);
+  assert.match(assistantScripts[0], /type="module"/);
+  assert.doesNotMatch(html, /agentency\.com|data-widget-token/);
 }
 
 test('homepage serves the supplied academy app and guards its optional embedded controls', () => {
@@ -51,7 +47,7 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assert.match(transformed, /link\.href = '\/parents\.html#\/parent-login'/);
   assert.match(transformed, /link\.href = '\/parents\.html#\/parent-signup'/);
   assert.match(transformed, /src="\/src\/siteFooter\.js"/);
-  assertAgentencyWidget(transformed);
+  assertSupportAssistant(transformed);
 });
 
 test('homepage drawer shows its menu label and all primary destinations', async () => {
@@ -125,7 +121,7 @@ test('native entry pages retain their app and return home or voice links to cano
     }
     assert.match(transformed, /event\.stopImmediatePropagation\(\)/, filename);
     assert.match(transformed, /src="\/src\/siteFooter\.js"/, filename);
-    assertAgentencyWidget(transformed);
+    assertSupportAssistant(transformed);
     if (filename === 'ai-conversation.html') {
       assert.equal((transformed.match(/src="\/src\/siteFooter\.js"/g) || []).length, 1);
     }
@@ -176,7 +172,17 @@ test('Creative Studio links back to Home and Code Playground and hardens local p
   assert.match(transformed, /src="\/src\/creativeStudioPage\.js"/);
   assert.match(transformed, /src="\/src\/siteFooter\.js"/);
   assert.match(transformed, /idilewaCreativeStudioBridge/);
-  assertAgentencyWidget(transformed);
+  assertSupportAssistant(transformed);
+});
+
+test('pricing keeps its existing app shell and receives the support assistant once', async () => {
+  const source = await readFile(resolve(rootDirectory, 'pricing.html'), 'utf8');
+  const transformed = transformEntry('pricing.html', source);
+
+  assert.match(transformed, /data-default-route="pricing"/);
+  assert.match(transformed, /src="\.\/app\.js"/);
+  assertSupportAssistant(transformed);
+  assert.doesNotMatch(transformed, /src="\/src\/siteFooter\.js"/);
 });
 
 test('the supplied editor route stays intact and the milestone route receives account-sync hooks', async () => {
@@ -185,17 +191,17 @@ test('the supplied editor route stays intact and the milestone route receives ac
   const transformedEditor = transformEntry('development-center.html', editor);
   const transformedMilestone = transformEntry('milestone-achievement.html', milestone);
 
-  const withoutWidget = transformedEditor.replace(
-    /<script\s+src="https:\/\/agentency\.com\/js\/chatbot-widget\.js"[\s\S]*?<\/script>/,
+  const withoutAssistant = transformedEditor.replace(
+    /<script\s+type="module"\s+src="\/src\/supportAssistant\.js"><\/script>/,
     '',
   );
-  assert.equal(withoutWidget, editor);
+  assert.equal(withoutAssistant, editor);
   assert.match(transformedEditor, /src="\/src\/development-center\/main\.tsx"/);
-  assertAgentencyWidget(transformedEditor);
+  assertSupportAssistant(transformedEditor);
   assert.equal(transformEntry('development-center.html', transformedEditor), transformedEditor);
   assert.match(transformedMilestone, /idilewa-milestone-progress-bridge/);
   assert.match(transformedMilestone, /src="\/src\/milestoneAchievementProgress\.js"/);
-  assertAgentencyWidget(transformedMilestone);
+  assertSupportAssistant(transformedMilestone);
 });
 
 test('every built HTML entry except the homepage points to the standalone app', async () => {
@@ -214,6 +220,7 @@ test('every built HTML entry except the homepage points to the standalone app', 
     'family-tasks.html',
     'login.html',
     'parents.html',
+    'pricing.html',
     'kids.html',
     'tutor.html',
     'trainer.html',

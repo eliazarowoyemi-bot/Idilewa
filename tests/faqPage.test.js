@@ -5,6 +5,7 @@ import test from 'node:test';
 test('FAQ route includes the supplied search, category, language, and accordion behaviors', async () => {
   const page = await readFile(new URL('../faq.html', import.meta.url), 'utf8');
   const client = await readFile(new URL('../src/faq.js', import.meta.url), 'utf8');
+  const knowledge = await readFile(new URL('../src/faqKnowledge.js', import.meta.url), 'utf8');
   const vite = await readFile(new URL('../vite.config.js', import.meta.url), 'utf8');
   assert.match(vite, /'faq'/);
   assert.match(page, /id="faqSearch"/);
@@ -18,8 +19,9 @@ test('FAQ route includes the supplied search, category, language, and accordion 
 });
 
 test('FAQ answers describe the current tutor availability and family approval flow honestly', async () => {
-  const client = await readFile(new URL('../src/faq.js', import.meta.url), 'utf8');
-  assert.match(client, /not currently enabled/);
-  assert.match(client, /points are added only after parent approval/);
-  assert.doesNotMatch(client, /Yes! Ìdíléwa provides a student–tutor messaging experience/);
+  const knowledge = await readFile(new URL('../src/faqKnowledge.js', import.meta.url), 'utf8');
+  assert.match(knowledge, /not currently enabled/);
+  assert.match(knowledge, /points are added only after parent approval/);
+  assert.match(knowledge, /All current learning plans are free/);
+  assert.doesNotMatch(knowledge, /Yes! Ìdíléwa provides a student–tutor messaging experience/);
 });
