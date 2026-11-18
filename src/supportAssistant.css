@@ -159,6 +159,7 @@
   align-self: flex-start;
   background: var(--support-sand);
   color: var(--support-ink);
+  white-space: pre-line;
 }
 
 #idilewa-support-assistant .id-support-message--user {

@@ -26,16 +26,16 @@ test('signup requires email confirmation and the frontend has no signup code ste
   assert.doesNotMatch(app, /signup-otp|verifySignupOtp|resendSignupOtp/);
   assert.match(template, /{{ \.ConfirmationURL }}/);
   assert.match(app, /Account created\. Confirm your email/);
-  assert.match(template, /https:\/\/www\.idilewa\.com\/assets\/idilewa-email-logo\.png\?v=4/);
-  assert.match(template, /alt="Idilewa · Language · Culture · Future"/);
+  assert.match(template, /https:\/\/idilewa\.com\/assets\/idilewa-mark\.png/);
+  assert.match(template, /Ìdíléwa[\s\S]*Our Language\. Our Future\./);
   assert.doesNotMatch(template, /Learn · Speak · Grow|African languages, stories, culture/);
   assert.doesNotMatch(template, /LANGUAGE · CULTURE · CURIOSITY|>È<\/td>/);
 });
 
-test('email logo is a real PNG that can be served from public assets', async () => {
-  const logo = await readFile(new URL('../public/assets/idilewa-email-logo.png', import.meta.url));
+test('homepage brand mark is a real PNG that can be served from public assets', async () => {
+  const logo = await readFile(new URL('../public/assets/idilewa-mark.png', import.meta.url));
   assert.deepEqual([...logo.subarray(0, 8)], [137, 80, 78, 71, 13, 10, 26, 10]);
-  assert.equal(logo.readUInt32BE(16), 360);
+  assert.equal(logo.readUInt32BE(16), 88);
   assert.equal(logo.readUInt32BE(20), 88);
 });
 

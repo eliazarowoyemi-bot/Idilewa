@@ -23,15 +23,21 @@ function createResponse() {
 test('account activity emails are branded and accept only supported events', () => {
   const email = createAuthActivityEmail({
     event: 'sign-in',
-    logoUrl: 'https://idilewa.com/assets/idilewa-email-logo.png',
+    logoUrl: 'https://idilewa.com/assets/idilewa-mark.png',
     timestamp: '2026-10-23T06:00:00.000Z',
   });
   assert.match(email.subject, /sign-in to your Idilewa account/i);
-  assert.match(email.html, /idilewa-email-logo\.png/);
+  assert.match(email.html, /idilewa-mark\.png/);
+  assert.match(email.html, /Ìdíléwa[\s\S]*Our Language\. Our Future\./);
   assert.match(email.text, /2026-10-23T06:00:00\.000Z/);
   assert.throws(() => createAuthActivityEmail({
     event: 'password',
-    logoUrl: 'https://idilewa.com/assets/idilewa-email-logo.png',
+    logoUrl: 'https://idilewa.com/assets/idilewa-mark.png',
+    timestamp: '2026-10-23T06:00:00.000Z',
+  }));
+  assert.throws(() => createAuthActivityEmail({
+    event: 'sign-in',
+    logoUrl: 'http://idilewa.com/assets/idilewa-mark.png',
     timestamp: '2026-10-23T06:00:00.000Z',
   }));
 });
@@ -93,7 +99,7 @@ test('activity endpoint requires a bearer session and sends only to the authenti
     assert.equal(response.statusCode, 202);
     const emailRequest = requests.find(({ url }) => url === 'https://api.resend.com/emails');
     assert.deepEqual(emailRequest.body.to, ['adult@example.com']);
-    assert.match(emailRequest.body.html, /idilewa-email-logo\.png/);
+    assert.match(emailRequest.body.html, /idilewa-mark\.png/);
   } finally {
     globalThis.fetch = originalFetch;
     for (const name of envNames) {

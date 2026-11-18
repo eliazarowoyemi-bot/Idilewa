@@ -45,7 +45,7 @@ export default async function handleAuthActivity(req, res) {
     const origin = getProductionOrigin();
     const email = createAuthActivityEmail({
       event,
-      logoUrl: `${origin}/assets/idilewa-email-logo.png`,
+      logoUrl: `${origin}/assets/idilewa-mark.png`,
       timestamp: new Date().toISOString(),
     });
     await sendGuardianEmail({ to: user.email, ...email });

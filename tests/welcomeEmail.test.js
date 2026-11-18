@@ -91,7 +91,8 @@ test('welcome email includes a clear sign-in action and matching plain text', ()
   });
 
   assert.match(email.subject, /Welcome to Idilewa/);
-  assert.match(email.html, /idilewa-email-logo\.png/);
+  assert.match(email.html, /idilewa-mark\.png/);
+  assert.match(email.html, /Ìdíléwa[\s\S]*Our Language\. Our Future\./);
   assert.match(email.html, /Welcome, Ayo\./);
   assert.match(email.html, /href="https:\/\/www\.idilewa\.com\/#\/login\?mode=signin"/);
   assert.match(email.html, /Four ways to begin/);

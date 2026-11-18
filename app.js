@@ -1,7 +1,6 @@
 import * as THREE from 'three';
-import brandLogoUrl from './assets/idilewa-brand.png';
 import './styles/site-footer.css';
-import { createSiteFooterMarkup } from './src/siteFooterMarkup.js';
+import { createSiteBrandMarkup, createSiteFooterMarkup } from './src/siteFooterMarkup.js';
 import landingHomeHeroUrl from './assets/landing-home-hero.webp';
 import landingFeatureVoiceUrl from './assets/landing-feature-voice.webp';
 import landingFeatureCodeUrl from './assets/landing-feature-code.webp';
@@ -626,8 +625,8 @@ import {
     return `<a class="${cls}" href="#/${destination}${query}" data-route="${destination}" ${sectionAttr} ${attrs}>${label}</a>`;
   }
 
-  function brandLogo(alt = '') {
-    return `<img class="brand-logo" src="${brandLogoUrl}" alt="${esc(alt)}" />`;
+  function brandLogo() {
+    return createSiteBrandMarkup();
   }
 
   function renderHeader(page) {
@@ -683,7 +682,7 @@ import {
     document.getElementById('site-header').innerHTML = `
       <div class="header-inner ${academyShell ? 'academy-reference-header' : ''}">
         <a class="brand" href="#/index" data-route="index" aria-label="Idilewa home">
-          ${brandLogo('Idilewa · Language · Culture · Future')}
+          ${brandLogo()}
         </a>
         <nav class="desktop-nav" aria-label="Main navigation">${nav}</nav>
         <div class="header-actions">
@@ -1095,7 +1094,7 @@ import {
               <div class="landing-phone-screen">
                 <div class="landing-phone-status"><span>9:41</span><span>● ▰</span></div>
                 <div class="landing-phone-brand">
-                  ${brandLogo('Idilewa · Language · Culture · Future')}
+                  ${brandLogo()}
                   <span class="landing-phone-tools">${icon('search', 15)}${icon('user', 15)}</span>
                 </div>
                 <div class="landing-phone-welcome">
@@ -3469,7 +3468,7 @@ import {
   }
 
   function renderTutorBrand() {
-    return `<a class="tutor-brand" href="#/tutor" data-route="tutor" aria-label="Idilewa tutor portal home">${brandLogo('Idilewa · Language · Culture · Future')}</a>`;
+    return `<a class="tutor-brand" href="#/tutor" data-route="tutor" aria-label="Idilewa tutor portal home">${brandLogo()}</a>`;
   }
 
   function renderTutorHomeLink() {
@@ -3532,7 +3531,7 @@ import {
     const initial = name.trim().charAt(0).toUpperCase() || 'T';
     const active = TUTOR_ACTIVE_LINK[page] || 'tutor-dashboard';
     const links = TUTOR_PORTAL_LINKS.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="tutor-sidebar-link ${item.route === active ? 'is-active' : ''}" ${item.route === active ? 'aria-current="page"' : ''}>${icon(item.icon, 17)}<span>${item.label}</span></a>`).join('');
-    return `<div class="tutor-workspace"><aside class="tutor-sidebar"><a class="tutor-sidebar-brand" href="#/tutor-dashboard" data-route="tutor-dashboard" aria-label="Idilewa · Language · Culture · Future">${brandLogo('Idilewa · Language · Culture · Future')}</a><nav class="tutor-sidebar-nav" aria-label="Tutor workspace">${links}<a href="#/tutor-availability" data-route="tutor-availability" class="tutor-sidebar-link ${page === 'tutor-availability' ? 'is-active' : ''}">${icon('calendar', 17)}<span>Availability</span></a></nav><a href="#/tutor-profile" data-route="tutor-profile" class="tutor-sidebar-user"><span class="tutor-avatar">${esc(initial)}</span><span><strong>${esc(name)}</strong><small>Educator</small></span></a></aside><main class="tutor-workspace-main"><header class="tutor-topbar"><div><a href="#/tutor-dashboard" data-route="tutor-dashboard">Tutor Portal</a><span class="breadcrumb-sep" aria-hidden="true"></span><strong>${esc(title)}</strong></div><div><a class="tutor-topbar-home" href="/" aria-label="Go to Idilewa home">Home</a><span class="tutor-secure-status"><i></i> Secure workspace</span><a class="tutor-topbar-avatar" href="#/tutor-profile" data-route="tutor-profile" aria-label="Open tutor profile">${esc(initial)}</a></div></header><div class="tutor-workspace-content">${content}</div></main></div>`;
+    return `<div class="tutor-workspace"><aside class="tutor-sidebar"><a class="tutor-sidebar-brand" href="#/tutor-dashboard" data-route="tutor-dashboard" aria-label="Ìdíléwa home">${brandLogo()}</a><nav class="tutor-sidebar-nav" aria-label="Tutor workspace">${links}<a href="#/tutor-availability" data-route="tutor-availability" class="tutor-sidebar-link ${page === 'tutor-availability' ? 'is-active' : ''}">${icon('calendar', 17)}<span>Availability</span></a></nav><a href="#/tutor-profile" data-route="tutor-profile" class="tutor-sidebar-user"><span class="tutor-avatar">${esc(initial)}</span><span><strong>${esc(name)}</strong><small>Educator</small></span></a></aside><main class="tutor-workspace-main"><header class="tutor-topbar"><div><a href="#/tutor-dashboard" data-route="tutor-dashboard">Tutor Portal</a><span class="breadcrumb-sep" aria-hidden="true"></span><strong>${esc(title)}</strong></div><div><a class="tutor-topbar-home" href="/" aria-label="Go to Idilewa home">Home</a><span class="tutor-secure-status"><i></i> Secure workspace</span><a class="tutor-topbar-avatar" href="#/tutor-profile" data-route="tutor-profile" aria-label="Open tutor profile">${esc(initial)}</a></div></header><div class="tutor-workspace-content">${content}</div></main></div>`;
   }
 
   function renderTutorHeading(eyebrow, title, description, actions = '') {
@@ -4424,7 +4423,7 @@ import {
   }
 
   function renderParentBrand(className = '') {
-    return `<a class="family-brand ${className}" href="#/families" data-route="families" aria-label="Idilewa · Language · Culture · Future">${brandLogo('Idilewa · Language · Culture · Future')}</a>`;
+    return `<a class="family-brand ${className}" href="#/families" data-route="families" aria-label="Ìdíléwa home">${brandLogo()}</a>`;
   }
 
   function renderFamiliesLanding() {
@@ -4506,7 +4505,7 @@ import {
     const active = page === 'parent-progress' ? 'parent-progress' : page;
     const links = PARENT_PORTAL_LINKS.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="family-sidebar-link ${item.route === active ? 'is-active' : ''}" ${item.route === active ? 'aria-current="page"' : ''}>${icon(item.icon, 17)}<span>${item.label}</span></a>`).join('');
     return `<div class="family-workspace">
-      <aside class="family-sidebar"><a class="family-sidebar-brand" href="#/parent-dashboard" data-route="parent-dashboard" aria-label="Idilewa · Language · Culture · Future">${brandLogo('Idilewa · Language · Culture · Future')}</a>
+      <aside class="family-sidebar"><a class="family-sidebar-brand" href="#/parent-dashboard" data-route="parent-dashboard" aria-label="Ìdíléwa home">${brandLogo()}
         <nav class="family-sidebar-nav" aria-label="Family portal">${links}</nav>
         <button type="button" class="family-sidebar-user" data-action="profile-sign-out"><span class="family-avatar">${esc(initial)}</span><span><strong>${esc(name)}</strong><small>Parent</small></span>${icon('arrow', 14)}</button>
       </aside>
@@ -4706,7 +4705,7 @@ import {
         <article class="profile-card"><h2>What we store</h2><p>Signed-in learners have progress, code submissions and voice practice saved to their account. Guest activity, including drafts, preferences and a profile photo, stays in this browser, where anyone using the same device profile may see it.</p></article>
         <article class="profile-card"><h2>Accounts & approval</h2><p>Adult accounts use an email address and password through Supabase Auth. A child account needs a parent or guardian to approve it by email before it can sign in, and connecting with a tutor needs a separate approval that names that tutor.</p></article>
         <article class="profile-card"><h2>Children’s information</h2><p>Do not enter a child’s full legal name, school, home address, phone number, password reused elsewhere, or other sensitive information on this site.</p></article>
-        <article class="profile-card"><h2>Third-party services</h2><p>Idilewa uses Supabase for accounts and stored learning data, Vercel for hosting and server functions, and an email provider for account and guardian messages. When you send a question to the site support assistant, your question and recent messages are sent to Gemini by Google to generate a reply. Idilewa does not save support chats. Do not share passwords or private details.</p></article>
+        <article class="profile-card"><h2>Third-party services</h2><p>Idilewa uses Supabase for accounts and stored learning data, Vercel for hosting and server functions, and an email provider for account and guardian messages. Common support questions are answered from a local Idilewa help guide; questions that need a generated reply and recent messages are sent to Gemini by Google. Idilewa does not save support chats. Do not share passwords or private details.</p></article>
         <article class="profile-card"><h2>Your choices</h2><p>You can clear this browser’s site data at any time through your browser settings. To review or delete data held against an account, write to the Idilewa team.</p></article>
         <article class="profile-card"><h2>Contact</h2><p>Write to <a href="mailto:idilewa2026@gmail.com">idilewa2026@gmail.com</a> with any privacy question, including a request to review or delete your family’s data.</p></article>
       </section>
@@ -5547,6 +5546,8 @@ import {
     'page-index-1.jpg', 'page-index-2.jpg', 'page-index-3.jpg', 'page-index-4.jpg',
     'page-index-5.jpg', 'page-index-6.jpg', 'page-index-7.jpg',
     'page-about-1.jpg', 'page-coding-1.jpg',
+    'page-families-1.jpg', 'page-ere-1.jpg',
+    'page-ifa-1.jpg', 'page-ifa_odu-1.jpg', 'home-family-learning.jpg',
     'page-languages-1.jpg', 'page-course-1.jpg', 'page-lesson-1.jpg', 'page-kids-1.jpg',
     'page-schools-1.jpg', 'page-connect_teachers-1.jpg',
     'page-connect_students-1.jpg', 'page-consent-1.jpg', 'page-oral-1.jpg',
@@ -5584,7 +5585,10 @@ import {
     tutor: 'A Nigerian language tutor in traditional agbada in a refined library',
     keepers: 'A Nigerian elder sharing knowledge with children in a beautiful courtyard',
     login: 'A child reading in a calm, sunlit family home',
-    voices: 'A child listening to a language recording in a comfortable reading nook'
+    voices: 'A child listening to a language recording in a comfortable reading nook',
+    privacy: 'A family learning together around a table at home',
+    ifa: 'A learner and elder reviewing knowledge together in a library',
+    ifa_odu: 'A teacher and learner studying an illustrated book together'
   };
   const ROUTE_IMAGE_SLOT_ALTS = {
     'index-1': 'Two Nigerian children in Yorùbá attire learning from a picture book with their mother',
@@ -5617,7 +5621,8 @@ import {
     'keepers-1': 'story-grandmother.jpg',
     'login-1': 'hero-reader.jpg',
     'tutor-1': 'yoruba-educator-man.jpg',
-    'voices-1': 'listening-reader.jpg'
+    'voices-1': 'listening-reader.jpg',
+    'privacy-1': 'home-family-learning.jpg'
   };
   function routeImageAlt(page, slot, tag = '') {
     const original = (tag.match(/\balt=("|')([^"']*)(?:\1)/i) || [,'',''])[2];
@@ -5658,7 +5663,7 @@ import {
       const filename = ROUTE_IMAGE_OVERRIDES[`${page}-1`] || `page-${page}-1.jpg`;
       const alt = routeImageAlt(page, 1);
       const visual = IMAGE_READY.has(filename)
-        ? `<img src="${imageUrl(filename)}" alt="${esc(alt)}" loading="lazy" />`
+        ? `<img src="${imageUrl(filename)}" alt="${esc(alt)}" loading="eager" fetchpriority="high" decoding="async" />`
         : imagePendingMarkup(alt);
       const banner = `<figure class="route-art-banner">${visual}<figcaption>${esc(LABELS[page] || 'Idilewa')} · a learning moment</figcaption></figure>`;
       const breadcrumb = output.match(/<div class="breadcrumbs">[\s\S]*?<\/div>/);

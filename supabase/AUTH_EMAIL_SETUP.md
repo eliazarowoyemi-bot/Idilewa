@@ -18,7 +18,7 @@ To have authentication messages arrive from Idilewa rather than the default Supa
    - Password: the Resend API key, entered directly in Supabase and never committed to this repository
    - Sender name: `Idilewa`
    - Sender email: the verified Idilewa address used by `RESEND_FROM_EMAIL`
-3. Deploy `public/assets/idilewa-email-logo.png` to `https://www.idilewa.com/assets/idilewa-email-logo.png` before enabling the confirmation template. Preview the auth-template changes with `supabase config diff --project-ref <project-ref>`. The confirmation email uses Supabase's `{{ .ConfirmationURL }}` link, which returns through `/auth-callback.html` and establishes the PKCE session.
+3. Deploy `public/assets/idilewa-mark.png` to `https://idilewa.com/assets/idilewa-mark.png` before enabling the confirmation template. Preview the auth-template changes with `supabase config diff --project-ref <project-ref>`. The confirmation email uses Supabase's `{{ .ConfirmationURL }}` link, which returns through `/auth-callback.html` and establishes the PKCE session.
 4. Apply the reviewed template settings with `supabase config push --project-ref <project-ref>`. This project config declares only the four email templates; it does not configure or replace SMTP credentials.
 5. Keep email confirmation enabled. The sign-up screen handles both confirmation-required accounts and projects configured to return an immediate session; production should require email confirmation.
 6. Send a test sign-up, email-code sign-in, and password-reset message to confirm sender authentication, branding, and delivery.

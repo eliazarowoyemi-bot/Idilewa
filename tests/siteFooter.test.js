@@ -2,10 +2,12 @@ import assert from 'node:assert/strict';
 import test from 'node:test';
 import { createSiteFooterMarkup } from '../src/siteFooterMarkup.js';
 
-test('shared footer uses the canonical leaf wordmark and homepage information structure', () => {
+test('shared footer uses the homepage brand lockup and information structure', () => {
   const footer = createSiteFooterMarkup();
 
-  assert.match(footer, /class="idilewa-footer-logo" src="\/assets\/idilewa-email-logo\.png"/);
+  assert.match(footer, /src="\/assets\/idilewa-mark\.png"/);
+  assert.match(footer, /Ìdíléwa<\/strong><small>Our Language\. Our Future\./);
+  assert.doesNotMatch(footer, /class="idilewa-brand-lockup" aria-hidden="true"/);
   assert.match(footer, /About Us[\s\S]*Quick Links[\s\S]*Get Connected/);
   assert.match(footer, /Social profile links will be added when verified/);
   assert.match(footer, /Start Learning Now/);

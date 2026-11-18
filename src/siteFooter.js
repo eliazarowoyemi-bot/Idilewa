@@ -1,5 +1,5 @@
 import '../styles/site-footer.css';
-import { createSiteFooterMarkup } from './siteFooterMarkup.js';
+import { createSiteBrandMarkup, createSiteFooterMarkup } from './siteFooterMarkup.js';
 
 const footerSelectors = [
   'footer.site-footer',
@@ -18,20 +18,17 @@ function replaceHeaderBranding() {
   );
 
   brands.forEach((brand) => {
-    if (!/Ìdíléwa|Idilewa/i.test(brand.textContent) || brand.querySelector('img')) return;
+    const image = brand.querySelector('img');
+    const isIdilewaBrand = /Ìdíléwa|Idilewa/i.test(brand.textContent)
+      || /Ìdíléwa|Idilewa/i.test(brand.getAttribute('aria-label') || '')
+      || /idilewa/i.test(image?.getAttribute('alt') || '')
+      || /idilewa/i.test(image?.getAttribute('src') || '');
+    if (!isIdilewaBrand || brand.querySelector('.idilewa-brand-lockup')) return;
 
-    const secondaryLabel = brand.querySelector('small')?.cloneNode(true);
-    const logo = document.createElement('img');
-    logo.className = 'idilewa-brand-logo';
-    logo.src = '/assets/idilewa-email-logo.png';
-    logo.alt = brand.matches('a[aria-label]') ? '' : 'Ìdíléwa · Language · Culture · Future';
-    logo.decoding = 'async';
-    brand.replaceChildren(logo);
-    brand.classList.add('idilewa-brand-lockup');
-    if (secondaryLabel) {
-      brand.append(secondaryLabel);
-      brand.classList.add('idilewa-brand-lockup--stacked');
-    }
+    const template = document.createElement('template');
+    template.innerHTML = createSiteBrandMarkup();
+    brand.replaceChildren(template.content.cloneNode(true));
+    brand.classList.add('idilewa-brand-lockup-host');
   });
 }
 

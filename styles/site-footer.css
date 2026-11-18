@@ -200,24 +200,47 @@
   background: #e9f4e9;
 }
 
-.idilewa-brand-lockup {
+.idilewa-brand-lockup-host {
   display: inline-flex;
   min-width: 0;
   align-items: center;
 }
 
-.idilewa-brand-lockup--stacked {
-  align-items: flex-start;
-  flex-direction: column;
-  gap: 3px;
+.idilewa-brand-lockup {
+  display: inline-flex;
+  min-width: 0;
+  align-items: center;
+  gap: 7px;
 }
 
-.idilewa-brand-logo {
+.idilewa-brand-lockup > img {
   display: block;
-  width: min(210px, 42vw);
-  max-width: 100%;
-  height: auto;
-  object-fit: contain;
+  width: 34px;
+  height: 34px;
+  flex: 0 0 auto;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.idilewa-brand-copy {
+  display: grid;
+  gap: 2px;
+  line-height: 1;
+  text-align: left;
+}
+
+.idilewa-brand-copy strong {
+  color: #174b35;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: -.025em;
+}
+
+.idilewa-brand-copy small {
+  color: #607066;
+  font-size: 9px;
+  font-weight: 650;
+  white-space: nowrap;
 }
 
 body.has-mobile-bottom-navigation .idilewa-site-footer {
@@ -262,8 +285,9 @@ body.has-mobile-bottom-navigation .idilewa-site-footer {
     width: 100%;
   }
 
-  .idilewa-brand-logo {
-    width: min(190px, 58vw);
+  .idilewa-brand-lockup > img {
+    width: 32px;
+    height: 32px;
   }
 }
 

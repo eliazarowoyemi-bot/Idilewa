@@ -8825,7 +8825,7 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .family-public-benefits small { color: #819087; font-size: 7px; line-height: 1.4; }
 .family-public-footer { min-height: 60px; padding: 10px max(24px, calc((100% - 1190px) / 2)); display: flex; align-items: center; gap: 17px; border-top: 1px solid #e9efeb; color: #829087; background: #fff; font-size: 8px; }
 .family-public-footer .family-brand { margin-right: auto; }
-.family-public-footer .family-brand img { width: 95px; }
+.family-public-footer .family-brand .idilewa-brand-lockup > img { width: 34px; height: 34px; }
 .family-public-footer > a:last-child { color: #4e6a5d; font-weight: 750; }
 
 .family-auth-page { min-height: 100vh; padding: 0 24px 24px; background: #f3f8f6; }
@@ -9047,8 +9047,8 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
   .family-dashboard-lower, .family-progress-detail, .family-message-layout, .family-settings-layout { grid-template-columns: minmax(0,1fr); }
 }
 @media (max-width: 520px) {
-  .family-brand img { width: 94px; }
-  .family-brand > span { display: none; }
+  .family-brand .idilewa-brand-lockup > img { width: 32px; height: 32px; }
+  .family-brand > .idilewa-brand-lockup { display: inline-flex; }
   .family-public-header nav { gap: 8px; }
   .family-public-header nav > a:not(.family-button) { font-size: 7px; }
   .family-public-header nav > .family-button { min-height: 29px; padding-inline: 9px; font-size: 7px; }

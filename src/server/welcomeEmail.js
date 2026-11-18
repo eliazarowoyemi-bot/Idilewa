@@ -1,3 +1,5 @@
+import { createEmailBrandMarkup } from './emailBrand.js';
+
 function escapeHtml(value) {
   return String(value).replace(/[&<>"']/g, (character) => ({
     '&': '&amp;',
@@ -8,11 +10,11 @@ function escapeHtml(value) {
   })[character]);
 }
 
-export function createWelcomeEmail({ name, loginUrl, logoUrl = 'https://idilewa.com/assets/idilewa-email-logo.png' }) {
+export function createWelcomeEmail({ name, loginUrl, logoUrl = 'https://idilewa.com/assets/idilewa-mark.png' }) {
   const displayName = String(name).replace(/\s+/g, ' ').trim().slice(0, 80);
   const safeName = escapeHtml(displayName);
   const safeLoginUrl = escapeHtml(loginUrl);
-  const safeLogoUrl = escapeHtml(logoUrl);
+  const brandMarkup = createEmailBrandMarkup(logoUrl, { inverse: true });
   const learningPaths = [
     {
       number: '01',
@@ -67,8 +69,7 @@ export function createWelcomeEmail({ name, loginUrl, logoUrl = 'https://idilewa.
       <tr><td align="center">
         <table role="presentation" width="100%" cellspacing="0" cellpadding="0" style="max-width:600px;background:#fff;border:1px solid #e4ebe2;border-radius:20px;overflow:hidden">
           <tr><td style="padding:30px 36px;background:#173f32;color:#fff">
-            <img src="${safeLogoUrl}" width="150" alt="Idilewa" style="display:block;width:150px;max-width:100%;height:auto" />
-            <div style="margin-top:10px;font-size:13px;color:#dce9df">LANGUAGE · CULTURE · CURIOSITY</div>
+            ${brandMarkup}
           </td></tr>
           <tr><td style="padding:38px 36px 18px">
             <div style="font-size:14px;font-weight:700;color:#28734d">Ẹ KÁÀBỌ̀ — YOU’RE HOME</div>

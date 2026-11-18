@@ -1,5 +1,6 @@
 import './supportAssistant.css';
 import { sendSupportAssistantMessage } from './supportAssistantClient.js';
+import { getLocalSupportAssistantReply } from './supportAssistantLocal.js';
 
 const assistantId = 'idilewa-support-assistant';
 if (!document.getElementById(assistantId)) {
@@ -112,10 +113,11 @@ if (!document.getElementById(assistantId)) {
     log.scrollTop = log.scrollHeight;
 
     try {
-      const result = await sendSupportAssistantMessage({
-        message: trimmedQuestion,
-        messages: messageHistory,
-      });
+      const result = getLocalSupportAssistantReply(trimmedQuestion)
+        || await sendSupportAssistantMessage({
+          message: trimmedQuestion,
+          messages: messageHistory,
+        });
       status.remove();
       appendTextMessage(result.reply, 'assistant');
       appendSources(result.sources);

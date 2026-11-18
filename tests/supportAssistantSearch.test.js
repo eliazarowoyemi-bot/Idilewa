@@ -87,7 +87,7 @@ test('assistant provides a Privacy link and documents support processing in the 
   assert.match(assistant, /href="\/parents\.html#\/privacy">Privacy<\/a>/);
   assert.doesNotMatch(assistant, /not live AI|not sent to a service or saved/);
   assert.match(assistant, /sendSupportAssistantMessage/);
-  assert.match(app, /question and recent messages are sent to Gemini by Google/);
+  assert.match(app, /questions that need a generated reply and recent messages are sent to Gemini by Google/);
   assert.match(app, /Idilewa does not save support chats/);
 });
 

@@ -9,6 +9,13 @@ const footerLinks = [
   { key: 'privacy', label: 'Privacy', href: '/parents.html#/privacy', route: 'privacy' },
 ];
 
+export function createSiteBrandMarkup() {
+  return `<span class="idilewa-brand-lockup">
+    <img src="/assets/idilewa-mark.png" alt="" width="34" height="34">
+    <span class="idilewa-brand-copy"><strong>Ìdíléwa</strong><small>Our Language. Our Future.</small></span>
+  </span>`;
+}
+
 const socialIcons = `
   <button aria-label="YouTube" class="idSocialIcon" data-footer-social type="button">
     <svg aria-hidden="true" viewBox="0 0 24 24"><rect fill="currentColor" height="14" rx="4" width="20" x="2" y="5"></rect><path d="M10 8.5v7l6-3.5z" fill="white"></path></svg>
@@ -44,7 +51,7 @@ export function createSiteFooterMarkup(renderLink = defaultLink) {
     <div class="idFooterInner">
       <section class="idFootAbout">
         <a class="idFootBrand" href="/" aria-label="Ìdíléwa home">
-          <img class="idilewa-footer-logo" src="/assets/idilewa-email-logo.png" alt="">
+          ${createSiteBrandMarkup()}
         </a>
         <h2>About Us</h2>
         <p>Ìdíléwa is a tech-driven platform that adapts modern technology to language lessons.</p>

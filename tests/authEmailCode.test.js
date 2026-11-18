@@ -27,7 +27,8 @@ test('auth code email templates validate codes and explain each purpose', () => 
   assert.match(childSignin.subject, /child’s Idilewa sign-in passcode/);
   assert.match(childSignin.text, /Share this one-time passcode with your child/);
   assert.match(childSignin.html, />12345678</);
-  assert.match(childSignin.html, /idilewa-email-logo\.png/);
+  assert.match(childSignin.html, /idilewa-mark\.png/);
+  assert.match(childSignin.html, /Ìdíléwa[\s\S]*Our Language\. Our Future\./);
 
   const recovery = createAuthCodeEmail({ code: '123456', purpose: 'recovery' });
   assert.match(recovery.subject, /Reset your Idilewa password/);
