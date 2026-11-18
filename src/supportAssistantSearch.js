@@ -5,7 +5,7 @@ const stopWords = new Set([
   'a', 'about', 'an', 'and', 'are', 'can', 'do', 'does', 'for', 'how', 'i',
   'have', 'in', 'is', 'it', 'learn', 'learning', 'me', 'my', 'of', 'on',
   'see', 'the', 'to', 'available', 'what', 'when', 'where', 'which', 'who',
-  'with', 'work', 'you', 'your',
+  'with', 'work', 'you', 'your', 'use', 'currently', 'highlighted',
 ]);
 
 const aliases = {
@@ -146,13 +146,14 @@ export function searchFaq(query, limit = 3) {
 }
 
 export function searchSupportKnowledge(query, limit = 8) {
-  const terms = getTerms(query);
+  const terms = [...new Set(getTerms(query))];
   if (!terms.length) return [];
 
   const normalizedQuery = normalize(query);
   const broadTerms = new Set([
     'child', 'children', 'family', 'families', 'get', 'help', 'idilewa', 'learn',
-    'learner', 'learners', 'page', 'pages', 'parent', 'parents', 'start', 'started',
+    'language', 'languages', 'learner', 'learners', 'nigerian', 'page', 'pages',
+    'parent', 'parents', 'start', 'started',
   ]);
 
   const documents = [

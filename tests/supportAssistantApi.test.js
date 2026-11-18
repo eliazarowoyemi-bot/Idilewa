@@ -64,6 +64,7 @@ test('support API rate-limits and answers with page links without saving the con
   assert.equal(res.body.reply, 'Start in the Language Academy.');
   assert.equal(res.body.persisted, false);
   assert.ok(res.body.sources.some((source) => source.url === '/'));
+  assert.equal(new Set(res.body.sources.map((source) => source.url)).size, res.body.sources.length);
   const rateLimitRequest = requests.find(({ url }) => url.includes('consume_ai_conversation_rate_limit'));
   assert.equal(JSON.parse(rateLimitRequest.options.body).p_max_requests, 10);
   assert.equal(requests.filter(({ url }) => url.includes(':generateContent')).length, 1);

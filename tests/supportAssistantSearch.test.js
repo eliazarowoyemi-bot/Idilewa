@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import { searchFaq, searchSupportKnowledge } from '../src/supportAssistantSearch.js';
-import { supportPageKnowledge } from '../src/supportAssistantKnowledge.js';
+import { supportFaqKnowledge, supportPageKnowledge } from '../src/supportAssistantKnowledge.js';
 
 test('local FAQ search matches accents and returns the relevant product route', () => {
   const results = searchFaq('Which languages can I learn?');
@@ -60,6 +60,23 @@ test('site knowledge search avoids unrelated pages on broad family questions', (
   assert.ok(urls.includes('/'));
   assert.ok(urls.includes('/about'));
   assert.ok(!urls.includes('/family-tasks'));
+});
+
+test('multi-part language questions include the matching Pidgin tools without unrelated pages', () => {
+  const results = searchSupportKnowledge(
+    'Which languages are currently highlighted in the Language Academy, and where can I use Nigerian Pidgin?',
+  );
+  const titles = results.map((result) => result.title);
+  const academyFaq = supportFaqKnowledge.find(
+    ({ title }) => title === 'Which languages does the Language Academy cover?',
+  );
+
+  assert.ok(titles.includes('Language Academy'));
+  assert.ok(titles.includes('AI Conversation'));
+  assert.ok(titles.includes('Speech and language tools'));
+  assert.ok(!titles.includes('Can tutors help with subjects beyond languages?'));
+  assert.ok(!titles.includes('Languages and courses'));
+  assert.equal(academyFaq.url, '/?view=academy');
 });
 
 test('assistant uses the live AI client and accurately discloses Gemini processing', async () => {

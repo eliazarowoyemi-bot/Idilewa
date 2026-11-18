@@ -54,8 +54,8 @@ export const supportPageKnowledge = Object.freeze([
     title: 'Speech and language tools',
     label: 'Voice Tools',
     url: '/voices',
-    keywords: 'voice translate translation text to speech transcription speech to text cloning Plotweaver',
-    content: 'Ìdíléwa offers supported voice and translation tools through Plotweaver, including speech generation, transcription, translation, and an opt-in voice-cloning flow. Availability differs by language and operation. Voice cloning requires explicit permission for the recording; never upload a child’s or another person’s voice without informed permission. Generated audio and recordings are not stored by Idilewa.',
+    keywords: 'voice translate translation text to speech transcription speech to text cloning Plotweaver Pidgin Nigerian',
+    content: 'Ìdíléwa offers supported voice and translation tools through Plotweaver, including speech generation, transcription, translation, and an opt-in voice-cloning flow. Nigerian Pidgin is available in selected Plotweaver voice tools where supported. Availability differs by language and operation. Voice cloning requires explicit permission for the recording; never upload a child’s or another person’s voice without informed permission. Generated audio and recordings are not stored by Idilewa.',
   },
   {
     title: 'AI Conversation',
@@ -264,6 +264,9 @@ export const supportPageKnowledge = Object.freeze([
 
 export const supportFaqKnowledge = Object.freeze(faqEntries.map(([title, content, category]) => {
   const searchText = `${title} ${content}`.toLowerCase();
+  if (title === 'Which languages does the Language Academy cover?') {
+    return { title, content, url: '/?view=academy', label: 'Language Academy', keywords: '' };
+  }
   if (category === 2 && /voice|pronunciation|microphone/.test(searchText)) {
     return { title, content, url: '/voice_lessons', label: 'Voice Lessons', keywords: '' };
   }

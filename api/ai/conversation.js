@@ -289,11 +289,18 @@ export default async function handler(req, res) {
         knowledge,
         config: providerConfig,
       });
+      const sourceUrls = new Set();
+      const sources = [];
+      for (const { title, label, url } of knowledge) {
+        if (!url || sourceUrls.has(url)) continue;
+        sourceUrls.add(url);
+        sources.push({ title, label, url });
+      }
       return sendJson(res, 200, {
         reply: result.reply,
         persisted: false,
         provider: 'Gemini · ' + result.model,
-        sources: knowledge.map(({ title, label, url }) => ({ title, label, url })),
+        sources,
       });
     }
 
