@@ -1,3 +1,9 @@
+import landingHomeHeroUrl from '../assets/landing-home-hero.webp';
+import landingFeatureVoiceUrl from '../assets/landing-feature-voice.webp';
+import landingFeatureCodeUrl from '../assets/landing-feature-code.webp';
+import landingFeatureAiUrl from '../assets/landing-feature-ai.webp';
+import landingFeatureHeritageUrl from '../assets/landing-feature-heritage.webp';
+
 /**
  * Ìdíléwa site chrome: navigation popovers, contextual "More" popover
  * and scroll reveal.
@@ -43,10 +49,10 @@ const NAVIGATION_HREFS = {
 };
 
 const FEATURE_ARTWORK = {
-  voice: '/assets/landing-feature-voice.webp',
-  code: '/assets/landing-feature-code.webp',
-  ai: '/assets/landing-feature-ai.webp',
-  heritage: '/assets/landing-feature-heritage.webp',
+  voice: landingFeatureVoiceUrl,
+  code: landingFeatureCodeUrl,
+  ai: landingFeatureAiUrl,
+  heritage: landingFeatureHeritageUrl,
 };
 
 function normalizeSiteNavigation() {
@@ -76,7 +82,7 @@ function normalizeSiteNavigation() {
 function setupHomepageArtwork() {
   const heroIllustration = document.querySelector('.heroIllustration');
   if (heroIllustration) {
-    heroIllustration.src = '/assets/landing-home-hero.webp';
+    heroIllustration.src = landingHomeHeroUrl;
     heroIllustration.width = 1446;
     heroIllustration.height = 463;
     heroIllustration.loading = 'eager';
