@@ -46,7 +46,9 @@ test('homepage drawer shows its menu label and all primary destinations', async 
   for (const destination of [
     "['/', 'Home']",
     "['/?view=academy', 'Language Academy']",
+    "['/?view=progress', 'My Progress']",
     "['/development-center.html', 'Development Center']",
+    "['/ai-conversation.html', 'AI Conversation']",
     "['/milestone-achievement.html', 'Milestone Achievement']",
     "['/?view=heritageLab', 'Heritage Library']",
     "['/kids.html', 'Kids Arcade']",
