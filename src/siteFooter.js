@@ -1,5 +1,9 @@
 import '../styles/site-footer.css';
-import { createSiteBrandMarkup, createSiteFooterMarkup } from './siteFooterMarkup.js';
+import {
+  createSiteBottomNavigationMarkup,
+  createSiteBrandMarkup,
+  createSiteFooterMarkup,
+} from './siteFooterMarkup.js';
 
 const footerSelectors = [
   'footer.site-footer',
@@ -90,9 +94,36 @@ function mountFooter() {
   });
 }
 
+function currentBottomNavigationKey() {
+  const { pathname, search, hash } = window.location;
+  const view = new URLSearchParams(search).get('view');
+
+  if (['parents.html', 'family-tasks.html', 'connect_students.html', 'connect_teachers.html', 'educator-portal.html'].includes(pathname.slice(1))
+    || hash.startsWith('#/parent')) return 'family';
+  if (['profile.html', 'milestone-achievement.html'].includes(pathname.slice(1)) || view === 'progress') return 'progress';
+  if (['oral.html', 'oral_genre.html', 'oriki.html', 'owe.html', 'owe_add.html', 'owe_detail.html', 'owe_story.html', 'owe_reflection.html', 'keepers.html'].includes(pathname.slice(1))
+    || view === 'heritageLab') return 'explore';
+  if (['voice_lessons.html', 'voices.html', 'trainer.html', 'languages.html', 'course.html', 'lesson.html'].includes(pathname.slice(1))
+    || view === 'academy' || view === 'learning' || (pathname === '/' && (!view || view === 'home'))) return 'learn';
+  return 'explore';
+}
+
+function mountBottomNavigation() {
+  if (document.querySelector('#mobile-nav, [data-idilewa-mobile-tabs]')) return;
+
+  const template = document.createElement('template');
+  template.innerHTML = createSiteBottomNavigationMarkup(currentBottomNavigationKey());
+  const navigation = template.content.firstElementChild;
+  if (!navigation) throw new Error('The Ìdíléwa mobile navigation could not be created.');
+
+  document.body.append(navigation);
+  document.body.classList.add('has-idilewa-mobile-tabs');
+}
+
 function init() {
   replaceHeaderBranding();
   mountFooter();
+  mountBottomNavigation();
 }
 
 if (document.readyState === 'loading') {

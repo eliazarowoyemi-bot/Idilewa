@@ -1,6 +1,9 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { createSiteFooterMarkup } from '../src/siteFooterMarkup.js';
+import {
+  createSiteBottomNavigationMarkup,
+  createSiteFooterMarkup,
+} from '../src/siteFooterMarkup.js';
 
 test('shared footer uses the homepage brand lockup and information structure', () => {
   const footer = createSiteFooterMarkup();
@@ -23,4 +26,18 @@ test('shared footer delegates app routes while keeping static-page fallbacks', (
   assert.match(footer, /href="\/faq\.html"/);
   assert.match(footer, /href="\/development-center\.html"/);
   assert.match(footer, /href="\/parents\.html#\/privacy"/);
+});
+
+test('mobile primary navigation has four labelled destinations and one current page', () => {
+  const navigation = createSiteBottomNavigationMarkup('explore');
+  const links = [...navigation.matchAll(/<a class="idilewa-mobile-tab[^"]*" href="([^"]+)"([^>]*)>/g)];
+
+  assert.equal(links.length, 4);
+  assert.match(navigation, /aria-label="Primary navigation"/);
+  assert.match(navigation, /href="\/voice_lessons\.html"/);
+  assert.match(navigation, /href="\/\?view=heritageLab"/);
+  assert.match(navigation, /href="\/profile\.html"/);
+  assert.match(navigation, /href="\/parents\.html#\/parent-login"/);
+  assert.equal(links.filter(([, , attributes]) => attributes.includes('aria-current="page"')).length, 1);
+  assert.match(navigation, /Explore<\/span>/);
 });

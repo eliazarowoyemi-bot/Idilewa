@@ -18,7 +18,7 @@ class SakugaSlider extends fx.Base {
     .trk { position: absolute; left: 0; right: 0; top: 16px; height: 14px; border: var(--sk-bw) solid var(--sk-ink); border-radius: 7px; background: var(--sk-card); overflow: hidden; }
     .trk i { display: block; height: 100%; width: calc(var(--v, 0) * 100% + 6px); max-width: 100%; background: var(--sk-pri); }
     .th { position: absolute; top: 9px; left: 0; width: 28px; height: 28px; border-radius: 50%; background: #fff; border: var(--sk-bw) solid var(--sk-ink); will-change: transform; }
-    .val { position: absolute; top: -30px; left: -9px; min-width: 46px; padding: 3px 4px; border: 2.6px solid var(--sk-ink); border-radius: 9px; background: var(--sk-card); text-align: center; font: 800 13px/1.1 -apple-system, "Segoe UI", system-ui, sans-serif; white-space: nowrap; transform-origin: 50% 160%; will-change: transform; }
+    .val { position: absolute; top: -30px; left: -9px; min-width: 46px; padding: 3px 4px; border: 2.6px solid var(--sk-ink); border-radius: 9px; background: var(--sk-card); text-align: center; font: 800 13px/1.1 var(--sk-font-family, -apple-system, "Segoe UI", system-ui, sans-serif); white-space: nowrap; transform-origin: 50% 160%; will-change: transform; }
     .val::after { content: ""; position: absolute; left: 50%; top: 100%; margin-left: -5px; border: 5px solid transparent; border-top: 7px solid var(--sk-ink); }
     input { position: absolute; inset: -8px 0; width: 100%; height: calc(100% + 16px); margin: 0; opacity: 0; cursor: ew-resize; }
     input:disabled { cursor: not-allowed; } :host([disabled]) .sld { opacity: .5; }
@@ -299,7 +299,7 @@ function squashy(el, { low = 0.82, k = 520, d = 15, wide = 0.55 } = {}) {
   return { s, pop, tilt, step(dt) { const y = s.step(dt), p = pop.step(dt), r = tilt.step(dt), still = Math.abs(y - 1) < 0.001 && Math.abs(s.v) < 0.01 && Math.abs(p - 1) < 0.001 && Math.abs(r) < 0.02;
     el.style.transform = still ? '' : `rotate(${r}deg) scale(${(1 + (1 - y) * wide) * p}, ${y * p})`; } };
 }
-const BASE_CSS = `:host{display:inline-block;position:relative;isolation:isolate;vertical-align:middle;color:var(--sk-ink);font:500 15px/1.4 -apple-system,BlinkMacSystemFont,"Inter","Segoe UI",system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
+const BASE_CSS = `:host{display:inline-block;position:relative;isolation:isolate;vertical-align:middle;color:var(--sk-ink);font:500 15px/1.4 var(--sk-font-family,-apple-system,BlinkMacSystemFont,"Inter","Segoe UI",system-ui,sans-serif);-webkit-tap-highlight-color:transparent}
 :host([hidden]){display:none}*{box-sizing:border-box}button,input{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent}
 :focus-visible{outline:2.5px solid var(--sk-acc);outline-offset:3px}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 canvas.back{position:absolute;left:-160px;top:-160px;width:calc(100% + 320px);height:calc(100% + 320px);pointer-events:none;z-index:-1}`;

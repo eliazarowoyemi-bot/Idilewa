@@ -16,6 +16,45 @@ export function createSiteBrandMarkup() {
   </span>`;
 }
 
+const bottomNavigationItems = [
+  {
+    key: 'learn',
+    label: 'Learn',
+    href: '/voice_lessons.html',
+    icon: '<path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v17H6.5A2.5 2.5 0 0 1 4 17.5z"/><path d="M4 17.5A2.5 2.5 0 0 1 6.5 15H20M8 7h8M8 10h6"/>',
+  },
+  {
+    key: 'explore',
+    label: 'Explore',
+    href: '/?view=heritageLab',
+    icon: '<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8z"/>',
+  },
+  {
+    key: 'progress',
+    label: 'Progress',
+    href: '/profile.html',
+    icon: '<path d="M4 19V5M4 19h17"/><path d="m7 15 4-4 3 2 5-6"/>',
+  },
+  {
+    key: 'family',
+    label: 'Family',
+    href: '/parents.html#/parent-login',
+    icon: '<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>',
+  },
+];
+
+export function createSiteBottomNavigationMarkup(activeKey = '') {
+  const links = bottomNavigationItems.map(({ key, label, href, icon }) => {
+    const active = key === activeKey;
+    return `<a class="idilewa-mobile-tab${active ? ' is-active' : ''}" href="${href}"${active ? ' aria-current="page"' : ''}>
+      <svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${icon}</svg>
+      <span>${label}</span>
+    </a>`;
+  }).join('');
+
+  return `<nav aria-label="Primary navigation" class="idilewa-mobile-tabs" data-idilewa-mobile-tabs>${links}</nav>`;
+}
+
 const socialIcons = `
   <button aria-label="YouTube" class="idSocialIcon" data-footer-social type="button">
     <svg aria-hidden="true" viewBox="0 0 24 24"><rect fill="currentColor" height="14" rx="4" width="20" x="2" y="5"></rect><path d="M10 8.5v7l6-3.5z" fill="white"></path></svg>

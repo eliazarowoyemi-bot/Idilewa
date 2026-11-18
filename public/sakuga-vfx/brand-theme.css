@@ -1,22 +1,24 @@
 :root {
   --sk-card: #ffffff;
-  --sk-ink: #15291f;
-  --sk-dim: #58675f;
-  --sk-soft: #d7e9dc;
-  --sk-pri: #136443;
+  --sk-ink: #112a20;
+  --sk-dim: #4a5d54;
+  --sk-soft: #dce8dc;
+  --sk-pri: #1b4332;
   --sk-pri-ink: #ffffff;
-  --sk-acc: #f59e0b;
-  --sk-track: #d7e9dc;
+  --sk-acc: #2d8a4e;
+  --sk-track: #dce8dc;
   --sk-r: 999px;
   --sk-bw: 2.4px;
-  --sk-sh: 0 5px 13px rgba(17, 91, 54, 0.22);
+  --sk-sh: 0 5px 13px rgba(17, 42, 32, 0.14);
   --sk-btn-sh: var(--sk-sh);
   --sk-btn-line: var(--sk-pri);
-  --sk-alt-sh: 0 3px 8px rgba(21, 41, 31, 0.12);
+  --sk-alt-sh: 0 3px 8px rgba(17, 42, 32, 0.1);
   --sk-alt-line: var(--sk-ink);
   --sk-tick: var(--sk-ink);
   --sk-fill: var(--sk-acc);
   --sk-on-pri: #ffffff;
+  --sk-font-family: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+  --sk-btn-font: 700 14px/1.1 var(--sk-font-family);
   --sk-slider-width: min(100%, 22rem);
 }
 

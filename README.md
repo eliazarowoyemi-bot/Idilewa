@@ -24,18 +24,19 @@ The visual identity is warm, calm, editorial, and rooted in nature. It strictly 
 
 | Token Name | Hex Code | Role & Usage |
 | :--- | :--- | :--- |
-| **Deep Forest Green** | `#0E4D34` | Main headings, major containers, navigation, and high-contrast actions |
-| **Vibrant Leaf Green** | `#029A5B` | Brand accent for links, icons, active states, and action highlights |
-| **Mint Tint** | `#E8F6F0` | Soft category cards and spacing surfaces |
-| **Warm Ochre Gold** | `#EAA822` | Cultural highlights and interactive accents |
-| **Terracotta Red** | `#D34836` | Cultural badges and warm secondary accents |
-| **Off-White** | `#F9FBF9` | Shared page canvas and browser theme color |
-| **Charcoal / Dark Olive** | `#2C3E35` | Body text and secondary copy |
+| **Forest Green** | `#1B4332` | Primary actions, active navigation, and key headings |
+| **Forest Hover** | `#122E22` | Hover/pressed primary actions |
+| **Leaf Green** | `#2D8A4E` | Accent icons, active markers, and highlights |
+| **Ink** | `#112A20` | High-contrast headings and body text |
+| **Muted Green** | `#4A5D54` | Supporting copy |
+| **Sage** | `#DCE8DC` / `#C8DEC9` | Homepage hero gradient and calm surfaces |
+| **Off-White** | `#F9FAF8` | Shared page canvas |
+| **Soft Border** | `#E2E8E4` | Card, control, and divider borders |
 
-- **Typography:** Inter-first sans-serif stack (`Inter, system-ui, -apple-system, sans-serif`).
-- **Layout:** Maximum container width around `1200px`, soft green-tinted shadows, `22px` / `30px` rounded cards and buttons.
-- **Header:** Light translucent sticky navigation with active link indicators and instant search overlay.
-- **Responsive layouts:** Shared and standalone pages adapt to phone, tablet, and desktop widths without horizontal page overflow.
+- **Typography:** Locally bundled Plus Jakarta Sans Variable with system sans fallbacks; use 400–800 weights.
+- **Layout:** `1280px` maximum content width, `20px` card radius, pill-shaped controls, and a consistent `20px` card-grid gap.
+- **Header:** An 80px desktop header with active indicators; compact menu at tablet widths and a four-destination bottom bar on mobile.
+- **Responsive layouts:** Four-column desktop, two-column tablet, and one-column mobile learning grids; native detail appears in [DESIGN.md](./DESIGN.md) and [NAVIGATION.md](./NAVIGATION.md).
 
 ---
 

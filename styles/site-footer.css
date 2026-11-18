@@ -1,9 +1,153 @@
+@import "@fontsource-variable/plus-jakarta-sans";
+
+:root {
+  --idilewa-forest: #1b4332;
+  --idilewa-forest-hover: #122e22;
+  --idilewa-leaf: #2d8a4e;
+  --idilewa-ink: #112a20;
+  --idilewa-muted: #4a5d54;
+  --idilewa-page: #f9faf8;
+  --idilewa-sage-start: #dce8dc;
+  --idilewa-sage-end: #c8dec9;
+  --idilewa-border: #e2e8e4;
+  --idilewa-font-sans: "Plus Jakarta Sans Variable", "Plus Jakarta Sans", ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+html {
+  color-scheme: light;
+  overflow-x: clip;
+  scroll-padding-block-end: 88px;
+}
+
+body {
+  color: var(--idilewa-ink);
+  font-family: var(--idilewa-font-sans);
+}
+
+body > header {
+  min-height: 80px;
+  border-bottom: 1px solid #e6ece8;
+  background: var(--idilewa-page);
+}
+
+body > header nav a,
+body > header nav button {
+  min-height: 44px;
+}
+
+.btn,
+.primary,
+.button-primary,
+.id-btn--primary {
+  min-height: 48px;
+  padding: 14px 28px;
+  border: 1px solid var(--idilewa-forest);
+  border-radius: 9999px;
+  background: var(--idilewa-forest);
+  color: #fff;
+  font-family: var(--idilewa-font-sans);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.btn:hover,
+.primary:hover,
+.button-primary:hover,
+.id-btn--primary:hover {
+  background: var(--idilewa-forest-hover);
+  border-color: var(--idilewa-forest-hover);
+}
+
+.btn.alt,
+.button-outline,
+.id-btn--secondary,
+.id-btn--outline {
+  border: 1.5px solid #cbd5ce;
+  background: #fff;
+  color: var(--idilewa-forest);
+}
+
+.idilewa-mobile-tabs { display: none; }
+
+@media (max-width: 760px) {
+  body.has-idilewa-mobile-tabs {
+    padding-block-end: calc(76px + env(safe-area-inset-bottom));
+  }
+
+  .idilewa-mobile-tabs {
+    position: fixed;
+    z-index: 100;
+    inset-inline: 0;
+    inset-block-end: 0;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    padding: 7px 10px calc(7px + env(safe-area-inset-bottom));
+    border-top: 1px solid var(--idilewa-border);
+    background: rgba(249, 250, 248, .97);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+
+  .idilewa-mobile-tab {
+    position: relative;
+    display: flex;
+    min-width: 44px;
+    min-height: 52px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 3px 4px;
+    border-radius: 12px;
+    color: var(--idilewa-muted);
+    font-size: 11px;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  .idilewa-mobile-tab svg {
+    width: 21px;
+    height: 21px;
+  }
+
+  .idilewa-mobile-tab[aria-current="page"] svg {
+    padding: 3px;
+    border-radius: 50%;
+    background: var(--idilewa-forest);
+    color: #fff;
+  }
+
+  .idilewa-mobile-tab[aria-current="page"] {
+    background: #e5efe8;
+    color: var(--idilewa-forest);
+    font-weight: 700;
+  }
+
+  .idilewa-mobile-tab[aria-current="page"]::after {
+    position: absolute;
+    inset: auto 12px 0;
+    border-block-end: 2px solid var(--idilewa-leaf);
+    content: "";
+  }
+
+  .idilewa-mobile-tab:focus-visible {
+    outline: 3px solid var(--idilewa-forest);
+    outline-offset: -3px;
+  }
+}
+
+@media (forced-colors: active) {
+  .idilewa-mobile-tab[aria-current="page"] { outline: 2px solid LinkText; }
+  .idilewa-mobile-tab[aria-current="page"]::after { border-color: LinkText; }
+}
+
 .idilewa-site-footer {
   width: 100%;
   margin-top: 44px;
   border-top: 1px solid #dce9df;
   background: linear-gradient(160deg, #fffef9 0%, #f7fbf4 80%, #f3fbf0 100%);
-  color: #172b24;
+  color: var(--idilewa-ink);
   text-align: left;
 }
 
@@ -38,7 +182,7 @@
 
 .idilewa-site-footer h2 {
   margin: 0 0 12px;
-  color: #146d37;
+  color: var(--idilewa-forest);
   font-size: 15px;
   font-weight: 750;
   letter-spacing: 0;
@@ -113,7 +257,7 @@
 
 .idilewa-site-footer .idFootLink:hover {
   background: #e9f4e9;
-  color: #075c2e;
+  color: var(--idilewa-forest);
 }
 
 .idilewa-site-footer .idFootLink:focus-visible,
@@ -174,7 +318,7 @@
   margin: 0 auto;
   padding: 12px clamp(18px, 3vw, 34px);
   border-top: 1px solid #dce9df;
-  background: #006b34;
+  background: var(--idilewa-forest);
   color: #fff;
   font-size: 12px;
 }

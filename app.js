@@ -689,18 +689,44 @@ import {
           <button class="icon-button menu-toggle" type="button" data-action="toggle-menu" aria-label="Open navigation" aria-expanded="false">${icon('menu', 21)}</button>
         </div>
       </div>
-      <div id="mobile-menu" class="mobile-menu" aria-hidden="true">
+      <dialog id="mobile-menu" class="mobile-menu" aria-labelledby="mobile-menu-title">
         <button class="mobile-menu-backdrop" type="button" data-action="toggle-menu" aria-label="Close navigation" tabindex="-1"></button>
         <div class="mobile-menu-panel">
-          <div class="mobile-menu-head"><div class="mobile-menu-heading"><span>YOUR NEXT STEP</span><strong>Explore Idilewa</strong></div><button class="icon-button mobile-menu-close" type="button" data-action="toggle-menu" aria-label="Close navigation">${icon('close', 20)}</button></div>
+          <div class="mobile-sheet-handle" aria-hidden="true"></div>
+          <div class="mobile-menu-head"><div class="mobile-menu-heading"><span>YOUR NEXT STEP</span><strong id="mobile-menu-title">Explore Ìdíléwa</strong></div><button class="icon-button mobile-menu-close" type="button" data-action="toggle-menu" aria-label="Close navigation" autofocus>${icon('close', 20)}</button></div>
           <div class="mobile-menu-list">${menu}${routeLink('contact', `${icon('send', 19)}<span>Contact</span>${icon('arrow', 16)}`, 'mobile-menu-link')}${routeLink('privacy', `${icon('lock', 19)}<span>Privacy</span>${icon('arrow', 16)}`, 'mobile-menu-link')}</div>
           <div class="mobile-menu-bottom">${currentUser
             ? `${routeLink('profile', `${icon('user', 15)} Open your profile ${icon('arrow', 14)}`, 'button button-primary')}<button class="button button-outline" type="button" data-action="account-sign-out">Sign out</button>`
             : `${routeLink('parent-login', 'Log in', 'button button-outline')}${routeLink('parent-signup', 'Get started', 'button button-primary')}`}</div>
         </div>
-      </div>`;
+      </dialog>`;
     const mobileMenu = document.getElementById('mobile-menu');
-    if (mobileMenu) document.body.append(mobileMenu);
+    if (mobileMenu) {
+      document.body.append(mobileMenu);
+      mobileMenu.addEventListener('close', () => {
+        mobileMenu.classList.remove('is-open');
+        document.querySelector('.menu-toggle')?.setAttribute('aria-expanded', 'false');
+      });
+      const handle = mobileMenu.querySelector('.mobile-sheet-handle');
+      let pointerStartY = null;
+      let pointerId = null;
+      handle?.addEventListener('pointerdown', (event) => {
+        pointerStartY = event.clientY;
+        pointerId = event.pointerId;
+        handle.setPointerCapture(event.pointerId);
+      });
+      handle?.addEventListener('pointerup', (event) => {
+        if (pointerId === event.pointerId && pointerStartY !== null && event.clientY - pointerStartY > 56) {
+          closeMobileMenu();
+        }
+        pointerStartY = null;
+        pointerId = null;
+      });
+      handle?.addEventListener('pointercancel', () => {
+        pointerStartY = null;
+        pointerId = null;
+      });
+    }
   }
 
   function renderMobileNav(page) {
@@ -709,15 +735,7 @@ import {
     const mobileNav = document.getElementById('mobile-nav');
     mobileNav.className = 'mobile-nav mobile-bottom-navigation';
     mobileNav.setAttribute('aria-label', 'Primary navigation');
-    if (page === 'index' || page === 'voice_lessons' || page.startsWith('voice-')) {
-      mobileNav.replaceChildren();
-      mobileNav.hidden = true;
-      document.body.classList.remove('has-mobile-bottom-navigation');
-      return;
-    }
-    if (page === 'ai-conversation' ||
-      page.startsWith('tutor') || page === 'families' ||
-      (page.startsWith('parent') && !familyDashboard) || (currentUser?.role === 'parent' && !familyDashboard) || currentUser?.role === 'educator') {
+    if (page === 'ai-conversation' || page.startsWith('tutor') || currentUser?.role === 'educator') {
       mobileNav.replaceChildren();
       mobileNav.hidden = true;
       document.body.classList.remove('has-mobile-bottom-navigation');
@@ -726,17 +744,13 @@ import {
     mobileNav.hidden = false;
     document.body.classList.add('has-mobile-bottom-navigation');
     const items = [
-      { route: 'index', label: 'Home', ico: 'home' },
-      { route: 'voice_lessons', label: 'Voice', ico: 'mic' },
-      { route: 'profile', label: 'Profile', ico: 'user' }
+      { route: 'voice_lessons', label: 'Learn', ico: 'book', active: page === 'index' || page === 'voice_lessons' || page.startsWith('voice-') || ['languages', 'course', 'lesson', 'kids'].includes(page) },
+      { route: 'oral', label: 'Explore', ico: 'quote', active: ['oral', 'oral_genre', 'oriki', 'owe', 'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'keepers', 'about', 'mentors'].includes(page) },
+      { route: 'profile', label: 'Progress', ico: 'user', active: ['profile', 'voice-progress', 'parent-progress'].includes(page) },
+      { route: 'families', label: 'Family', ico: 'people', active: NAV_GROUPS[page] === 'families' || familyDashboard }
     ];
     mobileNav.innerHTML = items.map((item) => {
-      const active = item.route === 'index'
-        ? page === 'index' || familyDashboard
-        : item.route === 'voice_lessons'
-          ? page === 'voice_lessons' || page.startsWith('voice-')
-          : page === item.route;
-      return `<a href="#/${item.route}" data-route="${item.route}" class="mobile-tab mobile-navigation-item ${active ? 'active' : ''}"${active ? ' aria-current="page"' : ''}>${icon(item.ico, 20)}<span>${item.label}</span></a>`;
+      return `<a href="#/${item.route}" data-route="${item.route}" class="mobile-tab mobile-navigation-item ${item.active ? 'active' : ''}"${item.active ? ' aria-current="page"' : ''}>${icon(item.ico, 20)}<span>${item.label}</span></a>`;
     }).join('');
   }
 
@@ -6245,7 +6259,8 @@ import {
   function closeMobileMenu() {
     const menu = document.getElementById('mobile-menu');
     const toggle = document.querySelector('.menu-toggle');
-    if (menu) { menu.classList.remove('is-open'); menu.setAttribute('aria-hidden', 'true'); }
+    if (menu?.open) menu.close();
+    if (menu) menu.classList.remove('is-open');
     if (toggle) toggle.setAttribute('aria-expanded', 'false');
   }
 
@@ -6253,10 +6268,13 @@ import {
     const menu = document.getElementById('mobile-menu');
     const toggle = document.querySelector('.menu-toggle');
     if (!menu) return;
-    const opening = !menu.classList.contains('is-open');
-    menu.classList.toggle('is-open', opening);
-    menu.setAttribute('aria-hidden', String(!opening));
-    if (toggle) toggle.setAttribute('aria-expanded', String(opening));
+    if (menu.open) {
+      closeMobileMenu();
+      return;
+    }
+    menu.showModal();
+    menu.classList.add('is-open');
+    if (toggle) toggle.setAttribute('aria-expanded', 'true');
   }
 
   const searchable = ROUTES.map((route) => ({ route, title: LABELS[route], summary: PAGE_META[route]?.desc || `Explore ${LABELS[route].toLowerCase()} in the Idilewa learning space.` })).concat(LANGUAGES.map((l) => ({ route: 'languages', title: l.name, summary: `${l.region} · ${l.lessons}` })));

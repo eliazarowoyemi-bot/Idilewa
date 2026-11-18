@@ -114,9 +114,13 @@ const nativeRouteNavigationStyles = `<style id="idilewa-native-route-navigation"
 @media(max-width:560px){.idilewa-route-nav a{flex:1 1 40%}}
 </style>`;
 const aboutHeaderNavigationStyles = `<style id="idilewa-about-header-navigation">
-#nav{display:none!important}
-#menu{display:inline-flex!important;align-items:center;justify-content:center;gap:8px;min-width:88px;min-height:44px}
-#menu::before{content:"☰";font-size:18px;line-height:1}
+#nav{display:flex;align-items:center;gap:clamp(16px,2.4vw,32px)}
+#nav a{display:inline-flex;align-items:center;min-height:44px;font-size:15px;font-weight:550}
+#menu{display:none}
+@media(max-width:980px){
+  #nav{display:none!important}
+  #menu{display:inline-flex!important;align-items:center;justify-content:center;gap:8px;min-width:88px;min-height:44px}
+}
 </style>`;
 
 function insertAfterClosingElement(html, tagName, content, message) {
