@@ -220,8 +220,8 @@ add a `--id-i-*` mask variable in `design-system.css` for pseudo-element use.
 ## 11. Verification
 
 ```powershell
-npm test          # 162 tests: a11y, screens, routes, AI provider contracts
-npm run build     # Vite must exit 0; index CSS ~18 kB, siteNav JS ~3 kB
+npm test          # node --test suite: a11y, screens, routes, AI provider contracts, language-lab engine
+npm run build     # Vite must exit 0; index CSS ~38 kB, siteNav JS ~3 kB
 ```
 
 Manual pass before merge: 1440px, 1024px, 768px, 375px; keyboard-only

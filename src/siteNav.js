@@ -19,6 +19,7 @@ const NAVIGATION_DESTINATIONS = [
   ['Learn', [
     ['/', 'Home'],
     ['/?view=academy', 'Language Academy'],
+    ['/?view=phoneticsLab', 'Sounds & Vowels'],
     ['/?view=progress', 'My Progress'],
     ['/development-center.html', 'Development Center'],
     ['/kids.html', 'Kids Arcade'],
@@ -42,6 +43,7 @@ const NAVIGATION_DESTINATIONS = [
 const NAVIGATION_HREFS = {
   academy: '/?view=academy',
   studio: '/?view=studio',
+  phoneticsLab: '/?view=phoneticsLab',
   tutors: '/tutor.html',
   aiChat: '/ai-conversation.html',
   codeLab: '/development-center.html',
@@ -118,8 +120,8 @@ function updateCurrentNavigation() {
   const view = new URLSearchParams(window.location.search).get('view') || 'home';
   const activeSelector = view === 'academy' || view === 'studio'
     ? '[data-id-dropdown] .id-nav__trigger'
-    : view === 'aiChat'
-      ? '[data-idilewa-route="aiChat"]'
+    : view === 'aiChat' || view === 'phoneticsLab'
+      ? `[data-idilewa-route="${view}"]`
       : view === 'home'
         ? '.id-nav__links > a[href="/"]'
         : '.id-more__trigger';

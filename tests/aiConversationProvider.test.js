@@ -214,3 +214,29 @@ test('AI conversation requests only reach the Gemini endpoint', async () => {
   ]);
   assert.ok(urls.every((url) => !/\/api\/(chat|embed)/.test(url)), 'no legacy local-model endpoints may be called');
 });
+
+test('the Ìjìròrò prompt covers tones, phonetics, heritage and code reasoning', async () => {
+  let systemPrompt = '';
+  await generateAiConversationReply({
+    language: 'yo',
+    ageGroup: '9-12',
+    level: 'Intermediate',
+    message: 'Teach me tones and loops',
+    config: GEMINI_TEST_CONFIG,
+    fetchImpl: async (_url, options) => {
+      systemPrompt = JSON.parse(options.body).systemInstruction.parts[0].text;
+      return new Response(JSON.stringify({
+        candidates: [{ content: { parts: [{ text: 'Ẹ káàárọ̀' }] } }],
+      }));
+    },
+  });
+
+  assert.match(systemPrompt, /five concise parts/);
+  assert.match(systemPrompt, /Yorùbá high, mid and low/);
+  assert.match(systemPrompt, /Igbo high, low and downstep/);
+  assert.match(systemPrompt, /Kiswahili penultimate stress/);
+  assert.match(systemPrompt, /labial-velars \(gb, kp\)/);
+  assert.match(systemPrompt, /literal and idiomatic meaning/);
+  assert.match(systemPrompt, /descriptive equivalent/);
+  assert.match(systemPrompt, /Never invent translations/);
+});

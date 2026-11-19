@@ -68,7 +68,7 @@ imports.
 ## Verification before finishing
 
 ```powershell
-npm test        # must stay green (162 tests)
+npm test        # must stay green (the full node --test suite)
 npm run build   # Vite must exit 0
 ```
 
