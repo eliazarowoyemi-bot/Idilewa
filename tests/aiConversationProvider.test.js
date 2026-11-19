@@ -43,6 +43,20 @@ test('conversation requests validate supported languages, input size, history an
     message: 'Hello',
     conversationId: '../someone-elses-conversation',
   }).error, /ID is not valid/);
+  assert.deepEqual(
+    (({ ageGroup, level }) => ({ ageGroup, level }))(parseAiConversationRequest({ language: 'yo', message: 'Hello' })),
+    { ageGroup: '9-12', level: 'Elementary' },
+  );
+  assert.match(parseAiConversationRequest({
+    language: 'yo',
+    message: 'Hello',
+    ageGroup: '0-2',
+  }).error, /age group/);
+  assert.match(parseAiConversationRequest({
+    language: 'yo',
+    message: 'Hello',
+    level: 'Expert',
+  }).error, /Elementary, Intermediate, or Advanced/);
 });
 
 test('site support requests validate bounded text and normalize conversation history', () => {
@@ -158,6 +172,28 @@ test('every supported language is sent to Gemini with its own response instructi
     assert.equal(result.reply, `Reply in ${languageName}`);
     assert.equal(result.provider, 'gemini');
   }
+});
+
+test('AI tutor prompt adapts to learner age and level without inventing cultural or pronunciation facts', async () => {
+  let systemPrompt = '';
+  await generateAiConversationReply({
+    language: 'yo',
+    ageGroup: '3-5',
+    level: 'Elementary',
+    message: 'Teach me a greeting',
+    config: GEMINI_TEST_CONFIG,
+    fetchImpl: async (_url, options) => {
+      systemPrompt = JSON.parse(options.body).systemInstruction.parts[0].text;
+      return new Response(JSON.stringify({
+        candidates: [{ content: { parts: [{ text: 'Ẹ káàárọ̀.' }] } }],
+      }));
+    },
+  });
+  assert.match(systemPrompt, /3-5 age group/);
+  assert.match(systemPrompt, /Elementary level/);
+  assert.match(systemPrompt, /target phrase/);
+  assert.match(systemPrompt, /English meaning/);
+  assert.match(systemPrompt, /Never invent translations, pronunciation rules, cultural facts/);
 });
 
 test('AI conversation requests only reach the Gemini endpoint', async () => {

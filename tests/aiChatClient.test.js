@@ -11,6 +11,8 @@ test('AI Conversation sends selected language, message and assistant history to 
     assert.equal(options.headers['Content-Type'], 'application/json');
     assert.deepEqual(JSON.parse(options.body), {
       language: 'yo',
+      ageGroup: '13-17',
+      level: 'Intermediate',
       message: 'Báwo ni?',
       messages: [
         { role: 'user', text: 'Hello' },
@@ -31,6 +33,8 @@ test('AI Conversation sends selected language, message and assistant history to 
   try {
     const result = await sendAiChatMessage({
       language: 'yo',
+      ageGroup: '13-17',
+      level: 'Intermediate',
       message: ' Báwo ni? ',
       messages: [
         { role: 'user', text: 'Hello' },
@@ -67,6 +71,10 @@ test('AI Conversation surfaces backend failures and rejects unsupported language
       sendAiChatMessage({ language: 'yo', message: '', messages: [] }),
       /Type a message/,
     );
+    await assert.rejects(
+      sendAiChatMessage({ language: 'yo', ageGroup: '0-2', message: 'Hello' }),
+      /age group/,
+    );
   } finally {
     globalThis.fetch = originalFetch;
   }
@@ -79,7 +87,13 @@ test('anonymous conversation requests omit bearer auth and validate API response
     assert.equal(url, '/api/ai/conversation');
     assert.equal(options.method, 'POST');
     assert.equal(options.headers.Authorization, undefined);
-    assert.deepEqual(JSON.parse(options.body), { language: 'sw', message: 'Habari', messages: [] });
+    assert.deepEqual(JSON.parse(options.body), {
+      language: 'sw',
+      ageGroup: '9-12',
+      level: 'Elementary',
+      message: 'Habari',
+      messages: [],
+    });
     assert.equal(options.signal, signal);
     return new Response(JSON.stringify({
       reply: 'Habari! Unaendeleaje?',

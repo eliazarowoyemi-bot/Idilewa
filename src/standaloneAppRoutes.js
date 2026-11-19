@@ -58,6 +58,21 @@ const nativeAppPages = new Set([
 
 const footerYearAssignment = 'document.getElementById("footerYear").textContent=new Date().getFullYear();';
 const siteFooterBootstrap = '<script type="module" src="/src/siteFooter.js"></script>';
+const legacyLearningBootstrap = `<script>
+window.IdilewaLegacyBindings = {
+  getState: () => ({ lang, level, age, stage, reverse }),
+  data,
+  voiceCode,
+  setLanguage: (value) => { lang = value; },
+  setLevel: (value) => { level = value; },
+  setAge: (value) => { age = value; },
+  setReverse: (value) => { reverse = value; },
+};
+</script>
+<script type="module">
+import { initializeLegacyLearningExperience } from './src/legacyLearningEngine.js';
+initializeLegacyLearningExperience(window.IdilewaLegacyBindings);
+</script>`;
 const supportAssistantBootstrap = '<script type="module" src="/src/supportAssistant.js"></script>';
 const guardedBilingualRoot = "const root=document.querySelector('.bilingualGame'), sel=root.querySelector(";
 const safeBilingualRoot = "const root=document.querySelector('.bilingualGame');if(!root)return;const sel=root.querySelector(";
@@ -566,7 +581,7 @@ function transformAppHtml(html) {
   }
 
   return styled.slice(0, closingBodyIndex)
-    .concat(viewBootstrap, siteFooterBootstrap, styled.slice(closingBodyIndex));
+    .concat(viewBootstrap, legacyLearningBootstrap, siteFooterBootstrap, styled.slice(closingBodyIndex));
 }
 
 function injectSupportAssistant(html) {

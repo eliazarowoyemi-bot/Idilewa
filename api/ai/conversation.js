@@ -313,6 +313,8 @@ export default async function handler(req, res) {
     const knowledge = await getKnowledge(database, request.language, request.message, providerConfig);
     const result = await generateAiConversationReply({
       language: request.language,
+      ageGroup: request.ageGroup,
+      level: request.level,
       message: request.message,
       messages,
       knowledge,

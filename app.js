@@ -3759,6 +3759,8 @@ import {
 
   const aiConversation = {
     languageId: AI_CONVERSATION_LANGUAGES[0].id,
+    ageGroup: '9-12',
+    level: 'Elementary',
     showTranslation: true,
     autoSpeak: false,
     rate: 1,
@@ -3919,6 +3921,8 @@ import {
           <button type="button" class="aichat-iconbtn aichat-iconbtn-mint" data-action="aichat-settings" aria-expanded="false" aria-controls="aichat-settings" aria-label="Conversation settings">${icon('settings', 21)}</button>
           <div class="aichat-popover aichat-settings-panel" id="aichat-settings" hidden>
             <p class="aichat-popover-title">Conversation settings</p>
+            <div class="aichat-audience-control"><label for="aichat-age-group">Learner age group</label><select id="aichat-age-group" name="ageGroup">${[['3-5', '3–5'], ['6-8', '6–8'], ['9-12', '9–12'], ['13-17', '13–17'], ['18+', '18+']].map(([value, label]) => `<option value="${value}"${value === aiConversation.ageGroup ? ' selected' : ''}>${label}</option>`).join('')}</select></div>
+            <div class="aichat-audience-control"><label for="aichat-level">Learning level</label><select id="aichat-level" name="level">${['Elementary', 'Intermediate', 'Advanced'].map((value) => `<option value="${value}"${value === aiConversation.level ? ' selected' : ''}>${value}</option>`).join('')}</select></div>
             <div class="aichat-switch-row"><span>Show translation</span><button type="button" class="aichat-switch" role="switch" aria-checked="${aiConversation.showTranslation}" aria-label="Show translation" data-action="aichat-toggle-translation"></button></div>
             <div class="aichat-switch-row"><span>Auto-play replies</span><button type="button" class="aichat-switch" role="switch" aria-checked="${aiConversation.autoSpeak}" aria-label="Auto-play replies" data-action="aichat-toggle-autospeak"></button></div>
           </div>
@@ -4181,6 +4185,8 @@ import {
     try {
       const result = await sendAiChatMessage({
         language: aiChatLanguage().id,
+        ageGroup: aiConversation.ageGroup,
+        level: aiConversation.level,
         message: text,
         conversationId: aiConversation.conversationId,
         messages: history,
@@ -7323,6 +7329,14 @@ import {
     }
     if (el.matches('.aichat-focus-select')) {
       changeAiChatLanguage(el.value);
+      return;
+    }
+    if (el.matches('#aichat-age-group')) {
+      aiConversation.ageGroup = el.value;
+      return;
+    }
+    if (el.matches('#aichat-level')) {
+      aiConversation.level = el.value;
       return;
     }
     if (el.matches('.translation-speed-select select')) {

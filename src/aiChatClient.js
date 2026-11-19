@@ -49,6 +49,8 @@ async function requestConversation(url, options = {}) {
 
 export async function sendAiChatMessage({
   language,
+  ageGroup = '9-12',
+  level = 'Elementary',
   message,
   conversationId = '',
   messages = [],
@@ -56,6 +58,12 @@ export async function sendAiChatMessage({
 }) {
   if (!SUPPORTED_LANGUAGES.has(language)) {
     throw new Error('Choose Yorùbá, Igbo, Hausa, Kiswahili, or Nigerian Pidgin for AI Conversation.');
+  }
+  if (!['3-5', '6-8', '9-12', '13-17', '18+'].includes(ageGroup)) {
+    throw new Error('Choose a supported learner age group.');
+  }
+  if (!['Elementary', 'Intermediate', 'Advanced'].includes(level)) {
+    throw new Error('Choose Elementary, Intermediate, or Advanced.');
   }
   if (typeof message !== 'string' || !message.trim()) {
     throw new Error('Type a message before sending it.');
@@ -65,6 +73,8 @@ export async function sendAiChatMessage({
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       language,
+      ageGroup,
+      level,
       message: message.trim(),
       conversationId: conversationId || undefined,
       messages: normalizeHistory(messages),

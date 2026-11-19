@@ -70,6 +70,10 @@ test('the AI conversation screen renders the guide card, thread, composer, and t
   assert.match(stylesSource, /\.aichat-status-sr-only\s*\{[\s\S]*?clip-path: inset\(50%\);/);
   assert.match(appSource, /data-form="aichat-composer"/);
   assert.match(appSource, /class="aichat-focus-select"/);
+  assert.match(appSource, /id="aichat-age-group"/);
+  assert.match(appSource, /id="aichat-level"/);
+  assert.match(appSource, /ageGroup: aiConversation\.ageGroup/);
+  assert.match(appSource, /level: aiConversation\.level/);
   assert.match(appSource, /class="aichat-input"/);
   assert.match(appSource, /label: 'Practice', ico: 'message', active: true/);
   assert.match(appSource, /<a class="aichat-tab" href="#\/\$\{tab\.route\}" data-route="\$\{tab\.route\}">/);
