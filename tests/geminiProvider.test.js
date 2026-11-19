@@ -4,9 +4,12 @@ import {
   AiServiceError,
   createAiKnowledgeEmbedding,
   DEFAULT_GEMINI_MODEL,
+  DEFAULT_OLLAMA_HOST,
+  DEFAULT_OLLAMA_MODEL,
   generateAiConversationReply,
   getAiProviderConfig,
   getGeminiConfig,
+  getOllamaConfig,
   resolveAiProvider,
 } from '../src/server/aiConversation.js';
 import { geminiModelChain } from '../src/server/geminiProvider.js';
@@ -23,10 +26,7 @@ test('Gemini configuration defaults, validation and provider selection', () => {
   assert.equal(resolveAiProvider({ AI_PROVIDER: 'Gemini' }), 'gemini');
   assert.equal(resolveAiProvider({ GEMINI_API_KEY: 'k' }), 'gemini');
   assert.equal(resolveAiProvider({ GOOGLE_AI_API_KEY: 'k' }), 'gemini');
-  assert.throws(
-    () => resolveAiProvider({ AI_PROVIDER: 'ollama' }),
-    (error) => error instanceof AiServiceError && /not supported/.test(error.message),
-  );
+  assert.equal(resolveAiProvider({ AI_PROVIDER: 'ollama' }), 'ollama');
 
   assert.throws(
     () => getGeminiConfig({}),
@@ -55,6 +55,12 @@ test('Gemini configuration defaults, validation and provider selection', () => {
   );
 
   assert.equal(getAiProviderConfig({ AI_PROVIDER: 'gemini', GEMINI_API_KEY: 'k' }).provider, 'gemini');
+  assert.equal(getAiProviderConfig({ AI_PROVIDER: 'ollama' }).provider, 'ollama');
+  assert.deepEqual(getOllamaConfig({}), {
+    provider: 'ollama',
+    host: DEFAULT_OLLAMA_HOST,
+    model: DEFAULT_OLLAMA_MODEL,
+  });
   assert.throws(() => getAiProviderConfig({ AI_PROVIDER: 'openai' }), /not supported/);
 });
 

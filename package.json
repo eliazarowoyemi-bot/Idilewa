@@ -16,6 +16,7 @@
     "canvas-confetti": "^1.9.4",
     "convex": "^1.48.0",
     "lucide-react": "^0.546.0",
+    "ollama": "^0.6.4",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "three": "^0.186.1",

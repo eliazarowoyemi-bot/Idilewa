@@ -7,9 +7,12 @@ test('support API rate-limits and answers with page links without saving the con
     'SUPABASE_URL',
     'SUPABASE_SERVICE_ROLE_KEY',
     'AI_RATE_LIMIT_HMAC_KEY',
+    'AI_PROVIDER',
     'GEMINI_API_KEY',
     'GEMINI_MODEL',
     'GEMINI_FALLBACK_MODELS',
+    'OLLAMA_HOST',
+    'OLLAMA_MODEL',
   ];
   const previousEnvironment = Object.fromEntries(environmentKeys.map((key) => [key, process.env[key]]));
   for (const key of environmentKeys) delete process.env[key];
@@ -63,6 +66,7 @@ test('support API rate-limits and answers with page links without saving the con
   assert.equal(res.statusCode, 200);
   assert.equal(res.body.reply, 'Start in the Language Academy.');
   assert.equal(res.body.persisted, false);
+  assert.equal(res.body.provider, 'Gemini · gemini-test-model');
   assert.ok(res.body.sources.some((source) => source.url === '/'));
   assert.equal(new Set(res.body.sources.map((source) => source.url)).size, res.body.sources.length);
   const rateLimitRequest = requests.find(({ url }) => url.includes('consume_ai_conversation_rate_limit'));

@@ -7,9 +7,12 @@ import {
   createAiKnowledgeEmbedding,
   DEFAULT_AI_PROVIDER,
   DEFAULT_GEMINI_MODEL,
+  DEFAULT_OLLAMA_HOST,
+  DEFAULT_OLLAMA_MODEL,
   generateAiConversationReply,
   getAiProviderConfig,
   getGeminiConfig,
+  getOllamaConfig,
   parseAiConversationRequest,
   parseSupportAssistantRequest,
   resolveAiProvider,
@@ -82,23 +85,52 @@ test('site support requests validate bounded text and normalize conversation his
   }).error, /unsupported message role/);
 });
 
-test('the deployment is Gemini-only and never falls back to a local model host', () => {
-  assert.deepEqual([...AI_PROVIDERS], ['gemini']);
+test('Gemini remains the default while local Ollama is available as an opt-in provider', () => {
+  assert.deepEqual([...AI_PROVIDERS], ['gemini', 'ollama']);
   assert.equal(DEFAULT_AI_PROVIDER, 'gemini');
   assert.equal(resolveAiProvider({}), 'gemini');
-  assert.throws(
-    () => resolveAiProvider({ AI_PROVIDER: 'ollama' }),
-    (error) => error instanceof AiServiceError && /not supported/.test(error.message),
-  );
-  assert.throws(
-    () => getAiProviderConfig({ AI_PROVIDER: 'ollama', GEMINI_API_KEY: 'k' }),
-    /not supported/,
-  );
+  assert.equal(resolveAiProvider({ AI_PROVIDER: 'ollama' }), 'ollama');
   assert.throws(
     () => getAiProviderConfig({}),
     (error) => error instanceof AiServiceError && error.code === 'AI_PROVIDER_NOT_CONFIGURED',
   );
   assert.equal(getAiProviderConfig({ GEMINI_API_KEY: 'k' }).provider, 'gemini');
+  assert.deepEqual(getOllamaConfig({}), {
+    provider: 'ollama',
+    host: DEFAULT_OLLAMA_HOST,
+    model: DEFAULT_OLLAMA_MODEL,
+  });
+  assert.equal(DEFAULT_OLLAMA_MODEL, 'llama3.2');
+  assert.equal(getAiProviderConfig({ AI_PROVIDER: 'ollama' }).provider, 'ollama');
+});
+
+test('production never selects a loopback Ollama host and uses configured Gemini instead', () => {
+  for (const env of [
+    { NODE_ENV: 'production' },
+    { VERCEL_ENV: 'production', OLLAMA_HOST: 'http://127.0.0.1:11434' },
+    { NODE_ENV: 'production', OLLAMA_HOST: 'http://[::1]:11434' },
+  ]) {
+    assert.equal(
+      getAiProviderConfig({
+        ...env,
+        AI_PROVIDER: 'ollama',
+        GEMINI_API_KEY: 'configured-server-key',
+      }).provider,
+      'gemini',
+    );
+  }
+  assert.throws(
+    () => getAiProviderConfig({ NODE_ENV: 'production', AI_PROVIDER: 'ollama' }),
+    (error) => error instanceof AiServiceError && error.code === 'AI_PROVIDER_NOT_CONFIGURED',
+  );
+  assert.equal(
+    getAiProviderConfig({
+      NODE_ENV: 'production',
+      AI_PROVIDER: 'ollama',
+      OLLAMA_HOST: 'http://ollama.internal:11434',
+    }).provider,
+    'ollama',
+  );
 });
 
 test('Gemini receives mapped history and approved knowledge notes', async () => {

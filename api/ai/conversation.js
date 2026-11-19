@@ -299,7 +299,7 @@ export default async function handler(req, res) {
       return sendJson(res, 200, {
         reply: result.reply,
         persisted: false,
-        provider: 'Gemini · ' + result.model,
+        provider: `${result.provider === 'ollama' ? 'Ollama' : 'Gemini'} · ${result.model}`,
         sources,
       });
     }
@@ -331,7 +331,7 @@ export default async function handler(req, res) {
         result.reply,
       )
       : null;
-    const providerLabel = 'Gemini';
+    const providerLabel = result.provider === 'ollama' ? 'Ollama' : 'Gemini';
     return sendJson(res, 200, {
       reply: result.reply,
       language: request.language,

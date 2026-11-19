@@ -61,8 +61,8 @@ export const supportPageKnowledge = Object.freeze([
     title: 'AI Conversation',
     label: 'AI Conversation',
     url: '/ai-conversation',
-    keywords: 'AI chat Gemini conversation practice language coach messages saved',
-    content: 'AI Conversation is a language practice experience for Yorùbá, Igbo, Hausa, Kiswahili, and Nigerian Pidgin. Gemini generates replies; Plotweaver handles supported speech and reply translation. Authenticated conversation history can be saved to the account, while anonymous chats are not saved by Idilewa. Users should not enter personal or identifying information.',
+    keywords: 'AI chat Gemini Ollama conversation practice language coach messages saved',
+    content: 'AI Conversation is a language practice experience for Yorùbá, Igbo, Hausa, Kiswahili, and Nigerian Pidgin. The server-side provider selected for the deployment (Gemini or local Ollama Desktop) generates replies; Plotweaver handles supported speech and reply translation. Authenticated conversation history can be saved to the account, while anonymous chats are not saved by Idilewa. Users should not enter personal or identifying information.',
   },
   {
     title: 'Code Playground and Development Center',
@@ -160,7 +160,7 @@ export const supportPageKnowledge = Object.freeze([
     label: 'Privacy',
     url: '/parents.html#/privacy',
     keywords: 'privacy data accounts children browser storage Supabase review delete',
-    content: 'The Privacy page says supported lesson and game progress syncs for signed-in learners. Proverb contributions submitted while signed in are private to the account and are not published automatically; guest contributions, personal reflections, drafts, preferences, and profile photos stay in the current browser. Common support questions are answered from a local Idilewa help guide; questions that need a generated reply and recent messages are sent to Gemini by Google. Idilewa does not save support chats. Child accounts require guardian email approval, and tutor connections require separate approval. Do not enter sensitive child details. Families can clear browser data or contact Idilewa to request review or deletion of account data.',
+    content: 'The Privacy page says supported lesson and game progress syncs for signed-in learners. Proverb contributions submitted while signed in are private to the account and are not published automatically; guest contributions, personal reflections, drafts, preferences, and profile photos stay in the current browser. Common support questions are answered from a local Idilewa help guide; questions that need a generated reply and recent messages are sent to the server-side provider configured for the deployment (Gemini or local Ollama Desktop). Idilewa does not save support chats. Child accounts require guardian email approval, and tutor connections require separate approval. Do not enter sensitive child details. Families can clear browser data or contact Idilewa to request review or deletion of account data.',
   },
   {
     title: 'Contact the Idilewa team',
