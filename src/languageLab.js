@@ -82,8 +82,8 @@ function isVowel(char) {
 // the way each orthography defines it.
 const UNMARKED_TONE = Object.freeze({
   'Yorùbá': 'M',
-  Igbo: 'L',
-  Hausa: 'H',
+  Igbo: 'unknown',
+  Hausa: 'unknown',
   Kiswahili: 'stress',
 });
 
@@ -106,7 +106,8 @@ export function parseSyllables(phrase, language = 'Yorùbá') {
   words.forEach((word) => {
     const clean = word.replace(/^[^\p{L}\p{N}]+|[^\p{L}\p{N}]+$/gu, '');
     if (!clean) return;
-    const chars = [...clean];
+    const chars = (clean.normalize('NFD').match(/\P{M}\p{M}*/gu) ?? [])
+      .map((character) => character.normalize('NFC'));
     let buffer = '';
     const wordStart = syllables.length;
 
@@ -149,6 +150,7 @@ export const TONE_LABELS = Object.freeze({
   H: 'high',
   L: 'low',
   M: 'mid',
+  unknown: 'not marked',
   stress: 'stress',
   plain: 'unstressed',
 });
@@ -226,7 +228,7 @@ export const PHONETICS = Object.freeze({
     tones: [
       { contrast: 'ákwá · àkwá · ákwà', meanings: 'weeping · egg · cloth', tones: 'H-H · L-H · H-L', cue: 'Same letters, different pitch: high-high, low-high, high-low.' },
     ],
-    note: 'Igbo writes high tone with an acute accent and leaves low tone unmarked in many texts, so an unaccented syllable is read low. Vowel harmony also constrains which vowels may share a word.',
+    note: 'Some Igbo teaching materials mark high tone with an acute accent and may leave low tone unmarked. This lab labels explicit marks only; an unmarked spelling alone is not enough to infer every syllable tone. Vowel-harmony descriptions can also vary by dialect.',
   },
   Hausa: {
     intro: 'Hausa has five vowel qualities, each of which can be short or long, glottalised consonants (ɓ, ɗ, ƙ, ƴ, ts) and lexical tone. Length and tone both change meaning, so they are learned with every new word.',
@@ -249,7 +251,7 @@ export const PHONETICS = Object.freeze({
       { contrast: 'gari · gaari', meanings: 'town · flour', tones: 'short · long', cue: 'Vowel length carries this contrast.' },
       { contrast: 'baba · babba', meanings: 'father · big', tones: 'short · long consonant', cue: 'A held consonant also changes the word.' },
     ],
-    note: 'Hausa tone is real but usually left unwritten outside teaching materials: high is unmarked in standard orthography and low is written with a grave accent. Learn the tone with each new word instead of guessing it from spelling.',
+    note: 'Hausa is tonal, but tone is usually omitted from everyday spelling. This lab labels explicit tone marks only and does not infer a tone from an unmarked syllable; learn each word with a trusted speaker.',
   },
   Kiswahili: {
     intro: 'Kiswahili is not a tone language. It has five pure vowels and predictable stress on the penultimate (second-to-last) syllable, plus digraphs such as ng’, ny, dh, th, gh, ch and sh.',
@@ -327,9 +329,9 @@ export const HERITAGE_STORIES = Object.freeze({
       title: 'Ọjị — the kola nut of welcome',
       native: 'Onye wetara ọjị wetara ndụ.',
       literal: 'Whoever brings kola nut brings life.',
-      idiomatic: 'A guest who is welcomed with kola brings blessing; hospitality itself is life-giving.',
-      english: 'A visitor arrives at midday. The elder breaks the kola nut, offers the first piece to the oldest person present, and only then does conversation begin.',
-      moral: 'Hospitality is shared in order: elders first, then guests, then the household. Refusing a guest kola is refusing the relationship.',
+      idiomatic: 'The saying links shared kola with life and welcome.',
+      english: 'At one gathering, an elder shares kola with a visitor before conversation begins.',
+      moral: 'In some Igbo communities, sharing kola is a gesture of welcome. The order and meaning of the ritual vary; ask a local host how to take part respectfully.',
       vocabulary: [
         { native: 'ọjị', english: 'kola nut' },
         { native: 'ndụ', english: 'life' },
@@ -338,7 +340,7 @@ export const HERITAGE_STORIES = Object.freeze({
       question: 'What does ọjị (kola nut) stand for when it is shared?',
       options: ['Life, peace and welcome', 'A quiet house', 'A competition between guests'],
       correct: 0,
-      explanation: '“Onye wetara ọjị wetara ndụ” ties the kola to ndụ, life. Sharing it opens peaceful conversation, so the nut is a symbol rather than a snack.',
+      explanation: '“Onye wetara ọjị wetara ndụ” links kola with ndụ (life) and welcome. The details of sharing vary by community.',
     },
     {
       title: 'Onye aghala nwanne ya — leave no sibling behind',
@@ -348,9 +350,9 @@ export const HERITAGE_STORIES = Object.freeze({
       english: 'When a village builds a bridge, the strongest workers carry materials for the household whose father is ill, so the crossing opens for everyone on the same day.',
       moral: 'Solidarity (ịdị n’otu) is practical: the group is only as strong as the member it refuses to leave behind.',
       vocabulary: [
+        { native: 'onye', english: 'person · someone' },
+        { native: 'aghala', english: 'should not abandon' },
         { native: 'nwanne', english: 'sibling' },
-        { native: 'agha', english: 'abandon · leave' },
-        { native: 'otu', english: 'one · together' },
       ],
       question: 'How is “Onye aghala nwanne ya” practised in the story?',
       options: ['By finishing the bridge as a group, including the family in need', 'By sending one family away', 'By waiting for another year'],
@@ -553,7 +555,7 @@ const GLOSSARY = Object.freeze({
   road: { yo: 'Ọ̀nà', ig: 'Ụzọ', ha: 'Hanya', sw: 'Barabara' },
   eye: { yo: 'Ojú', ig: 'Anya', ha: 'Ido', sw: 'Jicho' },
   hand: { yo: 'Ọwọ́', ig: 'Aka', ha: 'Hannu', sw: 'Mkono' },
-  bird: { yo: 'Ẹyẹ', ig: 'Nnụn', ha: 'Tsuntsu', sw: 'Ndege' },
+  bird: { yo: 'Ẹyẹ', ig: 'Nnụnụ', ha: 'Tsuntsu', sw: 'Ndege' },
   fish: { yo: 'Ẹja', ig: 'Azụ', ha: 'Kifi', sw: 'Samaki' },
   tree: { yo: 'Igi', ig: 'Osisi', ha: 'Itace', sw: 'Mti' },
   sun: { yo: 'Òòrùn', ig: 'Anyanwụ', ha: 'Rana', sw: 'Jua' },
@@ -596,7 +598,10 @@ const PATTERN_TEMPLATES = Object.freeze({
     name: (slot) => `Jina langu ni ${slot}`,
     want: (slot) => `Ninataka ${slot}`,
     wantLearn: (slot) => `Ninataka kujifunza ${slot}`,
-    where: (slot) => `${slot} iko wapi?`,
+    where: (_slot, key) => ({
+      water: 'Maji yako wapi?',
+      house: 'Nyumba iko wapi?',
+    })[key] ?? '',
     howMany: (slot) => `${slot} ngapi?`,
     like: (slot) => `Ninapenda ${slot}`,
     greet: (slot) => `Habari ${slot}`,
@@ -729,11 +734,12 @@ export function translatePhrase(input, { language = 'Yorùbá', direction = 'aut
   const canonicalNeedsMarks = hasDiacritics(nativeEntry?.native || '');
 
   if (nativeEntry && !englishEntry) {
-    if (typedWithoutMarks && canonicalNeedsMarks) {
+    if (typedWithoutMarks && canonicalNeedsMarks && direction === 'auto') {
       return {
         ...base,
         direction: 'native-en',
         output: nativeEntry.native,
+        native: nativeEntry.native,
         english: nativeEntry.en,
         status: 'curated',
         statusLabel: 'Curated spelling',
@@ -752,7 +758,9 @@ export function translatePhrase(input, { language = 'Yorùbá', direction = 'aut
         statusLabel: STATUS_LABELS.curated,
         confidence: 'high',
         tones: describeTones(nativeEntry.native, resolved),
-        note: 'Curated lesson phrase, matched with or without diacritics.',
+        note: typedWithoutMarks && canonicalNeedsMarks
+          ? `Curated lesson phrase. Standard spelling: “${nativeEntry.native}”.`
+          : 'Curated lesson phrase, matched with or without diacritics.',
       };
     }
   }
@@ -801,10 +809,18 @@ export function translatePhrase(input, { language = 'Yorùbá', direction = 'aut
   const pattern = matchPattern(text);
   if (resolvedDirection === 'en-native' && pattern) {
     const template = PATTERN_TEMPLATES[resolved]?.[pattern.key];
-    const glossaryEntry = GLOSSARY[stripDiacritics(pattern.slot)];
+    const slotKey = stripDiacritics(pattern.slot);
+    const glossaryEntry = GLOSSARY[slotKey];
     const slot = pattern.properNoun ? pattern.slot : glossaryEntry?.[code];
     if (template && slot) {
-      const output = template(slot);
+      const output = template(slot, slotKey);
+      if (!output) {
+        return {
+          ...base,
+          direction: 'en-native',
+          note: `The noun-class agreement for “${pattern.slot}” has not been reviewed in this lesson data, so no sentence was composed.`,
+        };
+      }
       return {
         ...base,
         direction: 'en-native',
@@ -823,7 +839,7 @@ export function translatePhrase(input, { language = 'Yorùbá', direction = 'aut
       output: '',
       status: 'missing',
       statusLabel: STATUS_LABELS.missing,
-      note: `The pattern is taught, but “${pattern.slot}” is not in the lesson glossary yet. Try water, house, mother, father, child, food, school, book, friend, market, peace, love, money, road, eye, hand, bird, fish, tree or sun.`,
+      note: `The pattern is taught, but “${pattern.slot}” is not in the reviewed lesson glossary yet. Try water, house, mother, father, child, food, school, book, friend, market, peace, love, money, road, eye, hand, bird, fish, tree or sun.`,
     };
   }
 
@@ -863,8 +879,8 @@ export const CODE_TERMS = Object.freeze({
     words: [
       { en: 'Code', native: 'Kóòdù' },
       { en: 'Variable', native: 'Àpótí ìpamọ́', descriptive: true },
-      { en: 'Condition', native: 'Ìpèníjà kóòdù', descriptive: true },
-      { en: 'Loop', native: 'Ìtẹ̀síwájú iṣẹ́', descriptive: true },
+      { en: 'Condition', native: 'Ìpò tí a ṣàyẹ̀wò', descriptive: true },
+      { en: 'Loop', native: 'Àṣẹ àtúnṣe', descriptive: true },
       { en: 'Output', native: 'Ìfiránṣẹ́ jáde', descriptive: true },
       { en: 'Event', native: 'Ìṣẹ̀lẹ̀' },
       { en: 'Speed', native: 'Ìyára' },
@@ -876,7 +892,7 @@ export const CODE_TERMS = Object.freeze({
       output: (value) => `Kọ̀ǹpútà gbọ́ àṣẹ rẹ, ó sì fi “${value}” hàn lójú ìbòjú.`,
       variable: 'Àpótí ìpamọ́ ni orúkọ kan fún nọ́mbà tàbí ọ̀rọ̀. Àmì (score) àti Ìyára (speed) jẹ́ àpótí ìpamọ́.',
       condition: 'Bí ohun kan bá ṣẹlẹ̀, kọ̀ǹpútà yóò yan ìgbésẹ̀ mìíràn. Bí bọ́ọ̀lù bá kan ọ̀pá, ó yípa.',
-      loop: 'Àṣẹ ìtẹ̀síwájú ń sọ pé kí iṣẹ́ kan máa ṣẹlẹ̀ lẹ́ẹ̀kọ̀ọ̀kan títí ète yóò fi pé.',
+      loop: 'Àṣẹ àtúnṣe ń sọ pé kí iṣẹ́ kan máa ṣẹlẹ̀ lẹ́ẹ̀kọ̀ọ̀kan títí ète yóò fi pé.',
       event: 'Ìṣẹ̀lẹ̀ ni ohun tí ó ṣẹlẹ̀, bí títẹ̀ bọ́tìnì tàbí gbígbọ́ orin.',
       collision: 'Ìfarakanra ni nígbà tí ohun méjì bá kan ara wọn, bí bọ́ọ̀lù àti ọ̀pá.',
       speed: 'Ìyára sọ bí ohun ṣe ń lọ kánkán; nọ́mbà tó pọ̀ túmọ̀ sí ìrìn tó yára.',
@@ -974,7 +990,7 @@ const ENGLISH_CODE_REASONING = Object.freeze({
 const GAME_WORD_GROUPS = Object.freeze({
   yo: [
     'Play — Ṣeré · Pause — Dúró díẹ̀ · Restart — Bẹ̀rẹ̀ lẹ́ẹ̀kan sí i · Score — Àmì · Level — Ìpele',
-    'Code — Kóòdù · Variable — Àpótí ìpamọ́ · Condition — Ìpèníjà kóòdù · Loop — Ìtẹ̀síwájú iṣẹ́ · Output — Ìfiránṣẹ́ jáde',
+    'Code — Kóòdù · Variable — Àpótí ìpamọ́ · Condition — Ìpò tí a ṣàyẹ̀wò · Loop — Àṣẹ àtúnṣe · Output — Ìfiránṣẹ́ jáde',
     'Speed — Ìyára · Size — Ìwọ̀n · Lives — Ẹ̀mí · Level — Ìpele · Colour — Àwọ̀',
     'Move — Gbé · Hide — Farapamọ́ · Collect — Kó jọ · Start — Bẹ̀rẹ̀',
     'Change — Yí padà · Create — Ṣẹ̀dà · Game — Eré · Rules — Àwọn òfin',
@@ -1009,7 +1025,8 @@ export function gameWordGroups(languageCode) {
 export function detectCodeConstruct(input) {
   const text = String(input ?? '').toLowerCase();
   if (/\b(loop|repeat|while|for each|iterate|again and again)\b/.test(text)) return 'loop';
-  if (/\b(if|else|when|condition|collide|collision|hit|touch|bounce)\b/.test(text)) return 'collision';
+  if (/\b(collide|collision|hit|touch|bounce|overlap)\b/.test(text)) return 'collision';
+  if (/\b(if|else|when|condition|branch)\b/.test(text)) return 'condition';
   if (/\b(event|click|press|keydown|key)\b/.test(text)) return 'event';
   if (/\b(speed|fast|slow|velocity|pace)\b/.test(text)) return 'speed';
   if (/\b(error|bug|wrong|crash|fail)\b/.test(text)) return 'error';
@@ -1112,7 +1129,8 @@ export function detectTutorIntent(input) {
 }
 
 export function buildTutorReply(input, { language = 'Yorùbá', level = 'Elementary' } = {}) {
-  const resolved = normalizeLanguageName(language);
+  const normalizedLanguage = normalizeLanguageName(language);
+  const resolved = LESSON_SETS[normalizedLanguage] ? normalizedLanguage : 'Yorùbá';
   const resolvedLevel = LAB_LEVELS.includes(level) ? level : 'Elementary';
   const set = LESSON_SETS[resolved];
   const info = getPhonetics(resolved);
@@ -1127,7 +1145,13 @@ export function buildTutorReply(input, { language = 'Yorùbá', level = 'Element
         target: vowels.map((vowel) => vowel.sym).join(' · '),
         pronunciation: vowels.map((vowel) => `${vowel.sym} ${vowel.ipa} — ${vowel.example} (${vowel.english})`).join('; '),
         meaning: `Vowels of ${resolved}.`,
-        note: `${info.note} ${resolvedLevel === 'Advanced' ? 'At this level, compare ẹ with e and ọ with o in your own recording.' : 'Listen for the dot below the letter: it marks a different vowel, not decoration.'}`,
+        note: `${info.note} ${resolvedLevel === 'Advanced'
+          ? resolved === 'Yorùbá'
+            ? 'Compare ẹ with e and ọ with o in your own recording.'
+            : 'Compare the sound contrasts shown in these examples in your own recording.'
+          : resolved === 'Yorùbá'
+            ? 'Listen for the dot below the letter: it marks a different vowel, not decoration.'
+            : 'Use the language-specific examples to hear how each vowel differs.'}`,
         followUp: 'Open Sounds & Vowels, play the first three cards, then say each example aloud.',
       }),
       speech: { text: vowels[0].example, language: resolved },
@@ -1143,7 +1167,7 @@ export function buildTutorReply(input, { language = 'Yorùbá', level = 'Element
         pronunciation: consonants.map((item) => `${item.sym} ${item.ipa} — ${item.example} (${item.english})`).join('; '),
         meaning: `Consonants of ${resolved}.`,
         note: 'Place your tongue and lips first, then release the sound. gb and kp are single sounds, not two letters read in a row.',
-        followUp: 'Record yourself in the Voice Mirror and compare the first syllable with the target contour.',
+        followUp: 'Listen to a trusted speaker, then repeat the sound slowly before adding it to a word.',
       }),
       speech: { text: consonants[0].example, language: resolved },
     };
@@ -1151,6 +1175,7 @@ export function buildTutorReply(input, { language = 'Yorùbá', level = 'Element
 
   if (intent === 'tones') {
     const tones = info.tones.slice(0, resolvedLevel === 'Elementary' ? 1 : 2);
+    const isStressLanguage = resolved === 'Kiswahili';
     return {
       intent,
       text: replyParts({
@@ -1158,7 +1183,9 @@ export function buildTutorReply(input, { language = 'Yorùbá', level = 'Element
         pronunciation: tones.map((tone) => `${tone.contrast} — ${tone.tones}`).join('; '),
         meaning: tones.map((tone) => `${tone.contrast} = ${tone.meanings}`).join('; '),
         note: `${tones[0].cue} ${info.note}`,
-        followUp: 'Say the pair once with a clear rise and once with a clear fall, then check the contour in the Voice Mirror.',
+        followUp: isStressLanguage
+          ? 'Say each word naturally and give the second-to-last syllable a clear beat; do not force a pitch rise.'
+          : 'Say the pair once with a clear rise and once with a clear fall, then check the contour in the Voice Mirror.',
       }),
       speech: { text: tones[0].contrast.split(' · ')[0], language: resolved },
     };
@@ -1172,7 +1199,7 @@ export function buildTutorReply(input, { language = 'Yorùbá', level = 'Element
         target: story.native,
         pronunciation: describeTones(story.native, resolved),
         meaning: `Literal: ${story.literal} Idiomatic: ${story.idiomatic}`,
-        note: `${story.moral} Question: ${story.question} (${story.options.join(' / ')})`,
+        note: `${story.moral} Wording and customs vary by community; confirm the example with a fluent local speaker. Question: ${story.question} (${story.options.join(' / ')})`,
         followUp: 'Open Heritage Stories and choose the answer that fits the proverb.',
       }),
       speech: { text: story.native, language: resolved },
@@ -1247,15 +1274,22 @@ export function completeTutorReply({ input, resolved, resolvedLevel, set, intent
     return {
       intent: 'translate',
       text: replyParts({
-        target: translation.output,
+        target: translation.statusLabel === 'Curated spelling'
+          ? translation.native ?? translation.output
+          : translation.output,
         pronunciation: translation.tones || describeTones(translation.output, resolved),
         meaning: translation.direction === 'native-en'
-          ? `English: ${translation.output}`
+          ? `English: ${translation.english ?? translation.output}`
           : `English source: ${translation.input}`,
         note: `${translation.statusLabel}. ${translation.note}`,
         followUp: 'Say it aloud, then ask me for one more word from the same lesson.',
       }),
-      speech: { text: translation.direction === 'native-en' ? translation.input : translation.output, language: resolved },
+      speech: {
+        text: translation.direction === 'native-en'
+          ? translation.native ?? translation.input
+          : translation.output,
+        language: resolved,
+      },
     };
   }
 
@@ -1277,10 +1311,12 @@ export function completeTutorReply({ input, resolved, resolvedLevel, set, intent
    that do not contain these sections (or in Node, where it does nothing).
    ------------------------------------------------------------------------- */
 
-const VOICE_DEFAULTS = Object.freeze({ H: 1.24, L: 0.8, M: 1, stress: 1.12, plain: 1 });
+const VOICE_DEFAULTS = Object.freeze({ H: 1.24, L: 0.8, M: 1, stress: 1, plain: 1 });
 
 let audioContext = null;
 let activeRecording = null;
+let recordingPending = false;
+let recordingTimeout = 0;
 let recordedUrl = '';
 let userContour = [];
 let userBaseline = 0;
@@ -1296,9 +1332,18 @@ function getAudioContext() {
   if (typeof window === 'undefined') return null;
   const Ctor = window.AudioContext || window.webkitAudioContext;
   if (!Ctor) return null;
-  if (!audioContext) audioContext = new Ctor();
-  if (audioContext.state === 'suspended') audioContext.resume().catch(() => {});
-  return audioContext;
+  try {
+    if (!audioContext) audioContext = new Ctor();
+    if (audioContext.state === 'suspended') {
+      audioContext.resume().catch((error) => {
+        setStatus(`Audio could not start (${error?.name || 'browser error'}). Use the browser's audio controls and try again.`);
+      });
+    }
+    return audioContext;
+  } catch (error) {
+    setStatus(`Audio is unavailable (${error?.name || 'browser error'}).`);
+    return null;
+  }
 }
 
 function setStatus(message, elementIds = ['labAudioStatus']) {
@@ -1354,38 +1399,57 @@ export function speakPhrase(text, localeOrLanguage = 'en-US', rate = 1) {
     return 'none';
   }
 
-  playToneContour(phrase, language, { rate });
-  setStatus('No device voice for this language, so the tone contour was played instead.');
-  return 'tones';
+  if (playToneContour(phrase, language, { rate })) {
+    setStatus('No device voice for this language, so the marked tone contour was played instead.');
+    return 'tones';
+  }
+  setStatus('No device voice is available, and this spelling does not provide a reliable pitch contour to synthesize.');
+  return 'none';
+}
+
+function hasReliablePitchTargets(phrase, language) {
+  const resolved = normalizeLanguageName(language);
+  const contour = toneContour(phrase, resolved);
+  if (!contour.length || resolved === 'Kiswahili') return false;
+  if (resolved === 'Yorùbá') return true;
+  return contour.every((point) => point.tone === 'H' || point.tone === 'L');
 }
 
 /** Play the phrase's tone contour as a sequence of short tones. */
 export function playToneContour(phrase, language = 'Yorùbá', { rate = 1, baseHz = 0 } = {}) {
+  if (!hasReliablePitchTargets(phrase, language)) {
+    setStatus('No reliable lexical-tone target is available for this language or spelling.');
+    return false;
+  }
   const ctx = getAudioContext();
   if (!ctx) return false;
   const contour = toneContour(phrase, language);
-  if (!contour.length) return false;
   const register = baseHz > 0 ? baseHz : 196;
   const step = 0.34 / Math.min(1.5, Math.max(0.5, rate));
-  const master = ctx.createGain();
-  master.gain.value = 0.22;
-  master.connect(ctx.destination);
-  contour.forEach((item, index) => {
-    const oscillator = ctx.createOscillator();
-    const gain = ctx.createGain();
-    const multiplier = VOICE_DEFAULTS[item.tone] ?? 1;
-    oscillator.type = 'triangle';
-    oscillator.frequency.value = register * multiplier;
-    const start = ctx.currentTime + index * step;
-    gain.gain.setValueAtTime(0.0001, start);
-    gain.gain.exponentialRampToValueAtTime(0.9, start + 0.03);
-    gain.gain.exponentialRampToValueAtTime(0.0001, start + step * 0.92);
-    oscillator.connect(gain);
-    gain.connect(master);
-    oscillator.start(start);
-    oscillator.stop(start + step);
-  });
-  return true;
+  try {
+    const master = ctx.createGain();
+    master.gain.value = 0.22;
+    master.connect(ctx.destination);
+    contour.forEach((item, index) => {
+      const oscillator = ctx.createOscillator();
+      const gain = ctx.createGain();
+      const multiplier = VOICE_DEFAULTS[item.tone] ?? 1;
+      oscillator.type = 'triangle';
+      oscillator.frequency.value = register * multiplier;
+      const start = ctx.currentTime + index * step;
+      gain.gain.setValueAtTime(0.0001, start);
+      gain.gain.exponentialRampToValueAtTime(0.9, start + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + step * 0.92);
+      oscillator.connect(gain);
+      gain.connect(master);
+      oscillator.start(start);
+      oscillator.stop(start + step);
+    });
+    return true;
+  } catch (error) {
+    setStatus(`Tone playback failed (${error?.name || 'audio error'}).`);
+    return false;
+  }
 }
 
 /** Normalised autocorrelation pitch detector for a short time-domain buffer. */
@@ -1444,7 +1508,7 @@ const VOICE_MIRROR_MARKUP = `
     <button type="button" class="secondary" id="vmPlayBtn">Play my recording</button>
     <button type="button" class="secondary" id="vmMirrorBtn">Mirror in my register</button>
   </div>
-  <p class="id-lab-feedback" id="vmFeedback" aria-live="polite">Recording stays in this browser tab; nothing is uploaded. Allow the microphone when the browser asks.</p>
+  <p class="id-lab-feedback" id="vmFeedback" aria-live="polite">Recording lasts up to 10 seconds and stays in this browser tab; nothing is uploaded. The microphone is requested only after you press Record.</p>
   <p class="muted" id="labAudioStatus" role="status"></p>
 `;
 
@@ -1463,8 +1527,9 @@ function mountVoiceMirror() {
   panel.dataset.ready = 'true';
   document.getElementById('vmRecordBtn')?.addEventListener('click', () => toggleVoiceRecording());
   document.getElementById('vmTargetBtn')?.addEventListener('click', () => {
-    playToneContour(currentPhrase, currentLanguage, { baseHz: userBaseline });
-    setStatus(`Target tones played${userBaseline ? ` around your ${userBaseline} Hz register` : ' at a child-friendly register'}.`);
+    if (playToneContour(currentPhrase, currentLanguage, { baseHz: userBaseline })) {
+      setStatus(`Target tones played${userBaseline ? ` around your ${userBaseline} Hz register` : ' at a practice register'}.`);
+    }
   });
   document.getElementById('vmPlayBtn')?.addEventListener('click', playOwnRecording);
   document.getElementById('vmMirrorBtn')?.addEventListener('click', mirrorRegister);
@@ -1534,7 +1599,9 @@ function drawContour(target, samples = []) {
 
   canvas.setAttribute(
     'aria-label',
-    `Target tone contour: ${target.map((point) => `${point.text} ${TONE_LABELS[point.tone] ?? point.tone}`).join(', ')}${samples.length > 1 ? '. Your recording is drawn as a second line.' : ''}`,
+    target.length
+      ? `Target tone contour: ${target.map((point) => `${point.text} ${TONE_LABELS[point.tone] ?? point.tone}`).join(', ')}${samples.length > 1 ? '. Your recording is drawn as a second line.' : ''}`
+      : 'No reliable pitch contour is available for this phrase.',
   );
 }
 
@@ -1562,7 +1629,25 @@ function syncVoiceMirror() {
     });
   }
 
-  drawContour(toneContour(currentPhrase, currentLanguage), userContour);
+  const hasTarget = hasReliablePitchTargets(currentPhrase, currentLanguage);
+  const recording = Boolean(activeRecording);
+  const recordButton = document.getElementById('vmRecordBtn');
+  const targetButton = document.getElementById('vmTargetBtn');
+  const playButton = document.getElementById('vmPlayBtn');
+  const mirrorButton = document.getElementById('vmMirrorBtn');
+  const feedback = document.getElementById('vmFeedback');
+  if (recordButton) recordButton.disabled = recordingPending || (!hasTarget && !recording);
+  if (targetButton) targetButton.disabled = !hasTarget;
+  if (playButton) playButton.disabled = !recordedUrl;
+  if (mirrorButton) mirrorButton.disabled = !hasTarget || !userBaseline;
+  if (!hasTarget && !recording && feedback) {
+    feedback.textContent = currentLanguage === 'Kiswahili'
+      ? 'Kiswahili uses predictable stress rather than lexical tone; this pitch-only mirror cannot assess it.'
+      : 'This spelling does not mark enough tone information for a reliable pitch comparison. Listen to a fluent speaker instead.';
+  }
+  const canvas = document.getElementById('toneCanvas');
+  if (canvas) canvas.hidden = !hasTarget;
+  drawContour(hasTarget ? toneContour(currentPhrase, currentLanguage) : [], hasTarget ? userContour : []);
 }
 
 function segmentMeans(samples, count) {
@@ -1579,6 +1664,13 @@ function segmentMeans(samples, count) {
  */
 export function contourFeedback(target, samples, language = 'Yorùbá') {
   if (!target.length) return 'Choose a stage phrase first.';
+  const resolved = normalizeLanguageName(language);
+  if (resolved === 'Kiswahili') {
+    return 'Kiswahili uses predictable penultimate stress, not lexical tone. This pitch-only tool cannot assess stress; listen to a trusted speaker and emphasize the second-to-last syllable.';
+  }
+  if (resolved !== 'Yorùbá' && target.some((point) => point.tone !== 'H' && point.tone !== 'L')) {
+    return 'This spelling does not mark enough tone information for a reliable pitch comparison. Listen to a fluent speaker instead.';
+  }
   if (!samples.length || samples.length < 4) {
     return 'Not enough voiced pitch was captured. Hold each syllable a little longer, closer to the microphone, and try again.';
   }
@@ -1608,17 +1700,27 @@ export function contourFeedback(target, samples, language = 'Yorùbá') {
   const correction = mismatches.length
     ? ` Work on this next: ${mismatches.slice(0, 2).join('; ')}.`
     : ' Now keep the same shape at speaking speed.';
-  const note = language === 'Kiswahili'
-    ? ' Kiswahili marks stress rather than tone, so aim for a clear penultimate beat rather than a pitch rise.'
-    : ' Repeat once slowly, then compare again.';
-  return `${opening}${correction}${note} This compares pitch shape only; it is practice feedback, not a pronunciation certificate.`;
+  return `${opening}${correction} Repeat once slowly, then compare again. This compares pitch shape only; it is practice feedback, not a pronunciation certificate.`;
 }
 
 async function toggleVoiceRecording() {
   const button = document.getElementById('vmRecordBtn');
   const feedback = document.getElementById('vmFeedback');
   if (activeRecording) {
-    activeRecording.stop();
+    try {
+      if (activeRecording.state !== 'inactive') activeRecording.stop();
+    } catch (error) {
+      if (feedback) feedback.textContent = `Recording could not stop (${error?.name || 'browser error'}).`;
+    }
+    return;
+  }
+  if (recordingPending) return;
+  if (!hasReliablePitchTargets(currentPhrase, currentLanguage)) {
+    if (feedback) {
+      feedback.textContent = currentLanguage === 'Kiswahili'
+        ? 'Kiswahili uses predictable stress rather than lexical tone; this pitch-only mirror cannot assess it.'
+        : 'This spelling does not mark enough tone information for a reliable pitch comparison. Listen to a fluent speaker instead.';
+    }
     return;
   }
   if (!navigator.mediaDevices?.getUserMedia || typeof window.MediaRecorder === 'undefined') {
@@ -1626,79 +1728,166 @@ async function toggleVoiceRecording() {
     return;
   }
 
-  let stream;
+  recordingPending = true;
+  if (button) {
+    button.disabled = true;
+    button.textContent = 'Requesting microphone…';
+  }
+  let stream = null;
+  let source = null;
+  let recorder = null;
+  let recorderError = '';
+  const releaseAfterStopFailure = (error) => {
+    recorderError = [recorderError, `could not stop (${error?.name || 'browser error'})`]
+      .filter(Boolean)
+      .join('; ');
+    if (recordingTimeout) window.clearTimeout(recordingTimeout);
+    recordingTimeout = 0;
+    window.cancelAnimationFrame(animationHandle);
+    stream?.getTracks().forEach((track) => track.stop());
+    try {
+      source?.disconnect();
+    } catch (cleanupError) {
+      recorderError += `; audio cleanup failed (${cleanupError?.name || 'browser error'})`;
+    }
+    activeRecording = null;
+    if (button) {
+      button.disabled = false;
+      button.textContent = 'Record my voice';
+    }
+    if (feedback) feedback.textContent = `Recording failed (${recorderError}).`;
+  };
+  const stopRecorder = () => {
+    if (!recorder || recorder.state === 'inactive') return;
+    try {
+      recorder.stop();
+    } catch (error) {
+      releaseAfterStopFailure(error);
+    }
+  };
   try {
     stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-  } catch (error) {
-    if (feedback) {
-      feedback.textContent = `Microphone access was refused (${error?.name || 'permission error'}). Allow the microphone in the browser and try again.`;
+    const context = getAudioContext();
+    if (!context) {
+      stream.getTracks().forEach((track) => track.stop());
+      if (feedback) feedback.textContent = 'Audio analysis is not available in this browser.';
+      return;
     }
-    return;
-  }
+    const phrase = currentPhrase;
+    const language = currentLanguage;
+    const analyser = context.createAnalyser();
+    analyser.fftSize = 1024;
+    source = context.createMediaStreamSource(stream);
+    source.connect(analyser);
+    const buffer = new Float32Array(analyser.fftSize);
+    const chunks = [];
+    let frames = 0;
+    let autoStopped = false;
+    userContour = [];
 
-  const context = getAudioContext();
-  if (!context) {
-    stream.getTracks().forEach((track) => track.stop());
-    if (feedback) feedback.textContent = 'Audio analysis is not available in this browser.';
-    return;
-  }
+    recorder = new window.MediaRecorder(stream);
+    recorder.addEventListener('dataavailable', (event) => {
+      if (event.data?.size) chunks.push(event.data);
+    });
+    recorder.addEventListener('error', (event) => {
+      recorderError = event.error?.name || event.error?.message || 'recording error';
+      stopRecorder();
+    });
+    recorder.addEventListener('stop', () => {
+      if (recordingTimeout) window.clearTimeout(recordingTimeout);
+      recordingTimeout = 0;
+      window.cancelAnimationFrame(animationHandle);
+      try {
+        source?.disconnect();
+      } catch (error) {
+        recorderError = [recorderError, `audio cleanup failed (${error?.name || 'browser error'})`]
+          .filter(Boolean)
+          .join('; ');
+      } finally {
+        stream.getTracks().forEach((track) => track.stop());
+        activeRecording = null;
+        if (button) {
+          button.disabled = false;
+          button.textContent = 'Record my voice';
+        }
+      }
 
-  userContour = [];
-  const analyser = context.createAnalyser();
-  analyser.fftSize = 1024;
-  const source = context.createMediaStreamSource(stream);
-  source.connect(analyser);
-  const buffer = new Float32Array(analyser.fftSize);
-  let frames = 0;
+      if (recorderError) {
+        if (feedback) feedback.textContent = `Recording failed (${recorderError}).`;
+        syncVoiceMirror();
+        return;
+      }
+      if (chunks.length) {
+        if (recordedUrl) URL.revokeObjectURL(recordedUrl);
+        recordedUrl = URL.createObjectURL(new Blob(chunks, { type: chunks[0]?.type || 'audio/webm' }));
+      }
+      if (userContour.length) {
+        userBaseline = Math.round(userContour.slice().sort((a, b) => a - b)[Math.floor(userContour.length / 2)]);
+        const badge = document.getElementById('voiceProfileBadge');
+        if (badge) badge.textContent = `Register: ${userBaseline} Hz`;
+      }
+      const target = toneContour(phrase, language);
+      drawContour(target, userContour);
+      if (feedback) {
+        const result = contourFeedback(target, userContour, language);
+        feedback.textContent = autoStopped
+          ? `Recording stopped at the 10-second limit. ${result}`
+          : result;
+      }
+      syncVoiceMirror();
+    });
 
-  const sample = () => {
-    if (!activeRecording) return;
-    frames += 1;
-    if (frames % 2 === 0) {
-      analyser.getFloatTimeDomainData(buffer);
-      const pitch = detectPitch(buffer, context.sampleRate);
-      if (pitch) userContour.push(pitch);
-    }
-    animationHandle = window.requestAnimationFrame(sample);
-  };
-
-  const chunks = [];
-  const recorder = new window.MediaRecorder(stream);
-  recorder.addEventListener('dataavailable', (event) => {
-    if (event.data?.size) chunks.push(event.data);
-  });
-  recorder.addEventListener('stop', () => {
-    stream.getTracks().forEach((track) => track.stop());
-    window.cancelAnimationFrame(animationHandle);
-    activeRecording = null;
-
-    if (chunks.length) {
-      if (recordedUrl) URL.revokeObjectURL(recordedUrl);
-      recordedUrl = URL.createObjectURL(new Blob(chunks, { type: chunks[0]?.type || 'audio/webm' }));
-    }
-    if (userContour.length) {
-      userBaseline = Math.round(userContour.slice().sort((a, b) => a - b)[Math.floor(userContour.length / 2)]);
-      const badge = document.getElementById('voiceProfileBadge');
-      if (badge) badge.textContent = `Register: ${userBaseline} Hz`;
-    }
-    const target = toneContour(currentPhrase, currentLanguage);
-    drawContour(target, userContour);
-    if (button) button.textContent = 'Record my voice';
-    if (feedback) feedback.textContent = contourFeedback(target, userContour, currentLanguage);
-  });
-
-  try {
     recorder.start();
-  } catch (error) {
-    stream.getTracks().forEach((track) => track.stop());
-    if (feedback) feedback.textContent = `Recording could not start (${error?.name || 'unknown error'}).`;
-    return;
-  }
+    activeRecording = recorder;
+    if (button) button.textContent = 'Stop recording';
+    if (feedback) feedback.textContent = 'Listening — say the phrase once, clearly, then stop. Recording is processed locally.';
 
-  activeRecording = recorder;
-  if (button) button.textContent = 'Stop recording';
-  if (feedback) feedback.textContent = 'Listening — say the phrase once, clearly, then stop the recording.';
-  sample();
+    const sample = () => {
+      if (activeRecording !== recorder) return;
+      frames += 1;
+      try {
+        if (frames % 2 === 0) {
+          analyser.getFloatTimeDomainData(buffer);
+          const pitch = detectPitch(buffer, context.sampleRate);
+          if (pitch) userContour.push(pitch);
+        }
+      } catch (error) {
+        recorderError = `audio analysis failed (${error?.name || 'browser error'})`;
+        stopRecorder();
+        return;
+      }
+      animationHandle = window.requestAnimationFrame(sample);
+    };
+    sample();
+    recordingTimeout = window.setTimeout(() => {
+      if (activeRecording !== recorder || recorder.state === 'inactive') return;
+      autoStopped = true;
+      recorder.stop();
+    }, 10_000);
+  } catch (error) {
+    recorderError = `recording failed (${error?.name || 'browser error'})`;
+    if (recorder && activeRecording === recorder) {
+      stopRecorder();
+      if (activeRecording === recorder) return;
+    }
+    stream?.getTracks().forEach((track) => track.stop());
+    try {
+      source?.disconnect();
+    } catch (cleanupError) {
+      recorderError += `; audio cleanup failed (${cleanupError?.name || 'browser error'})`;
+    }
+    if (feedback) {
+      feedback.textContent = error?.name === 'NotAllowedError'
+        ? 'Microphone access was refused. Allow it in the browser settings and try again; no audio was recorded.'
+        : `${recorderError}. No audio was uploaded.`;
+    }
+  } finally {
+    recordingPending = false;
+    if (button) {
+      button.disabled = false;
+      if (!activeRecording) button.textContent = 'Record my voice';
+    }
+  }
 }
 
 function playOwnRecording() {
@@ -1720,8 +1909,8 @@ function mirrorRegister() {
     playToneContour(currentPhrase, currentLanguage);
     return;
   }
-  playToneContour(currentPhrase, currentLanguage, { baseHz: userBaseline });
-  if (feedback) {
+  const played = playToneContour(currentPhrase, currentLanguage, { baseHz: userBaseline });
+  if (played && feedback) {
     feedback.textContent = `Target contour played at ${userBaseline} Hz, the register measured from your recording.`;
   }
 }
@@ -1777,8 +1966,11 @@ function renderPhonetics() {
       }
       currentPhrase = example;
       currentLanguage = language;
-      playToneContour(example, language);
-      setStatus(`Tone contour played for “${example}”.`, ['phonStatus', 'labAudioStatus']);
+      if (playToneContour(example, language)) {
+        setStatus(`Tone contour played for “${example}”.`, ['phonStatus', 'labAudioStatus']);
+      } else {
+        setStatus('No reliable lexical-tone contour is available for this example.', ['phonStatus', 'labAudioStatus']);
+      }
     });
     grid.appendChild(card);
   });
@@ -1849,10 +2041,14 @@ function renderHeritage() {
 
   const eyebrow = document.createElement('p');
   eyebrow.className = 'id-heritage__eyebrow';
-  eyebrow.textContent = `Proverb · ${heritageLanguage}`;
+  eyebrow.textContent = `Proverb example · ${heritageLanguage}`;
 
   const heading = document.createElement('h2');
   heading.textContent = story.title;
+
+  const reviewNote = document.createElement('p');
+  reviewNote.className = 'id-lab-copy';
+  reviewNote.textContent = 'Wording, interpretation, and customs may vary by community. Use this example for practice and confirm it with a fluent local speaker.';
 
   const native = document.createElement('p');
   native.className = 'id-heritage__proverb';
@@ -1924,7 +2120,7 @@ function renderHeritage() {
     choices.appendChild(button);
   });
 
-  article.append(eyebrow, heading, native, tones, meanings, storyText, moral, vocabulary, hear, question, choices, feedback);
+  article.append(eyebrow, heading, reviewNote, native, tones, meanings, storyText, moral, vocabulary, hear, question, choices, feedback);
   panel.append(controls, article);
 }
 
@@ -2153,7 +2349,7 @@ export function installLanguageLab() {
     syncWithCurrentLesson: syncVoiceMirror,
     playTargetContour: () => playToneContour(currentPhrase, currentLanguage, { baseHz: userBaseline }),
     playOwnRecording,
-    playClonedRegister: mirrorRegister,
+    playMirroredRegister: mirrorRegister,
   };
   window.IdilewaPhonetics = {
     render: renderPhonetics,
@@ -2200,11 +2396,11 @@ export function installLanguageLab() {
   const requestedView = new URLSearchParams(window.location.search).get('view');
   if (requestedView && requestedView !== 'home' && document.getElementById(requestedView)) {
     window.setTimeout(() => {
-      try {
-        window.go(requestedView);
-      } catch {
-        // A route that cannot open must never break the rest of the page.
+      if (typeof window.go !== 'function') {
+        setStatus(`The requested view “${requestedView}” could not be opened.`);
+        return;
       }
+      window.go(requestedView);
     }, 0);
   }
 

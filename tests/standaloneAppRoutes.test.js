@@ -49,7 +49,8 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assert.match(transformed, /<sakuga-button type="button" class="sakuga-hero-primary" onclick="go\('academy'\)">/);
   assert.match(transformed, /<sakuga-button type="button" variant="secondary" class="sakuga-hero-secondary" onclick="go\('codeLab'\)">/);
   assert.match(transformed, /src="\/src\/siteFooter\.js"/);
-  assert.match(transformed, /initializeLegacyLearningExperience\(window\.IdilewaLegacyBindings\)/);
+  assert.match(appSource, /src="\.\/src\/languageLab\.js"/);
+  assert.match(transformed, /if \(!window\.IdilewaLanguageLab\) initializeLegacyLearningExperience\(window\.IdilewaLegacyBindings\)/);
   assert.match(transformed, /src\/legacyLearningEngine\.js/);
   assertSupportAssistant(transformed);
 });

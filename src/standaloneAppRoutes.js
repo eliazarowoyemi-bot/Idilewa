@@ -71,7 +71,7 @@ window.IdilewaLegacyBindings = {
 </script>
 <script type="module">
 import { initializeLegacyLearningExperience } from './src/legacyLearningEngine.js';
-initializeLegacyLearningExperience(window.IdilewaLegacyBindings);
+if (!window.IdilewaLanguageLab) initializeLegacyLearningExperience(window.IdilewaLegacyBindings);
 </script>`;
 const supportAssistantBootstrap = '<script type="module" src="/src/supportAssistant.js"></script>';
 const guardedBilingualRoot = "const root=document.querySelector('.bilingualGame'), sel=root.querySelector(";

@@ -10,6 +10,7 @@ import {
   buildTutorReply,
   contourFeedback,
   describeTones,
+  detectCodeConstruct,
   detectPitch,
   explainCodeReasoning,
   gameWordGroups,
@@ -68,10 +69,16 @@ test('tone parsing follows each orthography and keeps the dots', () => {
   assert.deepEqual(low.map((syllable) => syllable.tone), ['L', 'L']);
   assert.equal(describeTones('igbá', 'Yorùbá'), 'i mid · gbá high');
   assert.equal(describeTones('ìgbà', 'Yorùbá'), 'ì low · gbà low');
+  assert.equal(
+    describeTones('Àgbájọ ọwọ́ la fi ń sọ̀yà.', 'Yorùbá'),
+    'À low · gbá high · jọ mid · ọ mid · wọ mid · la mid · fi mid · ń high · sọ̀ low · yà low',
+  );
 
   const igbo = parseSyllables('ákwá', 'Igbo');
   assert.deepEqual(igbo.map((syllable) => syllable.tone), ['H', 'H']);
   assert.deepEqual(parseSyllables('àkwá', 'Igbo').map((syllable) => syllable.tone), ['L', 'H']);
+  assert.deepEqual(parseSyllables('Aka', 'Igbo').map((syllable) => syllable.tone), ['unknown', 'unknown']);
+  assert.deepEqual(parseSyllables('Ruwa', 'Hausa').map((syllable) => syllable.tone), ['unknown', 'unknown']);
 
   const swahili = parseSyllables('asante', 'Kiswahili').map((syllable) => syllable.tone);
   assert.deepEqual(swahili, ['plain', 'stress', 'plain']);
@@ -86,13 +93,20 @@ test('translation is curated, composed or honestly glossed — never invented', 
   assert.equal(reverse.output, 'Thank you');
   assert.equal(reverse.direction, 'native-en');
 
+  assert.equal(translatePhrase('e kaaro', { language: 'Yorùbá', direction: 'native-en' }).output, 'Good morning');
+  const spellingHelp = buildTutorReply('oruko mi ni ade', { language: 'Yorùbá' });
+  assert.match(spellingHelp.text, /Target: Orúkọ mi ni Adé/);
+  assert.match(spellingHelp.text, /Meaning: English: My name is Ade/);
+  assert.equal(spellingHelp.speech.text, 'Orúkọ mi ni Adé');
+
   const composed = translatePhrase('my name is Tobi', { language: 'Yorùbá' });
   assert.equal(composed.status, 'composed');
   assert.equal(composed.output, 'Orúkọ mi ni Tobi');
 
   const composedSwahili = translatePhrase('where is water', { language: 'Kiswahili' });
   assert.equal(composedSwahili.status, 'composed');
-  assert.equal(composedSwahili.output, 'Maji iko wapi?');
+  assert.equal(composedSwahili.output, 'Maji yako wapi?');
+  assert.equal(translatePhrase('where is mother', { language: 'Kiswahili' }).status, 'missing');
 
   const gloss = translatePhrase('water house', { language: 'Hausa' });
   assert.equal(gloss.status, 'gloss');
@@ -139,6 +153,10 @@ test('the tutor answers every domain with the five required parts', () => {
   assert.match(menu.text, /will not invent/i);
   assert.equal(buildTutorReply('vowels', { language: 'Yorùbá', level: 'Elementary' }).intent, 'vowels');
   assert.equal(buildTutorReply('loop', { language: 'Yorùbá' }).intent, 'code');
+  const swahiliStress = buildTutorReply('how do tone marks work?', { language: 'Kiswahili' });
+  assert.match(swahiliStress.text, /second-to-last syllable/);
+  assert.doesNotMatch(swahiliStress.text, /clear rise|clear fall/i);
+  assert.equal(buildTutorReply('hello', { language: 'English' }).intent, 'greeting');
 });
 
 test('heritage stories carry a proverb, both meanings, vocabulary and one correct answer', () => {
@@ -162,7 +180,9 @@ test('code reasoning explains the same construct in English and the chosen langu
   const yo = explainCodeReasoning('why does the loop repeat?', 'yo');
   assert.equal(yo.construct, 'loop');
   assert.match(yo.english, /repeat/i);
-  assert.match(yo.native, /ìtẹ̀síwájú/);
+  assert.match(yo.native, /àṣẹ àtúnṣe/i);
+  assert.equal(detectCodeConstruct('explain an if statement'), 'condition');
+  assert.equal(detectCodeConstruct('why does the ball hit the paddle?'), 'collision');
 
   const sw = explainCodeReasoning('why does the paddle collide with the ball?', 'sw');
   assert.equal(sw.construct, 'collision');
@@ -192,6 +212,8 @@ test('voice-mirror feedback names the syllable to fix and stays honest', () => {
   const short = contourFeedback(target, [200], 'Yorùbá');
   assert.match(short, /Not enough voiced pitch/);
   assert.match(contourFeedback([], [200, 210, 220, 230]), /Choose a stage phrase first/);
+  assert.match(contourFeedback(toneContour('asante', 'Kiswahili'), flat, 'Kiswahili'), /cannot assess stress/i);
+  assert.match(contourFeedback(toneContour('Aka', 'Igbo'), flat, 'Igbo'), /does not mark enough tone/i);
 });
 
 test('pitch detection finds a sung tone and ignores silence', () => {
