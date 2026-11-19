@@ -78,7 +78,7 @@ The Vite configuration includes **28 HTML entry files**. Most files are small sh
 | `lesson.html` / `lesson` | Individual practice view inside the language curriculum. Provides a focused lesson, response/activity controls, and completion/progress behavior. Route parameters select the language, level, module, and lesson. |
 | `kids.html` / `kids` | Audience page for children. Emphasizes short phrases, shared stories, playful practice, and coding, with links into the learning paths. |
 | `tutor.html` / `tutor` | General editorial page introducing tutor-led learning, guided conversation, cultural context, and learning-path continuity. It is informational; the actual sample directory is `connect_teachers`. |
-| `profile.html` / `profile` | Learner progress dashboard concept. Shows current language/level, completion progress, a learning streak, points, and a timeline. The page explicitly describes progress as saved in the current browser for the prototype. |
+| `profile.html` / `profile` | Learner progress dashboard. Shows current language/level, completion progress, a learning streak, points, and a timeline. Supported lesson and game completions sync for signed-in learners; guest state and unsupported interactions remain browser-local. |
 | `login.html` / `login` | Legacy sign-in entry that redirects to the family auth screens: `#/parent-login` (`parents.html`) for sign-in and `#/parent-signup` when `mode=signup`. Parent and learner accounts now share one family authentication flow built on Supabase Auth. |
 | `pricing.html` / `pricing` | Plans preview with monthly/yearly selection and Explorer/Family-style plan concepts. The page calls out that final scope/details are not set; it does not implement a live subscription or payment service. |
 
@@ -99,8 +99,8 @@ The trainer UI includes six language choices (Yorùbá, Igbo, Hausa, Kiswahili, 
 | `oral.html` / `oral` | Gateway to oral traditions. Introduces voice practice, Oríkì, Òwe, and stories/songs; directs learners to the voice library and community/keepers pages. |
 | `oral_genre.html` / `oral_genre` | Guided genre index linking to voice training, Oríkì, Òwe, folktales, and spoken word. Explicitly frames its introductions as starting points and calls for consent, context, and attribution. |
 | `oriki.html` / `oriki` | Guided introduction to Yorùbá Oríkì as praise poetry and remembrance. Encourages attention to rhythm, speaker, addressee, local context, and asking before repeating. |
-| `owe.html` / `owe` | Òwe/proverb overview. Presents one proverb and the four-stage journey: original words, translation/meaning, moral story, and personal reflection. Includes a local-demo proverb contribution route. |
-| `owe_add.html` / `owe_add` | Form for a proverb in its original language, meaning/translation, context/attribution, and permission checkbox. Submissions are stored only on the current device in the demo; nothing is sent or published. |
+| `owe.html` / `owe` | Òwe/proverb overview. Presents one proverb and the four-stage journey: original words, translation/meaning, moral story, and personal reflection. Includes a contribution route with private account storage for signed-in users and device-local storage for guests. |
+| `owe_add.html` / `owe_add` | Form for a proverb in its original language, meaning/translation, context/attribution, and permission checkbox. Signed-in submissions are private and unapproved; guest submissions remain on the current device. Neither is published automatically. |
 | `owe_detail.html` / `owe_detail` | Translation and meaning lesson for “Sùúrù ni baba ìwà.” Explains that the displayed translation is one common rendering, includes a meaning check, and gates the following story step. |
 | `owe_story.html` / `owe_story` | Original classroom story about Dami and an okra seed. It is explicitly not presented as a traditional folktale. Contains a comprehension check and is gated by completion of the meaning step. |
 | `owe_reflection.html` / `owe_reflection` | Final step in the proverb activity. After the story check, learners choose a feeling and save a thought/action locally. It warns users not to enter private details and notes that browser users can see saved content. |
@@ -157,7 +157,7 @@ HTML shells use the shared off-white `#F9FBF9` as their browser theme color to m
 - Stepper components to communicate multi-stage learning flows.
 - Course levels, lesson cards, answer feedback, saved lesson responses, and completion state.
 - Demo points, streaks, badges, lesson scores, and profile progress.
-- Local saving of selected stories, proverb contributions, reflections, coding progress, and trainer state.
+- Local saving of selected stories, guest proverb contributions, reflections, coding progress, and trainer state.
 
 ### Voice and speech
 
@@ -179,7 +179,7 @@ HTML shells use the shared off-white `#F9FBF9` as their browser theme color to m
 - Story shelf and story-game comprehension prompt.
 - Oríkì and oral-genre introductions that foreground context and attribution.
 - Òwe lesson with gated comprehension steps, an original classroom story, and a personal reflection.
-- Local proverb contribution form requiring a consent checkbox.
+- Proverb contribution form requiring permission consent; signed-in contributions use owner-scoped Supabase storage and guest contributions stay local.
 - An offline learning-helper modal that provides fixed topic-specific prompts; it is not connected to an AI service and does not process questions with a model.
 
 ### Family and educator flows
@@ -204,7 +204,7 @@ HTML shells use the shared off-white `#F9FBF9` as their browser theme color to m
 |---|---|
 | `app.js` | Main route renderer, shared navigation, app state, event delegation, page markup, modal logic, and most prototype interactions. |
 | `styles.css` | Shared palette, typography, layout, page designs, responsive rules, and motion/visual effects. |
-| `src/supabaseClient.js` | Supabase Auth integration and data helpers. Auth requires `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`; learning progress continues to use local app state unless separately wired to remote persistence. |
+| `src/supabaseClient.js` | Supabase Auth integration and data helpers. Auth requires `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`; supported lesson and game progress syncs for signed-in accounts, while unsupported interactions and guest progress remain local. |
 | `api/code/` | Vercel serverless routes for installed-runtime discovery and bounded code execution through a private Judge0 CE service. |
 | `supabase_schema.sql` | Proposed PostgreSQL tables, triggers, indexes, and row-level security policies for profiles, progress, code submissions, voice submissions, and community proverbs. |
 | `src/translationEngine.js` | Curated exact phrase entries with explicit plain-letter Yoruba forms where available, browser speech synthesis, and tone oscillator; unsupported phrases are not assembled from word substitutions. |

@@ -25,6 +25,7 @@ export const faqEntries = [
   ['Can children create drawings and stories?', 'Creative Studio lets learners explore drawing, storytelling, and digital creativity.', 3],
   ['Can I save creative projects?', 'Creative Studio offers project-saving controls. Available storage and return-to-project behavior may vary by device and browser.', 3],
   ['What is the Heritage Library?', 'The Heritage Library brings together cultural stories, Oríkì, traditions, riddles, and other heritage learning resources.', 4],
+  ['Are proverb contributions public?', 'No. A signed-in contribution is saved privately to that account and is not published automatically. Guest contributions stay on the current device. Personal reflections remain on the device.', 4],
   ['What is Oríkì?', 'Oríkì is a Yorùbá tradition of praise poetry and descriptive expressions that celebrate people, families, communities, places, and heritage.', 4],
   ['Are heritage stories translated into English?', 'Many stories include English translations or explanations to help learners understand their meaning and cultural context.', 4],
   ['How can I suggest a cultural correction?', 'Contact the Idilewa team with the page and passage in question. Please include a source or context when available.', 4],

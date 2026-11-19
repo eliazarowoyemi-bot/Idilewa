@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import './styles/site-footer.css';
 import { createSiteBrandMarkup, createSiteFooterMarkup } from './src/siteFooterMarkup.js';
+import { getMyProverbContributions, saveMyProverbContribution } from './src/communityProverbs.js';
 import landingHomeHeroUrl from './assets/landing-home-hero.webp';
 import landingFeatureVoiceUrl from './assets/landing-feature-voice.webp';
 import landingFeatureCodeUrl from './assets/landing-feature-code.webp';
@@ -521,6 +522,11 @@ import {
     } catch (_) { return { ...defaults, available: { ...defaults.available }, trainer: { ...defaults.trainer } }; }
   }
   const state = readState();
+  let accountProverbs = [];
+  let accountProverbsOwnerId = '';
+  let accountProverbsLoadingUserId = '';
+  let accountProverbsLoadError = '';
+  let accountProverbsRevision = 0;
   for (const key of [
     'idilewa-pending-signup-email',
     'idilewa-pending-signin-otp',
@@ -3159,11 +3165,50 @@ import {
     document.getElementById('aiHelperQuestion')?.focus();
   }
 
+  function loadAccountProverbs(userId) {
+    if (accountProverbsOwnerId === userId || accountProverbsLoadingUserId === userId) return;
+
+    accountProverbs = [];
+    accountProverbsOwnerId = '';
+    accountProverbsLoadError = '';
+    accountProverbsLoadingUserId = userId;
+    const revision = ++accountProverbsRevision;
+
+    void getMyProverbContributions()
+      .then((records) => {
+        if (revision !== accountProverbsRevision || getCurrentUser()?.id !== userId) return;
+        accountProverbsOwnerId = userId;
+        accountProverbs = records;
+      })
+      .catch((error) => {
+        if (revision !== accountProverbsRevision || getCurrentUser()?.id !== userId) return;
+        accountProverbsOwnerId = userId;
+        accountProverbsLoadError = error instanceof Error
+          ? error.message
+          : 'Your private proverb contributions could not be loaded.';
+      })
+      .finally(() => {
+        if (accountProverbsLoadingUserId === userId) accountProverbsLoadingUserId = '';
+        if (getCurrentUser()?.id === userId && parseLocation().page === 'owe') render();
+      });
+  }
+
   function renderOwe() {
+    const userId = getCurrentUser()?.id || '';
+    if (userId) loadAccountProverbs(userId);
     const meaningDone = state.quizResults['owe-meaning:comprehension'] === 'correct';
     const storyDone = state.quizResults['owe-story:comprehension'] === 'correct';
     const activeStep = storyDone ? 3 : meaningDone ? 2 : 1;
-    const saved = state.savedProverbs.map((item) => `<article class="proverb-card saved-proverb"><span class="proverb-label">Shared on this device</span><blockquote>${esc(item.text)}</blockquote><p>${esc(item.meaning)}</p><small>${esc(item.language)}${item.context ? ` · ${esc(item.context)}` : ''}</small></article>`).join('');
+    const accountRecords = userId && accountProverbsOwnerId === userId ? accountProverbs : [];
+    const saved = [
+      ...accountRecords.map((item) => ({ ...item, accountSaved: true })),
+      ...state.savedProverbs.map((item) => ({ ...item, accountSaved: false })),
+    ].map((item) => `<article class="proverb-card saved-proverb"><span class="proverb-label">${item.accountSaved ? 'Private to your account' : 'Saved on this device'}</span><blockquote>${esc(item.text)}</blockquote><p>${esc(item.meaning)}</p><small>${esc(item.language)}${item.context ? ` · ${esc(item.context)}` : ''}</small></article>`).join('');
+    const accountStatus = userId && accountProverbsLoadingUserId === userId
+      ? '<p role="status">Loading your private contributions…</p>'
+      : userId && accountProverbsOwnerId === userId && accountProverbsLoadError
+        ? `<p role="status">${esc(accountProverbsLoadError)} <button type="button" class="text-link" data-action="owe-retry-contributions">Try again</button></p>`
+        : '';
     return `<div class="container route-page owe-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span class="breadcrumb-sep" aria-hidden="true"></span>${routeLink('oral', 'Read & listen')}<span class="breadcrumb-sep" aria-hidden="true"></span>${routeLink('oral_genre', 'Oral genres')}<span class="breadcrumb-sep" aria-hidden="true"></span><strong>Òwe · Proverbs</strong></div>
       <section class="owe-hero"><div class="owe-hero-copy"><span class="section-kicker">Òwe · Yorùbá proverbs</span><h1>A few words.<br /><em>A world to think about.</em></h1><p>Follow one proverb from its words, to a translation and meaning, into a story and your own reflection. Meaning and use can change with context, speaker and community.</p><div class="hero-actions">${routeLink('owe_detail', `Begin the Owe lesson ${icon('arrow', 15)}`, 'button button-primary')}${aiHelperButton('owe')}</div>${routeLink('owe_add', `Share a proverb ${icon('plus', 15)}`, 'text-link owe-share-link')}</div>
         <div class="owe-feature-photo"><img src="./assets/yoruba-educator-woman.jpg" alt="Yorùbá woman educator in richly woven aso-oke attire" /><div class="owe-feature-shade"></div><div class="owe-feature-content"><span class="section-kicker">A guided proverb · step one</span><blockquote>Sùúrù ni baba ìwà.</blockquote><p>A common classroom rendering: “Patience is the father of good character.”</p><span class="owe-feature-credit">Translations vary; learn with a fluent speaker.</span></div>\n    </section>
@@ -3176,7 +3221,7 @@ import {
       ${renderOweDetail()}
       ${renderOweStory()}
       ${renderOweReflection()}
-      ${saved ? `<section class="saved-proverbs"><div class="section-heading"><div><span class="section-kicker">Your contribution</span><h2>Saved proverbs</h2></div></div><div class="proverb-grid">${saved}</div></section>` : ''}
+      ${saved || accountStatus ? `<section class="saved-proverbs"><div class="section-heading"><div><span class="section-kicker">Your contribution</span><h2>Saved proverbs</h2></div></div>${accountStatus}<div class="proverb-grid">${saved}</div></section>` : ''}
       <div class="proverb-bottom-note">${icon('shield', 16)} Proverb translations can vary. A community voice can add the nuance a dictionary cannot.</div></div>`;
   }
 
@@ -3233,7 +3278,11 @@ import {
   }
 
   function renderOweAdd() {
-    return `<div class="container route-page form-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span class="breadcrumb-sep" aria-hidden="true"></span>${routeLink('oral', 'Read & listen')}<span class="breadcrumb-sep" aria-hidden="true"></span>${routeLink('owe', 'Proverbs')}<span class="breadcrumb-sep" aria-hidden="true"></span><strong>Share a proverb</strong></div><section class="form-intro"><span class="section-kicker">A contribution, held with care</span><h1>Share a proverb<br /><em>you know and love.</em></h1><p>Add one here to see how a community contribution feels. Nothing is sent or published.</p></section>${renderStepper(['Choose words', 'Add meaning', 'Add context', 'Share with care'], 3)}<div class="contribution-layout"><form class="contribution-form" data-form="proverb"><label for="proverbLang">Language <select id="proverbLang" name="language" required><option value="Yorùbá">Yorùbá</option><option value="Igbo">Igbo</option><option value="Hausa">Hausa</option><option value="Swahili">Swahili</option></select></label><label for="proverbText">Proverb in its original language <textarea id="proverbText" name="text" rows="3" maxlength="240" placeholder="Type the words as you know them…" required></textarea><small>Keep tonal marks and diacritics where you can.</small></label><label for="proverbMeaning">Meaning or translation <textarea id="proverbMeaning" name="meaning" rows="3" maxlength="320" placeholder="What does it mean to you?" required></textarea></label><label for="proverbContext">Context or attribution <input id="proverbContext" name="context" maxlength="120" placeholder="Who shared it, or where did you hear it?" /></label><label class="consent-check"><input type="checkbox" name="consent" required /><span>I have permission to share this contribution, and understand it stays on this device.</span></label><button class="button button-primary" type="submit">Save on this device ${icon('arrow', 16)}</button></form><aside class="contribution-aside"><span class="side-card-icon">${icon('heart', 21)}</span><h2>Knowledge travels with care.</h2><p>Before sharing an oral tradition, check who owns the story, what should stay private and how the source wants to be credited.</p><div class="contribution-aside-note">${icon('lock', 16)} Saved proverbs stay in this browser and are never published.</div></aside></div></div>`;
+    const signedIn = Boolean(getCurrentUser()?.id);
+    const saveDestination = signedIn
+      ? 'This contribution will be saved privately to your account. Submitting it does not publish it.'
+      : 'This contribution will stay on this device. Sign in to save it privately to your account.';
+    return `<div class="container route-page form-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span class="breadcrumb-sep" aria-hidden="true"></span>${routeLink('oral', 'Read & listen')}<span class="breadcrumb-sep" aria-hidden="true"></span>${routeLink('owe', 'Proverbs')}<span class="breadcrumb-sep" aria-hidden="true"></span><strong>Share a proverb</strong></div><section class="form-intro"><span class="section-kicker">A contribution, held with care</span><h1>Share a proverb<br /><em>you know and love.</em></h1><p>${saveDestination} Personal reflections remain on this device.</p></section>${renderStepper(['Choose words', 'Add meaning', 'Add context', 'Share with care'], 3)}<div class="contribution-layout"><form class="contribution-form" data-form="proverb"><label for="proverbLang">Language <select id="proverbLang" name="language" required><option value="Yorùbá">Yorùbá</option><option value="Igbo">Igbo</option><option value="Hausa">Hausa</option><option value="Swahili">Swahili</option></select></label><label for="proverbText">Proverb in its original language <textarea id="proverbText" name="text" rows="3" maxlength="240" placeholder="Type the words as you know them…" required></textarea><small>Keep tonal marks and diacritics where you can.</small></label><label for="proverbMeaning">Meaning or translation <textarea id="proverbMeaning" name="meaning" rows="3" maxlength="320" placeholder="What does it mean to you?" required></textarea></label><label for="proverbContext">Context or attribution <input id="proverbContext" name="context" maxlength="120" placeholder="A community or setting; avoid personal names" /><small>Do not include full names or identifying details.</small></label><label class="consent-check"><input type="checkbox" name="consent" required /><span>I have permission to share this contribution and understand it is saved as described above, not published by submitting it.</span></label><button class="button button-primary" type="submit">${signedIn ? 'Save privately to my account' : 'Save on this device'} ${icon('arrow', 16)}</button></form><aside class="contribution-aside"><span class="side-card-icon">${icon('heart', 21)}</span><h2>Knowledge travels with care.</h2><p>Before sharing an oral tradition, check who owns the story, what should stay private and how the source wants to be credited.</p><div class="contribution-aside-note">${icon('lock', 16)} Account contributions stay private; guest contributions stay in this browser. Nothing is published automatically.</div></aside></div></div>`;
   }
 
   function renderVoices() {
@@ -4711,10 +4760,10 @@ import {
       <section class="page-intro-card">
         <span class="section-kicker">Privacy & family safety</span>
         <h1>Learning should feel <em>safe.</em></h1>
-        <p>Idilewa keeps learning progress, drafts and preferences so you can continue where you left off. Signed-in accounts are protected by Supabase Auth; guest activity stays in this browser.</p>
+        <p>Idilewa keeps supported learning progress so you can continue where you left off. Signed-in accounts use Supabase Auth; guest activity stays in this browser.</p>
       </section>
       <section class="information-card-grid privacy-policy-grid">
-        <article class="profile-card"><h2>What we store</h2><p>Signed-in learners have progress, code submissions and voice practice saved to their account. Guest activity, including drafts, preferences and a profile photo, stays in this browser, where anyone using the same device profile may see it.</p></article>
+        <article class="profile-card"><h2>What we store</h2><p>Supported signed-in lesson and game progress is saved to the account. A proverb contribution submitted while signed in is private to that account and is not published automatically. Guest contributions, personal reflections, drafts, preferences and profile photos stay in this browser, where anyone using the same device profile may see them.</p></article>
         <article class="profile-card"><h2>Accounts & approval</h2><p>Adult accounts use an email address and password through Supabase Auth. A child account needs a parent or guardian to approve it by email before it can sign in, and connecting with a tutor needs a separate approval that names that tutor.</p></article>
         <article class="profile-card"><h2>Children’s information</h2><p>Do not enter a child’s full legal name, school, home address, phone number, password reused elsewhere, or other sensitive information on this site.</p></article>
         <article class="profile-card"><h2>Third-party services</h2><p>Idilewa uses Supabase for accounts and stored learning data, Vercel for hosting and server functions, and an email provider for account and guardian messages. Common support questions are answered from a local Idilewa help guide; questions that need a generated reply and recent messages are sent to Gemini by Google. Idilewa does not save support chats. Do not share passwords or private details.</p></article>
@@ -6996,6 +7045,16 @@ import {
         showToast('The sample learner cards are read-only; accept only the assigned learner displayed after code validation.', 'error'); break;
       }
       case 'select-feeling': state.reflectionFeeling = el.dataset.feeling || ''; saveState(); render(); break;
+      case 'owe-retry-contributions': {
+        const userId = getCurrentUser()?.id;
+        if (userId) {
+          accountProverbsOwnerId = '';
+          accountProverbsLoadError = '';
+          loadAccountProverbs(userId);
+          render();
+        }
+        break;
+      }
       case 'search-result': document.getElementById('modal-root').innerHTML = ''; navigate(el.dataset.route || 'index'); break;
       case 'select-language':
         if (state.available[lang]) { state.currentLang = lang; saveState(); navigate('course', { lang }); }
@@ -7728,7 +7787,34 @@ import {
       const text = String(data.get('text') || '').trim();
       const meaning = String(data.get('meaning') || '').trim();
       if (!text || !meaning || !data.get('consent')) { showToast('Please complete the required fields and consent check.', 'error'); return; }
-      state.savedProverbs.unshift({ text, meaning, language: String(data.get('language') || 'Yorùbá'), context: String(data.get('context') || '').trim() });
+      const contribution = {
+        text,
+        meaning,
+        language: String(data.get('language') || 'Yorùbá'),
+        context: String(data.get('context') || '').trim(),
+      };
+      if (getCurrentUser()?.id) {
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (submitButton) submitButton.disabled = true;
+        try {
+          const saved = await saveMyProverbContribution(contribution);
+          accountProverbsRevision += 1;
+          accountProverbsLoadingUserId = '';
+          if (getCurrentUser()?.id === saved.userId) {
+            accountProverbsOwnerId = saved.userId;
+            accountProverbsLoadError = '';
+            accountProverbs = [saved, ...accountProverbs.filter((item) => item.id !== saved.id)];
+          }
+          navigate('owe');
+          showToast('Saved privately to your account. It is not published.');
+        } catch (error) {
+          showToast(error instanceof Error ? error.message : 'Your contribution was not saved. Please try again.', 'error');
+        } finally {
+          if (submitButton?.isConnected) submitButton.disabled = false;
+        }
+        return;
+      }
+      state.savedProverbs.unshift(contribution);
       saveState(); navigate('owe'); showToast('Your proverb is saved on this device.');
     } else if (type === 'ide-assistant') {
       const prompt = String(data.get('question') || '').trim();

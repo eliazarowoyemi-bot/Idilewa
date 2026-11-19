@@ -101,7 +101,7 @@ The HTML entries declared in the active `vite.config.js` are supported:
 | **Code & STEM** | `creative-studio.html` | Offline Creative Studio for drawing, toon creation, 3D scenes, animation, and stories. The existing Code Playground and games remain at `/?view=codeLab`. |
 | | `#/tutor` (`tutor.html`) | Local-only learner-facing tutoring prototype with sample profiles, messages, lessons, rates, and payment displays; no real bookings or charges are made. |
 | | `/educator-portal.html` | Existing educator portal with invitation sign-in, guardian-approved learner connections, lessons, messages, profile, availability, and settings. |
-| | `#/profile` (`profile.html`) | Learner progress dashboard, points, streaks, badges (stored in local browser state). |
+| | `#/profile` (`profile.html`) | Learner progress dashboard with supported signed-in lesson and game completion sync; guest progress stays in browser storage. |
 | | `#/parent-login` (`parents.html`) | Family authentication for parents and guardians; `#/parent-signup` creates a parent account. `#/login` and `login.html` now redirect here. |
 | | `#/pricing` (`pricing.html`) | Preview family/explorer plans; explicitly non-billing demonstration. |
 | **Voice & Speech** | `#/trainer` (`trainer.html`) | Voice African Language Trainer: 6 languages, 60 audio lessons, Do-Re-Mi soundboard, 3D visualizer. |
@@ -113,7 +113,7 @@ The HTML entries declared in the active `vite.config.js` are supported:
 | | `#/oral_genre` (`oral_genre.html`) | Guided genre index linking attribution, speaker context, and consent. |
 | | `#/oriki` (`oriki.html`) | Yorùbá praise poetry & remembrance, exploring rhythm, speaker, and permission. |
 | | `#/owe` (`owe.html`) | Proverb gateway: original text, translations, stories, and reflection journey. |
-| | `#/owe_add` (`owe_add.html`) | Proverb contribution form with consent checkbox (stored on current device only). |
+| | `#/owe_add` (`owe_add.html`) | Proverb contributions save privately to the signed-in account; guest contributions stay on the current device and are never published automatically. |
 | | `#/owe_detail` (`owe_detail.html`) | Proverb breakdown for *“Sùúrù ni baba ìwà”* (noted as one common rendering). |
 | | `#/owe_story` (`owe_story.html`) | Educational classroom story about Dami & the okra seed (explicitly not a traditional folktale). |
 | | `#/owe_reflection` (`owe_reflection.html`) | Personal reflection step with explicit privacy notice. |
@@ -130,9 +130,9 @@ The HTML entries declared in the active `vite.config.js` are supported:
 To ensure transparency and protect learner privacy:
 1. **Speech & Fluency:** Plotweaver provides text-to-speech and supported-language transcription. Transcription returns recognized text only; it does not evaluate pronunciation, tone, or fluency. Provider language coverage differs by service, so the interface loads available languages and does not promise support for every African language in every feature.
 2. **AI Conversation:** Open-ended replies use Gemini (`GEMINI_API_KEY`, server-side only). Ìdíléwa is Gemini-only: any `AI_PROVIDER` value other than `gemini` is rejected instead of falling back to a local model host, and a missing or rejected key returns an explicit `503` rather than a fabricated reply. Plotweaver remains the speech and transcription provider, and reply translation is sent to its translations service, which must be enabled for the API key. Conversations are stored only for authenticated users; anonymous chats remain in the current page session. Approved knowledge notes are language-filtered and source-attributed. The included sample JSONL examples are synthetic and require human review; no model fine-tuning has been performed. Do not enter personal or identifying information.
-3. **Authentication & Data Storage:** Sign-up, email-code verification, sign-in and sign-out use Supabase Auth when configured. Authenticated AI conversation history is owner-scoped by Supabase row-level security. Account metadata and learner-record APIs are available, but not every progress, code or voice interaction in the app is yet connected to remote storage; unconnected state remains browser-local.
-4. **Child Safeguarding & Consent:** Child sign-up requires a guardian email approval request and one-time code through the Vercel API. The educator path requires a server-verified, single-use invitation. Both paths remain unavailable until their database migration and server email settings are configured. This workflow does not replace legal identity verification or educator background checks; live tutoring remains disabled.
-5. **Payments & Subscriptions:** Pricing cards are preview concepts only. No live financial transactions or payment gateways are configured.
+3. **Authentication & Data Storage:** Sign-up, email-code verification, sign-in and sign-out use Supabase Auth when configured. Authenticated AI conversation history and proverb contributions are owner-scoped by Supabase row-level security; proverb contributions are not published automatically. Supported lesson, game and milestone completions sync for signed-in learners. Guest progress and personal reflections remain browser-local, and not every code or voice interaction is connected to remote storage.
+4. **Child Safeguarding & Consent:** Child sign-up requires a guardian email approval request and one-time code through the Vercel API. The educator path requires a server-verified, single-use invitation. Both paths remain unavailable until their database migration and server email settings are configured. This workflow does not replace legal identity verification or educator background checks; live tutoring remains disabled pending verified educators and safeguarding review.
+5. **Payments & Subscriptions:** All current plans remain free. Stripe is the selected future provider, but no prices, market, or live payment credentials are configured, so checkout and paid bookings must stay disabled.
 6. **Cultural Attribution:** Proverbs, Oríkì, and Ifá introductions are educational overviews and explicitly emphasize community permission, speaker context, and oral attribution.
 7. **Sitewide AI Support:** The floating assistant sends questions and short conversation history to Gemini through `api/ai/conversation.js`. It retrieves relevant public-page summaries and Help Centre entries, links back to source pages, rate-limits requests, and does not persist support conversations. The Privacy page explains Gemini processing and advises visitors not to share passwords or private details. AI replies can be incomplete or incorrect, and the page links should be checked for current product details.
 
@@ -207,6 +207,7 @@ The migration files in this repository are not proof that a remote database has 
 6. `supabase/migrations/20261021000000_auth_email_code_rate_limits.sql` (authentication email-code rate limits).
 7. `supabase/migrations/20261110000000_ai_conversation.sql` (AI conversation persistence).
 8. `supabase/migrations/20261111000000_educator_google_signup.sql` (Google educator registration and its rate limits).
+9. `supabase/migrations/20261118210000_private_proverb_contributions.sql` (supported proverb languages and private, unapproved account submissions).
 
 Run `supabase link --project-ref <project-ref>` and `supabase db push --linked` after verifying the target project. Do not enable account registration until the migrations complete successfully; deployment does not apply database migrations. Never test account creation against production with an unowned test address.
 

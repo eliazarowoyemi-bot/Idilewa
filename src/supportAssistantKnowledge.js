@@ -104,7 +104,7 @@ export const supportPageKnowledge = Object.freeze([
     label: 'Òwe',
     url: '/owe',
     keywords: 'Owe proverb meaning translation story reflection contribute',
-    content: 'Òwe pages support learning about proverbs through original text, translations, stories, and reflection. The contribution flow stores a learner contribution on the current device. One proverb page discusses “Sùúrù ni baba ìwà” as one common rendering, not as the only possible wording.',
+    content: 'Òwe pages support learning about proverbs through original text, translations, stories, and reflection. A proverb contribution submitted while signed in is private to that account and is not published automatically; guest contributions stay on the current device. Personal reflections remain on the device. One proverb page discusses “Sùúrù ni baba ìwà” as one common rendering, not as the only possible wording.',
   },
   {
     title: 'Òwe detail and meaning',
@@ -160,7 +160,7 @@ export const supportPageKnowledge = Object.freeze([
     label: 'Privacy',
     url: '/parents.html#/privacy',
     keywords: 'privacy data accounts children browser storage Supabase review delete',
-    content: 'The Privacy page says signed-in learner progress, code submissions, and voice practice can be saved to the account, while guest drafts, preferences, and profile photos stay in the current browser. Common support questions are answered from a local Idilewa help guide; questions that need a generated reply and recent messages are sent to Gemini by Google. Idilewa does not save support chats. Child accounts require guardian email approval, and tutor connections require separate approval. Do not enter sensitive child details. Families can clear browser data or contact Idilewa to request review or deletion of account data.',
+    content: 'The Privacy page says supported lesson and game progress syncs for signed-in learners. Proverb contributions submitted while signed in are private to the account and are not published automatically; guest contributions, personal reflections, drafts, preferences, and profile photos stay in the current browser. Common support questions are answered from a local Idilewa help guide; questions that need a generated reply and recent messages are sent to Gemini by Google. Idilewa does not save support chats. Child accounts require guardian email approval, and tutor connections require separate approval. Do not enter sensitive child details. Families can clear browser data or contact Idilewa to request review or deletion of account data.',
   },
   {
     title: 'Contact the Idilewa team',
@@ -236,8 +236,8 @@ export const supportPageKnowledge = Object.freeze([
     title: 'Òwe contribution',
     label: 'Contribute an Òwe',
     url: '/owe_add',
-    keywords: 'owe add contribution proverb consent attribution local storage',
-    content: 'The Òwe contribution form asks learners to provide a meaning or context and confirm they have permission to share the material. Contributions are stored on the current device and are not published publicly.',
+    keywords: 'owe add contribution proverb consent attribution account private device storage',
+    content: 'The Òwe contribution form asks learners to provide a meaning or context and confirm they have permission to share the material. Signed-in submissions are private to the account and are not published automatically; guest submissions stay on the current device. Avoid including personal or identifying details.',
   },
   {
     title: 'Òwe reflection',

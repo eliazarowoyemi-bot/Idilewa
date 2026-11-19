@@ -82,17 +82,15 @@ test('homepage drawer shows its menu label and all primary destinations', async 
   assert.match(navigationSource, /window\.location\.assign\('\/faq\.html'\)/);
 });
 
-test('legacy learning and heritage URLs open their matching standalone views', () => {
-  const destinations = [
-    ['oral.html', '/?view=heritageLab'],
-    ['languages.html', '/?view=academy'],
-  ];
+test('legacy learning and heritage URLs open their matching standalone views', async () => {
+  const oral = transformEntry('oral.html', await readFile(resolve(rootDirectory, 'oral.html'), 'utf8'));
+  const languages = transformEntry('languages.html');
 
-  for (const [filename, destination] of destinations) {
-    const redirect = transformEntry(filename);
-    assert.ok(redirect.includes(`location.replace("${destination}")`));
-    assert.ok(redirect.includes(`<a href="${destination}">`));
-  }
+  assert.match(oral, /data-default-route="oral"/);
+  assert.match(oral, /src="\.\/app\.js"/);
+  assert.doesNotMatch(oral, /location\.replace\(/);
+  assert.ok(languages.includes('location.replace("/?view=academy")'));
+  assert.ok(languages.includes('<a href="/?view=academy">'));
 });
 
 test('native entry pages retain their app and return home or voice links to canonical pages', async () => {
@@ -107,6 +105,13 @@ test('native entry pages retain their app and return home or voice links to cano
     'login.html',
     'parents.html',
     'kids.html',
+    'oral_genre.html',
+    'oriki.html',
+    'owe.html',
+    'owe_add.html',
+    'owe_detail.html',
+    'owe_story.html',
+    'owe_reflection.html',
     'tutor.html',
     'trainer.html',
     'voice_lessons.html',
@@ -154,6 +159,17 @@ test('native entry pages retain their app and return home or voice links to cano
       assert.match(transformed, /document\.querySelector\('\.drawer-nav'\)/);
       assert.match(transformed, /data-idilewa-route/);
     }
+  }
+});
+
+test('oral tradition routes open the app renderers instead of redirecting to the homepage preview', async () => {
+  for (const route of ['oral', 'oral_genre', 'oriki', 'owe', 'owe_add', 'owe_detail', 'owe_story', 'owe_reflection']) {
+    const source = await readFile(resolve(rootDirectory, `${route}.html`), 'utf8');
+    const transformed = transformEntry(`${route}.html`, source);
+
+    assert.match(transformed, /data-default-route=/, route);
+    assert.match(transformed, /src="\.\/app\.js"/, route);
+    assert.doesNotMatch(transformed, /location\.replace\(/, route);
   }
 });
 
@@ -224,6 +240,14 @@ test('every built HTML entry except the homepage points to the standalone app', 
     'parents.html',
     'pricing.html',
     'kids.html',
+    'oral.html',
+    'oral_genre.html',
+    'oriki.html',
+    'owe.html',
+    'owe_add.html',
+    'owe_detail.html',
+    'owe_story.html',
+    'owe_reflection.html',
     'tutor.html',
     'trainer.html',
     'voice_lessons.html',
