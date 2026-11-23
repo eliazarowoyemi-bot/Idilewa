@@ -1,15 +1,26 @@
 import assert from 'node:assert/strict';
+import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 import {
   filterHeritageRecords,
   getHeritageCollectionCounts,
 } from '../src/heritageLibrary.js';
 
+const heritageSource = await readFile(new URL('../src/heritageLibrary.js', import.meta.url), 'utf8');
+
 const records = [
   { id: 'YO-01', title: 'Ìjàpá àti Àwọn Ẹyẹ', category: 'Folktales', language: 'Yorùbá', story: 'A tortoise learns gratitude.' },
   { id: 'ED17-1', title: 'The Weaver and the Rain Cloud', category: 'Folktales', language: 'Yorùbá', age: '6–8', body: 'A young weaver asks for help.' },
   { id: 'IG-01', title: 'Mbe na Enyi', category: 'History', language: 'Igbo', story: 'A community remembers its past.' },
 ];
+
+test('heritage welcome stage no longer shows the requested editorial notice', () => {
+  assert.doesNotMatch(
+    heritageSource,
+    /This is original educational fiction, not a reproduced traditional folktale\. Stories for ages 9–16\+ are shorter than planned publication manuscripts; Yorùbá drafts remain pending independent linguistic review\./,
+  );
+  assert.match(heritageSource, /Explore an original story about integrity and kindness/);
+});
 
 test('heritage filters combine search, category, language, and assigned age without mutating records', () => {
   const result = filterHeritageRecords(records, {

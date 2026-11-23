@@ -135,8 +135,7 @@ function renderStageContent(story, progress) {
   switch (progress.step) {
     case 0:
       return `<h3>Welcome to the Proverb Collection</h3>
-        <p>Explore an original story about integrity and kindness. Each age group has its own setting, characters and moral challenge.</p>
-        <div class="heritage-note">This is original educational fiction, not a reproduced traditional folktale. Stories for ages 9–16+ are shorter than planned publication manuscripts; Yorùbá drafts remain pending independent linguistic review.</div>`;
+        <p>Explore an original story about integrity and kindness. Each age group has its own setting, characters and moral challenge.</p>`;
     case 1:
       return `<h3>Your learning goals</h3>
         <p>Understand <strong>ìwà</strong> (character), notice a difficult moral choice, explain its consequences, and apply the lesson in everyday life.</p>
