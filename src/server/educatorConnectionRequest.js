@@ -7,14 +7,14 @@ import {
   hashGuardianValue,
   normalizeEmail,
   sendGuardianEmail,
-} from '../../src/server/guardianConsent.js';
+} from './guardianConsent.js';
 import {
   GuardianConsentError,
   readJsonBody,
   requireAuthenticatedProfile,
   sendApiFailure,
   sendApiJson,
-} from '../../src/server/authenticatedRequest.js';
+} from './authenticatedRequest.js';
 
 export const config = { maxDuration: 15 };
 

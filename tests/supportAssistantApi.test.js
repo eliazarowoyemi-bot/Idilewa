@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import handler from '../api/ai/conversation.js';
+import handler from '../api/ai/[...path].js';
 
 test('support API rate-limits and answers with page links without saving the conversation', async (t) => {
   const environmentKeys = [
@@ -46,6 +46,7 @@ test('support API rate-limits and answers with page links without saving the con
 
   const req = {
     method: 'POST',
+    url: '/api/ai/conversation',
     ip: '192.0.2.1',
     headers: { 'content-type': 'application/json' },
     body: {

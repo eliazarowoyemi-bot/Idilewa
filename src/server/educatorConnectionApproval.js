@@ -9,10 +9,10 @@ import {
   renderApprovalResult,
   sendGuardianEmail,
   sendGuardianHtml,
-} from '../../src/server/guardianConsent.js';
+} from './guardianConsent.js';
 import {
   GuardianConsentError,
-} from '../../src/server/authenticatedRequest.js';
+} from './authenticatedRequest.js';
 
 function readToken(req, body = {}) {
   const token = body.token || req.query?.token || '';

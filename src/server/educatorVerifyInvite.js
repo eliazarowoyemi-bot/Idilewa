@@ -7,8 +7,8 @@ import {
   normalizeEducatorInviteCode,
   readJsonBody,
   sendGuardianJson,
-} from '../../src/server/guardianConsent.js';
-import { normalizeEducatorProfile } from '../../src/educatorProfile.js';
+} from './guardianConsent.js';
+import { normalizeEducatorProfile } from '../educatorProfile.js';
 
 const UUID_PATTERN = /^[0-9a-f-]{36}$/i;
 

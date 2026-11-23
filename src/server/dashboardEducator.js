@@ -3,8 +3,8 @@ import {
   requireAuthenticatedProfile,
   sendApiFailure,
   sendApiJson,
-} from '../../src/server/authenticatedRequest.js';
-import { buildLearnerAnalytics } from '../../src/server/dashboardData.js';
+} from './authenticatedRequest.js';
+import { buildLearnerAnalytics } from './dashboardData.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET') {

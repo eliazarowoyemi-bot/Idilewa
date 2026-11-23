@@ -5,7 +5,7 @@ import test from 'node:test';
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const authClientSource = await readFile(new URL('../src/supabaseClient.js', import.meta.url), 'utf8');
 const callbackSource = await readFile(new URL('../src/authCallback.js', import.meta.url), 'utf8');
-const apiSource = await readFile(new URL('../api/educator/verify-invite.js', import.meta.url), 'utf8');
+const apiSource = await readFile(new URL('../src/server/educatorVerifyInvite.js', import.meta.url), 'utf8');
 const migrationSource = await readFile(new URL('../supabase/migrations/20261111000000_educator_google_signup.sql', import.meta.url), 'utf8');
 
 test('tutor signup uses the exact supplied artwork and matches the reference content', async () => {

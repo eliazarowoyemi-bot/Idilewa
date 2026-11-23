@@ -4,12 +4,12 @@ import {
   requireAuthenticatedProfile,
   sendApiFailure,
   sendApiJson,
-} from '../../src/server/authenticatedRequest.js';
+} from './authenticatedRequest.js';
 import {
   normalizeEmail,
   sendGuardianEmail,
-} from '../../src/server/guardianConsent.js';
-import { buildLearnerAnalytics } from '../../src/server/dashboardData.js';
+} from './guardianConsent.js';
+import { buildLearnerAnalytics } from './dashboardData.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'GET' && req.method !== 'POST') {

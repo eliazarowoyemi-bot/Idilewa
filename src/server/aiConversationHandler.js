@@ -9,8 +9,8 @@ import {
   getAiProviderConfig,
   parseAiConversationRequest,
   parseSupportAssistantRequest,
-} from '../../src/server/aiConversation.js';
-import { searchSupportKnowledge } from '../../src/supportAssistantSearch.js';
+} from './aiConversation.js';
+import { searchSupportKnowledge } from '../supportAssistantSearch.js';
 
 const MAX_BODY_BYTES = 16 * 1024;
 const MAX_KNOWLEDGE_ITEMS = 4;

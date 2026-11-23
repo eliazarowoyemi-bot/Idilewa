@@ -92,6 +92,11 @@ npx vercel --prod --yes      # build and promote on Vercel
 local link on a fresh clone. `.vercelignore` excludes `.env*`, so builds use the
 Vercel project environment variables rather than your local `.env`.
 
+The Vercel Hobby plan permits at most 12 Serverless Functions per deployment.
+API routes are grouped by area under `api/[area]/[...path].js` to keep this
+project within that limit. Check the function count with `vercel build` before
+adding new API entrypoints; exceeding the limit prevents deployment.
+
 The browser bundle reads Supabase config through `envPrefix` in `vite.config.js`
 (`VITE_SUPABASE_URL` → `SUPABASE_URL` → `SUPABASE_PUBLIC_URL` →
 `NEXT_PUBLIC_SUPABASE_URL`, plus the matching anon keys). Production supplies
@@ -190,7 +195,7 @@ Deliberately **not** uploaded:
 | :--- | :--- |
 | `ZOO_API_KEY` | Local Continue/MCP credential (`.continue/mcpServers/new-mcp-server.yaml`). No application code reads it — it is not an `idilewa` runtime variable. |
 | `GITHUB_TOKEN`, `VERCEL_TOKEN` | Local CLI tokens; never project environment variables |
-| `AI_RATE_LIMIT_HMAC_KEY` | Optional — `api/ai/conversation.js` falls back to `SUPABASE_SERVICE_ROLE_KEY` |
+| `AI_RATE_LIMIT_HMAC_KEY` | Optional — `src/server/aiConversationHandler.js` falls back to `SUPABASE_SERVICE_ROLE_KEY` |
 
 Rotate or add a value with:
 

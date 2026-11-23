@@ -5,7 +5,7 @@ import {
   getAiProviderConfig,
   parseAiKnowledgeEntry,
   parseAiKnowledgeReview,
-} from '../../src/server/aiConversation.js';
+} from './aiConversation.js';
 
 const MAX_BODY_BYTES = 16 * 1024;
 const KNOWLEDGE_FIELDS = 'id,language_code,category,title,content,source_name,source_url,review_status,created_by,created_at,reviewed_by,reviewed_at';
