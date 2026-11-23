@@ -5,6 +5,7 @@ const routeViews = {
   course: 'learning',
   languages: 'academy',
   lesson: 'learning',
+  'heritage-library': 'heritageLab',
   oral: 'heritageLab',
   oral_genre: 'heritageLab',
   oriki: 'heritageLab',
@@ -43,6 +44,7 @@ const nativeAppPages = new Set([
   'parents',
   'kids',
   'oral',
+  'heritage-library',
   'oral_genre',
   'oriki',
   'owe',
@@ -612,6 +614,7 @@ export function createStandaloneAppPlugin(rootDirectory) {
           return injectSupportAssistant(transformMilestoneAchievementHtml(html));
         }
         if (route === 'pricing') return injectSupportAssistant(html);
+        if (route === 'kids-signup' || route === 'payment') return html;
         if (!nativeAppPages.has(route)) return renderRouteRedirect(route);
         const routeHtml = route === 'kids'
           ? transformKidsArcadeHtml(html)

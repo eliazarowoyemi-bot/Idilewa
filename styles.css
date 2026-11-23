@@ -8981,6 +8981,18 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .family-message-note h2 { margin: 5px 0; color: #294a3d; font-family: "Plus Jakarta Sans", Inter, sans-serif; font-size: 12px; }
 .family-message-note p { margin: 0 0 10px; color: #78887f; font-size: 8px; line-height: 1.55; }
 .family-settings-layout { display: grid; grid-template-columns: minmax(0,.92fr) minmax(0,1.08fr); align-items: start; gap: 10px; }
+.family-billing-panel { grid-column: 1 / -1; }
+.family-billing-panel .family-section-heading h2 { font-size: 16px; }
+.family-billing-panel .family-settings-subsection > h3 { margin: 0 0 8px; color: #3b5b4c; font-size: 13px; }
+.family-payment-list { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 0 14px; }
+.family-billing-panel .family-consent-row { padding-bottom: 8px; border-bottom: 1px solid #edf1ef; }
+.family-billing-panel .family-consent-row > div > strong { color: #3e5b4e; font-size: 13px; }
+.family-billing-panel .family-consent-row small { color: #526459; font-size: 11px; }
+.family-billing-panel .family-consent-row > strong { flex: 0 0 auto; color: #25473a; font-size: 12px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.family-billing-panel .family-text-link { font-size: 12px; }
+.family-billing-panel .family-empty-inline,
+.family-billing-panel .family-privacy-note { color: #526459; font-size: 12px; }
+.family-child-card-footer { flex-wrap: wrap; }
 .family-profile-form { display: grid; gap: 11px; }
 .family-profile-form input { min-height: 37px; font-size: 8px; }
 .family-profile-form > .family-button { justify-self: start; }
@@ -9047,6 +9059,7 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
   .family-page-heading { align-items: flex-start; flex-direction: column; }
   .family-heading-actions, .family-heading-actions .family-button { width: 100%; }
   .family-dashboard-lower, .family-progress-detail, .family-message-layout, .family-settings-layout { grid-template-columns: minmax(0,1fr); }
+  .family-payment-list { grid-template-columns: minmax(0,1fr); }
 }
 @media (max-width: 520px) {
   .family-brand .idilewa-brand-lockup > img { width: 32px; height: 32px; }

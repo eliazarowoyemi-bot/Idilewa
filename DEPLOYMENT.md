@@ -120,6 +120,46 @@ A `404` whose body reads `The deployment could not be found on Vercel.
 DEPLOYMENT_NOT_FOUND` means the hostname reached Vercel but is not attached to
 the project.
 
+## Parent-managed child profiles and subscriptions
+
+The pricing, payment, and child-signup pages require the database migration
+`supabase/migrations/20261119000000_parent_managed_children_billing.sql`.
+Apply and verify this migration in the intended Supabase project before
+deploying the matching application build. It creates parent-owned profiles,
+consent records, subscription/payment history, RLS policies, and the atomic
+consent and profile-limit functions used by the server.
+
+The live checkout must not be enabled until all of these are configured
+securely in Vercel Production:
+
+| Variable | Purpose |
+| :--- | :--- |
+| `STRIPE_SECRET_KEY` | Server-side Stripe API access (`sk_test_…` for sandbox first; use a live key only after sandbox verification). |
+| `STRIPE_WEBHOOK_SECRET` | Signature verification for Stripe events delivered to `/api/payments/webhook`. |
+| `RESEND_API_KEY` | Delivery of parent-consent and billing confirmation emails. |
+| `RESEND_FROM_EMAIL` | Verified sender address for those emails. |
+| `APP_BASE_URL` | Must remain `https://idilewa.com` so consent and checkout return links use the canonical host. |
+
+Configure the Stripe webhook for
+`checkout.session.completed`,
+`checkout.session.async_payment_succeeded`,
+`checkout.session.async_payment_failed`,
+`customer.subscription.updated`,
+`customer.subscription.deleted`,
+`invoice.payment_succeeded`, and `invoice.payment_failed`. Use the webhook
+signing secret generated for that endpoint. Do not paste credentials into
+source files, chat, or commits; add them through the Vercel environment UI or
+the secret-safe `vercel env add` workflow below.
+
+Before switching to live Stripe credentials, verify in Stripe test mode that a
+parent can start checkout, complete payment, see the server-verified result and
+history, and schedule cancellation; verify separately that a child profile
+stays inactive until the single-use consent link is confirmed and becomes
+inactive when consent is withdrawn. Confirm that email delivery works. Stripe
+availability for the chosen account and NGN pricing must also be confirmed in
+that sandbox. Do not deploy this billing build to production until the
+migration and all required provider settings are ready.
+
 ## Server env vars (Vercel Production)
 
 Verified 2026-11-16 with `npx vercel env ls production --scope idilewa1`.
@@ -139,6 +179,7 @@ Still missing — each needs a real credential, there is **no safe default**:
 | :--- | :--- |
 | `GEMINI_API_KEY` (or `GOOGLE_AI_API_KEY`) | `POST /api/ai/conversation` and `/api/ai/knowledge` answer `503 Live AI chat is not configured. Add GEMINI_API_KEY to the deployment environment.` |
 | `RESEND_API_KEY`, `RESEND_FROM_EMAIL` | Welcome and verification emails are skipped |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Hosted subscription checkout, payment verification, renewal events, and cancellation are unavailable |
 | `JUDGE0_URL`, `JUDGE0_AUTH_TOKEN` | `GET /api/code/languages` returns `503` |
 | Plotweaver translations/speech entitlement | `GET /api/translate` still lists languages (the upstream list is public), but `POST /api/translate` and the Plotweaver speech/transcription endpoints answer `503 … not enabled for the configured account …` until those services are enabled for the key |
 | `CANVA_CLIENT_ID`, `CANVA_CLIENT_SECRET`, `CANVA_REDIRECT_URI` | Canva Connect stays disabled |

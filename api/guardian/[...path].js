@@ -1,6 +1,7 @@
 import requestGuardianAccess from '../../src/server/guardianRequestHandler.js';
 import verifyGuardianCode from '../../src/server/guardianVerifyHandler.js';
 import approveGuardianRequest from '../../src/server/guardianApproveHandler.js';
+import { consentConfirmationHandler, registerChildHandler } from '../../src/server/childRegistration.js';
 import familyTasksHandler from '../../src/server/familyTasksHandler.js';
 import { sendGuardianJson } from '../../src/server/guardianConsent.js';
 
@@ -8,6 +9,8 @@ const handlers = {
   request: requestGuardianAccess,
   verify: verifyGuardianCode,
   approve: approveGuardianRequest,
+  children: registerChildHandler,
+  consent: consentConfirmationHandler,
   'family-tasks': familyTasksHandler,
 };
 

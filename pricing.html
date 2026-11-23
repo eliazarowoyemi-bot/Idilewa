@@ -1,23 +1,82 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <meta name="theme-color" content="#F9FBF9" />
-  <meta name="description" content="Idilewa brings African languages, stories, culture and technology together in one welcoming learning space." />
-  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml" />
-  <title>Idilewa — Keep your language close</title>
-  <link rel="stylesheet" href="./styles.css" />
-  <script type="module" src="./app.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e7f7ec">
+  <meta name="description" content="Choose an Idilewa learning plan for your family.">
+  <title>Idilewa | Pricing</title>
+  <link rel="stylesheet" href="/styles/subscription-pages.css">
+  <script type="module" src="/src/pricingPage.js"></script>
 </head>
-<body data-default-route="pricing">
-  <a class="skip-link" href="#main">Skip to content</a>
-  <div id="app" class="app-shell">
-    <header id="site-header" class="site-header"></header>
-    <main id="main" class="main-content" tabindex="-1"></main>
-    <nav id="mobile-nav" class="mobile-nav" aria-label="Quick navigation"></nav>
-    <div id="modal-root"></div>
-    <div id="toast-root" class="toast-root" aria-live="polite" aria-atomic="true"></div>
-  </div>
+<body>
+  <header class="site-header">
+    <a class="logo" href="/" aria-label="Idilewa home"><b aria-hidden="true">◖</b> idìlẹ̀wà<small>OUR LANGUAGE. OUR FUTURE.</small></a>
+    <nav aria-label="Main navigation">
+      <a href="/">Home</a><a href="/?view=academy">Languages</a><a href="/ai-conversation.html">AI Chat</a><a href="/parents.html">Families</a>
+    </nav>
+    <div class="navright"><a href="/parents.html#/parent-login">Sign In</a><a class="btn" href="/kids-signup.html">Get Started →</a></div>
+  </header>
+  <main>
+    <section class="hero">
+      <div>
+        <span class="eyebrow">YORÙBÁ · IGBO · HAUSA · KISWAHILI</span>
+        <h1>Unlock the Power<br>of <span class="greenText">African Languages</span></h1>
+        <p>Choose a plan that fits your family’s learning journey and help your children thrive.</p>
+        <a class="btn green" href="#plans">Explore Plans →</a>
+      </div>
+      <div class="art" aria-hidden="true">👧🏾 📱 👦🏿<small>✦ 🌿 ✦</small></div>
+    </section>
+    <div class="center">
+      <h2>Simple, flexible pricing</h2>
+      <p>Start learning for free. Upgrade whenever you’re ready.</p>
+    </div>
+    <div class="toggle" role="group" aria-label="Billing frequency">
+      <button id="monthly" class="active" type="button" aria-pressed="true">Monthly</button>
+      <button id="yearly" type="button" aria-pressed="false">Yearly</button>
+    </div>
+    <section class="plans" id="plans" aria-label="Subscription plans">
+      <article class="card">
+        <div class="emoji" aria-hidden="true">🌱</div>
+        <h3>Free Plan</h3>
+        <p class="muted">Start learning for free.</p>
+        <div class="price" data-plan="free">₦0 <small>/ month</small></div>
+        <ul><li>Access basic lessons</li><li>Explore selected languages</li><li>Kids’ learning games</li></ul>
+        <a class="btn" href="/kids-signup.html?plan=free">Get Started Free</a>
+      </article>
+      <article class="card pop">
+        <span class="ribbon">Most Popular</span>
+        <div class="emoji" aria-hidden="true">👑</div>
+        <h3>Premium Plan</h3>
+        <p class="muted">Go further, learn more.</p>
+        <div class="price" data-plan="premium">₦1,500 <small>/ month</small></div>
+        <ul><li>All Free features</li><li>Access to 10+ languages</li><li>Advanced activities</li><li>Progress tracking</li></ul>
+        <a class="btn green plan-link" data-plan="premium" href="/payment.html?plan=premium&amp;billing=monthly">Subscribe Now</a>
+      </article>
+      <article class="card">
+        <div class="emoji" aria-hidden="true">👨‍👩‍👧‍👦</div>
+        <h3>Family Plan</h3>
+        <p class="muted">Learn together, save more.</p>
+        <div class="price" data-plan="family">₦3,000 <small>/ month</small></div>
+        <ul><li>Up to 4 child profiles</li><li>All Premium features</li><li>Family dashboard</li><li>Priority support</li></ul>
+        <a class="btn plan-link" data-plan="family" href="/payment.html?plan=family&amp;billing=monthly">Choose Family</a>
+      </article>
+    </section>
+    <div class="strip">
+      <div><strong>🏫 Special for Schools &amp; Educators</strong><p>Bring Idilewa to your classroom and inspire every learner.</p></div>
+      <a class="btn" href="mailto:hello@idilewa.com">Learn More →</a>
+    </div>
+    <div class="center"><h2>Why Choose Idilewa?</h2><p>A joyful connection to language, culture and confidence.</p></div>
+    <div class="benefits">
+      <div class="benefit">🎧<strong>Rich African Languages</strong><span>Discover language and culture</span></div>
+      <div class="benefit">🛡️<strong>Safe for Kids</strong><span>Parent-supported learning</span></div>
+      <div class="benefit">📊<strong>Track Progress</strong><span>Celebrate milestones</span></div>
+      <div class="benefit">💚<strong>Build Confidence</strong><span>Learn at your own pace</span></div>
+    </div>
+    <div class="banner">
+      <div><strong>Let’s keep African voices alive — one learner at a time!</strong><p>Give your child the gift of language and culture.</p></div>
+      <a class="btn green" href="/kids-signup.html">Get Started Today →</a>
+    </div>
+  </main>
 </body>
 </html>

@@ -105,6 +105,7 @@ test('native entry pages retain their app and return home or voice links to cano
     'educator-portal.html',
     'faq.html',
     'family-tasks.html',
+    'heritage-library.html',
     'login.html',
     'parents.html',
     'kids.html',
@@ -196,14 +197,24 @@ test('Creative Studio links back to Home and Code Playground and hardens local p
   assertSupportAssistant(transformed);
 });
 
-test('pricing keeps its existing app shell and receives the support assistant once', async () => {
+test('pricing, payment, and child signup use their standalone page scripts', async () => {
   const source = await readFile(resolve(rootDirectory, 'pricing.html'), 'utf8');
   const transformed = transformEntry('pricing.html', source);
 
-  assert.match(transformed, /data-default-route="pricing"/);
-  assert.match(transformed, /src="\.\/app\.js"/);
+  assert.match(transformed, /src="\/src\/pricingPage\.js"/);
+  assert.doesNotMatch(transformed, /src="\.\/app\.js"/);
   assertSupportAssistant(transformed);
-  assert.doesNotMatch(transformed, /src="\/src\/siteFooter\.js"/);
+  for (const [filename, script] of [
+    ['payment.html', '/src/paymentPage.js'],
+    ['kids-signup.html', '/src/kidsSignupPage.js'],
+  ]) {
+    const page = await readFile(resolve(rootDirectory, filename), 'utf8');
+    assert.equal(transformEntry(filename, page), page);
+    assert.match(page, new RegExp(`src="${script.replaceAll('/', '\\/')}"`));
+    assert.match(page, /class="art"/);
+  }
+  const childSignup = await readFile(resolve(rootDirectory, 'kids-signup.html'), 'utf8');
+  assert.match(childSignup, /<form[^>]*method="post"[^>]*action="\/api\/guardian\/children"/);
 });
 
 test('the supplied editor route stays intact and the milestone route receives account-sync hooks', async () => {
@@ -239,8 +250,11 @@ test('every built HTML entry except the homepage points to the standalone app', 
     'educator-portal.html',
     'faq.html',
     'family-tasks.html',
+    'heritage-library.html',
     'login.html',
     'parents.html',
+    'kids-signup.html',
+    'payment.html',
     'pricing.html',
     'kids.html',
     'oral.html',

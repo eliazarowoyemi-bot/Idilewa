@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#e7f7ec">
+  <meta name="description" content="Review your Idilewa subscription and continue to secure Stripe checkout.">
+  <title>Idilewa | Secure Payment</title>
+  <link rel="stylesheet" href="/styles/subscription-pages.css">
+  <script type="module" src="/src/paymentPage.js"></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="logo" href="/" aria-label="Idilewa home"><b aria-hidden="true">◖</b> idìlẹ̀wà<small>OUR LANGUAGE. OUR FUTURE.</small></a>
+    <nav aria-label="Main navigation">
+      <a href="/">Home</a><a href="/?view=academy">Languages</a><a href="/ai-conversation.html">AI Chat</a><a href="/parents.html">Families</a>
+    </nav>
+    <div class="navright"><a href="/parents.html#/parent-login">Sign In</a><a class="btn" href="/kids-signup.html">Get Started →</a></div>
+  </header>
+  <main>
+    <section class="hero">
+      <div>
+        <span class="eyebrow">🔒 SECURE &amp; ENCRYPTED CHECKOUT</span>
+        <h1>Complete Your <span class="greenText">Payment</span></h1>
+        <p>Review your subscription, then continue to Stripe’s secure checkout.</p>
+      </div>
+      <div class="art" aria-hidden="true">🛡️<small>👧🏾 💚 👦🏿</small></div>
+    </section>
+    <div class="heading"><h1>Checkout</h1><p>Review your plan and continue to a secure payment page.</p></div>
+    <div class="checkout">
+      <section class="panel" aria-labelledby="orderTitle">
+        <h2 id="orderTitle">Order Summary</h2>
+        <div class="summary">
+          <div class="emoji" aria-hidden="true">👑</div>
+          <div><strong id="planName">Loading plan…</strong><small class="muted" id="billingText">Checking current price</small></div>
+          <div class="amt" id="summaryPrice">—</div>
+        </div>
+        <div class="row"><span>Billing cycle</span><strong id="cycle">—</strong></div>
+        <div class="row"><span>Next billing date</span><strong id="nextDate">After checkout</strong></div>
+        <div class="row"><span>Child profiles</span><strong id="profiles">1 profile</strong></div>
+        <div class="total"><span>Total today</span><strong id="total">—</strong></div>
+        <p class="muted">The final amount and renewal schedule are confirmed by the server and Stripe before payment.</p>
+      </section>
+      <section class="panel" aria-labelledby="paymentMethodTitle">
+        <h2 id="paymentMethodTitle">Payment Method</h2>
+        <form id="payForm" aria-describedby="secureNote">
+          <fieldset class="methods">
+            <legend class="visually-hidden">Available payment methods</legend>
+            <label class="method">
+              <input type="radio" name="method" value="card" checked>
+              <span aria-hidden="true">💳</span><span><strong>Pay with Card</strong><small>Securely handled by Stripe</small></span>
+            </label>
+          </fieldset>
+          <div class="secure" id="secureNote">🛡️ Stripe’s hosted checkout collects card details. Idilewa never receives or stores your card number or security code.</div>
+          <button class="btn green wide" type="submit" id="payBtn" disabled>Continue to secure checkout</button>
+          <div class="status" id="payStatus" role="status" aria-live="polite"></div>
+          <div class="auth-links" id="authLinks" hidden>
+            <a href="/parents.html#/parent-login">Sign in to your parent account</a>
+            <a href="/parents.html#/parent-signup">Create a parent account</a>
+          </div>
+        </form>
+      </section>
+    </div>
+    <div class="banner">
+      <div><strong>Learning African languages has never been easier!</strong><p>Your child’s learning journey is just one step away.</p></div>
+      <a class="btn" href="/pricing.html">← Back to Pricing</a>
+    </div>
+  </main>
+</body>
+</html>

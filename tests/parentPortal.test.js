@@ -33,6 +33,10 @@ test('Parent account registration and email confirmation return to the protected
 test('Parent views keep learner data behind guardian-approved authentication and consent', () => {
   assert.match(appSource, /getCurrentUser\(\)\?\.role !== 'parent'\) return renderParentAccess\(\)/);
   assert.match(appSource, /parent-withdraw-consent/);
+  assert.match(appSource, /cancel-parent-subscription/);
+  assert.match(appSource, /withdraw-child-consent/);
+  assert.match(appSource, /renderParentBilling/);
+  assert.match(appSource, /\/api\/payments\/cancel/);
   assert.match(appSource, /href="\/family-tasks\.html">Family Tasks/);
   assert.match(appSource, /Direct messages aren’t enabled yet/);
   assert.match(appSource, /PARENT_PORTAL_LINKS/);

@@ -94,7 +94,50 @@ export default async function handler(req, res) {
     if (requestError) throw new GuardianConsentError(503, 'Family links could not be loaded.');
 
     const childIds = [...new Set((guardianRequests || []).map((row) => row.claimed_by).filter(Boolean))];
-    if (!childIds.length) return sendApiJson(res, 200, { children: [], connectionRequests: [] });
+    const { data: managedProfiles, error: managedProfilesError } = await admin.from('children')
+      .select('id,name,age_group,preferred_languages,learning_interests,status,created_at')
+      .eq('parent_user_id', profile.id)
+      .in('status', ['pending_consent', 'active'])
+      .order('created_at', { ascending: false })
+      .limit(4);
+    if (managedProfilesError) throw new GuardianConsentError(503, 'Parent-managed child profiles could not be loaded.');
+    const [
+      { data: subscriptions, error: subscriptionError },
+      { data: payments, error: paymentError },
+    ] = await Promise.all([
+      admin.from('subscriptions')
+        .select('id,plan,billing_period,status,current_period_start,current_period_end,cancel_at_period_end,created_at')
+        .eq('parent_user_id', profile.id)
+        .order('created_at', { ascending: false })
+        .limit(10),
+      admin.from('payments')
+        .select('id,plan,billing_period,amount_kobo,currency,status,receipt_status,paid_at,created_at')
+        .eq('parent_user_id', profile.id)
+        .order('created_at', { ascending: false })
+        .limit(25),
+    ]);
+    if (subscriptionError || paymentError) {
+      throw new GuardianConsentError(503, 'Subscription and payment history could not be loaded.');
+    }
+    const billing = { subscriptions: subscriptions || [], payments: payments || [] };
+    const managedChildren = (managedProfiles || []).map((child) => ({
+      id: child.id,
+      name: child.name,
+      ageGroup: child.age_group,
+      preferredLanguages: child.preferred_languages || [],
+      learningInterests: child.learning_interests || [],
+      profileStatus: child.status,
+      managedProfile: true,
+      points: 0,
+      streak: 0,
+      completedLessons: 0,
+      codingSessions: 0,
+      voicePractices: 0,
+      averageVoiceScore: null,
+    }));
+    if (!childIds.length) {
+      return sendApiJson(res, 200, { children: managedChildren, connectionRequests: [], billing });
+    }
 
     const now = new Date().toISOString();
     const { error: expiryError } = await admin
@@ -152,7 +195,10 @@ export default async function handler(req, res) {
       voiceSubmissions: voiceSubmissions || [],
     });
     const aliases = new Map(guardianRequests.map((request) => [request.claimed_by, request.learner_alias]));
-    const children = metrics.map((child) => ({ ...child, name: aliases.get(child.id) || 'Learner' }));
+    const children = [
+      ...metrics.map((child) => ({ ...child, name: aliases.get(child.id) || 'Learner' })),
+      ...managedChildren,
+    ];
 
     const educatorIds = [...new Set((connectionRequests || []).map((request) => request.educator_id))];
     let educators = [];
@@ -176,7 +222,7 @@ export default async function handler(req, res) {
         requestedAt: request.created_at,
       }));
 
-    return sendApiJson(res, 200, { children, connectionRequests: safeRequests });
+    return sendApiJson(res, 200, { children, connectionRequests: safeRequests, billing });
   } catch (error) {
     return sendApiFailure(res, error, 'dashboard/parent');
   }

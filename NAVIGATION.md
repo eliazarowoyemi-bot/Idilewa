@@ -12,7 +12,8 @@ The four persistent mobile destinations are:
 
 1. **Learn** — Voice Lessons, the language academy, and lesson paths.
 2. **Explore** — heritage, stories, coding and creative tools, AI practice, and
-   discovery.
+   discovery. The Heritage Library is a focused destination within this path;
+   its age-adapted journeys lead, with the searchable catalogue below.
 3. **Progress** — learner profile and achievements.
 4. **Family** — guardian sign-in, learner setup, and family tasks.
 

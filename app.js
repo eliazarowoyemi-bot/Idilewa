@@ -80,6 +80,14 @@ import {
   getVoiceGradePath,
   VOICE_GRADE_PATHS
 } from './src/voiceGradeCurriculum.js';
+import {
+  handleHeritageAction,
+  handleHeritageFieldChange,
+  handleHeritageFieldInput,
+  renderHeritageLibrary,
+  updateHeritageCatalogue
+} from './src/heritageLibrary.js';
+import './src/heritageLibrary.css';
 
 /* Idilewa app shell — dependency-free client-side router and renderers. */
 (async () => {
@@ -114,7 +122,7 @@ import {
     'mentors',
     'index', 'about', 'connect_students', 'connect_teachers', 'consent', 'contact', 'privacy', 'course',
     'keepers',
-    'kids', 'languages', 'lesson', 'login', 'oral', 'oral_genre', 'oriki', 'owe',
+    'kids', 'languages', 'lesson', 'login', 'oral', 'heritage-library', 'oral_genre', 'oriki', 'owe',
     'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'pricing', 'profile',
     'voices'
   ];
@@ -319,7 +327,7 @@ import {
     'tutor-settings': 'tutor',
     voice_lessons: 'trainer', 'ai-conversation': 'conversation',
     languages: 'read', course: 'read', lesson: 'read', kids: 'read',
-    oral: 'read', oral_genre: 'read', oriki: 'read', owe: 'read', owe_add: 'read',
+    oral: 'read', 'heritage-library': 'read', oral_genre: 'read', oriki: 'read', owe: 'read', owe_add: 'read',
     owe_detail: 'read', owe_story: 'read', owe_reflection: 'read', voices: 'read',
     connect_students: 'about', connect_teachers: 'about', consent: 'about', contact: 'about', privacy: 'about',
     about: 'about',
@@ -330,6 +338,7 @@ import {
   Object.assign(LABELS, {
     'voice-language': 'Choose a voice lesson language',
     'ai-conversation': 'AI Conversation',
+    'heritage-library': 'Heritage Library',
     'voice-grade': 'Choose a voice lesson grade',
     'voice-audio': 'Voice audio lessons',
     'voice-practice': 'Voice lesson practice',
@@ -600,6 +609,10 @@ import {
   }
 
   function navigate(route, params = {}, replace = false) {
+    if (route === 'pricing') {
+      window.location.assign('/pricing.html');
+      return;
+    }
     if (route === 'login') route = params.mode === 'signup' ? 'parent-signup' : 'parent-login';
     if (route === 'parent-login' || route === 'parent-signup') params = {};
     const section = OWE_ROUTE_SECTIONS[route];
@@ -751,7 +764,7 @@ import {
     document.body.classList.add('has-mobile-bottom-navigation');
     const items = [
       { route: 'voice_lessons', label: 'Learn', ico: 'book', active: page === 'index' || page === 'voice_lessons' || page.startsWith('voice-') || ['languages', 'course', 'lesson', 'kids'].includes(page) },
-      { route: 'oral', label: 'Explore', ico: 'quote', active: ['oral', 'oral_genre', 'oriki', 'owe', 'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'keepers', 'about', 'mentors'].includes(page) },
+      { route: 'oral', label: 'Explore', ico: 'quote', active: ['oral', 'heritage-library', 'oral_genre', 'oriki', 'owe', 'owe_add', 'owe_detail', 'owe_story', 'owe_reflection', 'keepers', 'about', 'mentors'].includes(page) },
       { route: 'profile', label: 'Progress', ico: 'user', active: ['profile', 'voice-progress', 'parent-progress'].includes(page) },
       { route: 'families', label: 'Family', ico: 'people', active: NAV_GROUPS[page] === 'families' || familyDashboard }
     ];
@@ -767,7 +780,7 @@ import {
       faq: 'faq',
       pricing: 'pricing',
       lessons: 'voice_lessons',
-      heritage: 'oral',
+      heritage: 'heritage-library',
       privacy: 'privacy',
     };
     return createSiteFooterMarkup((item, fallback) => (
@@ -3109,7 +3122,7 @@ import {
       { title: 'Òwe', titleSub: 'Proverbs', copy: 'Notice how compact sayings can hold wit, wisdom and ways of seeing the world.', icon: 'sparkles', route: 'owe', tone: 'mint' },
       { title: 'Story & song', titleSub: 'Oral genres', copy: 'Find out how stories, songs and spoken forms carry memory across generations.', icon: 'music', route: 'oral_genre', tone: 'blue' }
     ];
-    return `<div class="container route-page oral-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span class="breadcrumb-sep" aria-hidden="true"></span><strong>Read & listen</strong></div><section class="oral-hero"><div class="oral-hero-copy"><span class="section-kicker">Voices, memory & meaning</span><h1>Some knowledge is<br /><em>spoken into the room.</em></h1><p>Listen to the forms that carry language through family and community—from praise poetry to proverbs, speech pitch and story.</p><div class="hero-actions">${routeLink('voice_lessons', `${icon('mic', 16)} Voice Lessons`, 'button button-primary')}${routeLink('voices', `Hear the voice library ${icon('arrow', 15)}`, 'button button-outline')}${aiHelperButton('oral')}</div></div><div class="oral-hero-image"><img src="./assets/story-grandmother.jpg" alt="A grandmother sharing an oral story with children" /><span class="oral-image-note">Listen first. Learn the context.</span></div></section>${renderStepper(['Tradition', 'Genre', 'Piece', 'Reflection'], 0)}<section class="section oral-genres"><div class="section-heading"><div><span class="section-kicker">Choose a doorway</span><h2>Explore oral traditions.</h2><p>Each form has its own voice, purpose and place in community.</p></div></div><div class="oral-genre-grid">${genres.map((g) => `<a class="oral-genre-card tone-${g.tone}" href="#/${g.route}" data-route="${g.route}"><span class="oral-genre-icon">${icon(g.icon, 23)}</span><span class="oral-genre-sub">${g.titleSub}</span><h3>${g.title}</h3><p>${g.copy}</p><span class="oral-genre-arrow">Explore ${icon('arrow', 15)}</span></a>`).join('')}</div></section><section class="oral-quote-band"><span>${icon('quote', 25)}</span><div><strong>Stories are not just content.</strong><p>They are relationships—between speaker, listener, place and memory.</p></div>${routeLink('keepers', 'Meet the keepers ' + icon('arrow', 14), 'text-link')}</section></div>`;
+    return `<div class="container route-page oral-page"><div class="breadcrumbs">${routeLink('index', 'Home')}<span class="breadcrumb-sep" aria-hidden="true"></span><strong>Read & listen</strong></div><section class="oral-hero"><div class="oral-hero-copy"><span class="section-kicker">Voices, memory & meaning</span><h1>Some knowledge is<br /><em>spoken into the room.</em></h1><p>Listen to the forms that carry language through family and community—from praise poetry to proverbs, speech pitch and story.</p><div class="hero-actions">${routeLink('voice_lessons', `${icon('mic', 16)} Voice Lessons`, 'button button-primary')}${routeLink('voices', `Hear the voice library ${icon('arrow', 15)}`, 'button button-outline')}${aiHelperButton('oral')}</div></div><div class="oral-hero-image"><img src="./assets/story-grandmother.jpg" alt="A grandmother sharing an oral story with children" /><span class="oral-image-note">Listen first. Learn the context.</span></div></section>${renderStepper(['Tradition', 'Genre', 'Piece', 'Reflection'], 0)}<section class="section oral-genres"><div class="section-heading"><div><span class="section-kicker">Choose a doorway</span><h2>Explore oral traditions.</h2><p>Each form has its own voice, purpose and place in community.</p></div></div><div class="oral-genre-grid">${genres.map((g) => `<a class="oral-genre-card tone-${g.tone}" href="#/${g.route}" data-route="${g.route}"><span class="oral-genre-icon">${icon(g.icon, 23)}</span><span class="oral-genre-sub">${g.titleSub}</span><h3>${g.title}</h3><p>${g.copy}</p><span class="oral-genre-arrow">Explore ${icon('arrow', 15)}</span></a>`).join('')}</div><div class="oral-library-link">${routeLink('heritage-library', 'Explore the Heritage Library', 'button button-outline')}</div></section><section class="oral-quote-band"><span>${icon('quote', 25)}</span><div><strong>Stories are not just content.</strong><p>They are relationships—between speaker, listener, place and memory.</p></div>${routeLink('keepers', 'Meet the keepers ' + icon('arrow', 14), 'text-link')}</section></div>`;
   }
 
   function renderOralGenre() {
@@ -4594,9 +4607,29 @@ import {
     const name = typeof child.name === 'string' && child.name.trim() ? child.name.trim() : 'Learner';
     const initials = name.trim().split(/\s+/).slice(0, 2).map((part) => part.charAt(0)).join('').toUpperCase();
     const childId = encodeURIComponent(String(child.id || ''));
-    return `<article class="family-child-card"><div class="family-child-card-head"><span class="family-child-avatar">${esc(initials || 'L')}</span><div><span class="family-child-label">Approved learner</span><h3>${esc(name)}</h3><small>${Number(child.streak) || 0} day learning streak</small></div></div>
-      <div class="family-child-stats"><span><strong>${Number(child.completedLessons) || 0}</strong><small>Lessons</small></span><span><strong>${Number(child.codingSessions) || 0}</strong><small>Code sessions</small></span><span><strong>${Number(child.voicePractices) || 0}</strong><small>Voice practices</small></span></div>
-      <div class="family-child-card-footer"><span>${Number(child.points) || 0} learning points</span><a class="family-text-link" href="#/parent-progress?child=${childId}" data-route="parent-progress" data-child="${childId}">View Analytics ${icon('arrow', 13)}</a></div></article>`;
+    const managed = child.managedProfile === true;
+    const languageLabels = {
+      yoruba: 'Yorùbá', igbo: 'Igbo', hausa: 'Hausa', pidgin: 'Pidgin', kiswahili: 'Kiswahili', other: 'Other',
+    };
+    const languages = Array.isArray(child.preferredLanguages)
+      ? child.preferredLanguages.map((language) => languageLabels[language]).filter(Boolean)
+      : [];
+    const ageGroup = typeof child.ageGroup === 'string'
+      ? ({ under_6: 'Under 6', '6_8': '6–8', '9_12': '9–12', '13_17': '13–17' }[child.ageGroup] || '')
+      : '';
+    const profileLabel = child.profileStatus === 'active' ? 'Child profile' : 'Consent pending';
+    const detail = managed
+      ? [ageGroup, languages.join(', ')].filter(Boolean).join(' · ')
+      : `${Number(child.streak) || 0} day learning streak`;
+    const stats = managed
+      ? `<span><strong>${esc(ageGroup || '—')}</strong><small>Age group</small></span><span><strong>${languages.length}</strong><small>Languages</small></span><span><strong>${Array.isArray(child.learningInterests) ? child.learningInterests.length : 0}</strong><small>Interests</small></span>`
+      : `<span><strong>${Number(child.completedLessons) || 0}</strong><small>Lessons</small></span><span><strong>${Number(child.codingSessions) || 0}</strong><small>Code sessions</small></span><span><strong>${Number(child.voicePractices) || 0}</strong><small>Voice practices</small></span>`;
+    const footer = managed
+      ? `<span>${child.profileStatus === 'active' ? 'Profile active' : 'Awaiting your consent confirmation'}</span><button type="button" class="family-text-link" data-action="withdraw-child-consent" data-id="${esc(childId)}">${child.profileStatus === 'active' ? 'Withdraw consent' : 'Cancel request'}</button>`
+      : `<span>${Number(child.points) || 0} learning points</span><a class="family-text-link" href="#/parent-progress?child=${childId}" data-route="parent-progress" data-child="${childId}">View Analytics ${icon('arrow', 13)}</a>`;
+    return `<article class="family-child-card"><div class="family-child-card-head"><span class="family-child-avatar">${esc(initials || 'L')}</span><div><span class="family-child-label">${managed ? profileLabel : 'Approved learner'}</span><h3>${esc(name)}</h3><small>${esc(detail || 'Parent-managed profile')}</small></div></div>
+      <div class="family-child-stats">${stats}</div>
+      <div class="family-child-card-footer">${footer}</div></article>`;
   }
 
   function renderParentDashboard() {
@@ -4619,9 +4652,9 @@ import {
       : parentDashboardError
         ? `<div class="family-data-state is-error" role="alert">${esc(parentDashboardError)} <button type="button" data-action="parent-refresh">Try again</button></div>`
         : '';
-    return renderParentWorkspace('parent-dashboard', `${renderParentHeading('Your family learning space', `Welcome back, ${name}.`, 'Here’s how your children are growing with Idilewa.', `<a class="family-button family-button-outline" href="/family-tasks.html">Family Tasks</a><a class="family-button family-button-outline" href="#/parent-progress" data-route="parent-progress">View Analytics ${icon('arrow', 14)}</a>`)}
-      <section class="family-stat-grid" aria-label="Family learning overview">${stat('My Children', children.length, 'Guardian-approved learners')}${stat('Lessons Completed', totalLessons, 'Across your family', 'is-mint')}${stat('Coding Sessions', totalCoding, 'Saved practice attempts', 'is-blue')}${stat('Average Voice Score', averageVoice, 'When available', 'is-peach')}</section>
-      <section class="family-dashboard-section"><div class="family-section-heading"><div><span class="family-eyebrow">Your learners</span><h2>My Children</h2></div><a class="family-text-link" href="#/parent-children" data-route="parent-children">View all ${icon('arrow', 13)}</a></div>${loading}${childSection}</section>
+    return renderParentWorkspace('parent-dashboard', `${renderParentHeading('Your family learning space', `Welcome back, ${name}.`, 'Here’s how your children are growing with Idilewa.', `<a class="family-button family-button-outline" href="/kids-signup.html">Add child profile</a><a class="family-button family-button-outline" href="/family-tasks.html">Family Tasks</a><a class="family-button family-button-outline" href="#/parent-progress" data-route="parent-progress">View Analytics ${icon('arrow', 14)}</a>`)}
+      <section class="family-stat-grid" aria-label="Family learning overview">${stat('My Children', children.length, 'Parent-managed and approved profiles')}${stat('Lessons Completed', totalLessons, 'Across your family', 'is-mint')}${stat('Coding Sessions', totalCoding, 'Saved practice attempts', 'is-blue')}${stat('Average Voice Score', averageVoice, 'When available', 'is-peach')}</section>
+      <section class="family-dashboard-section"><div class="family-section-heading"><div><span class="family-eyebrow">Your learners</span><h2>My Children</h2></div><div class="family-heading-actions"><a class="family-text-link" href="/kids-signup.html">Add child profile</a><a class="family-text-link" href="#/parent-children" data-route="parent-children">View all ${icon('arrow', 13)}</a></div></div>${loading}${childSection}</section>
       <section class="family-dashboard-lower"><article class="family-insight-card"><span class="family-insight-icon">${icon('globe', 20)}</span><div><span class="family-eyebrow">A little every day</span><h2>Building a global voice, one child at a time.</h2><p>Celebrate each lesson, story and new word along the way.</p></div><a href="#/parent-progress" data-route="parent-progress" aria-label="Open learning analytics">${icon('arrow', 15)}</a></article><aside class="family-activity-panel"><div class="family-section-heading"><div><span class="family-eyebrow">Family updates</span><h2>Connection requests</h2></div><a class="family-text-link" href="#/parent-messages" data-route="parent-messages">View all ${icon('arrow', 13)}</a></div>${renderParentRequestSummary()}</aside></section>`);
   }
 
@@ -4685,6 +4718,54 @@ import {
       <aside class="family-message-note"><span class="family-insight-icon">${icon('lock', 19)}</span><span class="family-eyebrow">Your family’s privacy</span><h2>Direct messages aren’t enabled yet.</h2><p>Teacher requests are managed here. Contact Idilewa if you need help with your family account.</p><a class="family-text-link" href="mailto:idilewa2026@gmail.com?subject=Idilewa%20family%20support">Email our team ${icon('arrow', 13)}</a></aside></section>`);
   }
 
+  function renderParentBilling() {
+    const billing = parentDashboardData?.billing || {};
+    const subscriptions = Array.isArray(billing.subscriptions) ? billing.subscriptions : [];
+    const payments = Array.isArray(billing.payments) ? billing.payments : [];
+    const planLabel = (plan, period) => `${plan === 'family' ? 'Family' : plan === 'premium' ? 'Premium' : 'Subscription'} · ${period === 'yearly' ? 'Yearly' : 'Monthly'}`;
+    const statusLabel = (status) => ({
+      active: 'Active',
+      trialing: 'Trial',
+      past_due: 'Payment overdue',
+      canceled: 'Canceled',
+      unpaid: 'Unpaid',
+      incomplete: 'Incomplete',
+      incomplete_expired: 'Expired',
+      succeeded: 'Paid',
+      creating: 'Processing',
+      paid: 'Paid',
+      pending: 'Pending',
+      expired: 'Expired',
+      cancelled: 'Canceled',
+      failed: 'Failed',
+      refunded: 'Refunded',
+    }[status] || 'Processing');
+    const priceLabel = (amountKobo) => {
+      const amount = Number(amountKobo);
+      return Number.isSafeInteger(amount) && amount >= 0
+        ? new Intl.NumberFormat('en-NG', { style: 'currency', currency: 'NGN', maximumFractionDigits: 2 }).format(amount / 100)
+        : 'Amount unavailable';
+    };
+    const subscriptionRows = subscriptions.length
+      ? subscriptions.map((subscription) => {
+        const canceling = subscription.cancel_at_period_end === true;
+        const canCancel = ['active', 'trialing', 'past_due'].includes(subscription.status) && !canceling;
+        const periodLabel = subscription.current_period_end
+          ? ` · ${canceling ? 'Ends' : 'Renews'} ${esc(formatDashboardDate(subscription.current_period_end))}`
+          : '';
+        return `<article class="family-consent-row"><span class="family-request-icon">${icon('lock', 15)}</span><div><strong>${esc(planLabel(subscription.plan, subscription.billing_period))}</strong><small>${esc(statusLabel(subscription.status))}${periodLabel}${canceling ? ' · Scheduled to end' : ''}</small></div>${canCancel ? `<button type="button" class="family-text-link" data-action="cancel-parent-subscription" data-id="${esc(subscription.id)}">Cancel renewal</button>` : ''}</article>`;
+      }).join('')
+      : '<p class="family-empty-inline">No subscriptions yet. Choose a plan whenever your family is ready.</p>';
+    const paymentRows = payments.length
+      ? `<div class="family-payment-list">${payments.map((payment) => `<article class="family-consent-row"><span class="family-request-icon">${icon('check', 15)}</span><div><strong>${esc(planLabel(payment.plan, payment.billing_period))}</strong><small>${esc(formatDashboardDate(payment.paid_at || payment.created_at))} · ${esc(statusLabel(payment.status))}</small></div><strong>${esc(priceLabel(payment.amount_kobo))}</strong></article>`).join('')}</div>`
+      : '<p class="family-empty-inline">Completed and pending payments will appear here.</p>';
+    return `<section class="family-panel family-billing-panel"><div class="family-section-heading"><div><span class="family-eyebrow">Plan and payments</span><h2>Subscription</h2></div><a class="family-text-link" href="/pricing.html">View plans ${icon('arrow', 13)}</a></div>
+      ${parentDashboardLoading && !parentDashboardData ? '<p class="family-empty-inline">Loading your billing history…</p>' : subscriptionRows}
+      <div class="family-settings-subsection"><h3>Payment history</h3>${parentDashboardLoading && !parentDashboardData ? '' : paymentRows}</div>
+      <p class="family-privacy-note">${icon('lock', 14)} Payments are handled through Stripe-hosted checkout. To request deletion of a child profile’s stored information, <a href="mailto:idilewa2026@gmail.com?subject=Child%20profile%20deletion%20request">contact Idilewa support</a>.</p>
+    </section>`;
+  }
+
   function renderParentSettings() {
     const user = getCurrentUser() || {};
     const preferences = getParentPreferences();
@@ -4703,7 +4784,7 @@ import {
         <div class="family-settings-subsection"><span class="family-eyebrow">Consent and privacy</span>${connectionRows}<a class="family-text-link" href="#/consent" data-route="consent">Review family approval ${icon('arrow', 13)}</a></div>
         <div class="family-settings-subsection family-account-security"><div><strong>Account security</strong><p>Sign out of your family account on this device.</p></div><button type="button" class="family-button family-button-outline family-button-small" data-action="profile-sign-out">Sign out</button></div>
         <p class="family-privacy-note">${icon('lock', 14)} Preferences are saved in this browser. Notification switches do not subscribe you to emails.</p>
-      </section></div>`);
+      </section>${renderParentBilling()}</div>`);
   }
 
   function renderParentPortal(page, params = {}) {
@@ -4735,6 +4816,64 @@ import {
       const page = parseLocation().page;
       if (page.startsWith('parent-') && page !== 'parent-login' && page !== 'parent-signup' && page !== 'parent-welcome') render();
     }
+  }
+
+  async function sendParentPortalAction(path, method, payload) {
+    const token = await getOptionalSessionAccessToken();
+    if (!token) throw new Error('Your sign-in has expired. Sign in again and retry.');
+    const response = await fetch(path, {
+      method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+    let result;
+    try {
+      if (!response.headers.get('content-type')?.includes('application/json')) {
+        throw new Error('The service returned a non-JSON response.');
+      }
+      result = await response.json();
+    } catch (error) {
+      if (!response.ok) throw new Error('The parent service could not be reached. Please try again later.', { cause: error });
+      throw new Error('The parent service returned an unreadable response. Please try again later.', { cause: error });
+    }
+    if (!response.ok) throw new Error(result.error || 'The request could not be completed.');
+    return result;
+  }
+
+  function refreshParentPortalData(message) {
+    parentDashboardData = null;
+    parentDashboardError = '';
+    parentDashboardLoading = false;
+    parentDashboardRequest += 1;
+    showToast(message, 'success');
+    void loadParentPortalData();
+  }
+
+  function cancelParentSubscription(el) {
+    const subscriptionId = el.dataset.id;
+    if (!subscriptionId || !window.confirm('Stop automatic renewal? Your subscription will remain active until the current billing period ends.')) return;
+    el.disabled = true;
+    void sendParentPortalAction('/api/payments/cancel', 'POST', { subscriptionId })
+      .then((result) => refreshParentPortalData(result.message || 'Automatic renewal was canceled.'))
+      .catch((error) => {
+        showToast(error instanceof Error ? error.message : 'The subscription could not be canceled.', 'error');
+        if (el.isConnected) el.disabled = false;
+      });
+  }
+
+  function withdrawChildProfileConsent(el) {
+    const childId = el.dataset.id;
+    if (!childId || !window.confirm('Withdraw consent and deactivate this child profile now? Learning access will stop immediately. Contact Idilewa support if you also want stored profile information erased.')) return;
+    el.disabled = true;
+    void sendParentPortalAction('/api/guardian/children', 'DELETE', { childId })
+      .then((result) => refreshParentPortalData(result.message || 'Consent was withdrawn and the profile deactivated.'))
+      .catch((error) => {
+        showToast(error instanceof Error ? error.message : 'Consent could not be withdrawn.', 'error');
+        if (el.isConnected) el.disabled = false;
+      });
   }
 
   function renderContact() {
@@ -5571,6 +5710,7 @@ import {
       case 'course': return renderCourse(params);
       case 'lesson': return renderLesson(params);
       case 'oral': return renderOral();
+      case 'heritage-library': return renderHeritageLibrary();
       case 'oral_genre': return renderOralGenre();
       case 'oriki': return renderOriki();
       case 'owe': return renderOwe();
@@ -6376,6 +6516,20 @@ import {
   function handleAction(action, el) {
     const lang = el.dataset.lang;
     if (action.startsWith('aichat-')) { handleAiConversationAction(action, el); return; }
+    if (action.startsWith('heritage-')) {
+      if (handleHeritageAction(action, el)) {
+        render();
+        requestAnimationFrame(() => {
+          const target = action === 'heritage-select-age'
+            ? document.querySelector('.heritage-age-card[aria-pressed="true"]')
+            : action === 'heritage-step'
+              ? document.querySelector('[data-action="heritage-step"][aria-current="step"]')
+              : document.getElementById('heritage-learning-title');
+          target?.focus({ preventScroll: true });
+        });
+      }
+      return;
+    }
     switch (action) {
       case 'mentor-select-slot':
         selectedMentorBooking = {
@@ -6532,6 +6686,12 @@ import {
         });
         break;
       }
+      case 'cancel-parent-subscription':
+        cancelParentSubscription(el);
+        break;
+      case 'withdraw-child-consent':
+        withdrawChildProfileConsent(el);
+        break;
       case 'toggle-menu': toggleMobileMenu(); break;
       case 'open-search': openSearch(); break;
       case 'close-modal': closeModal(); break;
@@ -7310,6 +7470,11 @@ import {
 
   document.addEventListener('change', (event) => {
     const el = event.target;
+    if (handleHeritageFieldChange(el)) return;
+    if (el.matches('[data-heritage-filter]')) {
+      updateHeritageCatalogue();
+      return;
+    }
     if (el.matches('sakuga-toggle[data-sakuga-toggle="parent-preference"]')) {
       const key = el.dataset.setting;
       if (!['emailUpdates', 'learningReminders', 'weeklySummary'].includes(key)) return;
@@ -7414,6 +7579,11 @@ import {
 
   document.addEventListener('input', (event) => {
     const target = event.target;
+    if (handleHeritageFieldInput(target)) return;
+    if (target.matches('[data-heritage-filter="query"]')) {
+      updateHeritageCatalogue();
+      return;
+    }
     if (target.id === 'voice-translation-input') {
       const count = document.getElementById('voice-translation-character-count');
       if (count) count.textContent = String(target.value.length);
