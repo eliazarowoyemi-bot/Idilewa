@@ -355,7 +355,6 @@ function renderCatalogue() {
         <h3 id="heritage-most-read-title">Most Read Stories</h3>
         <p>Community favourites will appear when verified reading activity is available.</p>
       </div>
-      <p class="heritage-ranking-status">Reading rankings are coming soon. No estimated or demonstration read counts are shown.</p>
     </section>
     <details class="heritage-catalogue-disclosure" id="heritage-catalogue">
       <summary>More Heritage Stories — Explore the 300-concept register</summary>

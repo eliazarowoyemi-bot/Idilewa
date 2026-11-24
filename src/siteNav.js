@@ -22,7 +22,7 @@ const NAVIGATION_DESTINATIONS = [
     ['/?view=phoneticsLab', 'Sounds & Vowels'],
     ['/?view=progress', 'My Progress'],
     ['/development-center.html', 'Development Center'],
-    ['/kids.html', 'Kids Arcade'],
+    ['/?view=codeLab#all-coding-games', 'All games'],
   ]],
   ['Explore', [
     ['/?view=heritageLab', 'Heritage Library'],

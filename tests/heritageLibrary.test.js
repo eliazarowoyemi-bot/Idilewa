@@ -20,6 +20,10 @@ test('heritage welcome stage no longer shows the requested editorial notice', ()
     /This is original educational fiction, not a reproduced traditional folktale\. Stories for ages 9–16\+ are shorter than planned publication manuscripts; Yorùbá drafts remain pending independent linguistic review\./,
   );
   assert.match(heritageSource, /Explore an original story about integrity and kindness/);
+  assert.doesNotMatch(
+    heritageSource,
+    /Reading rankings are coming soon\. No estimated or demonstration read counts are shown\./,
+  );
 });
 
 test('heritage filters combine search, category, language, and assigned age without mutating records', () => {

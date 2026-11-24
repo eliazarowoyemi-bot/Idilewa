@@ -74,9 +74,9 @@ export const supportPageKnowledge = Object.freeze([
   {
     title: 'Kids Arcade',
     label: 'Kids Arcade',
-    url: '/kids',
+    url: '/?view=codeLab#all-coding-games',
     keywords: 'kids arcade games Turbo Racers Balloon Ludo score progress',
-    content: 'Kids Arcade includes Turbo Racers and Balloon Ludo. Completed results can update learner progress; guests use browser-local progress and signed-in learners use supported account sync. Saved game results contain score, outcome, language, and difficulty, not player names.',
+    content: 'Turbo Racers and Balloon Ludo are available in the Code Playground All games catalogue. Completed results can update learner progress; guests use browser-local progress and signed-in learners use supported account sync. Saved game results contain score, outcome, language, and difficulty, not player names.',
   },
   {
     title: 'Creative Studio',

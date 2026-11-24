@@ -42,7 +42,6 @@ const nativeAppPages = new Set([
   'family-tasks',
   'login',
   'parents',
-  'kids',
   'oral',
   'heritage-library',
   'oral_genre',
@@ -157,19 +156,11 @@ function insertAfterClosingElement(html, tagName, content, message) {
 }
 
 function appendRouteNavigation(html, route) {
-  const links = route === 'kids'
-    ? [
-      ['/', 'Academy'],
-      ['/creative-studio.html', 'Creative Studio'],
-      ['/about.html', 'About'],
-      ['/tutor.html', 'Tutorship'],
-      ['/parents.html#/parent-signup', 'Family account'],
-    ]
-    : route === 'tutor'
+  const links = route === 'tutor'
     ? [
       ['/', 'Academy'],
       ['/about.html', 'About'],
-      ['/kids.html', 'Kids Arcade'],
+      ['/?view=codeLab#all-coding-games', 'All games'],
       ['/parents.html#/parent-login', 'Parent sign in'],
       ['/parents.html#/parent-signup', 'Family account'],
     ]
@@ -184,41 +175,6 @@ function appendRouteNavigation(html, route) {
     navigation,
     `The ${route} page is missing its header.`,
   );
-}
-
-function transformKidsArcadeHtml(html) {
-  const gamesStart = html.indexOf('const GAMES=');
-  const frameStart = html.indexOf("const frame=document.getElementById('gameFrame')", gamesStart);
-  const gamesEnd = html.lastIndexOf('};', frameStart);
-  if (gamesStart === -1 || frameStart === -1 || gamesEnd < gamesStart) {
-    throw new Error('Kids Arcade is missing its embedded game launcher.');
-  }
-
-  let transformed = html.slice(0, gamesStart)
-    .concat(
-      'const GAMES={racer:"/games/turbo-racers.html",ludo:"/games/balloon-ludo.html"};\n',
-      html.slice(frameStart),
-    );
-  const legacyLauncher = /if\(which==='home'\)frame\.removeAttribute\('srcdoc'\);\s*else frame\.srcdoc=GAMES\[which\];/;
-  if (!legacyLauncher.test(transformed)) {
-    throw new Error('Kids Arcade is missing the expected game-selection behavior.');
-  }
-  transformed = transformed.replace(
-    legacyLauncher,
-    "if(which==='home'){frame.removeAttribute('src');frame.removeAttribute('srcdoc');}\n else frame.src=GAMES[which];",
-  );
-
-  if (!transformed.includes('id="progressStatus"')) {
-    const message = /<div id="message">[\s\S]*?<\/div>/i;
-    if (!message.test(transformed)) {
-      throw new Error('Kids Arcade is missing its game status message.');
-    }
-    transformed = transformed.replace(
-      message,
-      '$&<p id="progressStatus" role="status" aria-live="polite"></p>',
-    );
-  }
-  return transformed;
 }
 
 function transformAboutHtml(html) {
@@ -304,7 +260,9 @@ function guardBilingualGame(html) {
 
 function renderRouteRedirect(routeName) {
   const view = routeViews[routeName] ?? 'home';
-  const target = `/?view=${encodeURIComponent(view)}`;
+  const target = routeName === 'kids'
+    ? '/?view=codeLab#all-coding-games'
+    : `/?view=${encodeURIComponent(view)}`;
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -347,7 +305,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const nav = document.querySelector('.drawer-nav');
   if (!nav) throw new Error('About page is missing its navigation drawer.');
   const links = [
-    ['/kids.html', 'Kids Arcade'],
+    ['/?view=codeLab#all-coding-games', 'All games'],
     ['/creative-studio.html', 'Creative Studio'],
     ['/tutor.html', 'Tutorship'],
   ];
@@ -388,7 +346,7 @@ function transformCreativeStudioHtml(html) {
   const navigation = `<nav class="studio-site-nav" aria-label="Ìdíléwa navigation">
     <a href="/">Home</a>
     <a href="/development-center.html">Development Center</a>
-    <a href="/kids.html">Kids Arcade</a>
+    <a href="/?view=codeLab#all-coding-games">All games</a>
     <a href="/about.html">About</a>
     <a href="/tutor.html">Tutorship</a>
   </nav>`;
@@ -529,7 +487,7 @@ function transformAppHtml(html) {
     const menu = document.createElement('div');
     menu.className = 'premium-dropdown';
     menu.dataset.idilewaExploreMenu = 'true';
-    menu.innerHTML = '<button type="button" aria-expanded="false">Explore</button><div class="premium-menu"><a href="/kids.html">Kids Arcade</a><a href="/creative-studio.html">Creative Studio</a><a href="/about.html">About</a></div>';
+    menu.innerHTML = '<button type="button" aria-expanded="false">Explore</button><div class="premium-menu"><a href="/?view=codeLab#all-coding-games">All games</a><a href="/creative-studio.html">Creative Studio</a><a href="/about.html">About</a></div>';
     const button = menu.querySelector('button');
     const panel = menu.querySelector('.premium-menu');
     button.addEventListener('click', () => {
@@ -543,7 +501,7 @@ function transformAppHtml(html) {
   addExploreMenu(document.querySelector('.premium-links'));
   const mobileNavigation = document.querySelector('.premium-mobile-menu nav');
   for (const [key, href, label] of [
-    ['kids', '/kids.html', 'Kids Arcade'],
+    ['games', '/?view=codeLab#all-coding-games', 'All games'],
     ['studio', '/creative-studio.html', 'Creative Studio'],
     ['about', '/about.html', 'About'],
   ]) {
@@ -563,7 +521,7 @@ function transformAppHtml(html) {
   if (!${JSON.stringify([...validViews])}.includes(view)) return;
   if (typeof window.go !== 'function') throw new Error('Standalone app view navigation is unavailable.');
   window.go(view);
-  history.replaceState(null, '', location.pathname);
+  history.replaceState(null, '', location.pathname + location.hash);
 })();
 </script>`;
   const transformed = html
@@ -583,7 +541,13 @@ function transformAppHtml(html) {
   }
 
   return styled.slice(0, closingBodyIndex)
-    .concat(viewBootstrap, legacyLearningBootstrap, siteFooterBootstrap, styled.slice(closingBodyIndex));
+    .concat(
+      viewBootstrap,
+      legacyLearningBootstrap,
+      siteFooterBootstrap,
+      '<script type="module" src="/src/homepageArcadeIntegration.js"></script>',
+      styled.slice(closingBodyIndex),
+    );
 }
 
 function injectSupportAssistant(html) {
@@ -616,18 +580,10 @@ export function createStandaloneAppPlugin(rootDirectory) {
         if (route === 'pricing') return injectSupportAssistant(html);
         if (route === 'kids-signup' || route === 'payment') return html;
         if (!nativeAppPages.has(route)) return renderRouteRedirect(route);
-        const routeHtml = route === 'kids'
-          ? transformKidsArcadeHtml(html)
-          : route === 'about'
+        const routeHtml = route === 'about'
           ? transformAboutHtml(html)
           : html;
         const nativeHtml = transformNativeAppHtml(routeHtml, route);
-        if (route === 'kids') {
-          const closingBodyIndex = nativeHtml.toLowerCase().lastIndexOf('</body>');
-          if (closingBodyIndex === -1) throw new Error('Kids Arcade is missing its closing body tag.');
-          return injectSupportAssistant(nativeHtml.slice(0, closingBodyIndex)
-            .concat('<script type="module" src="/src/arcadeProgress.js"></script>', nativeHtml.slice(closingBodyIndex)));
-        }
         const transformed = route === 'creative-studio'
           ? transformCreativeStudioHtml(nativeHtml)
           : nativeHtml;

@@ -3,24 +3,19 @@ import { readFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
+import { HOMEPAGE_ARCADE_GAMES } from '../src/homepageArcadeIntegration.js';
 import { createStandaloneAppPlugin } from '../src/standaloneAppRoutes.js';
 import { verifyGameCompletionMessage } from '../src/gameCompletion.js';
 import test from 'node:test';
 
 const indexHtml = await readFile(new URL('../index.html', import.meta.url), 'utf8');
 const kidsHtml = await readFile(new URL('../kids.html', import.meta.url), 'utf8');
-const progressSource = await readFile(new URL('../src/arcadeProgress.js', import.meta.url), 'utf8');
 const completionSource = await readFile(new URL('../src/gameCompletion.js', import.meta.url), 'utf8');
+const integrationSource = await readFile(new URL('../src/homepageArcadeIntegration.js', import.meta.url), 'utf8');
 const racerHtml = await readFile(new URL('../public/games/turbo-racers.html', import.meta.url), 'utf8');
 const ludoHtml = await readFile(new URL('../public/games/balloon-ludo.html', import.meta.url), 'utf8');
 const rootDirectory = resolve(fileURLToPath(new URL('..', import.meta.url)));
 const plugin = createStandaloneAppPlugin(rootDirectory);
-
-function transformKidsPage() {
-  return plugin.transformIndexHtml.handler(kidsHtml, {
-    filename: resolve(rootDirectory, 'kids.html'),
-  });
-}
 
 function assertInlineScriptsParse(html, filename) {
   let scriptIndex = 0;
@@ -36,18 +31,34 @@ function assertInlineScriptsParse(html, filename) {
   assert.ok(scriptIndex > 0, `${filename} should include playable game logic`);
 }
 
-test('Kids Arcade loads the maintained same-origin game pages and reports progress', () => {
-  const transformed = transformKidsPage();
-  assert.match(transformed, /const GAMES=\{racer:"\/games\/turbo-racers\.html",ludo:"\/games\/balloon-ludo\.html"\}/);
-  assert.match(transformed, /frame\.src=GAMES\[which\]/);
-  assert.match(transformed, /id="progressStatus" role="status" aria-live="polite"/);
-  assert.match(transformed, /src="\/src\/arcadeProgress\.js"/);
-  assert.doesNotMatch(transformed, /const GAMES=\{racer:"<!doctype html>/);
-  assertInlineScriptsParse(transformed, 'kids.html');
+test('arcade games join the Code Playground cards and shared game selector', () => {
+  assert.deepEqual(
+    HOMEPAGE_ARCADE_GAMES.map(({ id, path }) => [id, path]),
+    [
+      ['turbo-racers', '/games/turbo-racers.html'],
+      ['balloon-ludo', '/games/balloon-ludo.html'],
+    ],
+  );
+  assert.match(indexHtml, /id="all-coding-games"/);
+  assert.match(indexHtml, /id="arcade-merged-frame"/);
+  assert.match(integrationSource, /className = 'game-directory-card'/);
+  assert.match(integrationSource, /gameFrame\.src = game\.path/);
+  assert.match(integrationSource, /switcherHeading\.textContent = `🎮 Select a game · /);
+
   const transformedHome = plugin.transformIndexHtml.handler(indexHtml, {
     filename: resolve(rootDirectory, 'index.html'),
   });
-  assert.match(transformedHome, /\/kids\.html/);
+  assert.match(transformedHome, /src="\/src\/homepageArcadeIntegration\.js"/);
+  assert.match(transformedHome, /history\.replaceState\(null, '', location\.pathname \+ location\.hash\)/);
+});
+
+test('the legacy Kids Arcade route opens the shared Code Playground catalogue', () => {
+  const transformed = plugin.transformIndexHtml.handler(kidsHtml, {
+    filename: resolve(rootDirectory, 'kids.html'),
+  });
+
+  assert.match(transformed, /location\.replace\("\/\?view=codeLab#all-coding-games"\)/);
+  assert.match(transformed, /href="\/\?view=codeLab#all-coding-games"/);
 });
 
 test('the academy merges the game-vocabulary accordion into the coding challenges', () => {
@@ -92,7 +103,5 @@ test('game results must match the same-origin game frame and validated completio
   assert.equal(verifyGameCompletionMessage({ ...event, data: { ...payload, score: -1 } }, frame, event.origin), null);
   assert.equal(verifyGameCompletionMessage({ ...event, data: { ...payload, language: 'xx' } }, frame, event.origin), null);
   assert.equal(verifyGameCompletionMessage({ ...event, data: { ...payload, outcome: 'unknown' } }, frame, event.origin), null);
-  assert.match(progressSource, /lessonType: 'coding'/);
-  assert.match(progressSource, /lessonId: `kids-arcade-\$\{completion\.game\}`/);
   assert.match(completionSource, /event\.origin !== origin/);
 });

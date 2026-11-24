@@ -96,7 +96,10 @@ test('site knowledge includes every public sitemap route or its canonical replac
   const sitemapRoutes = [...sitemap.matchAll(/<loc>(https:\/\/idilewa\.com[^<]+)<\/loc>/g)]
     .map(([, value]) => new URL(value).pathname);
   const indexedRoutes = new Set(supportPageKnowledge.map((page) => page.url));
-  const canonicalRoutes = new Map([['/trainer', '/voice_lessons']]);
+  const canonicalRoutes = new Map([
+    ['/trainer', '/voice_lessons'],
+    ['/kids', '/'],
+  ]);
 
   assert.ok(sitemapRoutes.length >= 20);
   assert.deepEqual(

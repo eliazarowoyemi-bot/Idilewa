@@ -42,7 +42,7 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assert.match(transformed, /Tutorship/);
   assert.match(transformed, /link\.href = '\/tutor\.html'/);
   assert.match(transformed, /Sign in/);
-  assert.match(transformed, /\/kids\.html/);
+  assert.match(transformed, /src="\/src\/homepageArcadeIntegration\.js"/);
   assert.match(transformed, /\/about\.html/);
   assert.match(transformed, /link\.href = '\/parents\.html#\/parent-login'/);
   assert.match(transformed, /link\.href = '\/parents\.html#\/parent-signup'/);
@@ -71,7 +71,7 @@ test('homepage drawer shows its menu label and all primary destinations', async 
     "['/ai-conversation.html', 'AI Conversation']",
     "['/milestone-achievement.html', 'Milestone Achievement']",
     "['/?view=heritageLab', 'Heritage Library']",
-    "['/kids.html', 'Kids Arcade']",
+    "['/?view=codeLab#all-coding-games', 'All games']",
     "['/creative-studio.html', 'Creative Studio']",
     "['/tutor.html', 'Tutorship']",
     "['/parents.html', 'For Families']",
@@ -96,6 +96,14 @@ test('legacy learning and heritage URLs open their matching standalone views', a
   assert.ok(languages.includes('<a href="/?view=academy">'));
 });
 
+test('the legacy Kids Arcade route opens the shared Code Playground catalogue', async () => {
+  const kids = await readFile(resolve(rootDirectory, 'kids.html'), 'utf8');
+  const transformed = transformEntry('kids.html', kids);
+
+  assert.match(transformed, /location\.replace\("\/\?view=codeLab#all-coding-games"\)/);
+  assert.match(transformed, /href="\/\?view=codeLab#all-coding-games"/);
+});
+
 test('native entry pages retain their app and return home or voice links to canonical pages', async () => {
   for (const filename of [
     'ai-conversation.html',
@@ -108,7 +116,6 @@ test('native entry pages retain their app and return home or voice links to cano
     'heritage-library.html',
     'login.html',
     'parents.html',
-    'kids.html',
     'oral_genre.html',
     'oriki.html',
     'owe.html',
@@ -124,7 +131,7 @@ test('native entry pages retain their app and return home or voice links to cano
     const source = await readFile(resolve(rootDirectory, filename), 'utf8');
     const transformed = transformEntry(filename, source);
     const closingHead = source.toLowerCase().lastIndexOf('</head>');
-    if (!['about.html', 'kids.html', 'tutor.html'].includes(filename)) {
+    if (!['about.html', 'tutor.html'].includes(filename)) {
       assert.ok(transformed.startsWith(source.slice(0, closingHead)), filename);
       const closingBody = source.toLowerCase().lastIndexOf('</body>');
       assert.ok(transformed.includes(source.slice(closingHead, closingBody)), filename);
@@ -141,13 +148,7 @@ test('native entry pages retain their app and return home or voice links to cano
       assert.match(transformed, /href = '\/educator-portal\.html#\/tutor-signup'/);
       assert.match(transformed, /link\.textContent = 'Secure Tutor Sign-up'/);
       assert.match(transformed, /id="idilewa-tutor-accessibility-overrides"/);
-      assert.match(transformed, /href="\/kids\.html">Kids Arcade/);
-    }
-    if (filename === 'kids.html') {
-      assert.match(transformed, /const GAMES=\{racer:"\/games\/turbo-racers\.html",ludo:"\/games\/balloon-ludo\.html"\}/);
-      assert.match(transformed, /frame\.src=GAMES\[which\]/);
-      assert.match(transformed, /src="\/src\/arcadeProgress\.js"/);
-      assert.match(transformed, /href="\/parents\.html#\/parent-signup">Family account/);
+      assert.match(transformed, /href="\/\?view=codeLab#all-coding-games">All games/);
     }
     if (filename === 'about.html') {
       assert.match(transformed, /href="\/\?view=academy"/);
@@ -188,7 +189,7 @@ test('Creative Studio links back to Home and Code Playground and hardens local p
   assert.match(transformed, /id="studioNavigationMenu" role="region" aria-label="Creative Studio and site navigation" hidden/);
   assert.match(transformed, /<h2 id="studioToolsLabel">Creative Studio<\/h2>\s*<nav class="tabs" id="tabs" aria-label="Creative Studio tools"><\/nav>/);
   assert.match(transformed, /<h2 id="studioPagesLabel">Ìdíléwa pages<\/h2>[\s\S]*<nav class="studio-site-nav" aria-label="Ìdíléwa navigation">/);
-  assert.match(transformed, /href="\/kids\.html">Kids Arcade<\/a>/);
+  assert.match(transformed, /href="\/\?view=codeLab#all-coding-games">All games<\/a>/);
   assert.match(transformed, /href="\/about\.html">About<\/a>/);
   assert.match(transformed, /href="\/tutor\.html">Tutorship<\/a>/);
   assert.match(transformed, /src="\/src\/creativeStudioPage\.js"/);
@@ -256,7 +257,6 @@ test('every built HTML entry except the homepage points to the standalone app', 
     'kids-signup.html',
     'payment.html',
     'pricing.html',
-    'kids.html',
     'oral.html',
     'oral_genre.html',
     'oriki.html',
