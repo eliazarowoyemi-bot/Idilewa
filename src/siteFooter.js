@@ -1,4 +1,5 @@
 import '../styles/site-footer.css';
+import './authDialog.js';
 import {
   createSiteBottomNavigationMarkup,
   createSiteBrandMarkup,

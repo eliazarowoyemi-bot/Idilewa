@@ -3,103 +3,16 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#e7f7ec">
+  <meta name="theme-color" content="#dce8dc">
   <meta name="description" content="Create a parent-managed Idilewa child profile with verified guardian consent.">
-  <title>Idilewa | Kids Sign Up</title>
-  <link rel="stylesheet" href="/styles/subscription-pages.css">
-  <script type="module" src="/src/kidsSignupPage.js"></script>
+  <title>Ìdíléwa | Child profile</title>
+  <script type="module" src="/src/authDialog.js"></script>
 </head>
 <body>
-  <header class="site-header">
-    <a class="logo" href="/" aria-label="Idilewa home"><b aria-hidden="true">◖</b> idìlẹ̀wà<small>OUR LANGUAGE. OUR FUTURE.</small></a>
-    <nav aria-label="Main navigation">
-      <a href="/">Home</a><a href="/?view=academy">Languages</a><a href="/ai-conversation.html">AI Chat</a><a href="/parents.html">Families</a>
-    </nav>
-    <div class="navright"><a href="/parents.html#/parent-login">Sign In</a><a class="btn" href="/pricing.html">View Plans →</a></div>
-  </header>
-  <main>
-    <section class="hero">
-      <div>
-        <span class="eyebrow">LEARN · PLAY · GROW</span>
-        <h1>Join Idilewa <span class="greenText">Kids Club!</span></h1>
-        <p>Create a child profile and begin a joyful journey through African languages.</p>
-      </div>
-      <div class="art" aria-hidden="true">👦🏿<small>🌿 👧🏾 ✨</small></div>
-    </section>
-    <div class="heading"><h1>Create a child profile</h1><p>A parent or legal guardian must provide consent before a child profile is activated.</p></div>
-    <form class="panel signup" id="signup" method="post" action="/api/guardian/children" aria-labelledby="signupTitle">
-      <h2 class="visually-hidden" id="signupTitle">Child profile information</h2>
-      <p class="account-prompt" id="accountPrompt" role="status" aria-live="polite"></p>
-      <section class="section" aria-labelledby="childInfoTitle">
-        <h2 id="childInfoTitle">👧🏾 Child Information</h2>
-        <div class="fields">
-          <div class="field"><label for="childName">Child’s name *</label><input id="childName" name="childName" maxlength="80" autocomplete="off" required placeholder="Enter child’s name"></div>
-          <div class="field"><label for="age">Age group *</label><select id="age" name="age" required><option value="">Select age</option><option value="under_6">Under 6</option><option value="6_8">6–8</option><option value="9_12">9–12</option><option value="13_17">13–17</option></select></div>
-        </div>
-        <div class="field spaced">
-          <fieldset>
-            <legend>Gender (optional)</legend>
-            <div class="choices">
-              <div class="choice"><input type="radio" name="gender" id="boy" value="boy"><label for="boy">👦🏿 Boy</label></div>
-              <div class="choice"><input type="radio" name="gender" id="girl" value="girl"><label for="girl">👧🏾 Girl</label></div>
-              <div class="choice"><input type="radio" name="gender" id="none" value="not_specified"><label for="none">Prefer not to say</label></div>
-            </div>
-          </fieldset>
-        </div>
-        <div class="field spaced">
-          <fieldset>
-            <legend>Choose an avatar</legend>
-            <div class="avatars">
-              <div class="avatar"><input type="radio" name="avatar" id="a1" value="a1" checked><label for="a1">👦🏿</label></div>
-              <div class="avatar"><input type="radio" name="avatar" id="a2" value="a2"><label for="a2">👧🏾</label></div>
-              <div class="avatar"><input type="radio" name="avatar" id="a3" value="a3"><label for="a3">🧒🏽</label></div>
-              <div class="avatar"><input type="radio" name="avatar" id="a4" value="a4"><label for="a4">👳🏾</label></div>
-            </div>
-          </fieldset>
-        </div>
-      </section>
-      <section class="section" aria-labelledby="languagesTitle">
-        <h3 id="languagesTitle">🌍 Preferred Languages *</h3>
-        <p class="muted">Choose one or more languages your child wants to learn.</p>
-        <fieldset><legend class="visually-hidden">Preferred languages</legend><div class="choices">
-          <div class="choice"><input type="checkbox" name="languages" id="yo" value="yoruba"><label for="yo">🇳🇬 Yorùbá</label></div>
-          <div class="choice"><input type="checkbox" name="languages" id="ig" value="igbo"><label for="ig">🇳🇬 Igbo</label></div>
-          <div class="choice"><input type="checkbox" name="languages" id="ha" value="hausa"><label for="ha">🇳🇬 Hausa</label></div>
-          <div class="choice"><input type="checkbox" name="languages" id="pi" value="pidgin"><label for="pi">Pidgin</label></div>
-          <div class="choice"><input type="checkbox" name="languages" id="sw" value="kiswahili"><label for="sw">Kiswahili</label></div>
-          <div class="choice"><input type="checkbox" name="languages" id="ot" value="other"><label for="ot">Other African languages</label></div>
-        </div></fieldset>
-      </section>
-      <section class="section" aria-labelledby="interestsTitle">
-        <h3 id="interestsTitle">🎨 Learning Interests</h3>
-        <fieldset><legend class="visually-hidden">Learning interests</legend><div class="choices">
-          <div class="choice"><input type="checkbox" name="interests" id="stories" value="stories"><label for="stories">📚 Stories</label></div>
-          <div class="choice"><input type="checkbox" name="interests" id="games" value="games"><label for="games">🎮 Games</label></div>
-          <div class="choice"><input type="checkbox" name="interests" id="songs" value="songs"><label for="songs">🎵 Songs</label></div>
-          <div class="choice"><input type="checkbox" name="interests" id="art" value="arts_crafts"><label for="art">🎨 Art &amp; Craft</label></div>
-        </div></fieldset>
-      </section>
-      <section class="section" aria-labelledby="guardianTitle">
-        <h3 id="guardianTitle">👨‍👩‍👧 Parent / Guardian Details</h3>
-        <div class="fields">
-          <div class="field"><label for="parentName">Parent or guardian’s full name *</label><input id="parentName" name="parentName" autocomplete="name" maxlength="100" required placeholder="Your full name"></div>
-          <div class="field"><label for="parentEmail">Parent or guardian’s email *</label><input id="parentEmail" name="parentEmail" type="email" autocomplete="email" spellcheck="false" required readonly></div>
-          <div class="field full"><label for="relationship">Relationship to child *</label><select id="relationship" name="relationship" required><option value="">Select relationship</option><option value="parent">Parent</option><option value="legal_guardian">Legal guardian</option><option value="authorized_caregiver">Other authorized caregiver</option></select></div>
-        </div>
-        <div class="consent">
-          <label for="consent"><input type="checkbox" id="consent" name="consent" required><span>I confirm that I am the child’s parent or legal guardian, or otherwise authorized to provide consent, and I give permission for Idilewa to create this child profile and process the submitted information to provide its learning service. *</span></label>
-          <p>After you submit, we’ll email a secure, single-use link. The child profile stays inactive until you verify your email and confirm this consent.</p>
-        </div>
-        <div class="consent optional-consent">
-          <label for="updates"><input type="checkbox" id="updates" name="updates"><span>I would like to receive optional learning updates and product news by email.</span></label>
-        </div>
-      </section>
-      <div class="honeypot" aria-hidden="true"><label for="website">Leave this field empty</label><input id="website" name="website" tabindex="-1" autocomplete="off"></div>
-      <button class="btn green wide" id="signupButton" type="submit">Create Child Profile →</button>
-      <div class="status" id="signupStatus" role="status" aria-live="polite"></div>
-      <p class="muted signup-footer">Already have an account? <a href="/parents.html#/parent-login">Sign in</a></p>
-    </form>
-    <div class="banner"><div><strong>A brighter future through African languages!</strong><p>Preserving and Promoting African Voice.</p></div><span class="closing-art" aria-hidden="true">🌿📚💚</span></div>
+  <main class="id-auth-route-placeholder">
+    <h1>Child profiles are parent-managed</h1>
+    <p>A parent or guardian account is required to create a child profile and confirm consent. Continue in the secure Idilewa account dialog.</p>
+    <a href="/parents.html#/parent-signup" data-auth-role="child" data-auth-mode="signup">Continue to child profile</a>
   </main>
 </body>
 </html>

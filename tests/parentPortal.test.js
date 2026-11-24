@@ -3,6 +3,7 @@ import { access, readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+const authDialogSource = await readFile(new URL('../src/authDialog.js', import.meta.url), 'utf8');
 const styleSource = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 const clientSource = await readFile(new URL('../src/supabaseClient.js', import.meta.url), 'utf8');
 const callbackSource = await readFile(new URL('../src/authCallback.js', import.meta.url), 'utf8');
@@ -17,14 +18,15 @@ test('Family portal exposes landing, account, dashboard, learning and settings r
     assert.match(appSource, new RegExp(`case '${route}':`));
   }
   assert.match(appSource, /label: 'For Parents', route: 'families'/);
-  assert.match(appSource, /data-form="parent-auth"/);
+  assert.match(appSource, /function renderAuthRoutePlaceholder\(role, mode\)/);
+  assert.match(authDialogSource, /data-auth-form="parent"/);
   assert.match(appSource, /data-form="parent-profile"/);
   assert.match(appSource, /getRoleDashboard\('\/api\/dashboard\/parent'\)/);
 });
 
 test('Parent account registration and email confirmation return to the protected family dashboard', () => {
-  assert.match(appSource, /role: 'parent',\s*redirectRoute: 'parent-dashboard'/);
-  assert.match(appSource, /signInAccount\(\{ email, password, expectedRole: 'parent' \}\)/);
+  assert.match(authDialogSource, /role: 'parent',\s*redirectRoute: 'parent-dashboard'/);
+  assert.match(authDialogSource, /expectedRole = role === 'tutor' \? 'educator' : 'parent'/);
   assert.match(clientSource, /role === 'parent' && phone/);
   assert.match(clientSource, /'parent-dashboard'\]\.includes\(redirectRoute\)/);
   assert.match(callbackSource, /'parent-dashboard'\]\.includes\(next/);

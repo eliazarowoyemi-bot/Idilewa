@@ -62,15 +62,8 @@ import {
   withdrawEducatorConnection,
   updateUserProfile,
   signOut as signOutAccount,
-  signIn as signInAccount,
-  signInWithGoogle,
-  beginEducatorGoogleSignup,
-  isGoogleAuthEnabled,
-  signUp as signUpAccount,
-  verifyEducatorInvite,
   restoreAuthSession,
   sendAuthActivityEmail,
-  isSignupPasswordValid,
   saveProgress,
   getUserProgress,
   saveCodeSubmission
@@ -3572,41 +3565,6 @@ import './src/heritageLibrary.css';
     </div>`;
   }
 
-  function renderTutorAuth(signup) {
-    const title = signup ? 'Create Tutor Account' : 'Welcome Back, Tutor';
-    const currentUser = getCurrentUser();
-    const currentNameParts = (currentUser?.name || '').trim().split(/\s+/);
-    const firstName = signup ? currentNameParts.shift() || '' : '';
-    const lastName = signup ? currentNameParts.join(' ') : '';
-    const email = signup ? currentUser?.email || '' : '';
-    const action = signup ? 'tutor-signup' : 'tutor-login';
-    return `<div class="tutor-auth-page ${signup ? 'tutor-auth-signup-page' : ''}">
-      <header class="tutor-auth-header">${renderTutorBrand()}<nav class="tutor-auth-nav" aria-label="Tutor account navigation">${renderTutorHomeLink()}<a href="#/tutor" data-route="tutor">Back to tutor portal</a></nav></header>
-      <main class="tutor-auth-layout">${signup ? `<aside class="tutor-signup-intro"><span class="tutor-eyebrow"><i></i> ÌDÍLÉWA LIVE TUTORSHIP</span><span class="tutor-signup-badge">A personal way to learn, wherever you are</span><h2>A brighter way<br /><em>to learn together.</em></h2><p>Connect with expert tutors in languages, Mathematics and more — with learning that fits your family.</p><div class="tutor-signup-art"><img src="/assets/tutor-signup-happy-toon.webp" alt="Happy cartoon tutor and children learning together on a laptop" /></div><ul><li><span class="tutor-signup-feature-icon">${icon('play', 17)}</span>Live Zoom lessons</li><li><span class="tutor-signup-feature-icon">${icon('book', 17)}</span>Languages &amp; subjects</li><li><span class="tutor-signup-feature-icon">${icon('chart', 17)}</span>Progress tracking</li><li><span class="tutor-signup-feature-icon">${icon('people', 17)}</span>Parent dashboards</li></ul><p class="tutor-signup-note">For parents, students and tutors. <strong>No payment required to sign up.</strong><span>A valid, one-time educator invitation is required for tutor accounts.</span></p></aside>` : ''}<section class="tutor-auth-card"><div class="tutor-auth-mobile-brand">${renderTutorBrand()}</div><span class="tutor-eyebrow">IDILEWA · EDUCATOR PORTAL</span><h1>${title}</h1><p>${signup ? 'Create your secure tutor account. No payment details are needed to join.' : 'Log in to continue your teaching journey.'}</p>
-        <form class="tutor-auth-form" data-form="${action}" novalidate>
-          ${signup ? `<div class="tutor-signup-progress" aria-label="Account setup steps"><span class="is-current"><b>1</b> Account</span><i></i><span><b>2</b> Email check</span><i></i><span><b>3</b> Dashboard</span></div><div class="tutor-signup-fields">
-            <label>First name<input name="firstName" autocomplete="given-name" maxlength="40" placeholder="First name" value="${esc(firstName)}" data-google-required required /></label>
-            <label>Last name<input name="lastName" autocomplete="family-name" maxlength="40" placeholder="Last name" value="${esc(lastName)}" data-google-required required /></label>
-            <label class="tutor-signup-span">Email address<input name="email" type="email" autocomplete="email" maxlength="180" placeholder="you@example.com" value="${esc(email)}" required /></label>
-            <label>Country<select name="country" data-google-required required><option value="">Choose country</option><option>United Kingdom</option><option>Nigeria</option><option>Ghana</option><option>United States</option><option>Canada</option><option>Other</option></select></label>
-            <label>Time zone<select name="timeZone" data-google-required required><option value="">Choose time zone</option><option value="Europe/London">UK / London</option><option value="Africa/Lagos">Nigeria / Lagos</option><option value="Africa/Accra">Ghana / Accra</option><option value="America/New_York">US / Eastern</option><option value="America/Los_Angeles">US / Pacific</option><option value="other">Other</option></select></label>
-            <label class="tutor-signup-span">Educator invitation code<input name="inviteCode" autocomplete="one-time-code" maxlength="64" placeholder="Enter your one-time code" data-google-required required /><small>Invitations are one-time use and expire for your security.</small></label>
-            <label>Main teaching subject<select name="teachingSubject" data-google-required required><option value="">Choose a subject</option><option>Yorùbá</option><option>Igbo</option><option>Hausa</option><option>Arabic</option><option>Kiswahili</option><option>Mathematics</option><option>English</option><option>Science</option><option>Coding</option><option>Other</option></select></label>
-            <label>Teaching experience<select name="teachingExperience" data-google-required required><option value="">Choose experience</option><option>Less than 1 year</option><option>1–3 years</option><option>4–7 years</option><option>8+ years</option></select></label>
-            <label class="tutor-signup-span">Qualifications and experience<textarea name="qualifications" maxlength="600" rows="3" placeholder="Share relevant teaching experience or qualifications (optional)"></textarea></label>
-            <label class="tutor-signup-span">Password<span class="tutor-password-field"><input id="tutor-password" name="password" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Create a password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-password" aria-label="Show password">${icon('eye', 15)}</button></span></label>
-            <label class="tutor-signup-span">Confirm password<span class="tutor-password-field"><input id="tutor-confirm-password" name="confirmPassword" type="password" autocomplete="new-password" minlength="12" maxlength="128" placeholder="Confirm your password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-confirm-password" aria-label="Show password">${icon('eye', 15)}</button></span></label>
-          </div><small class="tutor-password-guidance">Use 12–128 characters, including uppercase and lowercase letters, a number, and a symbol.</small><label class="tutor-check-label tutor-signup-terms"><input type="checkbox" name="agreement" data-google-required required /> I agree to follow Idilewa’s child-safeguarding and privacy requirements.</label>` : `<label>Email Address<input name="email" type="email" autocomplete="email" placeholder="Enter your email" required /></label><label>Password<span class="tutor-password-field"><input id="tutor-password" name="password" type="password" autocomplete="current-password" minlength="12" maxlength="128" placeholder="Enter your password" required /><button type="button" class="tutor-password-toggle" data-action="tutor-toggle-password" data-target="tutor-password" aria-label="Show password">${icon('eye', 15)}</button></span></label><div class="tutor-auth-options"><label class="tutor-check-label"><input type="checkbox" name="remember" /> Remember me</label></div>`}
-          <p class="tutor-auth-error" role="alert" aria-live="polite" hidden></p>
-          <button type="submit" class="tutor-button tutor-button-primary tutor-auth-submit">${signup ? 'Create Account' : 'Login'} ${icon('arrow', 15)}</button>
-        </form>
-        <div class="tutor-google-auth" data-google-auth hidden><div class="tutor-google-divider"><span>or</span></div><button type="button" class="tutor-google-button" data-action="${signup ? 'tutor-google-signup' : 'tutor-google-login'}"><svg aria-hidden="true" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94a11.05 11.05 0 0 1-4.8 7.24l7.75 6.01c4.52-4.18 7.09-10.34 7.09-17.72Z"/><path fill="#FBBC05" d="M10.53 28.59a14.4 14.4 0 0 1-.75-4.59c0-1.59.27-3.13.75-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19Z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.73l-7.75-6.01c-2.15 1.45-4.9 2.31-8.15 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"/></svg>Continue with Google</button>${signup ? '<small class="tutor-google-note">Google sign-up uses the email on your Google account and still requires the tutor details and one-time invitation above.</small>' : ''}</div>
-        <p class="tutor-auth-switch">${signup ? 'Already have an account?' : 'Don’t have an account?'} <a href="#/${signup ? 'tutor-login' : 'tutor-signup'}" data-route="${signup ? 'tutor-login' : 'tutor-signup'}">${signup ? 'Sign in' : 'Sign up'}</a></p>
-        <small class="tutor-auth-security">${icon('lock', 13)} Secure educator access · family consent is always required</small>
-      </section>${signup ? '' : `<aside class="tutor-auth-art"><img src="/assets/${image}" alt="Idilewa language tutor working at a laptop" /><div class="tutor-auth-art-caption">Better Language Skills<br /><strong>Brighter Futures</strong></div></aside>`}</main>
-    </div>`;
-  }
-
   function renderTutorWorkspace(page, title, content) {
     if (!isTutorAccount()) {
       return `<div class="tutor-access-page"><section class="tutor-access-card"><span class="tutor-access-icon">${icon('lock', 22)}</span><span class="tutor-eyebrow">Educator access</span><h1>Sign in to your tutor portal.</h1><p>Only verified educator accounts can view their dashboard and parent-approved student connections.</p><a class="tutor-button tutor-button-primary" href="#/tutor-login?next=${page}" data-route="tutor-login">Tutor sign in ${icon('arrow', 15)}</a></section></div>`;
@@ -3757,8 +3715,8 @@ import './src/heritageLibrary.css';
 
   function renderTutorPortal(page) {
     if (page === 'tutor') return renderTutorLanding();
-    if (page === 'tutor-login') return renderTutorAuth(false);
-    if (page === 'tutor-signup') return renderTutorAuth(true);
+    if (page === 'tutor-login') return renderAuthRoutePlaceholder('tutor', 'signin');
+    if (page === 'tutor-signup') return renderAuthRoutePlaceholder('tutor', 'signup');
     if (page === 'tutor-dashboard') return renderTutorDashboard();
     if (page === 'tutor-find-child') return renderTutorFindChild();
     if (page === 'tutor-students') return renderTutorStudents();
@@ -4542,34 +4500,18 @@ import './src/heritageLibrary.css';
     </div>`;
   }
 
+  function renderAuthRoutePlaceholder(role, mode) {
+    const accountType = role === 'tutor' ? 'tutor' : 'parent';
+    const authMode = mode === 'signin' ? 'signin' : 'signup';
+    return `<main class="id-auth-route-placeholder">
+      <h1>Account access</h1>
+      <p>Parent, tutor, and child-profile sign in and sign up now open in Idilewa’s shared secure account dialog.</p>
+      <a href="/" data-auth-role="${role}" data-auth-mode="${authMode}">Open ${accountType} ${authMode === 'signin' ? 'sign in' : 'sign up'}</a>
+    </main>`;
+  }
+
   function renderParentAuth(signup) {
-    const imageAlt = signup
-      ? 'A family sharing a language-learning activity'
-      : 'A parent and children learning together';
-    return `<div class="family-auth-page">
-      <header class="family-auth-header">${renderParentBrand()}<a href="#/families" data-route="families">Back to For Parents</a></header>
-      <main class="family-auth-layout">
-        <section class="family-auth-card"><div class="family-auth-mobile-brand">${renderParentBrand()}</div>
-          <span class="family-eyebrow">${signup ? 'Join the Idilewa family' : 'Welcome back'}</span>
-          <h1>${signup ? 'Create Parent Account' : 'Parent Login'}</h1>
-          <p>${signup ? 'Create your account and give your child the gift of a global voice.' : 'Welcome back. Please log in to your account to continue.'}</p>
-          <form class="family-auth-form" data-form="parent-auth" data-mode="${signup ? 'signup' : 'signin'}">
-            ${signup ? `<label>Full Name<input name="name" autocomplete="name" maxlength="60" placeholder="Enter your full name" required /></label>` : ''}
-            <label>Email Address<input id="authEmail" name="email" type="email" autocomplete="email" maxlength="254" placeholder="Enter your email" required /></label>
-            ${signup ? `<label>Phone Number<input name="phone" type="tel" autocomplete="tel" maxlength="24" placeholder="Enter your phone number" required /></label>` : ''}
-            <label>Password<input id="authPassword" name="password" type="password" autocomplete="${signup ? 'new-password' : 'current-password'}" minlength="${signup ? '12' : '1'}" maxlength="128" placeholder="${signup ? 'Create a password' : 'Enter your password'}" required /></label>
-            ${signup
-              ? '<small class="family-password-note">Use 12 or more characters, including uppercase and lowercase letters, a number and a symbol.</small>'
-              : `<div class="family-auth-options"><label class="family-remember"><input type="checkbox" name="remember" /> Remember me</label></div>`}
-            <p class="family-auth-error" role="alert" hidden></p>
-            <sakuga-button type="submit" class="family-auth-submit">${signup ? 'Create Account' : 'Login'} ${icon('arrow', 15)}</sakuga-button>
-          </form>
-          <p class="family-auth-switch">${signup ? 'Already have an account?' : 'Don’t have an account?'} <a href="#/parent-${signup ? 'login' : 'signup'}" data-route="parent-${signup ? 'login' : 'signup'}">${signup ? 'Log in' : 'Sign up'}</a></p>
-          <small class="family-auth-safe-note">${icon('lock', 13)} Your account is protected by Idilewa sign-in.</small>
-        </section>
-        <aside class="family-auth-art"><img src="./assets/home-family-learning.jpg" alt="${imageAlt}" /><div class="family-auth-art-caption"><span>${signup ? 'Their future' : 'Learn. Grow.'}</span><strong>${signup ? 'matters.' : 'Achieve.'}</strong><i aria-hidden="true">♡</i></div></aside>
-      </main>
-    </div>`;
+    return renderAuthRoutePlaceholder('parent', signup ? 'signup' : 'signin');
   }
 
   function renderParentWelcome() {
@@ -6222,16 +6164,6 @@ import './src/heritageLibrary.css';
     return storageError;
   }
 
-  function syncGoogleAuthAvailability(page) {
-    if (!page.startsWith('tutor')) return;
-    const block = document.querySelector('.tutor-google-auth[data-google-auth]');
-    if (!block) return;
-    void isGoogleAuthEnabled().then((enabled) => {
-      if (!block.isConnected) return;
-      block.hidden = !enabled;
-    });
-  }
-
   function syncHeaderScroll() {
     const header = document.getElementById('site-header');
     if (!header) return;
@@ -6303,7 +6235,6 @@ import './src/heritageLibrary.css';
       });
     }
     if (page.startsWith('tutor')) loadTutorPortalData();
-    syncGoogleAuthAvailability(page);
     if (page.startsWith('parent-') && !['parent-login', 'parent-signup', 'parent-welcome'].includes(page)
       && getCurrentUser()?.role === 'parent' && !parentDashboardData && !parentDashboardError) {
       void loadParentPortalData();
@@ -6565,83 +6496,6 @@ import './src/heritageLibrary.css';
           showToast('Booking requests open once secure checkout is enabled. Tell us your preferred slot.');
         }
         break;
-      case 'tutor-toggle-password': {
-        const input = document.getElementById(el.dataset.target || '');
-        if (!input) break;
-        const reveal = input.type === 'password';
-        input.type = reveal ? 'text' : 'password';
-        el.setAttribute('aria-label', reveal ? 'Hide password' : 'Show password');
-        el.innerHTML = icon(reveal ? 'eyeOff' : 'eye', 15);
-        break;
-      }
-      case 'tutor-google-login': {
-        const form = document.querySelector('[data-form="tutor-login"]');
-        const errorElement = form?.querySelector('.tutor-auth-error');
-        const originalMarkup = el.innerHTML;
-        const fail = (error) => {
-          if (errorElement) {
-            errorElement.textContent = error instanceof Error ? error.message : 'Google sign-in could not be started.';
-            errorElement.hidden = false;
-          }
-          el.disabled = false;
-          el.innerHTML = originalMarkup;
-        };
-        if (!isSupabaseConfigured || !supabase) {
-          fail(new Error('Google sign-in is not configured on this deployment. Please try again later.'));
-          break;
-        }
-        el.disabled = true;
-        el.textContent = 'Connecting to Google…';
-        void signInWithGoogle().catch(fail);
-        break;
-      }
-      case 'tutor-google-signup': {
-        const form = document.querySelector('[data-form="tutor-signup"]');
-        const errorElement = form?.querySelector('.tutor-auth-error');
-        if (!form) break;
-        if (!isSupabaseConfigured || !supabase) {
-          if (errorElement) {
-            errorElement.textContent = 'Google sign-up is not configured on this deployment. Please try again later.';
-            errorElement.hidden = false;
-          }
-          break;
-        }
-        const invalidField = [...form.querySelectorAll('[data-google-required]')]
-          .find((field) => !field.checkValidity());
-        if (invalidField) {
-          invalidField.reportValidity();
-          break;
-        }
-        const formData = new FormData(form);
-        const originalMarkup = el.innerHTML;
-        const fail = (error) => {
-          if (errorElement) {
-            errorElement.textContent = error instanceof Error ? error.message : 'Google tutor sign-up could not be started.';
-            errorElement.hidden = false;
-          }
-          el.disabled = false;
-          el.innerHTML = originalMarkup;
-        };
-        if (errorElement) {
-          errorElement.textContent = '';
-          errorElement.hidden = true;
-        }
-        el.disabled = true;
-        el.textContent = 'Connecting to Google…';
-        void beginEducatorGoogleSignup({
-          firstName: String(formData.get('firstName') || ''),
-          lastName: String(formData.get('lastName') || ''),
-          inviteCode: String(formData.get('inviteCode') || ''),
-          educatorProfile: {
-            country: String(formData.get('country') || ''),
-            timeZone: String(formData.get('timeZone') || ''),
-            teachingSubject: String(formData.get('teachingSubject') || ''),
-            teachingExperience: String(formData.get('teachingExperience') || ''),
-            qualifications: String(formData.get('qualifications') || ''),
-          },
-        }).catch(fail);
-        break;
-      }
       case 'tutor-toggle-preference': {
         const key = el.dataset.setting;
         if (!['emailUpdates', 'lessonReminders'].includes(key)) break;
@@ -7646,81 +7500,6 @@ import './src/heritageLibrary.css';
       return;
     }
     const data = new FormData(form);
-    if (type === 'parent-auth') {
-      if (!form.reportValidity()) return;
-      const errorElement = form.querySelector('.family-auth-error');
-      const submitButton = form.querySelector('button[type="submit"], sakuga-button[type="submit"]');
-      const showSubmitSuccess = () => {
-        if (typeof submitButton?.done === 'function') submitButton.done();
-      };
-      const fail = (message) => {
-        if (errorElement) {
-          errorElement.textContent = message;
-          errorElement.hidden = false;
-        } else showToast(message, 'error');
-      };
-      if (!isSupabaseConfigured || !supabase) {
-        fail('Family accounts are not configured on this deployment. Please try again later.');
-        return;
-      }
-      if (errorElement) {
-        errorElement.textContent = '';
-        errorElement.hidden = true;
-      }
-      if (submitButton) submitButton.disabled = true;
-      try {
-        const mode = form.dataset.mode;
-        const email = String(data.get('email') || '').trim();
-        const password = String(data.get('password') || '');
-        if (mode === 'signup') {
-          const name = String(data.get('name') || '').trim();
-          const phone = String(data.get('phone') || '').trim();
-          if (!/^\+?[0-9\s()-]{7,24}$/.test(phone)) throw new Error('Enter a valid phone number.');
-          if (!isSignupPasswordValid(password)) throw new Error('Use 12–128 characters with uppercase and lowercase letters, a number, and a symbol.');
-          const { session, welcomeEmailError } = await signUpAccount({
-            email,
-            password,
-            name,
-            phone,
-            role: 'parent',
-            redirectRoute: 'parent-dashboard'
-          });
-          showSubmitSuccess();
-          parentDashboardData = null;
-          parentDashboardError = '';
-          parentDashboardLoading = false;
-          parentDashboardRequest += 1;
-          navigate('parent-welcome');
-          if (!session) {
-            showToast('Account created. Confirm your email to finish setting up your parent account.', 'success');
-          } else if (welcomeEmailError) {
-            showToast(`Your parent account is ready. ${welcomeEmailError}`, 'error');
-          } else {
-            showToast('Your parent account is ready.', 'success');
-          }
-          return;
-        }
-        await signInAccount({ email, password, expectedRole: 'parent' });
-        showSubmitSuccess();
-        parentDashboardData = null;
-        parentDashboardError = '';
-        parentDashboardLoading = false;
-        parentDashboardRequest += 1;
-        let activityEmailError = '';
-        try {
-          await sendAuthActivityEmail('sign-in');
-        } catch (error) {
-          activityEmailError = error instanceof Error ? error.message : 'The sign-in notification could not be sent.';
-        }
-        navigate('parent-dashboard');
-        showToast(activityEmailError ? `Signed in successfully. ${activityEmailError}` : 'Welcome to your family portal.', activityEmailError ? 'error' : 'success');
-      } catch (error) {
-        fail(error instanceof Error ? error.message : 'Your parent account could not be verified.');
-      } finally {
-        if (submitButton?.isConnected) submitButton.disabled = false;
-      }
-      return;
-    }
     if (type === 'parent-profile') {
       if (!form.reportValidity()) return;
       const errorElement = form.querySelector('.family-auth-error');
@@ -7750,80 +7529,7 @@ import './src/heritageLibrary.css';
       }
       return;
     }
-    if (type === 'tutor-login' || type === 'tutor-signup') {
-      if (!form.reportValidity()) return;
-      const errorElement = form.querySelector('.tutor-auth-error');
-      const submitButton = form.querySelector('button[type="submit"]');
-      const fail = (message) => {
-        if (errorElement) {
-          errorElement.textContent = message;
-          errorElement.hidden = false;
-        } else showToast(message, 'error');
-      };
-      if (!isSupabaseConfigured || !supabase) {
-        fail('Educator accounts are not configured on this deployment. Please try again later.');
-        return;
-      }
-      if (errorElement) {
-        errorElement.textContent = '';
-        errorElement.hidden = true;
-      }
-      if (submitButton) submitButton.disabled = true;
-      try {
-        const email = String(data.get('email') || '').trim();
-        const password = String(data.get('password') || '');
-        if (type === 'tutor-signup') {
-          const firstName = String(data.get('firstName') || '').trim();
-          const lastName = String(data.get('lastName') || '').trim();
-          const name = `${firstName} ${lastName}`.trim();
-          const inviteCode = String(data.get('inviteCode') || '').trim();
-          if (!firstName || !lastName || name.length > 80) throw new Error('Enter a first and last name using no more than 80 characters.');
-          if (!data.get('agreement')) throw new Error('Please agree to follow Idilewa’s safeguarding and privacy requirements.');
-          if (password !== String(data.get('confirmPassword') || '')) throw new Error('The passwords do not match.');
-          if (!isSignupPasswordValid(password)) throw new Error('Use 12–128 characters with uppercase and lowercase letters, a number, and a symbol.');
-          const educatorProfile = {
-            country: String(data.get('country') || '').trim(),
-            timeZone: String(data.get('timeZone') || '').trim(),
-            teachingSubject: String(data.get('teachingSubject') || '').trim(),
-            teachingExperience: String(data.get('teachingExperience') || '').trim(),
-            qualifications: String(data.get('qualifications') || '').trim(),
-          };
-          const educatorInviteId = await verifyEducatorInvite(inviteCode);
-          const { session, welcomeEmailError } = await signUpAccount({
-            email,
-            password,
-            name,
-            role: 'educator',
-            educatorInviteId,
-            educatorProfile,
-            redirectRoute: 'tutor-login'
-          });
-          if (!session) {
-            navigate('tutor-login');
-            showToast('Account created. Confirm your email to finish setting up your tutor account.', 'success');
-            return;
-          }
-          navigate('tutor-dashboard');
-          showToast(welcomeEmailError ? `Your tutor account is ready. ${welcomeEmailError}` : 'Your tutor account is ready.', welcomeEmailError ? 'error' : 'success');
-          return;
-        }
-        await signInAccount({ email, password, expectedRole: 'educator' });
-        tutorDashboardData = null;
-        tutorDashboardDataPage = '';
-        let activityEmailError = '';
-        try {
-          await sendAuthActivityEmail('sign-in');
-        } catch (error) {
-          activityEmailError = error instanceof Error ? error.message : 'The sign-in notification could not be sent.';
-        }
-        navigate('tutor-dashboard');
-        showToast(activityEmailError ? `Signed in successfully. ${activityEmailError}` : 'Welcome to your tutor portal.', activityEmailError ? 'error' : 'success');
-      } catch (error) {
-        fail(error instanceof Error ? error.message : 'Your tutor account could not be verified.');
-      } finally {
-        if (submitButton?.isConnected) submitButton.disabled = false;
-      }
-    } else if (type === 'tutor-find-child') {
+    if (type === 'tutor-find-child') {
       const childEmail = String(data.get('childEmail') || '').trim();
       const submitButton = form.querySelector('button[type="submit"]');
       const feedback = form.querySelector('[data-tutor-connection-feedback]');

@@ -3,31 +3,29 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+const authDialogSource = await readFile(new URL('../src/authDialog.js', import.meta.url), 'utf8');
+const authDialogStyleSource = await readFile(new URL('../src/authDialog.css', import.meta.url), 'utf8');
 const authClientSource = await readFile(new URL('../src/supabaseClient.js', import.meta.url), 'utf8');
 const callbackSource = await readFile(new URL('../src/authCallback.js', import.meta.url), 'utf8');
 const apiSource = await readFile(new URL('../src/server/educatorVerifyInvite.js', import.meta.url), 'utf8');
 const migrationSource = await readFile(new URL('../supabase/migrations/20261111000000_educator_google_signup.sql', import.meta.url), 'utf8');
 
-test('tutor signup uses the exact supplied artwork and matches the reference content', async () => {
-  const markup = appSource.match(/<aside class="tutor-signup-intro">([\s\S]*?)<\/aside>/)?.[1] || '';
-  const image = await readFile(new URL('../public/assets/tutor-signup-happy-toon.webp', import.meta.url));
-
-  assert.match(markup, /A personal way to learn, wherever you are/);
-  assert.match(markup, /A brighter way<br \/><em>to learn together\.<\/em>/);
-  assert.match(markup, /Connect with expert tutors in languages, Mathematics and more/);
-  assert.match(markup, /src="\/assets\/tutor-signup-happy-toon\.webp"/);
-  assert.match(markup, /Live Zoom lessons/);
-  assert.match(markup, /Parent dashboards/);
-  assert.deepEqual([...image.subarray(0, 4)], [0x52, 0x49, 0x46, 0x46]);
-  assert.equal(image.toString('ascii', 8, 12), 'WEBP');
+test('tutor signup uses the shared responsive popup and Idilewa visual identity', () => {
+  assert.match(authDialogSource, /<dialog class="id-auth-dialog"/);
+  assert.match(authDialogSource, /<h2>Bring your language closer\.<\/h2>/);
+  assert.match(authDialogSource, /A brass desk lamp with a pull cord/);
+  assert.match(authDialogSource, /Create your tutor account/);
+  assert.match(authDialogSource, /Invitations are one-time use and expire for your security/);
+  assert.match(authDialogStyleSource, /#1b4332/);
+  assert.match(authDialogStyleSource, /@media \(max-width: 900px\)/);
+  assert.match(authDialogStyleSource, /@media \(max-width: 560px\)/);
+  assert.doesNotMatch(appSource, /renderTutorAuth|data-form="tutor-(?:login|signup)"/);
 });
 
 test('tutor account pages offer Google sign-in and invite-gated Google registration', () => {
-  assert.match(appSource, /data-action="\$\{signup \? 'tutor-google-signup' : 'tutor-google-login'\}"/);
-  assert.match(appSource, /case 'tutor-google-login'/);
-  assert.match(appSource, /case 'tutor-google-signup'/);
-  assert.match(appSource, /data-google-required required/);
-  assert.match(appSource, /beginEducatorGoogleSignup\(\{/);
+  assert.match(authDialogSource, /data-auth-google-action="\$\{signup \? 'signup' : 'signin'\}"/);
+  assert.match(authDialogSource, /data-google-required required/);
+  assert.match(authDialogSource, /beginEducatorGoogleSignup\(\{/);
   assert.match(authClientSource, /signInWithOAuth\(\{\s*provider: 'google'/);
   assert.match(authClientSource, /verifyEducatorInvite\(inviteCode\)/);
   assert.match(authClientSource, /verify-invite\?action=complete-google-signup/);

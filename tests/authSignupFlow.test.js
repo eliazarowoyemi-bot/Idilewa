@@ -4,21 +4,30 @@ import test from 'node:test';
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const supabaseClientSource = await readFile(new URL('../src/supabaseClient.js', import.meta.url), 'utf8');
+const authDialogSource = await readFile(new URL('../src/authDialog.js', import.meta.url), 'utf8');
+const childSignupSource = await readFile(new URL('../kids-signup.html', import.meta.url), 'utf8');
 
-test('family signup collects parent details and consent flows land on the signup screen', () => {
-  assert.match(appSource, /data-form="parent-auth" data-mode="\$\{signup \? 'signup' : 'signin'\}"/);
-  assert.match(appSource, /<label>Full Name<input name="name" autocomplete="name"/);
-  assert.match(appSource, /<label>Phone Number<input name="phone" type="tel"/);
-  assert.match(appSource, /Use 12 or more characters, including uppercase and lowercase letters, a number and a symbol\./);
-  assert.match(appSource, /if \(mode === 'signup'\) \{/);
-  assert.match(appSource, /role: 'parent',\s*redirectRoute: 'parent-dashboard'/);
+test('parent, tutor, and child flows share the popup while child profiles remain guardian-managed', () => {
+  assert.match(authDialogSource, /<dialog class="id-auth-dialog"/);
+  assert.match(authDialogSource, /event\.key === 'Escape' && dialog\.open[\s\S]*?dialog\.close\('dismissed'\)/);
+  assert.match(authDialogSource, /data-auth-form="parent"/);
+  assert.match(authDialogSource, /data-auth-form="tutor"/);
+  assert.match(authDialogSource, /function childForm\(\)/);
+  assert.match(authDialogSource, /A verified parent account manages the profile and confirms consent/);
+  assert.match(authDialogSource, /\/api\/guardian\/children/);
+  assert.match(authDialogSource, /consent: formData\.get\('consent'\) === 'on'/);
+  assert.doesNotMatch(childSignupSource, /<form[^>]*action="\/api\/guardian\/children"/);
+  assert.match(childSignupSource, /src="\/src\/authDialog\.js"/);
+  assert.match(authDialogSource, /if \(role === 'parent' && mode === 'signup'\)/);
+  assert.match(authDialogSource, /role: 'parent',\s*redirectRoute: 'parent-dashboard'/);
   assert.match(appSource, /case 'consent-signup': navigate\('parent-signup'\); break;/);
-  assert.match(appSource, /Create Parent Account/);
+  assert.doesNotMatch(appSource, /data-form="parent-auth"/);
+  assert.doesNotMatch(appSource, /renderTutorAuth|data-form="tutor-(?:login|signup)"/);
   assert.doesNotMatch(appSource, /renderLogin\(|modern-auth/);
 });
 
 test('signup handles both immediate sessions and confirmation-required accounts', async () => {
-  assert.match(appSource, /if \(!session\) \{[\s\S]*?Account created\. Confirm your email/);
+  assert.match(authDialogSource, /if \(!session\) \{\s*setConfirmation/);
   assert.doesNotMatch(appSource, /await signOutAccount\(\{ notify: false \}\)/);
   assert.match(supabaseClientSource, /confirmationRequired: !data\.session/);
   assert.match(supabaseClientSource, /emailRedirectTo: new URL\('\/auth-callback\.html\?next=index'/);
@@ -59,7 +68,7 @@ test('homepage hero and language cards use their supplied images in language ord
 
 test('parent sign-in is password-based on the family auth screen', () => {
   assert.doesNotMatch(appSource, /request-signin-otp|resend-signup-otp|signup-otp|request-child-signin-code/);
-  assert.match(appSource, /await signInAccount\(\{ email, password, expectedRole: 'parent' \}\)/);
+  assert.match(authDialogSource, /await signIn\(\{ email, password, expectedRole \}\)/);
   assert.match(supabaseClientSource, /expectedRole === 'adult' && \['parent', 'educator'\]\.includes\(userRecord\.role\)/);
   assert.match(supabaseClientSource, /if \(expectedRole && userRecord\.role !== expectedRole\s*&& !\(expectedRole === 'adult' && \['parent', 'educator'\]\.includes\(userRecord\.role\)\)\)/);
   assert.match(supabaseClientSource, /Email codes are only available for child sign-in and password recovery/);
@@ -76,21 +85,21 @@ test('legacy login routes redirect to the family auth screens', () => {
 });
 
 test('family auth screens keep their heading, email label and form mode in sync', () => {
-  assert.match(appSource, /<h1>\$\{signup \? 'Create Parent Account' : 'Parent Login'\}<\/h1>/);
-  assert.match(appSource, /<label>Email Address<input id="authEmail" name="email" type="email" autocomplete="email"/);
-  assert.match(appSource, /data-mode="\$\{signup \? 'signup' : 'signin'\}"/);
+  assert.match(authDialogSource, /id-auth-dialog-title/);
+  assert.match(authDialogSource, /id="id-auth-parent-email" name="email" type="email"/);
+  assert.match(authDialogSource, /data-auth-form="parent" data-mode="\$\{state\.mode\}"/);
+  assert.match(appSource, /return renderAuthRoutePlaceholder\('parent', signup \? 'signup' : 'signin'\)/);
   assert.doesNotMatch(appSource, /forgot-link|form-label-row|authPageHeading/);
 });
 
 test('family sign-in errors render inline above the submit button', () => {
-  assert.match(appSource, /<p class="family-auth-error" role="alert" hidden><\/p>/);
-  assert.match(appSource, /errorElement\.hidden = false;/);
-  assert.match(appSource, /Your parent account could not be verified\./);
+  assert.match(authDialogSource, /data-auth-feedback role="\$\{feedback\?\.kind === 'error' \? 'alert' : 'status'\}"/);
+  assert.match(authDialogSource, /Your account could not be verified\. Please try again\./);
   assert.doesNotMatch(appSource, /id="authInlineError"/);
 });
 
 test('sign-in and sign-out activity emails are sent without blocking local logout', () => {
-  assert.match(appSource, /await sendAuthActivityEmail\('sign-in'\)/);
+  assert.match(authDialogSource, /await sendAuthActivityEmail\('sign-in'\)/);
   assert.match(supabaseClientSource, /body: JSON\.stringify\(\{ event: 'sign-out' \}\)/);
   assert.match(supabaseClientSource, /supabase\.auth\.signOut\(\{ scope: 'local' \}\)/);
   assert.match(supabaseClientSource, /return \{\s*signedOut: true,\s*activityEmailError:/);

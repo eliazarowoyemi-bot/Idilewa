@@ -229,17 +229,16 @@ test('pricing, payment, and child signup use their standalone page scripts', asy
   assert.match(transformed, /src="\/src\/pricingPage\.js"/);
   assert.doesNotMatch(transformed, /src="\.\/app\.js"/);
   assertSupportAssistant(transformed);
-  for (const [filename, script] of [
-    ['payment.html', '/src/paymentPage.js'],
-    ['kids-signup.html', '/src/kidsSignupPage.js'],
-  ]) {
+  for (const [filename, script] of [['payment.html', '/src/paymentPage.js']]) {
     const page = await readFile(resolve(rootDirectory, filename), 'utf8');
     assert.equal(transformEntry(filename, page), page);
     assert.match(page, new RegExp(`src="${script.replaceAll('/', '\\/')}"`));
     assert.match(page, /class="art"/);
   }
   const childSignup = await readFile(resolve(rootDirectory, 'kids-signup.html'), 'utf8');
-  assert.match(childSignup, /<form[^>]*method="post"[^>]*action="\/api\/guardian\/children"/);
+  assert.match(childSignup, /src="\/src\/authDialog\.js"/);
+  assert.match(childSignup, /data-auth-role="child"/);
+  assert.doesNotMatch(childSignup, /<form[^>]*action="\/api\/guardian\/children"/);
 });
 
 test('public FAQ and pricing pages keep the primary destinations and grouped site directory', async () => {

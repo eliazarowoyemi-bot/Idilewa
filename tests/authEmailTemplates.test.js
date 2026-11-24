@@ -22,10 +22,11 @@ test('signup requires email confirmation and the frontend has no signup code ste
   const template = await readFile(new URL('../supabase/templates/confirmation.html', import.meta.url), 'utf8');
   const config = await readFile(new URL('../supabase/config.toml', import.meta.url), 'utf8');
   const app = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+  const authDialog = await readFile(new URL('../src/authDialog.js', import.meta.url), 'utf8');
   assert.match(config, /^\[auth\.email\]\s*[\s\S]*?^enable_confirmations = true$/m);
-  assert.doesNotMatch(app, /signup-otp|verifySignupOtp|resendSignupOtp/);
+  assert.doesNotMatch(`${app}\n${authDialog}`, /signup-otp|verifySignupOtp|resendSignupOtp/);
   assert.match(template, /{{ \.ConfirmationURL }}/);
-  assert.match(app, /Account created\. Confirm your email/);
+  assert.match(authDialog, /Account created\. Confirm your email/);
   assert.match(template, /https:\/\/idilewa\.com\/assets\/idilewa-mark\.png/);
   assert.match(template, /Ìdíléwa[\s\S]*Our Language\. Our Future\./);
   assert.doesNotMatch(template, /Learn · Speak · Grow|African languages, stories, culture/);

@@ -4,6 +4,7 @@ import test from 'node:test';
 import { normalizeEducatorProfile } from '../src/supabaseClient.js';
 
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
+const authDialogSource = await readFile(new URL('../src/authDialog.js', import.meta.url), 'utf8');
 const styleSource = await readFile(new URL('../styles.css', import.meta.url), 'utf8');
 const supabaseClientSource = await readFile(new URL('../src/supabaseClient.js', import.meta.url), 'utf8');
 const authCallbackSource = await readFile(new URL('../src/authCallback.js', import.meta.url), 'utf8');
@@ -19,20 +20,20 @@ test('Tutor Portal provides independent routes for every supplied interface', ()
     assert.match(appSource, new RegExp(`case '${route}':`));
   }
   assert.match(appSource, /label: 'For Tutors', route: 'tutor'/);
-  assert.match(appSource, /const action = signup \? 'tutor-signup' : 'tutor-login'/);
-  assert.match(appSource, /data-form="\$\{action\}"/);
+  assert.match(appSource, /if \(page === 'tutor-login'\) return renderAuthRoutePlaceholder\('tutor', 'signin'\)/);
+  assert.match(authDialogSource, /data-auth-form="tutor"/);
 });
 
 test('tutor landing, authentication, and workspace link back to the main Idilewa home', () => {
   assert.match(appSource, /function renderTutorHomeLink\(\)[\s\S]*?href="\/" aria-label="Go to Idilewa home"/);
-  assert.match(appSource, /tutor-auth-nav[^>]*aria-label="Tutor account navigation"/);
+  assert.match(appSource, /function renderAuthRoutePlaceholder\(role, mode\)/);
   assert.match(appSource, /tutor-topbar-home[^>]*href="\/"/);
 });
 
 test('educator registration verifies invitation and preserves the educator role', () => {
-  assert.match(appSource, /verifyEducatorInvite\(inviteCode\)/);
-  assert.match(appSource, /role: 'educator',\s*educatorInviteId,\s*educatorProfile,\s*redirectRoute: 'tutor-login'/);
-  assert.match(appSource, /educatorProfile,/);
+  assert.match(authDialogSource, /verifyEducatorInvite\(String\(formData\.get\('inviteCode'\)/);
+  assert.match(authDialogSource, /role: 'educator',\s*educatorInviteId,\s*educatorProfile/);
+  assert.match(authDialogSource, /educatorProfile:/);
   assert.match(supabaseClientSource, /export async function verifyEducatorInvite\(code\)/);
   assert.match(supabaseClientSource, /role === 'educator'.*educatorInviteId/);
   assert.match(supabaseClientSource, /teaching_subject: normalizedEducatorProfile\.teachingSubject/);
@@ -57,10 +58,10 @@ test('educator signup captures and validates profile details before authenticati
   });
   assert.throws(() => normalizeEducatorProfile({ ...profile, teachingSubject: 'Learner records' }), /teaching subject/);
   assert.throws(() => normalizeEducatorProfile({ ...profile, qualifications: 'x'.repeat(601) }), /600 characters/);
-  assert.match(appSource, /name="firstName"/);
-  assert.match(appSource, /name="lastName"/);
-  assert.match(appSource, /name="timeZone"/);
-  assert.match(appSource, /name="teachingExperience"/);
+  assert.match(authDialogSource, /name="firstName"/);
+  assert.match(authDialogSource, /name="lastName"/);
+  assert.match(authDialogSource, /name="timeZone"/);
+  assert.match(authDialogSource, /name="teachingExperience"/);
 });
 
 test('legacy tutor application and dashboard navigation enter real educator auth routes', () => {
