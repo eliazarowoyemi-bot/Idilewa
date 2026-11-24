@@ -13,10 +13,11 @@ function headerValue(source, key) {
   return block?.headers.find((header) => header.key.toLowerCase() === key.toLowerCase())?.value || '';
 }
 
-test('transport and framing headers are hardened for every route', () => {
+test('transport and framing headers allow only same-origin framing', () => {
   assert.equal(headerValue('/(.*)', 'Strict-Transport-Security'), 'max-age=63072000; includeSubDomains; preload');
   assert.equal(headerValue('/(.*)', 'X-Content-Type-Options'), 'nosniff');
-  assert.equal(headerValue('/(.*)', 'X-Frame-Options'), 'DENY');
+  assert.equal(headerValue('/(.*)', 'Content-Security-Policy'), "frame-ancestors 'self'");
+  assert.equal(headerValue('/(.*)', 'X-Frame-Options'), 'SAMEORIGIN');
   assert.equal(headerValue('/(.*)', 'Referrer-Policy'), 'strict-origin-when-cross-origin');
   assert.match(headerValue('/(.*)', 'Permissions-Policy'), /microphone=\(self\)/);
   assert.match(headerValue('/(.*)', 'Permissions-Policy'), /camera=\(\)/);
