@@ -1,11 +1,11 @@
 const GAME_CONFIGS = {
   'turbo-racers': {
-    path: '/games/turbo-racers.html',
+    path: '/games/turbo-racers?embed=1',
     outcomes: ['won', 'finished'],
     difficulties: ['easy', 'medium', 'hard'],
   },
   'balloon-ludo': {
-    path: '/games/balloon-ludo.html',
+    path: '/games/balloon-ludo?embed=1',
     outcomes: ['won'],
     difficulties: ['beginner', 'intermediate', 'advanced'],
   },

@@ -5,7 +5,7 @@ export const HOMEPAGE_ARCADE_GAMES = Object.freeze([
     title: 'Turbo Racers',
     description: 'Race, solve and celebrate your learning.',
     difficulty: 'Easy · Medium · Hard',
-    path: '/games/turbo-racers.html',
+    path: '/games/turbo-racers?embed=1',
   }),
   Object.freeze({
     id: 'balloon-ludo',
@@ -13,7 +13,7 @@ export const HOMEPAGE_ARCADE_GAMES = Object.freeze([
     title: 'Balloon Ludo',
     description: 'Play together, solve timed questions and win knowledge stars.',
     difficulty: 'Beginner · Intermediate · Advanced',
-    path: '/games/balloon-ludo.html',
+    path: '/games/balloon-ludo?embed=1',
   }),
 ]);
 

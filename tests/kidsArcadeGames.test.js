@@ -35,8 +35,8 @@ test('arcade games join the Code Playground cards and shared game selector', () 
   assert.deepEqual(
     HOMEPAGE_ARCADE_GAMES.map(({ id, path }) => [id, path]),
     [
-      ['turbo-racers', '/games/turbo-racers.html'],
-      ['balloon-ludo', '/games/balloon-ludo.html'],
+      ['turbo-racers', '/games/turbo-racers?embed=1'],
+      ['balloon-ludo', '/games/balloon-ludo?embed=1'],
     ],
   );
   assert.match(indexHtml, /id="all-coding-games"/);
@@ -79,7 +79,7 @@ test('both supplied game pages parse and report only completed-run progress', ()
 test('game results must match the same-origin game frame and validated completion values', () => {
   const frame = {
     contentWindow: {},
-    getAttribute: () => '/games/turbo-racers.html',
+    getAttribute: () => '/games/turbo-racers?embed=1',
   };
   const payload = {
     type: 'idilewa-game-complete',
