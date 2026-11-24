@@ -5,11 +5,16 @@ import test from 'node:test';
 const appSource = await readFile(new URL('../app.js', import.meta.url), 'utf8');
 const supabaseClientSource = await readFile(new URL('../src/supabaseClient.js', import.meta.url), 'utf8');
 const authDialogSource = await readFile(new URL('../src/authDialog.js', import.meta.url), 'utf8');
+const authDialogLoaderSource = await readFile(new URL('../src/authDialogLoader.js', import.meta.url), 'utf8');
 const childSignupSource = await readFile(new URL('../kids-signup.html', import.meta.url), 'utf8');
 
 test('parent, tutor, and child flows share the popup while child profiles remain guardian-managed', () => {
   assert.match(authDialogSource, /<dialog class="id-auth-dialog"/);
-  assert.match(authDialogSource, /event\.key === 'Escape' && dialog\.open[\s\S]*?dialog\.close\('dismissed'\)/);
+  assert.match(authDialogSource, /closedby="any"/);
+  assert.match(authDialogSource, /currentDialog\.showModal\(\)/);
+  assert.match(authDialogSource, /if \(!\('closedBy' in HTMLDialogElement\.prototype\)\)/);
+  assert.doesNotMatch(authDialogSource, /dialog\.show\(\)|dialog\.open\s*=|dialog\.setAttribute\(['"]open/);
+  assert.doesNotMatch(authDialogSource, /dialog\.addEventListener\(['"](?:keydown|cancel)['"]/);
   assert.match(authDialogSource, /data-auth-form="parent"/);
   assert.match(authDialogSource, /data-auth-form="tutor"/);
   assert.match(authDialogSource, /function childForm\(\)/);
@@ -17,13 +22,24 @@ test('parent, tutor, and child flows share the popup while child profiles remain
   assert.match(authDialogSource, /\/api\/guardian\/children/);
   assert.match(authDialogSource, /consent: formData\.get\('consent'\) === 'on'/);
   assert.doesNotMatch(childSignupSource, /<form[^>]*action="\/api\/guardian\/children"/);
-  assert.match(childSignupSource, /src="\/src\/authDialog\.js"/);
+  assert.match(childSignupSource, /src="\/src\/authDialogLoader\.js"/);
   assert.match(authDialogSource, /if \(role === 'parent' && mode === 'signup'\)/);
   assert.match(authDialogSource, /role: 'parent',\s*redirectRoute: 'parent-dashboard'/);
   assert.match(appSource, /case 'consent-signup': navigate\('parent-signup'\); break;/);
   assert.doesNotMatch(appSource, /data-form="parent-auth"/);
   assert.doesNotMatch(appSource, /renderTutorAuth|data-form="tutor-(?:login|signup)"/);
   assert.doesNotMatch(appSource, /renderLogin\(|modern-auth/);
+});
+
+test('auth dialog is dynamically loaded only for auth links and direct auth routes', async () => {
+  assert.match(authDialogLoaderSource, /import\('\.\/authDialog\.js'\)/);
+  assert.match(authDialogLoaderSource, /if \(intentFromLocation\(\)\) void loadAuthDialog\(\)/);
+  assert.match(authDialogLoaderSource, /document\.addEventListener\('click', handleAuthTrigger, true\)/);
+  for (const file of ['siteFooter.js', 'pricingPage.js', 'paymentPage.js']) {
+    const source = await readFile(new URL(`../src/${file}`, import.meta.url), 'utf8');
+    assert.match(source, /import '\.\/authDialogLoader\.js'/);
+    assert.doesNotMatch(source, /import ['"]\.\/authDialog\.js['"]/);
+  }
 });
 
 test('signup handles both immediate sessions and confirmation-required accounts', async () => {

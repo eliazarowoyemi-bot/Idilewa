@@ -236,7 +236,7 @@ test('pricing, payment, and child signup use their standalone page scripts', asy
     assert.match(page, /class="art"/);
   }
   const childSignup = await readFile(resolve(rootDirectory, 'kids-signup.html'), 'utf8');
-  assert.match(childSignup, /src="\/src\/authDialog\.js"/);
+  assert.match(childSignup, /src="\/src\/authDialogLoader\.js"/);
   assert.match(childSignup, /data-auth-role="child"/);
   assert.doesNotMatch(childSignup, /<form[^>]*action="\/api\/guardian\/children"/);
 });

@@ -15,6 +15,20 @@ const routes = [
 ];
 
 const input = Object.fromEntries(routes.map((route) => [route, resolve(__dirname, `${route}.html`)]));
+const appSharedModules = new Set([
+  'aiChatClient.js',
+  'aiConversationLanguages.js',
+  'communityProverbs.js',
+  'heritageLibrary.js',
+  'heritageLibraryData.js',
+  'plotweaverClient.js',
+  'siteFooterMarkup.js',
+  'threeScene.js',
+  'translationEngine.js',
+  'voiceGradeCurriculum.js',
+  'vowelsConsonantsData.js',
+  'yorubaCodeEngine.js',
+]);
 
 function sakugaVfxPlugin() {
   const scripts = ['button.js', 'toggle.js', 'slider.js'];
@@ -50,6 +64,23 @@ export default defineConfig({
     'NEXT_PUBLIC_SUPABASE_ANON_KEY',
   ],
   build: {
-    rollupOptions: { input },
+    chunkSizeWarningLimit: 550,
+    rollupOptions: {
+      input,
+      output: {
+        manualChunks(id) {
+          const normalizedId = id.replaceAll('\\', '/');
+          if (normalizedId.includes('/node_modules/')) {
+            if (normalizedId.includes('/node_modules/three/')) return 'three-vendor';
+            if (normalizedId.includes('/node_modules/@supabase/')) return 'supabase-vendor';
+            return 'vendor';
+          }
+          if (normalizedId.includes('/src/') && appSharedModules.has(normalizedId.split('/').pop())) {
+            return 'app-shared';
+          }
+          return undefined;
+        },
+      },
+    },
   },
 });

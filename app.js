@@ -1,4 +1,3 @@
-import * as THREE from 'three';
 import './styles/site-footer.css';
 import { createSiteBrandMarkup, createSiteFooterMarkup } from './src/siteFooterMarkup.js';
 import { getMyProverbContributions, saveMyProverbContribution } from './src/communityProverbs.js';

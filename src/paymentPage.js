@@ -1,5 +1,5 @@
 import { formatNaira } from './billingCatalog.js';
-import './authDialog.js';
+import './authDialogLoader.js';
 import { getCurrentUser, getSessionAccessToken, restoreAuthSession } from './supabaseClient.js';
 
 const params = new URLSearchParams(window.location.search);

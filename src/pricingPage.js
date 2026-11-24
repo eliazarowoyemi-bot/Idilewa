@@ -1,5 +1,5 @@
 import { BILLING_CATALOG, formatNaira } from './billingCatalog.js';
-import './authDialog.js';
+import './authDialogLoader.js';
 
 const periods = {
   monthly: { label: 'month', button: document.getElementById('monthly') },

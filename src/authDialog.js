@@ -335,7 +335,7 @@ function panelContent() {
 }
 
 function dialogMarkup() {
-  return `<dialog class="id-auth-dialog" aria-labelledby="id-auth-dialog-title" aria-describedby="id-auth-dialog-description" closedby="closerequest">
+  return `<dialog class="id-auth-dialog" aria-labelledby="id-auth-dialog-title" aria-describedby="id-auth-dialog-description" closedby="any">
     <div class="id-auth-layout">
       <aside class="id-auth-visual" aria-label="Interactive desk lamp">
         <div class="id-auth-visual-copy">
@@ -431,15 +431,20 @@ function ensureDialog() {
   document.body.append(dialog);
   dialog.addEventListener('click', handleDialogClick);
   dialog.addEventListener('submit', handleDialogSubmit);
+  if (!('closedBy' in HTMLDialogElement.prototype)) {
+    dialog.addEventListener('click', (event) => {
+      if (event.target !== dialog) return;
+      const bounds = dialog.getBoundingClientRect();
+      const clickedOutside = event.clientX < bounds.left
+        || event.clientX > bounds.right
+        || event.clientY < bounds.top
+        || event.clientY > bounds.bottom;
+      if (clickedOutside) dialog.close('dismissed');
+    });
+  }
   dialog.addEventListener('input', (event) => {
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement || event.target instanceof HTMLTextAreaElement) {
       clearFeedback();
-    }
-  });
-  dialog.addEventListener('keydown', (event) => {
-    if (event.key === 'Escape' && dialog.open) {
-      event.preventDefault();
-      dialog.close('dismissed');
     }
   });
   dialog.addEventListener('close', () => {
