@@ -422,7 +422,6 @@ export function renderHeritageLibrary() {
     </section>
     ${renderLearningJourney()}
     ${renderCatalogue()}
-    <footer class="heritage-content-note">Ìdíléwa · Original educational fiction · Unverified translations are clearly labelled · This sample is not a rights-cleared production library.</footer>
   </div>`;
   requestAnimationFrame(updateHeritageCatalogue);
   return markup;

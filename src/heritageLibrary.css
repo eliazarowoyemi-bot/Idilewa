@@ -748,15 +748,6 @@
   font-variant-numeric: tabular-nums;
 }
 
-.heritage-content-note {
-  margin-block-start: 28px;
-  padding-block-start: 18px;
-  border-block-start: 1px solid var(--line);
-  color: var(--ink-soft);
-  font-size: .8125rem;
-  line-height: 1.6;
-}
-
 .oral-library-link {
   margin-block-start: 20px;
 }

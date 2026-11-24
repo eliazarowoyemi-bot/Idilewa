@@ -17,6 +17,10 @@ const records = [
 test('heritage welcome stage no longer shows the requested editorial notice', () => {
   assert.doesNotMatch(
     heritageSource,
+    /Ìdíléwa · Original educational fiction · Unverified translations are clearly labelled · This sample is not a rights-cleared production library\./,
+  );
+  assert.doesNotMatch(
+    heritageSource,
     /This is original educational fiction, not a reproduced traditional folktale\. Stories for ages 9–16\+ are shorter than planned publication manuscripts; Yorùbá drafts remain pending independent linguistic review\./,
   );
   assert.match(heritageSource, /Explore an original story about integrity and kindness/);
