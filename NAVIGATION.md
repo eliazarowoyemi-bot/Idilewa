@@ -18,12 +18,14 @@ The persistent mobile bottom navigation keeps four high-frequency destinations:
 4. **Family** — guardian sign-in, learner setup, and family tasks.
 
 Across phone, tablet, and desktop, the primary header keeps **Home**, **Voice
-Lessons**, and **Code** visible. Voice Lessons and Code each have a separate
-disclosure control for related destinations; their labels remain direct links
-to the corresponding experience. The hamburger menu stays available at every
-width and retains the complete destination directory, grouped under Learn,
-Explore, and Family. Sign-in and Get Started remain in the header on wide
-screens and move into the hamburger menu on narrow screens.
+Lessons**, and **Code** visible on the homepage, shared app shell, and public
+content pages. On the homepage, Voice Lessons and Code each have a separate
+disclosure control for related destinations, as does Home for About, FAQ, and
+Pricing; category labels remain direct links to their corresponding
+experiences. Public page headers use the same three destinations and retain
+other site links in a grouped hamburger directory. Sign-in and Get Started
+remain in the header on wide screens and move into the hamburger menu on
+narrow screens.
 
 ## Breakpoints and page composition
 
@@ -37,6 +39,14 @@ Navigation state is derived from the route and query/hash state. Mark exactly
 one current destination with `aria-current="page"` when the location maps to a
 top-level item. Do not mark unrelated links active. Opening a menu or sheet
 must not change the current route.
+
+## Public page header scope
+
+The shared app shell and the Home, About, FAQ, and Pricing content headers keep
+the three primary destinations visible at compact and wide widths. Their
+hamburger directories retain secondary destinations in Learn, Create and
+Explore, and Family and Support groups. Checkout, account, AI conversation,
+and focused editor/workspace flows keep their streamlined headers.
 
 ## Pattern usage matrix
 

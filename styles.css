@@ -12053,6 +12053,71 @@ body.academy-reference-shell ::selection { background: #c9eed2; color: #075e2b; 
   .academy-footer-inner { width: calc(100% - 26px); min-height: 58px; }
   .academy-reference-shell .voice-feature-header { padding: 18px; }
 }
+
+@media (max-width: 1080px) {
+  #site-header { height: auto; min-height: 0; }
+  #site-header .header-inner {
+    display: grid;
+    width: calc(100% - 32px);
+    height: auto;
+    min-height: 0;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand actions"
+      "nav nav";
+    gap: 6px 12px;
+    padding-block: 8px;
+  }
+  #site-header .brand { grid-area: brand; min-width: 0; }
+  #site-header .header-actions { grid-area: actions; margin: 0; gap: 6px; }
+  #site-header .desktop-nav {
+    display: grid;
+    grid-area: nav;
+    width: 100%;
+    min-width: 0;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    margin: 0;
+    white-space: normal;
+  }
+  #site-header .nav-link {
+    display: flex;
+    min-width: 0;
+    min-height: 44px;
+    align-items: center;
+    justify-content: center;
+    padding: 7px 4px;
+    font-size: clamp(12px, 2.4vw, 14px);
+    line-height: 1.2;
+    text-align: center;
+    white-space: normal;
+  }
+  #site-header .nav-link::after { bottom: 3px; }
+  #site-header .header-cta { min-height: 42px; padding-inline: 14px; }
+}
+
+@media (max-width: 760px) {
+  #site-header .header-inner { width: calc(100% - 26px); }
+}
+
+@media (max-width: 1080px) {
+  #mobile-menu .mobile-menu-group {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+  #mobile-menu .mobile-menu-group h3 {
+    grid-column: 1 / -1;
+    margin: 4px 2px 0;
+    color: var(--muted-2);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  #mobile-menu .mobile-menu-group .mobile-menu-link { min-width: 0; }
+}
 @media (max-width: 420px) {
   .academy-reference-page { width: calc(100% - 24px); }
   .academy-reference-shell .header-inner.academy-reference-header { width: calc(100% - 24px); }

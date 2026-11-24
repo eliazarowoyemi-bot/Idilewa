@@ -14,11 +14,11 @@
     <header class="faq-header">
       <div class="faq-wrap faq-head">
         <a class="faq-brand" href="/" aria-label="Ìdíléwa home">Ìdíléwa<span aria-hidden="true">.</span></a>
-        <button class="faq-menu-toggle" id="faqMenuToggle" type="button" aria-expanded="false" aria-controls="faqDrawer" aria-label="Open help menu">Menu</button>
-        <nav class="faq-nav" aria-label="Help navigation">
+        <button class="faq-menu-toggle" id="faqMenuToggle" type="button" aria-expanded="false" aria-controls="faqDrawer" aria-label="Open site menu">Menu</button>
+        <nav class="faq-nav" aria-label="Main navigation">
           <a href="/">Home</a>
-          <a href="/parents.html#/parent-login">Family portal</a>
-          <a href="mailto:support@idilewa.com">Support</a>
+          <a href="/voice_lessons.html">Voice Lessons</a>
+          <a href="/development-center.html">Code</a>
           <label class="faq-language-label" for="faqLanguage">FAQ language</label>
           <select id="faqLanguage" class="faq-language">
             <option value="en">English</option>
@@ -32,14 +32,34 @@
     </header>
     <div class="faq-drawer" id="faqDrawer" aria-hidden="true">
       <div class="faq-drawer-backdrop" data-close="true"></div>
-      <nav class="faq-drawer-nav" aria-label="Mobile help navigation">
+      <nav class="faq-drawer-nav" aria-label="All site pages">
         <div class="faq-drawer-head">
           <strong>Menu</strong>
           <button class="faq-drawer-close" type="button" aria-label="Close help menu">Close</button>
         </div>
-        <a href="/">Home</a>
-        <a href="/parents.html#/parent-login">Family portal</a>
-        <a href="mailto:support@idilewa.com">Support</a>
+        <section class="faq-drawer-group" aria-labelledby="faqLearnLinks">
+          <h2 id="faqLearnLinks">Learn</h2>
+          <a href="/">Home</a>
+          <a href="/voice_lessons.html">Voice Lessons</a>
+          <a href="/?view=academy">Language Academy</a>
+          <a href="/ai-conversation.html">AI Conversation</a>
+          <a href="/?view=heritageLab">Heritage Library</a>
+        </section>
+        <section class="faq-drawer-group" aria-labelledby="faqCreateLinks">
+          <h2 id="faqCreateLinks">Create and explore</h2>
+          <a href="/development-center.html">Code</a>
+          <a href="/?view=codeLab#all-coding-games">All games</a>
+          <a href="/creative-studio.html">Creative Studio</a>
+          <a href="/tutor.html">Tutorship</a>
+        </section>
+        <section class="faq-drawer-group" aria-labelledby="faqFamilyLinks">
+          <h2 id="faqFamilyLinks">Family and support</h2>
+          <a href="/parents.html#/parent-login">Family portal</a>
+          <a href="/family-tasks.html">Family tasks</a>
+          <a href="/about.html">About Ìdíléwa</a>
+          <a href="/pricing.html">Pricing</a>
+          <a href="mailto:support@idilewa.com">Support</a>
+        </section>
         <label class="faq-language-label" for="faqLanguageMobile">FAQ language</label>
         <select id="faqLanguageMobile" class="faq-language faq-language-mobile">
           <option value="en">English</option>

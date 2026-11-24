@@ -139,11 +139,16 @@ const nativeRouteNavigationStyles = `<style id="idilewa-native-route-navigation"
 </style>`;
 const aboutHeaderNavigationStyles = `<style id="idilewa-about-header-navigation">
 #nav{display:flex;align-items:center;gap:clamp(16px,2.4vw,32px)}
-#nav a{display:inline-flex;align-items:center;min-height:44px;font-size:15px;font-weight:550}
-#menu{display:none}
+#nav a{display:inline-flex;align-items:center;justify-content:center;min-width:0;min-height:44px;font-size:15px;font-weight:650;text-align:center}
+#menu{display:inline-flex!important;align-items:center;justify-content:center;gap:8px;min-width:88px;min-height:44px}
+.drawer-nav{left:14px;right:14px;width:auto;max-width:320px;margin-left:auto}
+.drawer-nav-group{display:grid;gap:2px}
+.drawer-nav-group h2{margin:8px 10px 0;color:#526459;font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase}
+.drawer-nav .btn{color:#fff}
 @media(max-width:980px){
-  #nav{display:none!important}
-  #menu{display:inline-flex!important;align-items:center;justify-content:center;gap:8px;min-width:88px;min-height:44px}
+  header{flex-wrap:wrap;gap:10px 14px}
+  #nav{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));order:3;flex:1 1 100%;width:100%;gap:4px}
+  #nav a{padding:7px 4px;font-size:clamp(12px,3vw,14px);line-height:1.2}
 }
 </style>`;
 
@@ -205,6 +210,14 @@ function transformAboutHtml(html) {
   for (const [source, destination] of destinations) {
     transformed = transformed.replaceAll(`href="${source}"`, `href="${destination}"`);
   }
+  const primaryNavigationPattern = /<nav id="nav" class="desktop-nav"[^>]*>[\s\S]*?<\/nav>/i;
+  if (!primaryNavigationPattern.test(transformed)) {
+    throw new Error('About page is missing its primary navigation.');
+  }
+  transformed = transformed.replace(
+    primaryNavigationPattern,
+    '<nav id="nav" class="desktop-nav" aria-label="Main navigation"><a href="/">Home</a><a href="/voice_lessons.html">Voice Lessons</a><a href="/development-center.html">Code</a></nav>',
+  );
   return transformed;
 }
 
@@ -305,9 +318,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const nav = document.querySelector('.drawer-nav');
   if (!nav) throw new Error('About page is missing its navigation drawer.');
   const links = [
+    ['/voice_lessons.html', 'Voice Lessons'],
+    ['/ai-conversation.html', 'AI Conversation'],
     ['/?view=codeLab#all-coding-games', 'All games'],
     ['/creative-studio.html', 'Creative Studio'],
     ['/tutor.html', 'Tutorship'],
+    ['/faq.html', 'FAQ'],
+    ['/pricing.html', 'Pricing'],
   ];
   for (const [href, label] of links) {
     const key = href.slice(1).replaceAll('/', '-');
@@ -318,6 +335,29 @@ document.addEventListener('DOMContentLoaded', () => {
     link.textContent = label;
     nav.append(link);
   }
+  const groups = [
+    { id: 'about-nav-learn', label: 'Learn', hrefs: ['/', '/?view=academy', '/voice_lessons.html', '/ai-conversation.html', '/?view=heritageLab'] },
+    { id: 'about-nav-explore', label: 'Create and explore', hrefs: ['/development-center.html', '/?view=codeLab#all-coding-games', '/creative-studio.html'] },
+    { id: 'about-nav-family', label: 'Family and support', hrefs: ['/tutor.html', '/parents.html#/parent-login', '/parents.html#/parent-signup', '#about', '/faq.html', '/pricing.html'] }
+  ];
+  const linksInDrawer = [...nav.querySelectorAll(':scope > a')];
+  const sections = groups.map((group) => {
+    const section = document.createElement('section');
+    section.className = 'drawer-nav-group';
+    section.setAttribute('aria-labelledby', group.id);
+    const heading = document.createElement('h2');
+    heading.id = group.id;
+    heading.textContent = group.label;
+    section.append(heading);
+    for (const link of linksInDrawer) {
+      if (group.hrefs.includes(link.getAttribute('href'))) section.append(link);
+    }
+    return section;
+  });
+  if (linksInDrawer.some((link) => link.parentElement === nav)) {
+    throw new Error('About page has a navigation link that is not assigned to a menu group.');
+  }
+  nav.replaceChildren(nav.querySelector('.drawer-nav-header'), ...sections);
 });
 </script>`
     : '';
@@ -576,7 +616,15 @@ function transformAppHtml(html) {
   history.replaceState(null, '', location.pathname + location.hash);
 })();
 </script>`;
-  const transformed = replaceHomepagePrimaryNavigation(html)
+  const navigationCtaPattern = /<sakuga-button\b(?=[^>]*class="sakuga-nav-cta")(?=[^>]*onclick="go\('academy'\)")[^>]*>([\s\S]*?)<\/sakuga-button>/;
+  if (!navigationCtaPattern.test(html)) {
+    throw new Error('Standalone app is missing the expected header call to action.');
+  }
+  const withNavigationCta = html.replace(
+    navigationCtaPattern,
+    '<a class="id-btn id-btn--primary id-nav__cta" href="/?view=academy">$1</a>',
+  );
+  const transformed = replaceHomepagePrimaryNavigation(withNavigationCta)
     .replace(codeLabHeader, codeLabHeaderWithStudio)
     .replace(footerYearAssignment, '(()=>{const yearElement=document.getElementById("footerYear");if(yearElement)yearElement.textContent=new Date().getFullYear()})();')
     .replace('<h3>Source</h3>', '<h2>Source</h2>');

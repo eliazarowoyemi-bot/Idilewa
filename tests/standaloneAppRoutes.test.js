@@ -57,11 +57,14 @@ test('homepage serves the supplied academy app and guards its optional embedded 
 
 test('homepage header keeps Home, Voice Lessons, and Code visible with grouped links', () => {
   const transformed = transformEntry('index.html', appSource);
+  const header = transformed.match(/<header\b[\s\S]*?<\/header>/)?.[0] || '';
 
   assert.match(transformed, /<nav aria-label="Main navigation" class="id-nav__links">/);
   assert.match(transformed, /data-id-primary="home" href="\/">Home/);
   assert.match(transformed, /data-id-primary="voiceLessons" href="\/voice_lessons\.html">Voice Lessons/);
   assert.match(transformed, /data-id-primary="code" href="\/development-center\.html">Code/);
+  assert.match(transformed, /<a class="id-btn id-btn--primary id-nav__cta" href="\/\?view=academy">/);
+  assert.doesNotMatch(header, /<sakuga-button[^>]*class="sakuga-nav-cta"/);
   assert.match(transformed, /id="idHomeMenu"[\s\S]*?href="\/about\.html">About Ìdíléwa/);
   assert.match(transformed, /id="idHomeMenu"[\s\S]*?href="\/faq\.html">FAQ/);
   assert.match(transformed, /id="idHomeMenu"[\s\S]*?href="\/pricing\.html">Pricing/);
@@ -175,10 +178,15 @@ test('native entry pages retain their app and return home or voice links to cano
       assert.match(transformed, /alt="A grandparent and child sharing an African language learning book"/);
       assert.doesNotMatch(transformed, /href="https:\/\/idilewa\.com/);
       assert.match(transformed, /idilewa-about-header-navigation/);
-      assert.match(transformed, /#nav\{display:none!important\}/);
+      assert.match(transformed, /<nav id="nav" class="desktop-nav" aria-label="Main navigation"><a href="\/">Home<\/a><a href="\/voice_lessons\.html">Voice Lessons<\/a><a href="\/development-center\.html">Code<\/a><\/nav>/);
+      assert.match(transformed, /#nav\{display:grid;grid-template-columns:repeat\(3,minmax\(0,1fr\)\)/);
       assert.match(transformed, /#menu\{display:inline-flex!important/);
       assert.match(transformed, /document\.querySelector\('\.drawer-nav'\)/);
       assert.match(transformed, /data-idilewa-route/);
+      assert.match(transformed, /id: 'about-nav-learn'/);
+      assert.match(transformed, /id: 'about-nav-explore'/);
+      assert.match(transformed, /id: 'about-nav-family'/);
+      assert.match(transformed, /About page has a navigation link that is not assigned to a menu group/);
     }
   }
 });
@@ -232,6 +240,27 @@ test('pricing, payment, and child signup use their standalone page scripts', asy
   }
   const childSignup = await readFile(resolve(rootDirectory, 'kids-signup.html'), 'utf8');
   assert.match(childSignup, /<form[^>]*method="post"[^>]*action="\/api\/guardian\/children"/);
+});
+
+test('public FAQ and pricing pages keep the primary destinations and grouped site directory', async () => {
+  const faq = await readFile(resolve(rootDirectory, 'faq.html'), 'utf8');
+  const pricing = await readFile(resolve(rootDirectory, 'pricing.html'), 'utf8');
+
+  for (const html of [faq, pricing]) {
+    assert.match(html, /href="\/">Home<\/a>/);
+    assert.match(html, /href="\/voice_lessons\.html">Voice Lessons<\/a>/);
+    assert.match(html, /href="\/development-center\.html">Code<\/a>/);
+  }
+  assert.match(faq, /aria-label="All site pages"/);
+  assert.match(faq, /aria-labelledby="faqLearnLinks"/);
+  assert.match(faq, /aria-labelledby="faqCreateLinks"/);
+  assert.match(faq, /aria-labelledby="faqFamilyLinks"/);
+  assert.match(pricing, /id="pricingMenuToggle" type="button" aria-expanded="false" aria-controls="pricingMenu"/);
+  assert.match(pricing, /id="pricingMenu" aria-label="All site pages" hidden/);
+  assert.match(pricing, /aria-labelledby="pricingLearnLinks"/);
+  assert.match(pricing, /aria-labelledby="pricingCreateLinks"/);
+  assert.match(pricing, /aria-labelledby="pricingFamilyLinks"/);
+  assert.match(pricing, /event\.key === 'Escape'/);
 });
 
 test('the supplied editor route stays intact and the milestone route receives account-sync hooks', async () => {

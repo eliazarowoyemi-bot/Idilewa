@@ -12,10 +12,42 @@
 <body>
   <header class="site-header">
     <a class="logo" href="/" aria-label="Idilewa home"><b aria-hidden="true">◖</b> idìlẹ̀wà<small>OUR LANGUAGE. OUR FUTURE.</small></a>
-    <nav aria-label="Main navigation">
-      <a href="/">Home</a><a href="/?view=academy">Languages</a><a href="/ai-conversation.html">AI Chat</a><a href="/parents.html">Families</a>
+    <nav class="site-primary-nav" aria-label="Main navigation">
+      <a href="/">Home</a><a href="/voice_lessons.html">Voice Lessons</a><a href="/development-center.html">Code</a>
     </nav>
-    <div class="navright"><a href="/parents.html#/parent-login">Sign In</a><a class="btn" href="/kids-signup.html">Get Started →</a></div>
+    <div class="pricing-header-actions">
+      <button class="pricing-menu-toggle" id="pricingMenuToggle" type="button" aria-expanded="false" aria-controls="pricingMenu">Menu</button>
+      <div class="navright"><a href="/parents.html#/parent-login">Sign In</a><a class="btn" href="/kids-signup.html">Get Started →</a></div>
+    </div>
+    <nav class="pricing-menu" id="pricingMenu" aria-label="All site pages" hidden>
+      <section class="pricing-menu-group" aria-labelledby="pricingLearnLinks">
+        <h2 id="pricingLearnLinks">Learn</h2>
+        <a href="/">Home</a>
+        <a href="/voice_lessons.html">Voice Lessons</a>
+        <a href="/?view=academy">Language Academy</a>
+        <a href="/ai-conversation.html">AI Conversation</a>
+        <a href="/?view=heritageLab">Heritage Library</a>
+      </section>
+      <section class="pricing-menu-group" aria-labelledby="pricingCreateLinks">
+        <h2 id="pricingCreateLinks">Create and explore</h2>
+        <a href="/development-center.html">Code</a>
+        <a href="/?view=codeLab#all-coding-games">All games</a>
+        <a href="/creative-studio.html">Creative Studio</a>
+        <a href="/tutor.html">Tutorship</a>
+      </section>
+      <section class="pricing-menu-group" aria-labelledby="pricingFamilyLinks">
+        <h2 id="pricingFamilyLinks">Family and support</h2>
+        <a href="/parents.html#/parent-login">Family portal</a>
+        <a href="/family-tasks.html">Family tasks</a>
+        <a href="/about.html">About Ìdíléwa</a>
+        <a href="/faq.html">FAQ</a>
+        <a href="/pricing.html">Pricing</a>
+      </section>
+      <div class="pricing-menu-actions">
+        <a href="/parents.html#/parent-login">Sign In</a>
+        <a class="btn" href="/kids-signup.html">Get Started</a>
+      </div>
+    </nav>
   </header>
   <main>
     <section class="hero">
@@ -78,5 +110,29 @@
       <a class="btn green" href="/kids-signup.html">Get Started Today →</a>
     </div>
   </main>
+  <script>
+    const pricingMenuToggle = document.getElementById('pricingMenuToggle');
+    const pricingMenu = document.getElementById('pricingMenu');
+
+    function setPricingMenuOpen(open, restoreFocus = false) {
+      pricingMenuToggle.setAttribute('aria-expanded', String(open));
+      pricingMenuToggle.setAttribute('aria-label', open ? 'Close site menu' : 'Open site menu');
+      pricingMenu.hidden = !open;
+      if (restoreFocus) pricingMenuToggle.focus();
+    }
+
+    pricingMenuToggle.addEventListener('click', () => {
+      setPricingMenuOpen(pricingMenuToggle.getAttribute('aria-expanded') !== 'true');
+    });
+    pricingMenu.addEventListener('click', (event) => {
+      if (event.target.closest('a')) setPricingMenuOpen(false);
+    });
+    document.addEventListener('click', (event) => {
+      if (!pricingMenu.hidden && !event.target.closest('.site-header')) setPricingMenuOpen(false);
+    });
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && !pricingMenu.hidden) setPricingMenuOpen(false, true);
+    });
+  </script>
 </body>
 </html>

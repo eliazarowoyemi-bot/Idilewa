@@ -959,6 +959,13 @@ body {
     white-space: normal;
     text-align: center;
   }
+  .id-nav__dropdown:nth-child(2) .id-nav__menu {
+    left: 50%;
+    transform: translate(-50%, -6px) scale(0.98);
+  }
+  .id-nav__dropdown:nth-child(2) .id-nav__menu[data-open="true"] {
+    transform: translate(-50%, 0) scale(1);
+  }
   .id-nav__dropdown:last-child .id-nav__menu { right: -8px; left: auto; }
 }
 

@@ -292,13 +292,21 @@ import './src/heritageLibrary.css';
   const NAV = [
     { label: 'Home', route: 'index', group: 'home' },
     { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' },
-    { label: 'AI Conversation', route: 'ai-conversation', group: 'conversation' },
-    { label: 'For Tutors', route: 'tutor', href: '/tutor.html', group: 'tutor' }
+    { label: 'Code', route: 'development-center', href: '/development-center.html', group: 'code' }
   ];
   const MENU_NAV = [...NAV,
+    { label: 'AI Conversation', route: 'ai-conversation', group: 'conversation' },
+    { label: 'For Tutors', route: 'tutor', href: '/tutor.html', group: 'tutor' },
     { label: 'Mentors', route: 'mentors', group: 'mentors' },
     { label: 'For Parents', route: 'families', group: 'families' },
     { label: 'Read & listen', route: 'oral', group: 'read' },
+    { label: 'Heritage Library', route: 'heritage-library', href: '/?view=heritageLab', group: 'read' },
+    { label: 'All games', route: 'codeLab', href: '/?view=codeLab#all-coding-games', group: 'code' },
+    { label: 'Creative Studio', route: 'studio', href: '/creative-studio.html', group: 'code' },
+    { label: 'Family tasks', route: 'family-tasks', href: '/family-tasks.html', group: 'families' },
+    { label: 'Milestones', route: 'milestones', href: '/milestone-achievement.html', group: 'read' },
+    { label: 'FAQ', route: 'faq', href: '/faq.html', group: 'about' },
+    { label: 'Pricing', route: 'pricing', href: '/pricing.html', group: 'about' },
     { label: 'About', route: 'about', href: '/about.html', group: 'about' }
   ];
 
@@ -661,20 +669,10 @@ import './src/heritageLibrary.css';
       : page === 'voice_lessons' || page.startsWith('voice-')
         ? 'trainer'
         : '');
-    const academyNav = [
-      { route: 'index', label: 'Home' },
-      { route: 'voice_lessons', label: 'Learn' },
-      { route: 'voice-translation', label: 'Translate & Listen' },
-      { route: 'voice-progress', label: 'Progress' }
-    ];
-    const nav = (academyShell ? academyNav : NAV).map((item) => {
-      const active = academyShell
-        ? item.route === page || (item.route === 'voice_lessons' && (page === 'voice_lessons' || (page.startsWith('voice-') && page !== 'voice-progress' && page !== 'voice-translation')))
-        : currentGroup === item.group;
+    const nav = NAV.map((item) => {
+      const active = currentGroup === item.group;
       const current = active ? ' aria-current="page"' : '';
-      return academyShell
-        ? `<a class="nav-link ${active ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}"${current}>${item.label}</a>`
-        : item.href
+      return item.href
         ? `<a class="nav-link ${active ? 'active' : ''}" href="${item.href}"${current}>${item.label}</a>`
         : `<a class="nav-link ${active ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}"${current}>${item.label}</a>`;
     }).join('');
@@ -684,16 +682,29 @@ import './src/heritageLibrary.css';
       : esc(avatarLabel);
     const accountActions = currentUser
       ? `<a class="header-profile ${page === 'profile' ? 'active' : ''}" href="#/profile" data-route="profile" aria-label="Open profile"${page === 'profile' ? ' aria-current="page"' : ''}><span class="header-avatar">${profileAvatar}</span><span class="header-profile-label">${esc(currentUser.name || 'Profile')}</span></a><button class="header-signout" type="button" data-action="account-sign-out">Sign out</button>`
-      : `${routeLink('parent-login', 'Log in', 'header-signin')}<sakuga-button type="button" class="header-cta" data-route="${academyShell ? 'voice_lessons' : 'parent-signup'}">${academyShell ? 'Start Learning' : 'Get started'}</sakuga-button>`;
+      : `${routeLink('parent-login', 'Log in', 'header-signin')}${routeLink(academyShell ? 'voice_lessons' : 'parent-signup', academyShell ? 'Start Learning' : 'Get started', 'button button-primary header-cta')}`;
     const mobileShortcuts = [
       { route: 'profile', label: 'Profile', ico: 'user' }
     ].map((item) => `<a class="mobile-menu-link ${page === item.route ? 'active' : ''}" href="#/${item.route}" data-route="${item.route}">${icon(item.ico, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`).join('');
-    const menu = MENU_NAV.map((item) => {
-      const iconName = item.href ? 'code' : item.group === 'home' ? 'home' : item.group === 'trainer' ? 'mic' : item.group === 'learn' ? 'book' : item.group === 'read' ? 'headphones' : item.group === 'code' ? 'code' : item.group === 'stories' ? 'quote' : item.group === 'community' ? 'people' : 'sparkles';
+    const renderMenuLink = (item) => {
+      const iconName = item.group === 'home' ? 'home'
+        : item.group === 'trainer' || item.group === 'conversation' ? 'mic'
+          : item.group === 'read' ? 'headphones'
+            : item.group === 'code' ? 'code'
+              : item.group === 'tutor' || item.group === 'mentors' || item.group === 'families' ? 'people'
+                : 'sparkles';
       const active = currentGroup === item.group ? 'active' : '';
       return item.href
         ? `<a class="mobile-menu-link ${active}" href="${item.href}">${icon(iconName, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`
         : `<a class="mobile-menu-link ${active}" href="#/${item.route}" data-route="${item.route}">${icon(iconName, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`;
+    };
+    const menu = [
+      { id: 'mobile-menu-learn', label: 'Learn', groups: ['home', 'trainer'] },
+      { id: 'mobile-menu-explore', label: 'Create and explore', groups: ['code', 'conversation', 'read'] },
+      { id: 'mobile-menu-family', label: 'Family and support', groups: ['tutor', 'mentors', 'families', 'about'] }
+    ].map(({ id, label, groups }) => {
+      const links = MENU_NAV.filter((item) => groups.includes(item.group)).map(renderMenuLink).join('');
+      return `<section class="mobile-menu-group" aria-labelledby="${id}"><h3 id="${id}">${label}</h3>${links}</section>`;
     }).join('') + mobileShortcuts;
     document.getElementById('mobile-menu')?.remove();
     document.getElementById('site-header').innerHTML = `
