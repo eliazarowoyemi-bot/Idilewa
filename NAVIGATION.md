@@ -11,9 +11,9 @@ browser history as the source of truth for navigation.
 The persistent mobile bottom navigation keeps four high-frequency destinations:
 
 1. **Learn** — Voice Lessons, the language academy, and lesson paths.
-2. **Explore** — heritage, stories, coding and creative tools, AI practice, and
-   discovery. The Heritage Library is a focused destination within this path;
-   its age-adapted journeys lead, with the searchable catalogue below.
+2. **Explore** — heritage, oral stories, AI practice, and discovery. The
+   Heritage Library is a focused destination within this path; its age-adapted
+   journeys lead, with the searchable catalogue below.
 3. **Progress** — learner profile and achievements.
 4. **Family** — guardian sign-in, learner setup, and family tasks.
 
@@ -22,10 +22,11 @@ Lessons**, and **Code** visible on the homepage, shared app shell, and public
 content pages. On the homepage, Voice Lessons and Code each have a separate
 disclosure control for related destinations, as does Home for About, FAQ, and
 Pricing; category labels remain direct links to their corresponding
-experiences. Public page headers use the same three destinations and retain
-other site links in a grouped hamburger directory. Sign-in and Get Started
-remain in the header on wide screens and move into the hamburger menu on
-narrow screens.
+experiences. Public page headers use the same three destinations. Hamburger
+directories keep only destinations not already available from those primary
+navigation disclosures, grouped into learning/exploration and family links.
+Sign-in and Get Started remain in the header on wide screens and move into the
+hamburger menu on narrow screens.
 
 ## Breakpoints and page composition
 
@@ -44,9 +45,10 @@ must not change the current route.
 
 The shared app shell and the Home, About, FAQ, and Pricing content headers keep
 the three primary destinations visible at compact and wide widths. Their
-hamburger directories retain secondary destinations in Learn, Create and
-Explore, and Family and Support groups. Checkout, account, AI conversation,
-and focused editor/workspace flows keep their streamlined headers.
+hamburger directories omit destinations already exposed by the Home, Voice
+Lessons, and Code disclosures, retaining only unique exploration and family
+destinations. Checkout, account, AI conversation, and focused editor/workspace
+flows keep their streamlined headers.
 
 ## Pattern usage matrix
 

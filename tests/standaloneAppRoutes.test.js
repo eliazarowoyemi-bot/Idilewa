@@ -52,6 +52,7 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assert.match(appSource, /src="\.\/src\/languageLab\.js"/);
   assert.match(transformed, /if \(!window\.IdilewaLanguageLab\) initializeLegacyLearningExperience\(window\.IdilewaLegacyBindings\)/);
   assert.match(transformed, /src\/legacyLearningEngine\.js/);
+  assert.match(transformed, /if \(id === 'heritageLab'\) \{\s*location\.assign\('\/heritage-library'\)/);
   assertSupportAssistant(transformed);
 });
 
@@ -74,34 +75,45 @@ test('homepage header keeps Home, Voice Lessons, and Code visible with grouped l
   assert.match(transformed, /id="idCodeMenu"[\s\S]*?href="\/creative-studio\.html">Creative Studio/);
 });
 
-test('homepage drawer shows its menu label and all primary destinations', async () => {
+test('homepage drawer keeps unique destinations without repeating the primary navigation', async () => {
   const navigationSource = await readFile(resolve(rootDirectory, 'src/siteNav.js'), 'utf8');
+  const appSource = await readFile(resolve(rootDirectory, 'app.js'), 'utf8');
+  const homepageMarkup = await readFile(resolve(rootDirectory, 'index.html'), 'utf8');
+  const destinations = navigationSource.match(/const NAVIGATION_DESTINATIONS = \[([\s\S]*?)\n\];/)?.[1] || '';
+  const appMenu = appSource.match(/const MENU_NAV = \[([\s\S]*?)\n  \];/)?.[1] || '';
 
   assert.match(navigationSource, /label\.textContent = 'Menu'/);
-  assert.match(appSource, /class="id-menu-btn"[^>]*popovertarget="idDrawer"/);
-  assert.match(appSource, /<nav aria-labelledby="idDrawerTitle" class="id-drawer id-popover"[^>]*id="idDrawer" popover/);
-  assert.doesNotMatch(appSource, /<dialog[^>]*id="idDrawer"/);
-  assert.match(appSource, /class="id-drawer__foot"><a[^>]*>Sign in<\/a><sakuga-button[^>]*>Get Started<\/sakuga-button><\/div>/);
+  assert.match(homepageMarkup, /class="id-menu-btn"[^>]*popovertarget="idDrawer"/);
+  assert.match(homepageMarkup, /<nav aria-labelledby="idDrawerTitle" class="id-drawer id-popover"[^>]*id="idDrawer" popover/);
+  assert.doesNotMatch(homepageMarkup, /<dialog[^>]*id="idDrawer"/);
+  assert.match(homepageMarkup, /class="id-drawer__foot"><a[^>]*>Sign in<\/a><sakuga-button[^>]*>Get Started<\/sakuga-button><\/div>/);
   for (const destination of [
-    "['/', 'Home']",
-    "['/?view=academy', 'Language Academy']",
-    "['/?view=progress', 'My Progress']",
-    "['/development-center.html', 'Development Center']",
+    "['/profile.html', 'My Progress']",
+    "['/heritage-library', 'Heritage Library']",
     "['/ai-conversation.html', 'AI Conversation']",
     "['/milestone-achievement.html', 'Milestone Achievement']",
-    "['/?view=heritageLab', 'Heritage Library']",
-    "['/?view=codeLab#all-coding-games', 'All games']",
-    "['/creative-studio.html', 'Creative Studio']",
     "['/tutor.html', 'Tutorship']",
     "['/parents.html', 'For Families']",
     "['/family-tasks.html', 'Family Tasks']",
-    "['/faq.html', 'FAQ']",
-    "['/about.html', 'About Ìdíléwa']",
-    "['/pricing.html', 'Pricing']",
   ]) {
     assert.ok(navigationSource.includes(destination), `drawer should include ${destination}`);
   }
+  assert.match(destinations, /Your learning/);
+  assert.doesNotMatch(destinations, /'Home'|'Language Academy'|'Sounds & Vowels'|'Development Center'|'All games'|'Creative Studio'|'FAQ'|'About Ìdíléwa'|'Pricing'/);
+  assert.match(appMenu, /label: 'Heritage Library'.*href: '\/heritage-library'/);
+  assert.doesNotMatch(appMenu, /label: '(?:Home|Voice Lessons|Code|All games|Creative Studio|FAQ|Pricing|About)'/);
   assert.match(navigationSource, /window\.location\.assign\('\/faq\.html'\)/);
+});
+
+test('legacy Heritage paths redirect to the live Heritage Library route', async () => {
+  const config = JSON.parse(await readFile(resolve(rootDirectory, 'vercel.json'), 'utf8'));
+  const oldShortPath = config.redirects.find(({ source }) => source === '/heritage');
+  const oldQueryPath = config.redirects.find(({ has }) => (
+    has?.some(({ type, key, value }) => type === 'query' && key === 'view' && value === 'heritageLab')
+  ));
+
+  assert.equal(oldShortPath?.destination, '/heritage-library');
+  assert.equal(oldQueryPath?.destination, '/heritage-library');
 });
 
 test('legacy learning and heritage URLs open their matching standalone views', async () => {
@@ -172,7 +184,8 @@ test('native entry pages retain their app and return home or voice links to cano
     if (filename === 'about.html') {
       assert.match(transformed, /href="\/\?view=academy"/);
       assert.match(transformed, /href="\/development-center\.html"/);
-      assert.match(transformed, /href="\/\?view=heritageLab"/);
+      assert.match(transformed, /href="\/heritage-library"/);
+      assert.doesNotMatch(transformed, /href="\/\?view=heritageLab"/);
       assert.match(transformed, /<div class="hero-art"><img src="\/assets\/page-about-1\.jpg"/);
       assert.match(transformed, /fetchpriority="high"/);
       assert.match(transformed, /alt="A grandparent and child sharing an African language learning book"/);
@@ -183,7 +196,6 @@ test('native entry pages retain their app and return home or voice links to cano
       assert.match(transformed, /#menu\{display:inline-flex!important/);
       assert.match(transformed, /document\.querySelector\('\.drawer-nav'\)/);
       assert.match(transformed, /data-idilewa-route/);
-      assert.match(transformed, /id: 'about-nav-learn'/);
       assert.match(transformed, /id: 'about-nav-explore'/);
       assert.match(transformed, /id: 'about-nav-family'/);
       assert.match(transformed, /About page has a navigation link that is not assigned to a menu group/);
@@ -249,6 +261,8 @@ test('public FAQ and pricing pages keep the primary destinations and grouped sit
     assert.match(html, /href="\/">Home<\/a>/);
     assert.match(html, /href="\/voice_lessons\.html">Voice Lessons<\/a>/);
     assert.match(html, /href="\/development-center\.html">Code<\/a>/);
+    assert.match(html, /href="\/heritage-library">Heritage Library<\/a>/);
+    assert.doesNotMatch(html, /href="\/\?view=heritageLab"/);
   }
   assert.match(faq, /aria-label="All site pages"/);
   assert.match(faq, /aria-labelledby="faqLearnLinks"/);

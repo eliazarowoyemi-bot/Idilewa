@@ -5,7 +5,7 @@ const footerLinks = [
   { key: 'pricing', label: 'Pricing', href: '/pricing.html', route: 'pricing', info: 'pricing' },
   { key: 'lessons', label: 'Lessons', href: '/?view=academy', route: 'voice_lessons', view: 'academy' },
   { key: 'code', label: 'Code', href: '/development-center.html' },
-  { key: 'heritage', label: 'Heritage', href: '/?view=heritageLab', route: 'oral', view: 'heritageLab' },
+  { key: 'heritage', label: 'Heritage', href: '/heritage-library' },
   { key: 'privacy', label: 'Privacy', href: '/parents.html#/privacy', route: 'privacy' },
 ];
 
@@ -26,7 +26,7 @@ const bottomNavigationItems = [
   {
     key: 'explore',
     label: 'Explore',
-    href: '/?view=heritageLab',
+    href: '/heritage-library',
     icon: '<circle cx="12" cy="12" r="9"/><path d="m15.5 8.5-2.2 4.8-4.8 2.2 2.2-4.8z"/>',
   },
   {

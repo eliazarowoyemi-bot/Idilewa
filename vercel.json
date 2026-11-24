@@ -2,6 +2,25 @@
   "buildCommand": "npm run build",
   "outputDirectory": "dist",
   "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/heritage",
+      "destination": "/heritage-library",
+      "permanent": true
+    },
+    {
+      "source": "/",
+      "has": [
+        {
+          "type": "query",
+          "key": "view",
+          "value": "heritageLab"
+        }
+      ],
+      "destination": "/heritage-library",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/code",

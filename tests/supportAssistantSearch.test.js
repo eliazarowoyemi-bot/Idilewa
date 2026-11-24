@@ -62,6 +62,13 @@ test('site knowledge search avoids unrelated pages on broad family questions', (
   assert.ok(!urls.includes('/family-tasks'));
 });
 
+test('site knowledge links Heritage results to the current Heritage Library route', () => {
+  const results = searchSupportKnowledge('heritage library');
+
+  assert.ok(results.some((result) => result.url === '/heritage-library'));
+  assert.ok(!results.some((result) => result.url === '/?view=heritageLab'));
+});
+
 test('multi-part language questions include the matching Pidgin tools without unrelated pages', () => {
   const results = searchSupportKnowledge(
     'Which languages are currently highlighted in the Language Academy, and where can I use Nigerian Pidgin?',

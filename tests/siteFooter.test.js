@@ -35,7 +35,7 @@ test('mobile primary navigation has four labelled destinations and one current p
   assert.equal(links.length, 4);
   assert.match(navigation, /aria-label="Primary navigation"/);
   assert.match(navigation, /href="\/voice_lessons\.html"/);
-  assert.match(navigation, /href="\/\?view=heritageLab"/);
+  assert.match(navigation, /href="\/heritage-library"/);
   assert.match(navigation, /href="\/profile\.html"/);
   assert.match(navigation, /href="\/parents\.html#\/parent-login"/);
   assert.equal(links.filter(([, , attributes]) => attributes.includes('aria-current="page"')).length, 1);

@@ -286,20 +286,15 @@ import './src/heritageLibrary.css';
     { label: 'Voice Lessons', route: 'voice_lessons', group: 'trainer' },
     { label: 'Code', route: 'development-center', href: '/development-center.html', group: 'code' }
   ];
-  const MENU_NAV = [...NAV,
+  const MENU_NAV = [
     { label: 'AI Conversation', route: 'ai-conversation', group: 'conversation' },
+    { label: 'Read & listen', route: 'oral', group: 'read' },
+    { label: 'Heritage Library', route: 'heritage-library', href: '/heritage-library', group: 'read' },
+    { label: 'Milestone Achievement', route: 'milestones', href: '/milestone-achievement.html', group: 'read' },
     { label: 'For Tutors', route: 'tutor', href: '/tutor.html', group: 'tutor' },
     { label: 'Mentors', route: 'mentors', group: 'mentors' },
     { label: 'For Parents', route: 'families', group: 'families' },
-    { label: 'Read & listen', route: 'oral', group: 'read' },
-    { label: 'Heritage Library', route: 'heritage-library', href: '/?view=heritageLab', group: 'read' },
-    { label: 'All games', route: 'codeLab', href: '/?view=codeLab#all-coding-games', group: 'code' },
-    { label: 'Creative Studio', route: 'studio', href: '/creative-studio.html', group: 'code' },
     { label: 'Family tasks', route: 'family-tasks', href: '/family-tasks.html', group: 'families' },
-    { label: 'Milestones', route: 'milestones', href: '/milestone-achievement.html', group: 'read' },
-    { label: 'FAQ', route: 'faq', href: '/faq.html', group: 'about' },
-    { label: 'Pricing', route: 'pricing', href: '/pricing.html', group: 'about' },
-    { label: 'About', route: 'about', href: '/about.html', group: 'about' }
   ];
 
   const NAV_GROUPS = {
@@ -691,9 +686,8 @@ import './src/heritageLibrary.css';
         : `<a class="mobile-menu-link ${active}" href="#/${item.route}" data-route="${item.route}">${icon(iconName, 19)}<span>${item.label}</span>${icon('arrow', 16)}</a>`;
     };
     const menu = [
-      { id: 'mobile-menu-learn', label: 'Learn', groups: ['home', 'trainer'] },
-      { id: 'mobile-menu-explore', label: 'Create and explore', groups: ['code', 'conversation', 'read'] },
-      { id: 'mobile-menu-family', label: 'Family and support', groups: ['tutor', 'mentors', 'families', 'about'] }
+      { id: 'mobile-menu-explore', label: 'Explore', groups: ['conversation', 'read'] },
+      { id: 'mobile-menu-family', label: 'Family', groups: ['tutor', 'mentors', 'families'] }
     ].map(({ id, label, groups }) => {
       const links = MENU_NAV.filter((item) => groups.includes(item.group)).map(renderMenuLink).join('');
       return `<section class="mobile-menu-group" aria-labelledby="${id}"><h3 id="${id}">${label}</h3>${links}</section>`;
@@ -837,7 +831,7 @@ import './src/heritageLibrary.css';
       { title: 'Voice Lessons', description: 'Listen & Speak', image: landingFeatureVoiceUrl, alt: 'Learners exploring voice lessons', route: 'voice_lessons', tone: 'voice' },
       { title: 'Code', description: 'Build & Create', image: landingFeatureCodeUrl, alt: 'A young learner exploring code', href: './creative-studio.html', tone: 'code' },
       { title: 'AI Conversation', description: 'Chat & Practise', image: landingFeatureAiUrl, alt: 'Learners practising a conversation', route: 'ai-conversation', tone: 'ai' },
-      { title: 'Heritage Stories', description: 'Stories & Culture', image: landingFeatureHeritageUrl, alt: 'A family sharing a heritage story', route: 'oral', tone: 'heritage' }
+      { title: 'Heritage Stories', description: 'Stories & Culture', image: landingFeatureHeritageUrl, alt: 'A family sharing a heritage story', route: 'heritage-library', tone: 'heritage' }
     ];
     const experienceCards = experiences.map((item) => {
       const contents = `<img src="${item.image}" alt="${esc(item.alt)}" loading="lazy" /><span class="academy-home-feature-copy"><strong>${esc(item.title)}</strong><small>${esc(item.description)}</small></span><span class="academy-home-feature-arrow" aria-hidden="true">${icon('arrow', 17)}</span>`;

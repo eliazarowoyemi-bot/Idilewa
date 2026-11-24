@@ -79,7 +79,7 @@ function getSource(question, answer, category) {
     return { url: '/creative-studio.html', label: 'Creative Studio' };
   }
   if (category === 3) return { url: '/development-center.html', label: 'Development Center' };
-  if (category === 4) return { url: '/?view=heritageLab', label: 'Heritage Library' };
+  if (category === 4) return { url: '/heritage-library', label: 'Heritage Library' };
   if (category === 5) return { url: '/tutor.html', label: 'Tutorship' };
   if (category === 6 && /task/.test(content)) {
     return { url: '/family-tasks.html', label: 'Family Tasks' };

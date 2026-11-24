@@ -88,7 +88,7 @@ export const supportPageKnowledge = Object.freeze([
   {
     title: 'Heritage Library',
     label: 'Heritage Library',
-    url: '/?view=heritageLab',
+    url: '/heritage-library',
     keywords: 'heritage culture stories traditions riddles oral history',
     content: 'The Heritage Library brings together cultural stories, Oríkì, Òwe, traditions, riddles, and related learning resources. Cultural material should be understood with its speaker, source, and community context; the site treats culture as living knowledge rather than decoration.',
   },
@@ -287,7 +287,7 @@ export const supportFaqKnowledge = Object.freeze(faqEntries.map(([title, content
     1: ['/about', 'About Ìdíléwa'],
     2: ['/?view=academy', 'Language Academy'],
     3: ['/code', 'Code and Creativity'],
-    4: ['/?view=heritageLab', 'Heritage Library'],
+    4: ['/heritage-library', 'Heritage Library'],
     5: ['/tutor', 'Tutorship'],
     6: ['/parents', 'For Families'],
     7: ['/faq', 'Help Centre'],

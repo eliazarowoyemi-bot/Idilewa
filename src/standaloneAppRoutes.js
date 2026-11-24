@@ -186,7 +186,7 @@ function transformAboutHtml(html) {
   const destinations = [
     ['https://idilewa.com/academy', '/?view=academy'],
     ['https://idilewa.com/code', '/development-center.html'],
-    ['https://idilewa.com/heritage', '/?view=heritageLab'],
+    ['https://idilewa.com/heritage', '/heritage-library'],
     ['https://idilewa.com/login', '/parents.html#/parent-login'],
     ['https://idilewa.com/signup', '/parents.html#/parent-signup'],
     ['https://idilewa.com', '/'],
@@ -318,13 +318,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const nav = document.querySelector('.drawer-nav');
   if (!nav) throw new Error('About page is missing its navigation drawer.');
   const links = [
-    ['/voice_lessons.html', 'Voice Lessons'],
     ['/ai-conversation.html', 'AI Conversation'],
-    ['/?view=codeLab#all-coding-games', 'All games'],
-    ['/creative-studio.html', 'Creative Studio'],
     ['/tutor.html', 'Tutorship'],
-    ['/faq.html', 'FAQ'],
-    ['/pricing.html', 'Pricing'],
+    ['/family-tasks.html', 'Family tasks'],
   ];
   for (const [href, label] of links) {
     const key = href.slice(1).replaceAll('/', '-');
@@ -336,11 +332,12 @@ document.addEventListener('DOMContentLoaded', () => {
     nav.append(link);
   }
   const groups = [
-    { id: 'about-nav-learn', label: 'Learn', hrefs: ['/', '/?view=academy', '/voice_lessons.html', '/ai-conversation.html', '/?view=heritageLab'] },
-    { id: 'about-nav-explore', label: 'Create and explore', hrefs: ['/development-center.html', '/?view=codeLab#all-coding-games', '/creative-studio.html'] },
-    { id: 'about-nav-family', label: 'Family and support', hrefs: ['/tutor.html', '/parents.html#/parent-login', '/parents.html#/parent-signup', '#about', '/faq.html', '/pricing.html'] }
+    { id: 'about-nav-explore', label: 'Explore', hrefs: ['/heritage-library', '/ai-conversation.html'] },
+    { id: 'about-nav-family', label: 'Family', hrefs: ['/tutor.html', '/family-tasks.html', '/parents.html#/parent-login', '/parents.html#/parent-signup'] }
   ];
-  const linksInDrawer = [...nav.querySelectorAll(':scope > a')];
+  const primaryDestinations = new Set(['/', '/?view=academy', '/development-center.html', '#about']);
+  const linksInDrawer = [...nav.querySelectorAll(':scope > a')]
+    .filter((link) => !primaryDestinations.has(link.getAttribute('href')));
   const sections = groups.map((group) => {
     const section = document.createElement('section');
     section.className = 'drawer-nav-group';
@@ -540,6 +537,10 @@ function transformAppHtml(html) {
     window.go = (id, ...args) => {
       if (id === 'aiChat') {
         location.assign('/ai-conversation.html');
+        return;
+      }
+      if (id === 'heritageLab') {
+        location.assign('/heritage-library');
         return;
       }
       return nativeGo(id, ...args);

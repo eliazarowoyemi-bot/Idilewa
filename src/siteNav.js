@@ -16,22 +16,11 @@ import landingFeatureHeritageUrl from '../assets/landing-feature-heritage.webp';
 const nav = document.querySelector('[data-id-nav]');
 
 const NAVIGATION_DESTINATIONS = [
-  ['Learn', [
-    ['/', 'Home'],
-    ['/?view=academy', 'Language Academy'],
-    ['/?view=phoneticsLab', 'Sounds & Vowels'],
-    ['/?view=progress', 'My Progress'],
-    ['/development-center.html', 'Development Center'],
-    ['/?view=codeLab#all-coding-games', 'All games'],
-  ]],
-  ['Explore', [
-    ['/?view=heritageLab', 'Heritage Library'],
+  ['Your learning', [
+    ['/profile.html', 'My Progress'],
+    ['/heritage-library', 'Heritage Library'],
     ['/ai-conversation.html', 'AI Conversation'],
     ['/milestone-achievement.html', 'Milestone Achievement'],
-    ['/creative-studio.html', 'Creative Studio'],
-    ['/faq.html', 'FAQ'],
-    ['/about.html', 'About Ìdíléwa'],
-    ['/pricing.html', 'Pricing'],
   ]],
   ['Family', [
     ['/parents.html', 'For Families'],
@@ -47,7 +36,7 @@ const NAVIGATION_HREFS = {
   tutors: '/tutor.html',
   aiChat: '/ai-conversation.html',
   codeLab: '/development-center.html',
-  heritageLab: '/?view=heritageLab',
+  heritageLab: '/heritage-library',
 };
 
 const FEATURE_ARTWORK = {
