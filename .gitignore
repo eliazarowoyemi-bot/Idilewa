@@ -11,6 +11,7 @@ scratch/
 _*.ps1
 _*.mjs
 _*.txt
+/_live.html
 
 .vercel
 
