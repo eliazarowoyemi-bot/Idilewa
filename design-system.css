@@ -451,6 +451,15 @@ body {
 
 .id-nav__dropdown { position: relative; }
 
+.id-nav__category {
+  display: inline-flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.id-nav__category-link { white-space: nowrap; }
+.id-nav__disclosure { min-width: 32px; justify-content: center; }
+
 .id-nav__menu {
   position: absolute;
   top: calc(100% + 12px);
@@ -480,28 +489,33 @@ body {
   transform: translateY(0) scale(1);
 }
 
-.id-nav__menu button {
+.id-nav__menu button,
+.id-nav__menu a {
   display: flex;
   align-items: center;
   justify-content: flex-start;
   width: 100%;
+  min-height: 44px;
   padding: 10px 12px;
   border: 0;
   border-radius: 9px;
   background: transparent;
   color: var(--id-ink);
+  font-family: inherit;
   font-size: 14px;
   font-weight: 520;
   text-align: left;
   cursor: pointer;
+  text-decoration: none;
   transition: background-color var(--id-dur-fast) var(--id-ease), color var(--id-dur-fast) var(--id-ease);
 }
 
 .id-nav__menu button:hover,
-.id-nav__menu button:focus-visible {
+.id-nav__menu button:focus-visible,
+.id-nav__menu a:hover,
+.id-nav__menu a:focus-visible {
   background: rgba(20, 83, 45, 0.07);
   color: var(--id-forest);
-  outline: none;
 }
 
 .id-nav__auth {
@@ -914,17 +928,55 @@ body {
 }
 
 /* Responsive -------------------------------------------------------------- */
-/* Below the inline-nav breakpoint the drawer becomes the primary secondary
-   navigation, so the menu button only appears once the links have folded. */
+/* Keep the three requested destinations visible above the fold at every size. */
 @media (max-width: 1080px) {
   .id-menu-btn { display: inline-flex; }
-  .id-nav__links { display: none; }
-  .id-nav__inner { justify-content: space-between; }
+  .id-nav__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand auth"
+      "links links";
+    gap: 8px 12px;
+    justify-content: stretch;
+    padding-block: 10px;
+  }
+  .id-brand { grid-area: brand; min-width: 0; }
+  .id-nav__auth { grid-area: auth; gap: 8px; }
+  .id-nav__links {
+    display: grid;
+    grid-area: links;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+  }
+  .id-nav__links > .id-nav__link,
+  .id-nav__category { justify-content: center; width: 100%; }
+  .id-nav__category-link {
+    min-width: 0;
+    white-space: normal;
+    text-align: center;
+  }
+  .id-nav__dropdown:last-child .id-nav__menu { right: -8px; left: auto; }
+}
+
+@media (min-width: 1081px) {
+  .id-menu-btn { display: inline-flex; }
+  .id-nav__inner { display: flex; gap: clamp(12px, 1.8vw, 28px); }
+  .id-nav__links { gap: clamp(8px, 1.4vw, 20px); margin-left: 0; }
 }
 
 @media (max-width: 760px) {
   .id-nav__auth .id-btn--ghost { display: none; }
+  .id-nav__auth .sakuga-nav-cta { display: none; }
   .id-brand__copy small { display: none; }
+  .id-nav__inner { min-height: 0; }
+  .id-nav__links { gap: 2px; }
+  .id-nav__link { font-size: clamp(12px, 3.8vw, 14px); }
+  .id-nav__category-link { line-height: 1.2; }
+  .id-nav__disclosure { min-width: 28px; padding-inline: 2px; }
   .id-hero { grid-template-columns: 1fr; }
   .id-hero .heroText { padding: 36px 28px 12px; }
   .id-hero .art { min-height: 230px; padding: 12px 24px 24px; }

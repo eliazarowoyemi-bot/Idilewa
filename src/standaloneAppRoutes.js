@@ -426,6 +426,58 @@ window.idilewaCreativeStudioBridge = {
     .concat(bridge, styled.slice(adjustedBodyIndex));
 }
 
+const homepagePrimaryNavigation = `<nav aria-label="Main navigation" class="id-nav__links">
+  <div class="id-nav__dropdown" data-id-dropdown>
+    <div class="id-nav__category">
+      <a class="id-nav__link id-nav__category-link" data-id-primary="home" href="/">Home</a>
+      <button aria-controls="idHomeMenu" aria-expanded="false" aria-label="Open Home pages" class="id-nav__link id-nav__trigger id-nav__disclosure" type="button">
+        <svg aria-hidden="true" class="id-chevron" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+    <div class="id-nav__menu" data-open="false" id="idHomeMenu">
+      <a href="/about.html">About Ìdíléwa</a>
+      <a href="/faq.html">FAQ</a>
+      <a href="/pricing.html">Pricing</a>
+    </div>
+  </div>
+  <div class="id-nav__dropdown" data-id-dropdown>
+    <div class="id-nav__category">
+      <a class="id-nav__link id-nav__category-link" data-id-primary="voiceLessons" href="/voice_lessons.html">Voice Lessons</a>
+      <button aria-controls="idVoiceLessonsMenu" aria-expanded="false" aria-label="Open Voice Lessons pages" class="id-nav__link id-nav__trigger id-nav__disclosure" type="button">
+        <svg aria-hidden="true" class="id-chevron" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+    <div class="id-nav__menu" data-open="false" id="idVoiceLessonsMenu">
+      <a href="/voice_lessons.html">Voice Lessons</a>
+      <a href="/?view=academy">Language Academy</a>
+      <a href="/?view=studio">Translate &amp; Listen</a>
+      <a href="/?view=phoneticsLab">Sounds &amp; Vowels</a>
+      <a href="/tutor.html">Live Tutors</a>
+    </div>
+  </div>
+  <div class="id-nav__dropdown" data-id-dropdown>
+    <div class="id-nav__category">
+      <a class="id-nav__link id-nav__category-link" data-id-primary="code" href="/development-center.html">Code</a>
+      <button aria-controls="idCodeMenu" aria-expanded="false" aria-label="Open Code pages" class="id-nav__link id-nav__trigger id-nav__disclosure" type="button">
+        <svg aria-hidden="true" class="id-chevron" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></svg>
+      </button>
+    </div>
+    <div class="id-nav__menu" data-open="false" id="idCodeMenu">
+      <a href="/development-center.html">Development Center</a>
+      <a href="/?view=codeLab#all-coding-games">All games</a>
+      <a href="/creative-studio.html">Creative Studio</a>
+    </div>
+  </div>
+</nav>`;
+
+function replaceHomepagePrimaryNavigation(html) {
+  const navigationPattern = /<nav aria-label="Main navigation" class="id-nav__links">[\s\S]*?<\/nav>/;
+  if (!navigationPattern.test(html)) {
+    throw new Error('Standalone app is missing the expected primary navigation.');
+  }
+  return html.replace(navigationPattern, homepagePrimaryNavigation);
+}
+
 function transformAppHtml(html) {
   if (!html.includes(footerYearAssignment)) {
     throw new Error('Standalone app is missing the expected optional footer-year script.');
@@ -524,7 +576,7 @@ function transformAppHtml(html) {
   history.replaceState(null, '', location.pathname + location.hash);
 })();
 </script>`;
-  const transformed = html
+  const transformed = replaceHomepagePrimaryNavigation(html)
     .replace(codeLabHeader, codeLabHeaderWithStudio)
     .replace(footerYearAssignment, '(()=>{const yearElement=document.getElementById("footerYear");if(yearElement)yearElement.textContent=new Date().getFullYear()})();')
     .replace('<h3>Source</h3>', '<h2>Source</h2>');

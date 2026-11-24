@@ -55,6 +55,22 @@ test('homepage serves the supplied academy app and guards its optional embedded 
   assertSupportAssistant(transformed);
 });
 
+test('homepage header keeps Home, Voice Lessons, and Code visible with grouped links', () => {
+  const transformed = transformEntry('index.html', appSource);
+
+  assert.match(transformed, /<nav aria-label="Main navigation" class="id-nav__links">/);
+  assert.match(transformed, /data-id-primary="home" href="\/">Home/);
+  assert.match(transformed, /data-id-primary="voiceLessons" href="\/voice_lessons\.html">Voice Lessons/);
+  assert.match(transformed, /data-id-primary="code" href="\/development-center\.html">Code/);
+  assert.match(transformed, /id="idHomeMenu"[\s\S]*?href="\/about\.html">About Ìdíléwa/);
+  assert.match(transformed, /id="idHomeMenu"[\s\S]*?href="\/faq\.html">FAQ/);
+  assert.match(transformed, /id="idHomeMenu"[\s\S]*?href="\/pricing\.html">Pricing/);
+  assert.match(transformed, /id="idVoiceLessonsMenu"[\s\S]*?href="\/\?view=academy">Language Academy/);
+  assert.match(transformed, /id="idVoiceLessonsMenu"[\s\S]*?href="\/tutor\.html">Live Tutors/);
+  assert.match(transformed, /id="idCodeMenu"[\s\S]*?href="\/\?view=codeLab#all-coding-games">All games/);
+  assert.match(transformed, /id="idCodeMenu"[\s\S]*?href="\/creative-studio\.html">Creative Studio/);
+});
+
 test('homepage drawer shows its menu label and all primary destinations', async () => {
   const navigationSource = await readFile(resolve(rootDirectory, 'src/siteNav.js'), 'utf8');
 

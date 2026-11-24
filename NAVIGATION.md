@@ -8,7 +8,7 @@ browser history as the source of truth for navigation.
 
 ## Information architecture
 
-The four persistent mobile destinations are:
+The persistent mobile bottom navigation keeps four high-frequency destinations:
 
 1. **Learn** — Voice Lessons, the language academy, and lesson paths.
 2. **Explore** — heritage, stories, coding and creative tools, AI practice, and
@@ -17,19 +17,21 @@ The four persistent mobile destinations are:
 3. **Progress** — learner profile and achievements.
 4. **Family** — guardian sign-in, learner setup, and family tasks.
 
-On desktop, the primary header exposes Home, Languages, AI Chat, More, Sign in,
-and Get Started. The menu groups related destinations rather than duplicating
-every route in the top-level bar. The mobile bar is reserved for the four
-high-frequency destinations; contextual routes remain in the menu or within
-their parent workflow.
+Across phone, tablet, and desktop, the primary header keeps **Home**, **Voice
+Lessons**, and **Code** visible. Voice Lessons and Code each have a separate
+disclosure control for related destinations; their labels remain direct links
+to the corresponding experience. The hamburger menu stays available at every
+width and retains the complete destination directory, grouped under Learn,
+Explore, and Family. Sign-in and Get Started remain in the header on wide
+screens and move into the hamburger menu on narrow screens.
 
 ## Breakpoints and page composition
 
 | Viewport | Header and primary navigation | Content / secondary navigation |
 | --- | --- | --- |
-| Wide web, above 1080px | Persistent 80px top header with inline links, active underline, sign-in, and primary CTA | 1280px content max; four-column language, feature, and tutor grids |
-| Tablet, 761–1080px | Compact top header; menu button opens a contextual anchored panel or right-side app drawer | Two-column card grids; preserve selected item and scroll position |
-| Mobile, up to 760px | Compact app bar plus fixed four-item bottom bar with safe-area padding; menu opens a bottom sheet | Single-column cards; contextual top tabs stay beneath their app bar |
+| Wide web, above 1080px | Persistent top header with the three destinations, grouped disclosures, hamburger, sign-in, and primary CTA | 1280px content max; four-column language, feature, and tutor grids |
+| Tablet, 761–1080px | Brand/actions row plus a three-column row of visible destinations; menu opens the full directory | Two-column card grids; preserve selected item and scroll position |
+| Mobile, up to 760px | Compact brand/menu row plus a three-column destination row; fixed four-item bottom bar retains safe-area padding | Single-column cards; disclosures wrap labels rather than clipping or overlapping |
 
 Navigation state is derived from the route and query/hash state. Mark exactly
 one current destination with `aria-current="page"` when the location maps to a
@@ -52,10 +54,12 @@ must not change the current route.
 
 ### Global header and tab bar
 
-- Desktop header: 80px high, warm off-white surface, 1px bottom divider, 1280px
-  inner width. The active link has a 2px forest underline and active text color.
-- Mobile app bar: 68px high. The brand remains a link to Home; menu controls have
-  an accessible name and `aria-expanded`.
+- Desktop header: warm off-white surface, 1px bottom divider, 1280px inner
+  width. Home, Voice Lessons, and Code stay visible beside the brand; grouped
+  disclosures and the full-directory menu remain keyboard and touch operable.
+- Compact header: brand and hamburger share the first row; the three primary
+  destinations occupy a separate row with at least 44px targets. The brand
+  remains a link to Home; disclosure and menu controls expose `aria-expanded`.
 - Bottom bar: four equal columns (Learn, Explore, Progress, Family), outline
   icons when inactive, filled/stronger icon state when active, and a persistent
   text label. Reserve the bottom safe area with `env(safe-area-inset-bottom)`.
@@ -131,7 +135,8 @@ must not change the current route.
 
 ## Current implementation notes
 
-- The homepage header, grouped menu, feature cards, shared footer, app-shell
+- The homepage header, three visible primary destinations, grouped menu,
+  feature cards, shared footer, app-shell
   bottom navigation, static-page bottom navigation, and mobile dialog sheet are
   implemented in the web project.
 - The app-shell navigation is intentionally hidden in dedicated AI/tutor

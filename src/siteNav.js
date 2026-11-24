@@ -118,16 +118,19 @@ function setupHomepageArtwork() {
 
 function updateCurrentNavigation() {
   const view = new URLSearchParams(window.location.search).get('view') || 'home';
-  const activeSelector = view === 'academy' || view === 'studio'
-    ? '[data-id-dropdown] .id-nav__trigger'
-    : view === 'aiChat' || view === 'phoneticsLab'
-      ? `[data-idilewa-route="${view}"]`
-      : view === 'home'
-        ? '.id-nav__links > a[href="/"]'
-        : '.id-more__trigger';
+  const pathname = window.location.pathname.replace(/\.html$/i, '');
+  const voiceViews = new Set(['academy', 'learning', 'phoneticsLab', 'studio']);
+  const codeViews = new Set(['codeLab']);
+  const activeCategory = view === 'home' && pathname === '/'
+    ? 'home'
+    : voiceViews.has(view) || ['/voice_lessons', '/voices', '/trainer', '/languages'].includes(pathname)
+      ? 'voiceLessons'
+      : codeViews.has(view) || ['/development-center', '/creative-studio'].includes(pathname)
+        ? 'code'
+        : '';
 
-  document.querySelectorAll('.id-nav__links .id-nav__link').forEach((link) => {
-    if (link.matches(activeSelector)) link.setAttribute('aria-current', 'page');
+  document.querySelectorAll('.id-nav__links [data-id-primary]').forEach((link) => {
+    if (link.dataset.idPrimary === activeCategory) link.setAttribute('aria-current', 'page');
     else link.removeAttribute('aria-current');
   });
 }
@@ -158,42 +161,56 @@ function renderNavigationLinks(drawer) {
 }
 
 function setupDropdown() {
-  const dropdown = document.querySelector('[data-id-dropdown]');
-  if (!dropdown) return;
+  const dropdowns = [...document.querySelectorAll('[data-id-dropdown]')];
+  if (!dropdowns.length) return;
 
-  const trigger = dropdown.querySelector('.id-nav__trigger');
-  const menu = dropdown.querySelector('.id-nav__menu');
-  if (!trigger || !menu) return;
+  const setOpen = (dropdown, open) => {
+    const trigger = dropdown.querySelector('.id-nav__trigger');
+    const menu = dropdown.querySelector('.id-nav__menu');
+    if (!trigger || !menu) return;
 
-  const setOpen = (open) => {
     trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+    trigger.setAttribute(
+      'aria-label',
+      `${open ? 'Close' : 'Open'} ${dropdown.querySelector('[data-id-primary]')?.textContent.trim()} pages`,
+    );
     menu.dataset.open = open ? 'true' : 'false';
   };
 
-  setOpen(false);
+  dropdowns.forEach((dropdown) => {
+    const trigger = dropdown.querySelector('.id-nav__trigger');
+    const menu = dropdown.querySelector('.id-nav__menu');
+    if (!trigger || !menu) return;
 
-  trigger.addEventListener('click', (event) => {
-    event.stopPropagation();
-    setOpen(trigger.getAttribute('aria-expanded') !== 'true');
-  });
+    setOpen(dropdown, false);
+    trigger.addEventListener('click', (event) => {
+      event.stopPropagation();
+      const shouldOpen = trigger.getAttribute('aria-expanded') !== 'true';
+      dropdowns.forEach((item) => setOpen(item, item === dropdown && shouldOpen));
+    });
 
-  menu.addEventListener('click', (event) => {
-    if (event.target.closest('a')) setOpen(false);
+    menu.addEventListener('click', (event) => {
+      if (event.target.closest('a')) setOpen(dropdown, false);
+    });
+
+    dropdown.addEventListener('focusout', (event) => {
+      if (!dropdown.contains(event.relatedTarget)) setOpen(dropdown, false);
+    });
   });
 
   document.addEventListener('click', (event) => {
-    if (!dropdown.contains(event.target)) setOpen(false);
+    if (dropdowns.some((dropdown) => dropdown.contains(event.target))) return;
+    dropdowns.forEach((dropdown) => setOpen(dropdown, false));
   });
 
   document.addEventListener('keydown', (event) => {
     if (event.key !== 'Escape') return;
-    if (trigger.getAttribute('aria-expanded') !== 'true') return;
-    setOpen(false);
-    trigger.focus();
-  });
-
-  dropdown.addEventListener('focusout', (event) => {
-    if (!dropdown.contains(event.relatedTarget)) setOpen(false);
+    const openDropdown = dropdowns.find((dropdown) => (
+      dropdown.querySelector('.id-nav__trigger')?.getAttribute('aria-expanded') === 'true'
+    ));
+    if (!openDropdown) return;
+    setOpen(openDropdown, false);
+    openDropdown.querySelector('.id-nav__trigger')?.focus();
   });
 }
 
