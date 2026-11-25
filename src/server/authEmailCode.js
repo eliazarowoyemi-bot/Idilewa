@@ -9,7 +9,7 @@ import {
 } from './guardianConsent.js';
 import { createAuthCodeEmail } from './authCodeEmail.js';
 
-const PURPOSES = new Set(['child-signin', 'recovery']);
+const PURPOSES = new Set(['recovery']);
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 async function enforceEmailCodeLimit(admin, bucket, action, limit, windowSeconds) {
@@ -56,39 +56,16 @@ export default async function handleAuthEmailCode(req, res) {
       throw new GuardianConsentError(503, 'Email verification is temporarily unavailable.');
     }
     if (!profile?.id) {
-      return sendGuardianJson(res, 202, { message: 'If the account exists and is eligible, a passcode will be sent to its parent or guardian.' });
+      return sendGuardianJson(res, 202, { message: 'If the account exists and needs a code, an email will be sent.' });
     }
 
-    let recipientEmail = email;
-    if (purpose === 'child-signin') {
-      if (profile.role !== 'child' || !profile.parent_consent_request_id) {
-        return sendGuardianJson(res, 202, { message: 'If the account exists and is eligible, a passcode will be sent to its parent or guardian.' });
-      }
-      const { data: guardianRequest, error: guardianError } = await admin
-        .from('guardian_access_requests')
-        .select('parent_email')
-        .eq('id', profile.parent_consent_request_id)
-        .eq('claimed_by', profile.id)
-        .eq('status', 'used')
-        .maybeSingle();
-      if (guardianError) {
-        throw new GuardianConsentError(503, 'Parent passcode delivery is temporarily unavailable.');
-      }
-      if (!guardianRequest?.parent_email || guardianRequest.parent_email.toLowerCase() === email) {
-        return sendGuardianJson(res, 202, { message: 'If the account exists and is eligible, a passcode will be sent to its parent or guardian.' });
-      }
-      recipientEmail = guardianRequest.parent_email.toLowerCase();
-    }
+    const recipientEmail = email;
 
     const { data: userData, error: userError } = await admin.auth.admin.getUserById(profile.id);
     const user = userData?.user;
     if (userError || !user || user.email?.toLowerCase() !== email) {
       throw new GuardianConsentError(503, 'Email verification is temporarily unavailable.');
     }
-    if (purpose === 'child-signin' && (profile.role !== 'child' || !profile.parent_consent_request_id)) {
-      return sendGuardianJson(res, 202, { message: 'If the account exists and is eligible, a passcode will be sent to its parent or guardian.' });
-    }
-
     const apiKey = process.env.RESEND_API_KEY;
     const from = process.env.RESEND_FROM_EMAIL;
     const fromAddress = from?.match(/<([^<>]+)>$/)?.[1] || from || '';
@@ -115,7 +92,7 @@ export default async function handleAuthEmailCode(req, res) {
       response = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
-          Authorization: `******`,
+          Authorization: `Bearer ${apiKey}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ from, to: [recipientEmail], ...emailContent }),
@@ -144,9 +121,7 @@ export default async function handleAuthEmailCode(req, res) {
     }
 
     return sendGuardianJson(res, 202, {
-      message: purpose === 'child-signin'
-        ? 'If the account exists and is eligible, a passcode will be sent to its parent or guardian.'
-        : 'If the account exists and needs a code, an email will be sent.',
+      message: 'If the account exists and needs a code, an email will be sent.',
     });
   } catch (error) {
     if (error instanceof GuardianConsentError) {

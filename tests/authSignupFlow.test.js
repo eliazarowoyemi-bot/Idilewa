@@ -18,6 +18,10 @@ test('parent, tutor, and child flows share the popup while child profiles remain
   assert.match(authDialogSource, /data-auth-form="parent"/);
   assert.match(authDialogSource, /data-auth-form="tutor"/);
   assert.match(authDialogSource, /function childForm\(\)/);
+  assert.match(authDialogSource, /Sign in to your child account/);
+  assert.match(authDialogSource, /No guardian passcode is required/);
+  assert.match(authDialogSource, /Verify approval and create account/);
+  assert.match(authDialogSource, /role === 'child'/);
   assert.match(authDialogSource, /A verified parent account manages the profile and confirms consent/);
   assert.match(authDialogSource, /\/api\/guardian\/children/);
   assert.match(authDialogSource, /consent: formData\.get\('consent'\) === 'on'/);
@@ -87,8 +91,8 @@ test('parent sign-in is password-based on the family auth screen', () => {
   assert.match(authDialogSource, /await signIn\(\{ email, password, expectedRole \}\)/);
   assert.match(supabaseClientSource, /expectedRole === 'adult' && \['parent', 'educator'\]\.includes\(userRecord\.role\)/);
   assert.match(supabaseClientSource, /if \(expectedRole && userRecord\.role !== expectedRole\s*&& !\(expectedRole === 'adult' && \['parent', 'educator'\]\.includes\(userRecord\.role\)\)\)/);
-  assert.match(supabaseClientSource, /Email codes are only available for child sign-in and password recovery/);
-  assert.match(supabaseClientSource, /requestAuthEmailCode\(email, purpose === 'password-reset' \? 'recovery' : purpose\)/);
+  assert.match(supabaseClientSource, /Email codes are only available for password recovery/);
+  assert.match(supabaseClientSource, /export async function requestPasswordReset\(email\)/);
 });
 
 test('legacy login routes redirect to the family auth screens', () => {

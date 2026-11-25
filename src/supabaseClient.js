@@ -59,6 +59,7 @@ export const supabase = isSupabaseConfigured
 
 let googleProviderEnabled = null;
 let googleProviderProbe = null;
+const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 /**
  * Supabase publishes which social providers a project has enabled. Google OAuth
@@ -260,8 +261,8 @@ async function loadAccountProfile(client, authUser) {
 }
 
 async function requestAuthEmailCode(email, purpose) {
-  if (!['child-signin', 'password-reset'].includes(purpose)) {
-    throw new Error('Email codes are only available for child sign-in and password recovery.');
+  if (!['password-reset', 'recovery'].includes(purpose)) {
+    throw new Error('Email codes are only available for password recovery.');
   }
   const response = await fetch('/api/auth/welcome?action=email-code', {
     method: 'POST',
@@ -605,54 +606,6 @@ export async function completeAuthCallback(callbackUrl = window.location.href) {
   };
 }
 
-export async function requestSigninOtp(email, purpose = 'child-signin') {
-  if (!['child-signin', 'password-reset'].includes(purpose)) {
-    throw new Error('Email codes are only available for child sign-in and password recovery.');
-  }
-  await requestAuthEmailCode(email, purpose === 'password-reset' ? 'recovery' : purpose);
-}
-
-export async function verifySigninOtp({ email, token, expectedRole, purpose = 'child-signin' }) {
-  const client = requireSupabase();
-  if (!['child-signin', 'password-reset'].includes(purpose)) {
-    throw new Error('Email codes are only available for child sign-in and password recovery.');
-  }
-  if (purpose === 'child-signin' && expectedRole !== 'child') {
-    throw new Error('Child sign-in codes can only be used for a child account.');
-  }
-  if (expectedRole && !['child', 'educator', 'adult', 'parent'].includes(expectedRole)) {
-    throw new Error('Select a valid account type before using email-code sign-in.');
-  }
-  const normalizedEmail = email.toLowerCase().trim();
-  if (!/^\d{6,8}$/.test(token)) throw new Error('Enter the verification code from your email.');
-  const { data, error } = await client.auth.verifyOtp({
-    email: normalizedEmail,
-    token,
-    type: purpose === 'password-reset' ? 'recovery' : 'magiclink',
-  });
-  if (error) throw new Error(normalizeAuthError(error, 'verification'), { cause: error });
-  if (!data?.user || !data.session) throw new Error('Email verification did not return a signed-in account.');
-
-  let userRecord;
-  try {
-    userRecord = await loadAccountProfile(client, data.user);
-    if (expectedRole && userRecord.role !== expectedRole) {
-      if (expectedRole === 'adult' && ['parent', 'educator'].includes(userRecord.role)) {
-        setLocalItem(LOCAL_STORAGE_KEY_USER, userRecord);
-        return { user: userRecord, session: data.session, error: null };
-      }
-      throw new Error(`This email belongs to a ${userRecord.role} account. Select the matching account type.`);
-    }
-  } catch (profileError) {
-    const { error: signOutError } = await client.auth.signOut();
-    if (signOutError) throw new Error('Could not clear the session after the account check failed.', { cause: signOutError });
-    throw profileError;
-  }
-
-  setLocalItem(LOCAL_STORAGE_KEY_USER, userRecord);
-  return userRecord;
-}
-
 export async function updateAccountPassword(password) {
   const client = requireSupabase();
   if (!isSignupPasswordValid(password)) {
@@ -661,6 +614,18 @@ export async function updateAccountPassword(password) {
   const { data, error } = await client.auth.updateUser({ password });
   if (error) throw new Error(error.message, { cause: error });
   if (!data?.user) throw new Error('The authentication service did not confirm your new password.');
+}
+
+export async function requestPasswordReset(email) {
+  const client = requireSupabase();
+  const normalizedEmail = email.toLowerCase().trim();
+  if (!EMAIL_PATTERN.test(normalizedEmail)) {
+    throw new Error('Enter a valid account email address.');
+  }
+  const { error } = await client.auth.resetPasswordForEmail(normalizedEmail, {
+    redirectTo: new URL('/auth-callback.html?next=index', window.location.origin).toString(),
+  });
+  if (error) throw new Error(normalizeAuthError(error, 'signin'), { cause: error });
 }
 
 export async function signIn({ email, password, expectedRole }) {

@@ -9791,6 +9791,100 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .tutor-auth-signup-page .tutor-auth-error { font-size: 12px; }
 
 .tutor-workspace { min-height: 100vh; display: grid; grid-template-columns: 195px minmax(0, 1fr); background: var(--tutor-canvas); }
+/* Exact tutor dashboard reference */
+.id-tutor-dashboard { min-height: 100vh; background: #f7faf8; color: #18322a; font-family: "Plus Jakarta Sans Variable", Inter, system-ui, sans-serif; }
+.id-tutor-header { height: 69px; padding: 0 clamp(18px, 3.2vw, 48px); display: flex; align-items: center; justify-content: space-between; background: #fff; border-bottom: 1px solid #edf2ef; }
+.id-tutor-brand { display: inline-flex; align-items: center; text-decoration: none; }
+.id-tutor-brand .brand-logo { width: 170px; max-width: 42vw; height: auto; }
+.id-tutor-header-actions { display: flex; align-items: center; gap: 16px; }
+.id-tutor-notifications { position: relative; width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 50%; color: #405c50; background: transparent; cursor: pointer; }
+.id-tutor-notifications b { position: absolute; top: -2px; right: 0; width: 17px; height: 17px; display: grid; place-items: center; border: 2px solid #fff; border-radius: 50%; color: #fff; background: #ff5b5b; font-size: 9px; line-height: 1; }
+.id-tutor-avatar { width: 43px; height: 43px; overflow: hidden; border: 2px solid #e6eee9; border-radius: 50%; color: #fff; background: linear-gradient(145deg, #d2bb8d, #0a6b4c); font-weight: 800; cursor: pointer; }
+.id-tutor-menu { width: 36px; height: 36px; display: grid; place-items: center; border: 0; color: #18322a; background: transparent; cursor: pointer; }
+.id-tutor-main { width: min(896px, calc(100% - 32px)); margin: 0 auto; padding: 22px 0 92px; }
+.id-tutor-hero { height: 260px; overflow: hidden; display: grid; grid-template-columns: 55% 45%; border-radius: 20px; background: linear-gradient(105deg, #087847 0%, #0d9c50 57%, #8bcf91 100%); box-shadow: 0 9px 28px rgba(27,67,50,.10); }
+.id-tutor-hero-copy { position: relative; z-index: 2; padding: 31px 42px; color: #fff; }
+.id-tutor-live { min-height: 34px; padding: 7px 13px; display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; color: #07543a; background: rgba(255,255,255,.88); font-size: 12px; font-weight: 800; }
+.id-tutor-live i { width: 8px; height: 8px; border-radius: 50%; background: #2fc16f; }
+.id-tutor-hero-copy h1 { margin: 17px 0 10px; color: #fff; font-size: 38px; line-height: 1.02; letter-spacing: -1.8px; }
+.id-tutor-hero-copy p { max-width: 330px; margin: 0 0 22px; font-size: 15px; line-height: 1.42; }
+.id-tutor-profile-button { min-height: 49px; padding: 0 20px; display: inline-flex; align-items: center; gap: 12px; border-radius: 999px; color: #18322a; background: #fff; font-size: 14px; font-weight: 800; box-shadow: 0 7px 18px rgba(8,74,48,.12); }
+.id-tutor-profile-button span { font-size: 22px; line-height: 1; }
+.id-tutor-hero-photo { min-width: 0; background: url("/assets/yoruba-educator-woman.jpg") 64% 30% / cover no-repeat; border-radius: 0 20px 20px 0; }
+.id-tutor-stats { margin: 18px 0 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+.id-tutor-stats article { min-height: 94px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; border: 1px solid #edf2ef; border-radius: 16px; background: #fff; box-shadow: 0 5px 18px rgba(27,67,50,.035); }
+.id-tutor-stat-icon { width: 49px; height: 49px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; }
+.id-tutor-stat-icon.green { color: #fff; background: #35b971; }.id-tutor-stat-icon.blue { color: #fff; background: #4e86d8; }.id-tutor-stat-icon.purple { color: #fff; background: #765cba; }.id-tutor-stat-icon.gold { color: #fff; background: #d1a126; }
+.id-tutor-stats strong { display: block; font-size: 28px; line-height: 1; }.id-tutor-stats small { display: block; margin-top: 5px; color: #52645b; font-size: 12px; white-space: nowrap; }
+.id-tutor-zoom { overflow: hidden; border: 1px solid #edf2ef; border-radius: 16px; background: #fff; }
+.id-tutor-zoom header { min-height: 72px; padding: 0 28px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #edf2ef; }
+.id-tutor-zoom header h2 { display: flex; align-items: center; gap: 11px; margin: 0; font-size: 20px; }
+.id-tutor-zoom-icon { width: 32px; height: 32px; display: grid; place-items: center; border-radius: 9px; color: #1979e8; background: #edf5ff; }
+.id-tutor-availability-control { display: flex; align-items: center; gap: 12px; font-size: 11px; }
+.id-tutor-toggle { width: 47px; height: 26px; padding: 3px; border: 0; border-radius: 999px; background: #ccd7d1; cursor: pointer; }
+.id-tutor-toggle span { width: 20px; height: 20px; display: block; border-radius: 50%; background: #fff; transition: transform .18s ease; box-shadow: 0 2px 5px rgba(0,0,0,.12); }
+.id-tutor-toggle.is-on { background: #08704d; }.id-tutor-toggle.is-on span { transform: translateX(21px); }
+.id-tutor-zoom-body { min-height: 188px; display: grid; grid-template-columns: 40% 60%; align-items: center; }
+.id-tutor-zoom-illustration { height: 188px; display: grid; place-items: center; background: radial-gradient(circle at 20% 20%, #fff 0 4%, transparent 5%), radial-gradient(circle at 80% 70%, #eef8f1 0 8%, transparent 9%); }
+.id-tutor-laptop { width: 190px; height: 118px; display: grid; place-items: center; align-content: center; gap: 6px; border: 8px solid #315a47; border-radius: 8px 8px 3px 3px; color: #1979e8; background: #f8fbf9; box-shadow: 0 12px 0 -8px #244737; }
+.id-tutor-laptop b { font-size: 20px; }
+.id-tutor-zoom-copy { padding: 22px 28px 22px 8px; }
+.id-tutor-zoom-copy h3 { margin: 0 0 7px; font-size: 16px; }.id-tutor-zoom-copy p { margin: 0 0 19px; color: #53675d; font-size: 13px; line-height: 1.45; }
+.id-tutor-primary { min-height: 52px; padding: 0 22px; display: inline-flex; align-items: center; justify-content: center; gap: 10px; border: 0; border-radius: 999px; color: #fff; background: #07543b; font-size: 13px; font-weight: 800; box-shadow: 0 8px 19px rgba(7,84,59,.14); }
+.id-tutor-detail-grid { margin-top: 20px; display: grid; grid-template-columns: 1.05fr .95fr; gap: 18px; }
+.id-tutor-profile-card, .id-tutor-preview-card { min-height: 320px; border: 1px solid #edf2ef; border-radius: 16px; background: #fff; }
+.id-tutor-profile-card { padding: 22px 20px; }.id-tutor-profile-card header { display: flex; align-items: center; justify-content: space-between; }
+.id-tutor-profile-card header h2 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 17px; }.id-tutor-profile-card header a { min-height: 37px; padding: 0 12px; display: inline-flex; align-items: center; gap: 7px; border: 1px solid #e7eee9; border-radius: 999px; font-size: 11px; font-weight: 800; }
+.id-tutor-profile-main { margin: 18px 0 16px; display: grid; grid-template-columns: 112px 1fr; align-items: center; gap: 16px; }
+.id-tutor-profile-photo { width: 112px; height: 112px; border: 4px solid #edf5ef; border-radius: 50%; background: url("/assets/yoruba-educator-woman.jpg") 50% 20% / cover no-repeat; }.id-tutor-profile-main h3 { margin: 0 0 6px; font-size: 17px; }.id-tutor-verified { margin-bottom: 8px; display: inline-flex; align-items: center; gap: 5px; color: #08704d; font-size: 11px; font-weight: 800; }.id-tutor-profile-main p { margin: 7px 0; display: flex; align-items: center; gap: 8px; color: #53675d; font-size: 12px; }
+.id-tutor-profile-card h4 { margin: 0 0 8px; font-size: 13px; }.id-tutor-language { min-height: 36px; padding: 8px 12px; display: inline-flex; align-items: center; border-radius: 999px; color: #08704d; background: #edf7f0; font-size: 12px; }
+.id-tutor-preview-card { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: linear-gradient(145deg, #f3faf4, #fff 45%, #edf8f0); }
+.id-tutor-preview-card::before,.id-tutor-preview-card::after { content:""; position:absolute; border-radius:50%; background:rgba(104,195,145,.13); }.id-tutor-preview-card::before { width:170px;height:170px;right:-80px;top:-55px }.id-tutor-preview-card::after { width:120px;height:120px;left:-60px;bottom:-45px }
+.id-tutor-preview-icon { width: 58px;height:58px;display:grid;place-items:center;border-radius:16px;color:#08704d;background:#fff;box-shadow:0 7px 20px rgba(35,92,63,.07); }.id-tutor-preview-card h2 { margin:18px 0 8px;font-size:18px }.id-tutor-preview-card p { margin:0 0 20px;color:#53675d;font-size:12px;line-height:1.5 }.id-tutor-preview-card .id-tutor-primary { position:relative;z-index:1 }
+.id-tutor-bottom-nav { position: fixed; z-index: 20; left: 0; right: 0; bottom: 0; min-height: 82px; padding: 10px max(20px, calc((100% - 880px)/2)) 8px; display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid #edf2ef; background: rgba(255,255,255,.98); box-shadow: 0 -8px 22px rgba(27,67,50,.04); }
+.id-tutor-bottom-nav a { min-height: 64px; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:5px; color:#334e43;font-size:12px;font-weight:800; }.id-tutor-bottom-nav a.is-active { position:relative;color:#08704d }.id-tutor-bottom-nav a.is-active::after { content:"";position:absolute;bottom:-8px;width:72px;height:3px;border-radius:3px;background:#08704d }.id-tutor-bottom-nav .id-tutor-help { width:132px;height:58px;justify-self:end;align-self:center;border-radius:999px;color:#fff;background:#07543b;flex-direction:row }
+
+@media (max-width: 980px) {
+  .id-tutor-main { width: min(760px, calc(100% - 28px)); }
+  .id-tutor-hero { height: 238px; }
+  .id-tutor-hero-copy { padding: 26px 30px; }
+  .id-tutor-hero-copy h1 { font-size: 34px; }
+  .id-tutor-stats { grid-template-columns: repeat(2, 1fr); }
+  .id-tutor-detail-grid { grid-template-columns: 1fr; }
+  .id-tutor-preview-card { min-height: 280px; }
+}
+@media (max-width: 620px) {
+  .id-tutor-header { height: 58px; padding: 0 12px; }
+  .id-tutor-brand .brand-logo { width: 126px; }
+  .id-tutor-header-actions { gap: 6px; }
+  .id-tutor-avatar { width: 38px; height: 38px; }
+  .id-tutor-main { width: calc(100% - 20px); padding: 10px 0 88px; }
+  .id-tutor-hero { height: 390px; grid-template-columns: 1fr; grid-template-rows: 210px 180px; }
+  .id-tutor-hero-copy { padding: 20px 20px 14px; }
+  .id-tutor-hero-copy h1 { margin: 12px 0 8px; font-size: 31px; }
+  .id-tutor-hero-copy p { margin-bottom: 12px; font-size: 13px; }
+  .id-tutor-profile-button { min-height: 43px; }
+  .id-tutor-hero-photo { background-position: 50% 24%; border-radius: 0; }
+  .id-tutor-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+  .id-tutor-stats article { min-height: 82px; padding: 10px; gap: 8px; }
+  .id-tutor-stat-icon { width: 42px; height: 42px; }
+  .id-tutor-stats strong { font-size: 23px; }
+  .id-tutor-stats small { font-size: 10px; white-space: normal; }
+  .id-tutor-zoom header { min-height: 88px; padding: 12px 16px; align-items:flex-start; flex-direction:column; }
+  .id-tutor-zoom header h2 { font-size:17px; }
+  .id-tutor-availability-control { align-self:flex-end; margin-top:-8px; }
+  .id-tutor-zoom-body { grid-template-columns:1fr; }
+  .id-tutor-zoom-illustration { height:150px; }
+  .id-tutor-laptop { width:170px;height:104px; }
+  .id-tutor-zoom-copy { padding:18px 16px 22px;text-align:center; }
+  .id-tutor-zoom-copy .id-tutor-primary { width:100%; }
+  .id-tutor-profile-main { grid-template-columns:92px 1fr; }
+  .id-tutor-profile-photo { width:92px;height:92px; }
+  .id-tutor-profile-card header { gap:8px; }.id-tutor-profile-card header h2 { font-size:15px }.id-tutor-profile-card header a { padding:0 9px;font-size:10px }
+  .id-tutor-profile-main p { font-size:11px; }
+  .id-tutor-preview-card { min-height:260px; }
+  .id-tutor-bottom-nav { min-height:70px;padding:6px 8px; }.id-tutor-bottom-nav a { min-height:58px;font-size:10px }.id-tutor-bottom-nav .id-tutor-help { width:92px;height:52px }.id-tutor-bottom-nav a.is-active::after { bottom:-6px;width:54px }
+}
 .tutor-sidebar { min-width: 0; min-height: 100vh; padding: 0 10px 14px; display: flex; flex-direction: column; color: #fff; background: var(--tutor-sidebar); }
 .tutor-sidebar-brand { min-height: 66px; padding: 11px 8px; display: flex; align-items: center; justify-content: center; border-bottom: 1px solid rgba(255,255,255,.13); }
 .tutor-sidebar-brand .brand-logo { display: block; width: 158px; max-width: 100%; height: auto; border-radius: 5px; background: #fff; }

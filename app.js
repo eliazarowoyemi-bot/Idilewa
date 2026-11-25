@@ -195,6 +195,10 @@ import './src/heritageLibrary.css';
     translate: '<path d="M4 5h10M9 3v2c0 4-2.5 7.5-6 9"/><path d="M6 12c1.6 2.6 4 4.4 7 5M13 21l4-10 4 10m-6.8-3h5.6"/>',
     image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="m4 18 5-5 4 4 3-3 4 4"/>',
     bell: '<path d="M18 9a6 6 0 1 0-12 0c0 4-2 5-2 5h16s-2-1-2-5"/><path d="M10.5 20a2 2 0 0 0 3 0"/>',
+    video: '<rect x="3" y="6" width="13" height="12" rx="2"/><path d="m16 10 5-3v10l-5-3z"/>',
+    mail: '<rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/>',
+    graduation: '<path d="m3 10 9-5 9 5-9 5z"/><path d="M7 12v5c3 2 7 2 10 0v-5"/>',
+    'message-circle': '<path d="M21 12a8 8 0 0 1-8 8H9l-5 2 1.5-4A8 8 0 1 1 21 12Z"/><path d="M8 12h.01M12 12h.01M16 12h.01"/>',
     'arrow-right': '<path d="M4 12h16m-6-6 6 6-6 6"/>',
     gamepad: '<rect x="2" y="7" width="20" height="10" rx="4"/><path d="M7 10v4m-2-2h4m7 0h.01M17.5 13.5h.01"/>',
     moon: '<path d="M21 13a8.5 8.5 0 1 1-9.9-9.6 7 7 0 0 0 9.9 9.6Z"/>',
@@ -3577,18 +3581,78 @@ import './src/heritageLibrary.css';
   function renderTutorDashboard() {
     const data = tutorDashboardData || {};
     const educator = data.educator || {};
-    const firstName = (getCurrentUser()?.name || educator.name || 'Tutor').trim().split(/\s+/)[0];
+    const user = getCurrentUser() || {};
+    const profileDetails = getProfileDetails();
+    const tutorName = (profileDetails.name || user.name || educator.name || 'Onilude Hammed').trim();
+    const firstName = tutorName.split(/\s+/)[0];
     const requests = Array.isArray(data.requests) ? data.requests : [];
     const learners = Array.isArray(data.learners) ? data.learners : [];
     const approvedCount = learners.length;
     const lessons = learners.reduce((sum, learner) => sum + (Number(learner.completedLessons) || 0), 0);
     const pending = requests.filter((request) => request.status === 'pending').length;
     const recent = requests.slice(0, 4);
-    return renderTutorWorkspace('tutor-dashboard', 'Dashboard', `${renderTutorHeading('Your teaching space', `Good Morning, ${firstName}!`, 'Here’s what’s happening with your learners today.', `<a class="tutor-button tutor-button-primary" href="#/tutor-find-child" data-route="tutor-find-child">${icon('plus', 15)} Find a Child</a>`)}
-      <section class="tutor-stat-grid" aria-label="Teaching overview"><article><span>${icon('people', 17)} Approved Students</span><strong>${approvedCount}</strong><small>Parent-approved connections</small></article><article><span>${icon('book', 17)} Lessons Completed</span><strong>${lessons}</strong><small>Across approved learners</small></article><article><span>${icon('calendar', 17)} Pending Consent</span><strong>${pending}</strong><small>Awaiting family approval</small></article><article><span>${icon('sparkles', 17)} Learners Practising</span><strong>${learners.filter((learner) => learner.streak > 0).length}</strong><small>Recent learning activity</small></article></section>
-      <section class="tutor-dashboard-lower"><div class="tutor-panel tutor-recent-panel"><div class="tutor-section-heading"><div><span class="tutor-eyebrow">Your learners</span><h2>Recent connections</h2></div><a class="tutor-text-link" href="#/tutor-students" data-route="tutor-students">View all ${icon('arrow', 14)}</a></div><div id="tutor-recent-connections">${recent.length ? recent.map((request) => `<article class="tutor-recent-row"><span class="tutor-student-avatar">${icon(request.status === 'approved' ? 'user' : 'lock', 16)}</span><div><strong>${esc(request.learner)}</strong><small>${request.status === 'approved' ? `${Number(request.completedLessons) || 0} lessons completed` : 'No learner information is shared before consent'}</small></div><span class="tutor-status tutor-status-${esc(request.status)}">${esc(consentStatusLabel(request.status))}</span></article>`).join('') : '<p class="tutor-empty-inline">Your approved connections and consent requests will appear here.</p>'}</div></div>
-      <aside class="tutor-panel tutor-today-panel"><span class="tutor-today-icon">${icon('book', 20)}</span><span class="tutor-eyebrow">Teaching resource</span><h2>Today’s Lesson</h2><p>Explore a short Yorùbá greeting lesson and prepare a welcoming first activity.</p><div class="tutor-lesson-progress"><span>Language practice</span><strong>Beginner</strong></div><a class="tutor-button tutor-button-primary" href="#/tutor-lesson" data-route="tutor-lesson">Read Lesson ${icon('arrow', 14)}</a></aside></section>
-      <p class="tutor-privacy-note">${icon('shield', 14)} Student names and progress appear only after a parent or guardian approves your request.</p>`);
+    const availability = getTutorAvailability();
+    const isAvailable = availability.days.length > 0;
+    const profileEmail = esc(user.email || 'onilsonly@gmail.com');
+    const profileLanguage = esc(LANGUAGES.find((language) => language.id === (profileDetails.language || 'english'))?.name || 'English');
+    return `<div class="id-tutor-dashboard">
+      <header class="id-tutor-header">
+        <a class="id-tutor-brand" href="#/tutor-dashboard" data-route="tutor-dashboard" aria-label="Idilewa tutor dashboard">${brandLogo()}</a>
+        <div class="id-tutor-header-actions">
+          <button class="id-tutor-notifications" type="button" aria-label="Notifications, 3 unread"><span>${icon('bell', 18)}</span><b>3</b></button>
+          <button class="id-tutor-avatar" type="button" aria-label="Open tutor profile" data-route="tutor-profile">${esc(tutorName.trim().charAt(0).toUpperCase() || 'O')}</button>
+          <button class="id-tutor-menu" type="button" aria-label="Open tutor menu" aria-expanded="false" data-action="tutor-menu">${icon('menu', 20)}</button>
+        </div>
+      </header>
+      <main class="id-tutor-main">
+        <section class="id-tutor-hero">
+          <div class="id-tutor-hero-copy">
+            <span class="id-tutor-live"><i></i> Live Tutor</span>
+            <h1>Welcome back,<br>${esc(tutorName.split(/\s+/).pop() || 'Onilude')}!</h1>
+            <p>Your dedication is helping African children learn and thrive. <span aria-hidden="true">❤️</span></p>
+            <a href="#/tutor-profile" data-route="tutor-profile" class="id-tutor-profile-button">View Profile <span aria-hidden="true">→</span></a>
+          </div>
+          <div class="id-tutor-hero-photo" role="img" aria-label="Tutor Onilude Hammed"></div>
+        </section>
+        <section class="id-tutor-stats" aria-label="Tutor statistics">
+          <article><span class="id-tutor-stat-icon green">${icon('people', 20)}</span><div><strong>2</strong><small>Sample Learners</small></div></article>
+          <article><span class="id-tutor-stat-icon blue">${icon('check', 20)}</span><div><strong>17</strong><small>Completed Lessons</small></div></article>
+          <article><span class="id-tutor-stat-icon purple">${icon('calendar', 20)}</span><div><strong>0</strong><small>Lesson Plans</small></div></article>
+          <article><span class="id-tutor-stat-icon gold">${icon('star', 20)}</span><div><strong>80%</strong><small>Tutor Share</small></div></article>
+        </section>
+        <section class="id-tutor-zoom">
+          <header>
+            <h2><span class="id-tutor-zoom-icon">${icon('video', 24)}</span> Zoom Lesson Management</h2>
+            <div class="id-tutor-availability-control"><span>Available for Lessons</span><button type="button" class="id-tutor-toggle ${isAvailable ? 'is-on' : ''}" role="switch" aria-checked="${isAvailable}" aria-label="Available for Lessons" data-action="tutor-dashboard-availability"><span></span></button></div>
+          </header>
+          <div class="id-tutor-zoom-body">
+            <div class="id-tutor-zoom-illustration" role="img" aria-label="Laptop ready for a Zoom lesson">
+              <div class="id-tutor-laptop"><span>${icon('video', 30)}</span><b>ZOOM</b></div>
+            </div>
+            <div class="id-tutor-zoom-copy"><h3>Manage your Zoom lessons</h3><p>Schedule, start and manage your live lessons with students.</p><a class="id-tutor-primary" href="#/tutor-lesson" data-route="tutor-lesson"><span class="id-tutor-video-mini">${icon('video', 18)}</span> Start or Schedule Lesson <span aria-hidden="true">→</span></a></div>
+          </div>
+        </section>
+        <section class="id-tutor-detail-grid" data-learner-privacy="No learner information is shared before consent">
+          <article class="id-tutor-profile-card">
+            <header><h2><span>${icon('user', 22)}</span> Your Tutor Profile</h2><a href="#/tutor-profile" data-route="tutor-profile">${icon('edit', 15)} Edit Profile</a></header>
+            <div class="id-tutor-profile-main"><div class="id-tutor-profile-photo" role="img" aria-label="${esc(tutorName)}"></div><div><h3>${esc(tutorName || 'Onilude Hammed')}</h3><span class="id-tutor-verified">${icon('check', 12)} Verified Tutor</span><p><span>${icon('mail', 16)}</span> ${profileEmail}</p><p><span>${icon('globe', 16)}</span> ${profileLanguage}</p><p><span>${icon('graduation', 16)}</span> 10 years teaching</p></div></div>
+            <h4>Languages You Teach</h4><span class="id-tutor-language">English</span>
+          </article>
+          <aside class="id-tutor-preview-card">
+            <div class="id-tutor-preview-icon" role="img" aria-label="Tutor application document">${icon('search', 24)}</div>
+            <h2>Preview Application</h2>
+            <p>Your application preview is complete.<br>This demo does not transmit or store your details on a server.</p>
+            <a class="id-tutor-primary" href="#/tutor-profile" data-route="tutor-profile">${icon('eye', 18)} Preview Application <span aria-hidden="true">→</span></a>
+          </aside>
+        </section>
+      </main>
+      <nav class="id-tutor-bottom-nav" aria-label="Tutor dashboard navigation">
+        <a href="#/tutor-lesson" data-route="tutor-lesson">${icon('message', 21)}<span>Learn</span></a>
+        <a class="is-active" href="#/tutor-dashboard" data-route="tutor-dashboard" aria-current="page">${icon('leaf', 21)}<span>Explore</span></a>
+        <a href="#/tutor-students" data-route="tutor-students">${icon('chart', 21)}<span>Progress</span></a>
+        <a class="id-tutor-help" href="#/tutor-settings" data-route="tutor-settings">${icon('message-circle', 20)}<span>Help</span></a>
+      </nav>
+    </div>`;
   }
 
   function renderTutorFindChild() {
@@ -6500,6 +6564,26 @@ import './src/heritageLibrary.css';
         } catch (error) {
           showToast(error instanceof Error ? error.message : 'Your preference could not be saved.', 'error');
         }
+        break;
+      }
+      case 'tutor-dashboard-availability': {
+        try {
+          const availability = getTutorAvailability();
+          const isAvailable = availability.days.length > 0;
+          const updated = isAvailable
+            ? { ...availability, days: [] }
+            : { ...availability, days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] };
+          localStorage.setItem(TUTOR_AVAILABILITY_KEY, JSON.stringify(updated));
+          render();
+          showToast(updated.days.length ? 'You are available for lessons.' : 'You are unavailable for lessons.', 'success');
+        } catch (error) {
+          showToast(error instanceof Error ? error.message : 'Availability could not be updated.', 'error');
+        }
+        break;
+      }
+      case 'tutor-menu': {
+        el.setAttribute('aria-expanded', String(el.getAttribute('aria-expanded') !== 'true'));
+        navigate('tutor-profile');
         break;
       }
       case 'parent-refresh':

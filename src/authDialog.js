@@ -8,6 +8,7 @@ import {
   isSignupPasswordValid,
   isSupabaseConfigured,
   resendSignupConfirmation,
+  requestPasswordReset,
   restoreAuthSession,
   sendAuthActivityEmail,
   signIn,
@@ -100,6 +101,7 @@ function parentForm() {
     </div>
     ${signup ? '<p class="id-auth-hint id-auth-span">Use 12–128 characters, including uppercase and lowercase letters, a number, and a symbol.</p>' : ''}
     ${feedbackMarkup()}
+    ${signup ? '' : '<button class="id-auth-secondary" type="button" data-auth-action="forgot-password">Forgot password?</button>'}
     <button class="id-auth-submit" type="submit">${signup ? 'Create parent account' : 'Sign in'}</button>
     <p class="id-auth-switch">${signup ? 'Already have a parent account?' : 'New to Idilewa?'}
       <button type="button" data-auth-mode="${signup ? 'signin' : 'signup'}">${signup ? 'Sign in' : 'Create an account'}</button>
@@ -184,6 +186,7 @@ function tutorForm() {
       })}
     </div>`}
     ${feedbackMarkup()}
+    ${signup ? '' : '<button class="id-auth-secondary" type="button" data-auth-action="forgot-password">Forgot password?</button>'}
     <button class="id-auth-submit" type="submit">${signup ? 'Create tutor account' : 'Sign in'}</button>
     <p class="id-auth-switch">${signup ? 'Already have a tutor account?' : 'New to the tutor portal?'}
       <button type="button" data-auth-mode="${signup ? 'signin' : 'signup'}">${signup ? 'Sign in' : 'Create an account'}</button>
@@ -219,83 +222,41 @@ function childGate() {
 }
 
 function childForm() {
-  const parent = state.parent || getCurrentUser();
-  const name = parent?.name || '';
-  const email = parent?.email || '';
-  return `<form class="id-auth-form id-auth-child-form" data-auth-child-form aria-labelledby="id-auth-form-title">
-    <h3 id="id-auth-form-title">Create a child profile</h3>
-    <p class="id-auth-form-copy">A parent or legal guardian must provide consent before a child profile is activated.</p>
-    <section class="id-auth-child-section">
-      <h4>Child information</h4>
+  const signup = state.mode === 'signup';
+  if (!signup) {
+    return `<form class="id-auth-form" data-auth-form="child" data-mode="signin" aria-labelledby="id-auth-form-title" autocomplete="on">
+      <h3 id="id-auth-form-title">Sign in to your child account</h3>
+      <p class="id-auth-form-copy">Use the email and password created with guardian approval. No guardian passcode is required.</p>
       <div class="id-auth-fields">
-        <label class="id-auth-field" for="id-auth-child-name">Child’s name <span aria-hidden="true">*</span>
-          <input id="id-auth-child-name" name="childName" maxlength="80" autocomplete="off" required />
+        <label class="id-auth-field id-auth-span" for="id-auth-child-email">Child email address
+          <input id="id-auth-child-email" name="email" type="email" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="254" required />
         </label>
-        <label class="id-auth-field" for="id-auth-child-age">Age group <span aria-hidden="true">*</span>
-          <select id="id-auth-child-age" name="age" required>
-            <option value="">Select age</option><option value="under_6">Under 6</option><option value="6_8">6–8</option><option value="9_12">9–12</option><option value="13_17">13–17</option>
-          </select>
-        </label>
+        ${passwordField({ id: 'id-auth-child-password', name: 'password', label: 'Password', autocomplete: 'current-password', minlength: '1', confirm: true })}
       </div>
-      <fieldset class="id-auth-choice-field"><legend>Gender (optional)</legend><div class="id-auth-choices">
-        <label><input type="radio" name="gender" value="boy" /> Boy</label>
-        <label><input type="radio" name="gender" value="girl" /> Girl</label>
-        <label><input type="radio" name="gender" value="not_specified" /> Prefer not to say</label>
-      </div></fieldset>
-      <fieldset class="id-auth-choice-field"><legend>Choose an avatar</legend><div class="id-auth-choices id-auth-avatars">
-        <label><input type="radio" name="avatar" value="a1" checked /> <span aria-hidden="true">👦🏿</span><span class="id-auth-sr-only">Avatar 1</span></label>
-        <label><input type="radio" name="avatar" value="a2" /> <span aria-hidden="true">👧🏾</span><span class="id-auth-sr-only">Avatar 2</span></label>
-        <label><input type="radio" name="avatar" value="a3" /> <span aria-hidden="true">🧒🏽</span><span class="id-auth-sr-only">Avatar 3</span></label>
-        <label><input type="radio" name="avatar" value="a4" /> <span aria-hidden="true">👳🏾</span><span class="id-auth-sr-only">Avatar 4</span></label>
-      </div></fieldset>
-    </section>
-    <section class="id-auth-child-section">
-      <h4>Preferred languages <span aria-hidden="true">*</span></h4>
-      <p class="id-auth-hint">Choose one or more languages your child wants to learn.</p>
-      <fieldset class="id-auth-choice-field"><legend class="id-auth-sr-only">Preferred languages</legend><div class="id-auth-choices">
-        <label><input type="checkbox" name="languages" value="yoruba" /> Yorùbá</label>
-        <label><input type="checkbox" name="languages" value="igbo" /> Igbo</label>
-        <label><input type="checkbox" name="languages" value="hausa" /> Hausa</label>
-        <label><input type="checkbox" name="languages" value="pidgin" /> Pidgin</label>
-        <label><input type="checkbox" name="languages" value="kiswahili" /> Kiswahili</label>
-        <label><input type="checkbox" name="languages" value="other" /> Other African languages</label>
-      </div></fieldset>
-    </section>
-    <section class="id-auth-child-section">
-      <h4>Learning interests</h4>
-      <fieldset class="id-auth-choice-field"><legend class="id-auth-sr-only">Learning interests</legend><div class="id-auth-choices">
-        <label><input type="checkbox" name="interests" value="stories" /> Stories</label>
-        <label><input type="checkbox" name="interests" value="games" /> Games</label>
-        <label><input type="checkbox" name="interests" value="songs" /> Songs</label>
-        <label><input type="checkbox" name="interests" value="arts_crafts" /> Art &amp; craft</label>
-      </div></fieldset>
-    </section>
-    <section class="id-auth-child-section">
-      <h4>Parent or guardian details</h4>
-      <div class="id-auth-fields">
-        <label class="id-auth-field" for="id-auth-parent-name">Parent or guardian’s full name
-          <input id="id-auth-parent-name" name="parentName" autocomplete="name" maxlength="100" value="${escapeAttribute(name)}" readonly required />
-        </label>
-        <label class="id-auth-field" for="id-auth-parent-email">Parent or guardian’s email
-          <input id="id-auth-parent-email" name="parentEmail" type="email" autocomplete="email" value="${escapeAttribute(email)}" readonly required />
-        </label>
-        <label class="id-auth-field id-auth-span" for="id-auth-relationship">Relationship to child
-          <select id="id-auth-relationship" name="relationship" required>
-            <option value="">Select relationship</option><option value="parent">Parent</option><option value="legal_guardian">Legal guardian</option><option value="authorized_caregiver">Other authorized caregiver</option>
-          </select>
-        </label>
-      </div>
-      <label class="id-auth-consent"><input type="checkbox" name="consent" required />
-        <span>I confirm that I am the child’s parent or legal guardian, or otherwise authorized to provide consent, and I give permission for Idilewa to create this child profile and process the submitted information to provide its learning service.</span>
+      ${feedbackMarkup()}
+      <button class="id-auth-secondary" type="button" data-auth-action="forgot-password">Forgot password?</button>
+      <button class="id-auth-submit" type="submit">Sign in</button>
+    </form>`;
+  }
+  return `<form class="id-auth-form" data-auth-form="child" data-mode="signup" aria-labelledby="id-auth-form-title" autocomplete="on">
+    <h3 id="id-auth-form-title">Create a child account</h3>
+    <p class="id-auth-form-copy">A parent or guardian must approve the account. No guardian passcode is needed after approval.</p>
+    <div class="id-auth-fields">
+      <label class="id-auth-field" for="id-auth-child-name">Child name
+        <input id="id-auth-child-name" name="name" autocomplete="name" maxlength="80" required />
       </label>
-      <p class="id-auth-hint">After you submit, we’ll email a secure, single-use link. The child profile stays inactive until you verify your email and confirm this consent.</p>
-      <label class="id-auth-consent id-auth-optional-consent"><input type="checkbox" name="updates" />
-        <span>I would like to receive optional learning updates and product news by email.</span>
+      <label class="id-auth-field" for="id-auth-child-email">Child email address
+        <input id="id-auth-child-email" name="email" type="email" autocomplete="username" autocapitalize="none" spellcheck="false" maxlength="254" required />
       </label>
-    </section>
-    <div class="id-auth-honeypot" aria-hidden="true"><label for="id-auth-website">Leave this field empty</label><input id="id-auth-website" name="website" tabindex="-1" autocomplete="off" /></div>
+      ${passwordField({ id: 'id-auth-child-password', name: 'password', label: 'Password', autocomplete: 'new-password', minlength: '12' })}
+      ${passwordField({ id: 'id-auth-child-confirm-password', name: 'confirmPassword', label: 'Confirm password', autocomplete: 'new-password', minlength: '12', confirm: true })}
+      <label class="id-auth-field id-auth-span" for="id-auth-child-approval-code">Guardian approval code
+        <input id="id-auth-child-approval-code" name="approvalCode" type="text" inputmode="numeric" autocomplete="one-time-code" minlength="6" maxlength="6" pattern="[0-9]{6}" placeholder="6-digit code" required />
+        <small>The code is emailed to the child after the parent or guardian approves.</small>
+      </label>
+    </div>
     ${feedbackMarkup()}
-    <button class="id-auth-submit" type="submit">Create child profile</button>
+    <button class="id-auth-submit" type="submit">Verify approval and create account</button>
   </form>`;
 }
 
@@ -313,24 +274,28 @@ function resultPanel() {
       <button class="id-auth-secondary" type="button" data-auth-action="return-to-signin">Return to sign in</button>
     </section>`;
   }
-  const dashboard = result.role === 'tutor' ? 'tutor-dashboard' : 'parent-dashboard';
-  const destination = result.role === 'tutor' ? 'tutor' : 'family';
+  const dashboard = result.role === 'tutor'
+    ? 'tutor-dashboard'
+    : result.role === 'child'
+      ? 'child-dashboard'
+      : 'parent-dashboard';
+  const destination = result.role === 'tutor'
+    ? 'tutor'
+    : result.role === 'child'
+      ? 'learning'
+      : 'family';
   return `<section class="id-auth-result">
     <span class="id-auth-result-mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 12 4 4L19 6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"/></svg></span>
     <h3>${escapeHtml(result.title)}</h3>
     <p>${escapeHtml(result.message)}</p>
-    <button class="id-auth-submit" type="button" data-auth-action="continue" data-dashboard="${dashboard}">Continue to ${destination === 'tutor' ? 'tutor portal' : 'family dashboard'}</button>
+    <button class="id-auth-submit" type="button" data-auth-action="continue" data-dashboard="${dashboard}">Continue to ${destination === 'tutor' ? 'tutor portal' : destination === 'learning' ? 'learning' : 'family dashboard'}</button>
     <button class="id-auth-secondary" type="button" data-auth-close>Stay on this page</button>
   </section>`;
 }
 
 function panelContent() {
   if (state.screen !== 'form') return resultPanel();
-  if (state.role === 'child') {
-    return state.parentCheck === 'ready' && state.parent?.role === 'parent'
-      ? childForm()
-      : childGate();
-  }
+  if (state.role === 'child') return childForm();
   return state.role === 'tutor' ? tutorForm() : parentForm();
 }
 
@@ -469,7 +434,7 @@ function renderPanel() {
     button.setAttribute('aria-pressed', String(button.dataset.authMode === state.mode));
   });
   const modePicker = dialog.querySelector('.id-auth-mode-picker');
-  modePicker.hidden = state.role === 'child' || state.screen !== 'form';
+  modePicker.hidden = state.screen !== 'form';
   dialog.querySelector('[data-auth-content]').innerHTML = panelContent();
   updateGoogleVisibility();
 }
@@ -536,7 +501,7 @@ async function checkParentAccount() {
 
 function setRole(role, { pendingChild = false, mode = state.mode } = {}) {
   state.role = role;
-  state.mode = role === 'child' ? 'signup' : mode;
+  state.mode = mode;
   state.screen = 'form';
   state.pendingChild = pendingChild;
   state.feedback = null;
@@ -670,6 +635,9 @@ function handleDialogClick(event) {
       state.result = null;
       renderPanel();
       break;
+    case 'forgot-password':
+      void handleForgotPassword(actionButton);
+      break;
     case 'resend-confirmation':
       void resendConfirmation(actionButton);
       break;
@@ -682,7 +650,33 @@ function continueToDashboard(route) {
   dialog.close('continue');
   window.location.assign(route === 'tutor-dashboard'
     ? '/educator-portal.html#/tutor-dashboard'
-    : '/parents.html#/parent-dashboard');
+    : route === 'child-dashboard'
+      ? '/?view=academy'
+      : '/parents.html#/parent-dashboard');
+}
+
+async function handleForgotPassword(button) {
+  const form = button.closest('form');
+  const emailInput = form?.querySelector('input[name="email"]');
+  if (!(emailInput instanceof HTMLInputElement)) return;
+  if (!emailInput.reportValidity()) {
+    emailInput.focus();
+    return;
+  }
+  button.disabled = true;
+  const previousLabel = button.textContent;
+  button.textContent = 'Sending recovery email…';
+  try {
+    await requestPasswordReset(emailInput.value);
+    setFeedback('If an account exists for this email, a password recovery link has been sent.', 'success');
+  } catch (error) {
+    setFeedback(error instanceof Error ? error.message : 'Password recovery could not be started.', 'error');
+  } finally {
+    if (button.isConnected) {
+      button.disabled = false;
+      button.textContent = previousLabel;
+    }
+  }
 }
 
 async function resendConfirmation(button) {
@@ -781,6 +775,68 @@ async function handleDialogSubmit(event) {
   const password = String(formData.get('password') || '');
   const submitButton = form.querySelector('button[type="submit"]');
   if (!(submitButton instanceof HTMLButtonElement)) return;
+
+  if (role === 'child') {
+    submitButton.disabled = true;
+    submitButton.textContent = mode === 'signup' ? 'Creating child account…' : 'Signing in…';
+    try {
+      if (mode === 'signup') {
+        if (password !== String(formData.get('confirmPassword') || '')) {
+          setFeedback('The passwords do not match.');
+          form.querySelector('[name="confirmPassword"]')?.focus();
+          return;
+        }
+        if (!isSignupPasswordValid(password)) {
+          setFeedback('Use 12–128 characters with uppercase and lowercase letters, a number, and a symbol.');
+          form.querySelector('[name="password"]')?.focus();
+          return;
+        }
+        const approvalCode = String(formData.get('approvalCode') || '').trim();
+        if (!/^\d{6}$/.test(approvalCode)) {
+          setFeedback('Enter the six-digit guardian approval code.');
+          form.querySelector('[name="approvalCode"]')?.focus();
+          return;
+        }
+        const approvalResponse = await fetch('/api/guardian/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({ email, code: approvalCode }),
+        });
+        const approvalResult = await approvalResponse.json().catch(() => null);
+        if (!approvalResponse.ok || !approvalResult?.approvalId) {
+          throw new Error(approvalResult?.error || 'The guardian approval code is invalid or expired.');
+        }
+        const { session, user, welcomeEmailError } = await signUp({
+          email,
+          password,
+          name: String(formData.get('name') || '').trim(),
+          role: 'child',
+          guardianAccessRequestId: approvalResult.approvalId,
+          redirectRoute: 'index',
+        });
+        if (!session) {
+          setConfirmation('Your child account was created. Confirm the account email before signing in.', email);
+          return;
+        }
+        setAccountReady('child', user, welcomeEmailError
+          ? `Your child account is ready. ${welcomeEmailError}`
+          : 'Your child account is ready.');
+        return;
+      }
+
+      const user = await signIn({ email, password, expectedRole: 'child' });
+      setAccountReady('child', user, 'Welcome back. Your child account is ready.');
+      return;
+    } catch (error) {
+      setFeedback(error instanceof Error ? error.message : 'The child account could not be verified.');
+      return;
+    } finally {
+      if (submitButton.isConnected && state.screen === 'form') {
+        submitButton.disabled = false;
+        submitButton.textContent = mode === 'signup' ? 'Verify approval and create account' : 'Sign in';
+      }
+    }
+  }
 
   if (role === 'parent' && mode === 'signup') {
     const phone = String(formData.get('phone') || '').trim();
