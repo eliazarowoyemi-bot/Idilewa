@@ -7,6 +7,7 @@ import {
 } from '../src/heritageLibrary.js';
 
 const heritageSource = await readFile(new URL('../src/heritageLibrary.js', import.meta.url), 'utf8');
+const heritageCssSource = await readFile(new URL('../src/heritageLibrary.css', import.meta.url), 'utf8');
 
 const records = [
   { id: 'YO-01', title: 'Ìjàpá àti Àwọn Ẹyẹ', category: 'Folktales', language: 'Yorùbá', story: 'A tortoise learns gratitude.' },
@@ -46,6 +47,13 @@ test('heritage age filtering excludes catalogue entries without editorial age as
   const result = filterHeritageRecords(records, { age: '6–8' });
 
   assert.deepEqual(result.map((record) => record.id), ['ED17-1']);
+});
+
+test('heritage age cards use landscape media at every responsive size', () => {
+  assert.match(heritageCssSource, /\.heritage-age-card img\s*\{[\s\S]*?aspect-ratio:\s*16\s*\/\s*9;/);
+  assert.match(heritageCssSource, /@media \(max-width: 640px\)[\s\S]*?\.heritage-age-grid\s*\{[\s\S]*?grid-template-columns:\s*repeat\(2,/);
+  assert.match(heritageCssSource, /@media \(max-width: 430px\)[\s\S]*?\.heritage-age-grid\s*\{[\s\S]*?grid-template-columns:\s*minmax\(0,\s*1fr\)/);
+  assert.doesNotMatch(heritageCssSource, /\.heritage-age-card img\s*\{[\s\S]*?aspect-ratio:\s*1\.48/);
 });
 
 test('collection counts use the records actually available', () => {

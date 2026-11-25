@@ -72,7 +72,7 @@
 
 .heritage-age-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 188px), 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
   gap: 16px;
 }
 
@@ -104,7 +104,7 @@
 .heritage-age-card img {
   display: block;
   inline-size: 100%;
-  aspect-ratio: 1.48;
+  aspect-ratio: 16 / 9;
   border-radius: calc(var(--radius) - 1px) calc(var(--radius) - 1px) 0 0;
   object-fit: cover;
   object-position: center;
@@ -823,6 +823,12 @@
 
   .heritage-pagination {
     flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 430px) {
+  .heritage-age-grid {
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
