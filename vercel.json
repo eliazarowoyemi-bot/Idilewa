@@ -4,6 +4,11 @@
   "cleanUrls": true,
   "redirects": [
     {
+      "source": "/tutor.html",
+      "destination": "/educator-portal.html#/tutor-dashboard",
+      "permanent": true
+    },
+    {
       "source": "/heritage",
       "destination": "/heritage-library",
       "permanent": true

@@ -3600,7 +3600,7 @@ import './src/heritageLibrary.css';
         <a class="id-tutor-brand" href="#/tutor-dashboard" data-route="tutor-dashboard" aria-label="Idilewa tutor dashboard">${brandLogo()}</a>
         <div class="id-tutor-header-actions">
           <button class="id-tutor-notifications" type="button" aria-label="Notifications, 3 unread"><span>${icon('bell', 18)}</span><b>3</b></button>
-          <button class="id-tutor-avatar" type="button" aria-label="Open tutor profile" data-route="tutor-profile">${esc(tutorName.trim().charAt(0).toUpperCase() || 'O')}</button>
+          <button class="id-tutor-avatar" type="button" aria-label="Open tutor profile" data-route="tutor-profile"><img src="/assets/yoruba-educator-woman.jpg" alt="" /></button>
           <button class="id-tutor-menu" type="button" aria-label="Open tutor menu" aria-expanded="false" data-action="tutor-menu">${icon('menu', 20)}</button>
         </div>
       </header>
@@ -3608,7 +3608,7 @@ import './src/heritageLibrary.css';
         <section class="id-tutor-hero">
           <div class="id-tutor-hero-copy">
             <span class="id-tutor-live"><i></i> Live Tutor</span>
-            <h1>Welcome back,<br>${esc(tutorName.split(/\s+/).pop() || 'Onilude')}!</h1>
+            <h1>Welcome back,<br>${esc(tutorName.split(/\s+/).pop() || 'Hammed')}!</h1>
             <p>Your dedication is helping African children learn and thrive. <span aria-hidden="true">❤️</span></p>
             <a href="#/tutor-profile" data-route="tutor-profile" class="id-tutor-profile-button">View Profile <span aria-hidden="true">→</span></a>
           </div>

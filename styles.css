@@ -9800,6 +9800,7 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .id-tutor-notifications { position: relative; width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 50%; color: #405c50; background: transparent; cursor: pointer; }
 .id-tutor-notifications b { position: absolute; top: -2px; right: 0; width: 17px; height: 17px; display: grid; place-items: center; border: 2px solid #fff; border-radius: 50%; color: #fff; background: #ff5b5b; font-size: 9px; line-height: 1; }
 .id-tutor-avatar { width: 43px; height: 43px; overflow: hidden; border: 2px solid #e6eee9; border-radius: 50%; color: #fff; background: linear-gradient(145deg, #d2bb8d, #0a6b4c); font-weight: 800; cursor: pointer; }
+.id-tutor-avatar img { width: 100%; height: 100%; display: block; border-radius: 50%; object-fit: cover; object-position: 50% 18%; }
 .id-tutor-menu { width: 36px; height: 36px; display: grid; place-items: center; border: 0; color: #18322a; background: transparent; cursor: pointer; }
 .id-tutor-main { width: min(896px, calc(100% - 32px)); margin: 0 auto; padding: 22px 0 92px; }
 .id-tutor-hero { height: 260px; overflow: hidden; display: grid; grid-template-columns: 55% 45%; border-radius: 20px; background: linear-gradient(105deg, #087847 0%, #0d9c50 57%, #8bcf91 100%); box-shadow: 0 9px 28px rgba(27,67,50,.10); }
