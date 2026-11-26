@@ -125,7 +125,7 @@ async function initializeAuthCallback() {
       }
 
       if (isGoogleAccount && callback.user.role === 'adult') {
-        showTutorSignup('This Google account is ready. Complete the tutor details and enter your one-time invitation to register as an educator.');
+        showTutorSignup('This Google account is ready. Complete the tutor details to register as an educator.');
         return;
       }
 

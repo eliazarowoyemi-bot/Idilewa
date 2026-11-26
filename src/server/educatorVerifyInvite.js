@@ -10,8 +10,6 @@ import {
 } from './guardianConsent.js';
 import { normalizeEducatorProfile } from '../educatorProfile.js';
 
-const UUID_PATTERN = /^[0-9a-f-]{36}$/i;
-
 function readBearerToken(req) {
   const authorization = req.headers?.authorization;
   const match = typeof authorization === 'string' ? /^Bearer\s+(.+)$/i.exec(authorization) : null;
@@ -24,9 +22,6 @@ function readBearerToken(req) {
 async function completeGoogleSignup(req, res) {
   try {
     const body = readJsonBody(req);
-    if (!UUID_PATTERN.test(body.inviteId || '')) {
-      throw new GuardianConsentError(400, 'A verified one-time educator invitation is required.');
-    }
     if (body.safeguardingAccepted !== true) {
       throw new GuardianConsentError(400, 'Accept the safeguarding requirements before creating a tutor account.');
     }
@@ -77,7 +72,6 @@ async function completeGoogleSignup(req, res) {
         ...user.user_metadata,
         name,
         role: 'educator',
-        educator_invite_id: body.inviteId,
         country: educatorProfile.country,
         time_zone: educatorProfile.timeZone,
         teaching_subject: educatorProfile.teachingSubject,
@@ -87,15 +81,14 @@ async function completeGoogleSignup(req, res) {
       },
     });
     if (metadataError) {
-      throw new GuardianConsentError(503, 'Your tutor details could not be saved. Your invitation has not been used; please try again.');
+      throw new GuardianConsentError(503, 'Your tutor details could not be saved. Please try again.');
     }
 
     const { data: completed, error: completionError } = await admin.rpc('complete_educator_google_signup', {
       p_user_id: user.id,
-      p_invite_id: body.inviteId,
     });
     if (completionError || completed !== true) {
-      throw new GuardianConsentError(400, 'That invitation is invalid, expired, used, or belongs to another account.');
+      throw new GuardianConsentError(400, 'Your educator account could not be completed. Please try again.');
     }
 
     return sendGuardianJson(res, 200, { role: 'educator' });

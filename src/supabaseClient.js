@@ -287,7 +287,6 @@ export async function signUp({
   phone = '',
   role = 'child',
   guardianAccessRequestId,
-  educatorInviteId,
   educatorProfile,
   redirectRoute = 'index',
 }) {
@@ -300,9 +299,6 @@ export async function signUp({
   }
   if (role === 'child' && !/^[0-9a-f-]{36}$/i.test(guardianAccessRequestId || '')) {
     throw new Error('A verified guardian approval is required before creating a child account.');
-  }
-  if (role === 'educator' && !/^[0-9a-f-]{36}$/i.test(educatorInviteId || '')) {
-    throw new Error('A verified one-time educator invitation code is required before creating a teacher account.');
   }
   const normalizedEducatorProfile = role === 'educator'
     ? normalizeEducatorProfile(educatorProfile)
@@ -323,7 +319,6 @@ export async function signUp({
         ...(role === 'parent' && phone ? { phone: phone.trim().slice(0, 24) } : {}),
         ...(role === 'child' ? { guardian_access_request_id: guardianAccessRequestId } : {}),
         ...(role === 'educator' ? {
-          educator_invite_id: educatorInviteId,
           country: normalizedEducatorProfile.country,
           time_zone: normalizedEducatorProfile.timeZone,
           teaching_subject: normalizedEducatorProfile.teachingSubject,
@@ -382,28 +377,7 @@ export async function signUp({
   };
 }
 
-export async function verifyEducatorInvite(code) {
-  const response = await fetch('/api/educator/verify-invite', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-    body: JSON.stringify({ code }),
-  });
-  let result;
-  try {
-    result = await response.json();
-  } catch (error) {
-    throw new Error('The invitation service returned an invalid response.', { cause: error });
-  }
-  if (!response.ok) {
-    throw new Error(typeof result?.error === 'string' ? result.error : 'The educator invitation could not be verified.');
-  }
-  if (typeof result?.inviteId !== 'string' || !/^[0-9a-f-]{36}$/i.test(result.inviteId)) {
-    throw new Error('The invitation service did not return a valid invitation.');
-  }
-  return result.inviteId;
-}
-
-export async function beginEducatorGoogleSignup({ inviteCode, educatorProfile, firstName, lastName }) {
+export async function beginEducatorGoogleSignup({ educatorProfile, firstName, lastName }) {
   const client = requireSupabase();
   const normalizedFirstName = typeof firstName === 'string' ? firstName.trim() : '';
   const normalizedLastName = typeof lastName === 'string' ? lastName.trim() : '';
@@ -412,9 +386,7 @@ export async function beginEducatorGoogleSignup({ inviteCode, educatorProfile, f
     throw new Error('Enter a first and last name using no more than 40 characters each.');
   }
   const profile = normalizeEducatorProfile(educatorProfile);
-  const inviteId = await verifyEducatorInvite(inviteCode);
   const pendingSignup = {
-    inviteId,
     profile,
     firstName: normalizedFirstName,
     lastName: normalizedLastName,
@@ -491,7 +463,6 @@ export function getPendingEducatorGoogleSignup() {
     throw new Error('Your pending Google tutor signup is invalid. Please start again.', { cause: error });
   }
   const valid = pendingSignup && typeof pendingSignup === 'object'
-    && /^[0-9a-f-]{36}$/i.test(pendingSignup.inviteId || '')
     && typeof pendingSignup.createdAt === 'number'
     && Date.now() - pendingSignup.createdAt >= 0
     && Date.now() - pendingSignup.createdAt <= 15 * 60 * 1000
@@ -502,7 +473,6 @@ export function getPendingEducatorGoogleSignup() {
     return null;
   }
   return {
-    inviteId: pendingSignup.inviteId,
     profile: normalizeEducatorProfile(pendingSignup.profile),
     firstName: pendingSignup.firstName,
     lastName: pendingSignup.lastName,
@@ -517,7 +487,7 @@ export function clearPendingEducatorGoogleSignup() {
   }
 }
 
-export async function completeEducatorGoogleSignup({ accessToken, inviteId, educatorProfile, firstName, lastName }) {
+export async function completeEducatorGoogleSignup({ accessToken, educatorProfile, firstName, lastName }) {
   if (typeof accessToken !== 'string' || !accessToken.trim()) {
     throw new Error('Your Google session could not be verified. Please sign in again.');
   }
@@ -529,7 +499,6 @@ export async function completeEducatorGoogleSignup({ accessToken, inviteId, educ
       Accept: 'application/json',
     },
     body: JSON.stringify({
-      inviteId,
       educatorProfile: normalizeEducatorProfile(educatorProfile),
       firstName,
       lastName,

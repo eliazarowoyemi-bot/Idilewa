@@ -14,7 +14,6 @@ import {
   signIn,
   signInWithGoogle,
   signUp,
-  verifyEducatorInvite,
 } from './supabaseClient.js';
 
 const state = {
@@ -143,10 +142,6 @@ function tutorForm() {
           <option value="">Choose time zone</option><option value="Europe/London">UK / London</option><option value="Africa/Lagos">Nigeria / Lagos</option><option value="Africa/Accra">Ghana / Accra</option><option value="America/New_York">US / Eastern</option><option value="America/Los_Angeles">US / Pacific</option><option value="other">Other</option>
         </select>
       </label>
-      <label class="id-auth-field id-auth-span" for="id-auth-tutor-invite">Educator invitation code
-        <input id="id-auth-tutor-invite" name="inviteCode" autocomplete="one-time-code" maxlength="64" data-google-required required />
-        <small>Invitations are one-time use and expire for your security.</small>
-      </label>
       <label class="id-auth-field" for="id-auth-tutor-subject">Main teaching subject
         <select id="id-auth-tutor-subject" name="teachingSubject" data-google-required required>
           <option value="">Choose a subject</option><option>Yorùbá</option><option>Igbo</option><option>Hausa</option><option>Arabic</option><option>Kiswahili</option><option>Mathematics</option><option>English</option><option>Science</option><option>Coding</option><option>Other</option>
@@ -205,7 +200,7 @@ function tutorForm() {
       <svg aria-hidden="true" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5Z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94a11.05 11.05 0 0 1-4.8 7.24l7.75 6.01c4.52-4.18 7.09-10.34 7.09-17.72Z"/><path fill="#FBBC05" d="M10.53 28.59a14.4 14.4 0 0 1-.75-4.59c0-1.59.27-3.13.75-4.59l-7.98-6.19A23.9 23.9 0 0 0 0 24c0 3.87.93 7.53 2.56 10.78l7.97-6.19Z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.9-5.73l-7.75-6.01c-2.15 1.45-4.9 2.31-8.15 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48Z"/></svg>
       Continue with Google
     </button>
-    ${signup ? '<small>Google sign-up still requires your tutor details and one-time invitation.</small>' : ''}
+    ${signup ? '<small>Google sign-up requires your tutor details and safeguarding agreement.</small>' : ''}
   </div>`;
   return form;
 }
@@ -726,7 +721,6 @@ async function startGoogleAuth(action, button) {
       await beginEducatorGoogleSignup({
         firstName: String(data.get('firstName') || ''),
         lastName: String(data.get('lastName') || ''),
-        inviteCode: String(data.get('inviteCode') || ''),
         educatorProfile: {
           country: String(data.get('country') || ''),
           timeZone: String(data.get('timeZone') || ''),
@@ -923,13 +917,11 @@ async function handleDialogSubmit(event) {
     if (role === 'tutor' && mode === 'signup') {
       const firstName = String(formData.get('firstName') || '').trim();
       const lastName = String(formData.get('lastName') || '').trim();
-      const educatorInviteId = await verifyEducatorInvite(String(formData.get('inviteCode') || '').trim());
       const { session, user, welcomeEmailError } = await signUp({
         email,
         password,
         name: `${firstName} ${lastName}`.trim(),
         role: 'educator',
-        educatorInviteId,
         educatorProfile: {
           country: String(formData.get('country') || '').trim(),
           timeZone: String(formData.get('timeZone') || '').trim(),

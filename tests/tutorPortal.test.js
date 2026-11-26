@@ -9,6 +9,7 @@ const styleSource = await readFile(new URL('../styles.css', import.meta.url), 'u
 const supabaseClientSource = await readFile(new URL('../src/supabaseClient.js', import.meta.url), 'utf8');
 const authCallbackSource = await readFile(new URL('../src/authCallback.js', import.meta.url), 'utf8');
 const tutorNavigationSource = await readFile(new URL('../src/tutorNavigation.js', import.meta.url), 'utf8');
+const migrationSource = await readFile(new URL('../supabase/migrations/20261126141500_open_educator_registration.sql', import.meta.url), 'utf8');
 
 test('Tutor Portal provides independent routes for every supplied interface', () => {
   for (const route of [
@@ -30,14 +31,16 @@ test('tutor landing, authentication, and workspace link back to the main Idilewa
   assert.match(appSource, /tutor-topbar-home[^>]*href="\/"/);
 });
 
-test('educator registration verifies invitation and preserves the educator role', () => {
-  assert.match(authDialogSource, /verifyEducatorInvite\(String\(formData\.get\('inviteCode'\)/);
-  assert.match(authDialogSource, /role: 'educator',\s*educatorInviteId,\s*educatorProfile/);
+test('educator registration is open and preserves profile validation and child approval', () => {
+  assert.doesNotMatch(authDialogSource, /verifyEducatorInvite|id-auth-tutor-invite|inviteCode/);
+  assert.match(authDialogSource, /role: 'educator',\s*educatorProfile/);
   assert.match(authDialogSource, /educatorProfile:/);
-  assert.match(supabaseClientSource, /export async function verifyEducatorInvite\(code\)/);
-  assert.match(supabaseClientSource, /role === 'educator'.*educatorInviteId/);
+  assert.doesNotMatch(supabaseClientSource, /educatorInviteId|educator_invite_id/);
+  assert.match(supabaseClientSource, /role === 'educator'[\s\S]*?normalizeEducatorProfile\(educatorProfile\)/);
   assert.match(supabaseClientSource, /teaching_subject: normalizedEducatorProfile\.teachingSubject/);
   assert.match(supabaseClientSource, /safeguarding_accepted_at: new Date\(\)\.toISOString\(\)/);
+  assert.match(migrationSource, /IF v_role = 'child' THEN[\s\S]*?guardian_access_requests/);
+  assert.doesNotMatch(migrationSource, /educator_invites|educator_invite_id/);
   assert.match(authCallbackSource, /'tutor-login'/);
 });
 
@@ -66,6 +69,7 @@ test('educator signup captures and validates profile details before authenticati
 
 test('legacy tutor application and dashboard navigation enter real educator auth routes', () => {
   assert.match(tutorNavigationSource, /createPortalLink\('tutor-signup', 'Become a Tutor'\)/);
+  assert.doesNotMatch(tutorNavigationSource, /invitation code/);
   assert.match(tutorNavigationSource, /createPortalLink\('tutor-dashboard', 'Tutor Dashboard'\)/);
   assert.match(tutorNavigationSource, /link\.href = `\.\/educator-portal\.html#\/\$\{route\}`/);
   assert.doesNotMatch(tutorNavigationSource, /link\.href = `\.\/index\.html#\//);

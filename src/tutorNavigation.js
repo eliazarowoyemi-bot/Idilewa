@@ -67,7 +67,7 @@ const signupHeading = document.createElement('h3');
 signupHeading.textContent = 'Ready to teach with Ìdíléwa?';
 const signupDescription = document.createElement('p');
 signupDescription.className = 'muted';
-signupDescription.textContent = 'Create an educator account with your one-time invitation code. Your application details and sign-in stay in the secure tutor portal.';
+signupDescription.textContent = 'Create an educator account and share your teaching details in the secure tutor portal.';
 const signupActions = document.createElement('div');
 signupActions.className = 'actions';
 signupActions.append(
