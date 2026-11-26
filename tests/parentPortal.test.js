@@ -29,7 +29,7 @@ test('Parent account registration and email confirmation return to the protected
   assert.match(authDialogSource, /expectedRole = role === 'tutor' \? 'educator' : 'parent'/);
   assert.match(clientSource, /role === 'parent' && phone/);
   assert.match(clientSource, /'parent-dashboard'\]\.includes\(redirectRoute\)/);
-  assert.match(callbackSource, /'parent-dashboard'\]\.includes\(next/);
+  assert.match(callbackSource, /'parent-dashboard', 'parent-signup'\]\.includes\(next/);
 });
 
 test('Parent views keep learner data behind guardian-approved authentication and consent', () => {

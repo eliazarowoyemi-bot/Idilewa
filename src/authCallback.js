@@ -1,6 +1,7 @@
 import {
   clearPendingEducatorGoogleSignup,
   completeEducatorGoogleSignup,
+  completeParentGoogleSignup,
   completeAuthCallback,
   getPendingEducatorGoogleSignup,
   isSignupPasswordValid,
@@ -33,6 +34,13 @@ function showTutorLogin(message) {
   loginLink.hidden = false;
 }
 
+function showParentSignup(message) {
+  status.textContent = message;
+  loginLink.href = '/parents.html#/parent-signup';
+  loginLink.textContent = 'Return to parent sign-up';
+  loginLink.hidden = false;
+}
+
 async function initializeAuthCallback() {
   let callback;
   try {
@@ -46,7 +54,30 @@ async function initializeAuthCallback() {
     recoveryForm.hidden = false;
   } else if (callback) {
     const next = new URLSearchParams(window.location.search).get('next');
-    const destination = ['index', 'login', 'profile', 'tutor-login', 'parent-dashboard'].includes(next || '') ? next : 'index';
+    const destination = ['index', 'login', 'profile', 'tutor-login', 'parent-dashboard', 'parent-signup'].includes(next || '') ? next : 'index';
+    if (destination === 'parent-signup') {
+      try {
+        const providers = callback.session.user.app_metadata?.providers;
+        if (!Array.isArray(providers) || !providers.includes('google')) {
+          throw new Error('Use a verified Google account to complete parent registration.');
+        }
+        await completeParentGoogleSignup({ accessToken: callback.session.access_token });
+        const user = await restoreAuthSession();
+        if (user?.role !== 'parent') {
+          throw new Error('Google sign-in succeeded, but the parent role could not be confirmed.');
+        }
+        window.location.replace('/parents.html#/parent-dashboard');
+      } catch (error) {
+        try {
+          await signOutAccount({ notify: false });
+        } catch {
+          showParentSignup(`${error instanceof Error ? error.message : 'Google parent signup could not be completed.'} Your sign-in could not be cleared; contact Idilewa support.`);
+          return;
+        }
+        showParentSignup(error instanceof Error ? error.message : 'Google parent signup could not be completed. Please try again.');
+      }
+      return;
+    }
     if (destination === 'tutor-login') {
       const providers = callback.session.user.app_metadata?.providers;
       const isGoogleAccount = Array.isArray(providers) && providers.includes('google');

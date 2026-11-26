@@ -44,7 +44,98 @@ function getConfiguredOrigin() {
   }
 }
 
+async function completeGoogleParentSignup(req, res) {
+  if (req.method !== 'POST') {
+    res.setHeader('Allow', 'POST');
+    return sendJson(res, 405, { error: 'Method not allowed.' });
+  }
+  const match = typeof req.headers?.authorization === 'string'
+    ? /^Bearer\s+(\S+)$/i.exec(req.headers.authorization)
+    : null;
+  if (!match || match[1].length > 4096) {
+    return sendJson(res, 401, { error: 'Sign in with Google before completing parent registration.' });
+  }
+
+  const supabaseUrl = process.env.SUPABASE_URL
+    || process.env.SUPABASE_PUBLIC_URL
+    || process.env.VITE_SUPABASE_URL;
+  const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  if (!supabaseUrl || !serviceRoleKey) {
+    return sendJson(res, 503, { error: 'Google parent registration is not configured yet.' });
+  }
+
+  try {
+    const admin = createClient(supabaseUrl, serviceRoleKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
+    });
+    const { data: authData, error: authError } = await admin.auth.getUser(match[1]);
+    const user = authData?.user;
+    if (authError || !user) {
+      return sendJson(res, 401, { error: 'Your Google session could not be verified. Sign in again.' });
+    }
+    const providers = user.app_metadata?.providers;
+    if (!Array.isArray(providers) || !providers.includes('google')
+      || !user.email_confirmed_at || !user.email) {
+      return sendJson(res, 403, { error: 'Use a verified Google account to complete parent registration.' });
+    }
+
+    const { data: profile, error: profileError } = await admin
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (profileError) {
+      console.error('[auth/welcome] Parent Google signup profile lookup failed.', {
+        code: profileError.code,
+      });
+      return sendJson(res, 503, { error: 'Your account profile could not be verified.' });
+    }
+    if (!profile) {
+      return sendJson(res, 409, { error: 'Your Google account profile is not ready. Please try again.' });
+    }
+    if (profile.role === 'parent') return sendJson(res, 200, { role: 'parent' });
+    if (profile.role !== 'adult') {
+      return sendJson(res, 409, { error: 'This Google account already belongs to a different Idilewa account type.' });
+    }
+
+    const { data: updatedProfile, error: updateError } = await admin
+      .from('profiles')
+      .update({ role: 'parent', updated_at: new Date().toISOString() })
+      .eq('id', user.id)
+      .eq('role', 'adult')
+      .select('role')
+      .maybeSingle();
+    if (updateError) {
+      console.error('[auth/welcome] Parent Google signup role update failed.', {
+        code: updateError.code,
+      });
+      return sendJson(res, 503, { error: 'Your parent account could not be completed. Please try again.' });
+    }
+    if (updatedProfile?.role === 'parent') return sendJson(res, 200, { role: 'parent' });
+
+    const { data: currentProfile, error: currentProfileError } = await admin
+      .from('profiles')
+      .select('role')
+      .eq('id', user.id)
+      .maybeSingle();
+    if (currentProfileError) {
+      console.error('[auth/welcome] Parent Google signup role confirmation failed.', {
+        code: currentProfileError.code,
+      });
+      return sendJson(res, 503, { error: 'Your parent account could not be verified. Please try again.' });
+    }
+    if (currentProfile?.role === 'parent') return sendJson(res, 200, { role: 'parent' });
+    return sendJson(res, 409, { error: 'This Google account already belongs to a different Idilewa account type.' });
+  } catch (error) {
+    console.error('[auth/welcome] Parent Google signup failed.', error);
+    return sendJson(res, 500, { error: 'Google parent signup could not be completed.' });
+  }
+}
+
 export default async function handler(req, res) {
+  if (req.query?.action === 'complete-google-signup') {
+    return completeGoogleParentSignup(req, res);
+  }
   if (req.query?.action === 'email-code') {
     return handleAuthEmailCode(req, res);
   }

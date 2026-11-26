@@ -435,18 +435,44 @@ export async function beginEducatorGoogleSignup({ inviteCode, educatorProfile, f
 
 export async function signInWithGoogle({ redirectRoute = 'tutor-login' } = {}) {
   const client = requireSupabase();
-  if (redirectRoute !== 'tutor-login') {
-    throw new Error('Google sign-in is only available for the tutor portal.');
+  if (!['tutor-login', 'parent-signup'].includes(redirectRoute)) {
+    throw new Error('Choose a supported destination for Google sign-in.');
   }
   const { data, error } = await client.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: new URL('/auth-callback.html?next=tutor-login', window.location.origin).toString(),
+      redirectTo: new URL(`/auth-callback.html?next=${encodeURIComponent(redirectRoute)}`, window.location.origin).toString(),
       queryParams: { prompt: 'select_account' },
     },
   });
   if (error) throw new Error('Google sign-in could not be started. Check that Google is enabled for Idilewa and try again.', { cause: error });
   if (!data?.url) throw new Error('Google sign-in did not return a secure redirect. Please try again.');
+}
+
+export async function completeParentGoogleSignup({ accessToken }) {
+  if (typeof accessToken !== 'string' || !accessToken.trim()) {
+    throw new Error('Your Google session could not be verified. Please sign in again.');
+  }
+  const response = await fetch('/api/auth/welcome?action=complete-google-signup', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      Accept: 'application/json',
+    },
+    cache: 'no-store',
+  });
+  let result;
+  try {
+    result = await response.json();
+  } catch (error) {
+    throw new Error('The parent signup service returned an invalid response.', { cause: error });
+  }
+  if (!response.ok) {
+    throw new Error(typeof result?.error === 'string' ? result.error : 'Your Google parent signup could not be completed.');
+  }
+  if (result?.role !== 'parent') {
+    throw new Error('The parent signup service did not confirm your parent account.');
+  }
 }
 
 export function getPendingEducatorGoogleSignup() {

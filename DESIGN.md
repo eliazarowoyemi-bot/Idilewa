@@ -99,8 +99,9 @@ iOS/Android translation are specified in [NAVIGATION.md](./NAVIGATION.md).
 Parent, tutor, and child-profile entry points use one responsive native dialog.
 The lamp illustration keeps its articulated arm, glow, and pull-cord interaction
 while using the forest-and-sage palette; the account form remains available
-without requiring animation. Parent and tutor authentication continue through
-the existing role-aware account services. Child profiles are created only
-inside a verified parent session and remain inactive until guardian consent is
-confirmed. On narrow screens the illustration sits above a single-column,
+without requiring animation. Parent signup supports password and Google
+registration when the provider is enabled. Tutor authentication continues
+through the existing role-aware account services. Child profiles are created
+only inside a verified parent session and remain inactive until guardian consent
+is confirmed. On narrow screens the illustration sits above a single-column,
 scrollable form; at wide screens it shares the dialog with the form.
