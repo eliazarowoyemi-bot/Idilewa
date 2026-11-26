@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js';
 import { normalizeEducatorProfile } from './educatorProfile.js';
+import { AUTH_USER_STORAGE_KEY, notifyAuthStateChanged } from './authState.js';
 
 export { normalizeEducatorProfile } from './educatorProfile.js';
 
@@ -93,7 +94,7 @@ export async function isGoogleAuthEnabled(fetchImpl = globalThis.fetch) {
   return googleProviderProbe;
 }
 
-const LOCAL_STORAGE_KEY_USER = 'idilewa_auth_user';
+const LOCAL_STORAGE_KEY_USER = AUTH_USER_STORAGE_KEY;
 const LOCAL_STORAGE_KEY_PROGRESS = 'idilewa_db_progress';
 const LOCAL_STORAGE_KEY_CODE = 'idilewa_db_code';
 const LOCAL_STORAGE_KEY_VOICE = 'idilewa_db_voice';
@@ -115,6 +116,7 @@ function setLocalItem(key, value) {
   } catch (error) {
     throw new Error(`Could not save browser data (${key}).`, { cause: error });
   }
+  if (key === LOCAL_STORAGE_KEY_USER) notifyAuthStateChanged();
 }
 
 function requireSupabase() {
@@ -544,6 +546,7 @@ export async function restoreAuthSession() {
       if (event !== 'SIGNED_OUT') return;
       try {
         localStorage.removeItem(LOCAL_STORAGE_KEY_USER);
+        notifyAuthStateChanged();
       } catch (storageError) {
         console.error('The signed-out account cache could not be cleared.', storageError);
       }
@@ -552,6 +555,7 @@ export async function restoreAuthSession() {
   }
   if (!data.session?.user) {
     localStorage.removeItem(LOCAL_STORAGE_KEY_USER);
+    notifyAuthStateChanged();
     return null;
   }
 
@@ -565,6 +569,7 @@ export async function restoreAuthSession() {
       throw new Error('Your account profile could not be restored and the local session could not be cleared.', { cause: signOutError });
     }
     localStorage.removeItem(LOCAL_STORAGE_KEY_USER);
+    notifyAuthStateChanged();
     throw profileError;
   }
 }
@@ -692,6 +697,7 @@ export async function signOut({ notify = true } = {}) {
   } catch (error) {
     throw new Error('Signed out, but the local account cache could not be cleared.', { cause: error });
   }
+  notifyAuthStateChanged();
   if (authError) {
     throw new Error('Signed out on this device, but Supabase could not confirm the session revocation.', { cause: authError });
   }

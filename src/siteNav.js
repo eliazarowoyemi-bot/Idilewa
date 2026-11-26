@@ -3,6 +3,7 @@ import landingFeatureVoiceUrl from '../assets/landing-feature-voice.webp';
 import landingFeatureCodeUrl from '../assets/landing-feature-code.webp';
 import landingFeatureAiUrl from '../assets/landing-feature-ai.webp';
 import landingFeatureHeritageUrl from '../assets/landing-feature-heritage.webp';
+import { AUTH_STATE_CHANGED_EVENT, AUTH_USER_STORAGE_KEY, getCachedAuthUser } from './authState.js';
 
 /**
  * Ìdíléwa site chrome: navigation popovers, contextual "More" popover
@@ -14,6 +15,7 @@ import landingFeatureHeritageUrl from '../assets/landing-feature-heritage.webp';
  */
 
 const nav = document.querySelector('[data-id-nav]');
+let accountMenuListenersBound = false;
 
 const NAVIGATION_DESTINATIONS = [
   ['Your learning', [
@@ -335,6 +337,243 @@ function setupNavigationPopover() {
   window.addEventListener('scroll', placeFallback, { passive: true });
 }
 
+function getAccountDestination(user) {
+  if (user?.role === 'parent') {
+    return {
+      role: 'Parent',
+      dashboard: { href: '/parents.html#/parent-dashboard', label: 'Parent dashboard' },
+    };
+  }
+  if (user?.role === 'educator' || user?.role === 'tutor') {
+    return {
+      role: 'Tutor',
+      dashboard: { href: '/educator-portal.html#/tutor-dashboard', label: 'Tutor dashboard' },
+    };
+  }
+  if (user?.role === 'child') {
+    return {
+      role: 'Learner',
+      dashboard: { href: '/kids.html', label: 'Learning dashboard' },
+    };
+  }
+  return {
+    role: 'Learner',
+    dashboard: { href: '/profile.html', label: 'My progress' },
+  };
+}
+
+function getAccountName(user) {
+  const name = typeof user?.name === 'string' ? user.name.trim() : '';
+  const email = typeof user?.email === 'string' ? user.email.trim() : '';
+  return name || email || 'Your account';
+}
+
+function createAccountIdentity(name, role) {
+  const identity = document.createElement('div');
+  identity.className = 'id-account__identity';
+
+  const avatar = document.createElement('span');
+  avatar.className = 'id-account__avatar';
+  avatar.setAttribute('aria-hidden', 'true');
+  avatar.textContent = name.charAt(0).toUpperCase() || 'I';
+
+  const copy = document.createElement('span');
+  copy.className = 'id-account__identity-copy';
+
+  const displayName = document.createElement('strong');
+  displayName.textContent = name;
+  const roleLabel = document.createElement('small');
+  roleLabel.textContent = role;
+  copy.append(displayName, roleLabel);
+  identity.append(avatar, copy);
+  return identity;
+}
+
+function createAccountLink(destination, className) {
+  const link = document.createElement('a');
+  link.className = className;
+  link.href = destination.href;
+  link.textContent = destination.label;
+  return link;
+}
+
+function createAccountMenu(user) {
+  const destination = getAccountDestination(user);
+  const name = getAccountName(user);
+  const root = document.createElement('div');
+  root.className = 'id-account';
+  root.dataset.idAccountRoot = 'true';
+
+  const trigger = document.createElement('button');
+  trigger.id = 'idAccountTrigger';
+  trigger.className = 'id-account__trigger';
+  trigger.type = 'button';
+  trigger.setAttribute('aria-label', `Open account menu for ${name}`);
+  trigger.setAttribute('aria-controls', 'idAccountMenu');
+  trigger.setAttribute('aria-expanded', 'false');
+  trigger.setAttribute('popovertarget', 'idAccountMenu');
+  trigger.append(createAccountIdentity(name, destination.role));
+
+  const menu = document.createElement('div');
+  menu.id = 'idAccountMenu';
+  menu.className = 'id-account__menu';
+  menu.dataset.idAccountMenu = 'true';
+  menu.dataset.open = 'false';
+  menu.setAttribute('popover', 'auto');
+  menu.setAttribute('aria-labelledby', trigger.id);
+  menu.append(
+    createAccountIdentity(name, destination.role),
+    createAccountLink(destination.dashboard, 'id-account__link'),
+  );
+  root.append(trigger, menu);
+  return root;
+}
+
+function accountMenuIsOpen(root) {
+  const menu = root.querySelector('[data-id-account-menu]');
+  if (!menu) return false;
+  return typeof menu.showPopover === 'function'
+    ? menu.matches(':popover-open')
+    : menu.dataset.open === 'true';
+}
+
+function positionAccountMenu(root) {
+  const trigger = root.querySelector('#idAccountTrigger');
+  const menu = root.querySelector('[data-id-account-menu]');
+  if (!trigger || !menu || !accountMenuIsOpen(root)) return;
+  const supportsPopover = typeof menu.showPopover === 'function';
+  const supportsAnchorPositioning = typeof CSS !== 'undefined'
+    && CSS.supports?.('position-area: block-end');
+  if (supportsPopover && supportsAnchorPositioning) return;
+
+  const triggerBox = trigger.getBoundingClientRect();
+  const width = menu.offsetWidth || Math.min(250, window.innerWidth - 24);
+  const height = menu.offsetHeight;
+  const left = Math.max(12, Math.min(triggerBox.right - width, window.innerWidth - width - 12));
+  const top = Math.max(12, Math.min(triggerBox.bottom + 8, window.innerHeight - height - 12));
+  menu.style.position = 'fixed';
+  menu.style.margin = '0';
+  menu.style.insetBlockStart = `${Math.round(top)}px`;
+  menu.style.insetInlineStart = `${Math.round(left)}px`;
+  menu.style.insetInlineEnd = 'auto';
+}
+
+function closeAccountMenu(root, restoreFocus = false) {
+  const trigger = root.querySelector('#idAccountTrigger');
+  const menu = root.querySelector('[data-id-account-menu]');
+  if (!trigger || !menu) return;
+  if (typeof menu.hidePopover === 'function') {
+    if (accountMenuIsOpen(root)) menu.hidePopover();
+  } else {
+    menu.hidden = true;
+    menu.dataset.open = 'false';
+  }
+  trigger.setAttribute('aria-expanded', 'false');
+  if (restoreFocus) trigger.focus();
+}
+
+function setupAccountMenu(root) {
+  const trigger = root.querySelector('#idAccountTrigger');
+  const menu = root.querySelector('[data-id-account-menu]');
+  if (!trigger || !menu) return;
+  const supportsPopover = typeof menu.showPopover === 'function'
+    && typeof menu.hidePopover === 'function';
+  const syncExpanded = (open) => trigger.setAttribute('aria-expanded', open ? 'true' : 'false');
+
+  if (supportsPopover) {
+    menu.addEventListener('toggle', (event) => {
+      const open = event.newState === 'open';
+      syncExpanded(open);
+      if (open) positionAccountMenu(root);
+    });
+  } else {
+    menu.hidden = true;
+    trigger.addEventListener('click', (event) => {
+      event.preventDefault();
+      const open = menu.hidden;
+      menu.hidden = !open;
+      menu.dataset.open = String(open);
+      syncExpanded(open);
+      if (open) positionAccountMenu(root);
+    });
+  }
+
+  root.addEventListener('focusout', (event) => {
+    if (event.relatedTarget instanceof Node && !root.contains(event.relatedTarget)) {
+      closeAccountMenu(root);
+    }
+  });
+
+  if (accountMenuListenersBound) return;
+  document.addEventListener('click', (event) => {
+    const activeRoot = document.querySelector('[data-id-account-root]');
+    const activeMenu = activeRoot?.querySelector('[data-id-account-menu]');
+    if (!activeRoot || !activeMenu || typeof activeMenu.showPopover === 'function'
+      || !accountMenuIsOpen(activeRoot) || activeRoot.contains(event.target)) return;
+    closeAccountMenu(activeRoot);
+  });
+  document.addEventListener('keydown', (event) => {
+    const activeRoot = document.querySelector('[data-id-account-root]');
+    const activeMenu = activeRoot?.querySelector('[data-id-account-menu]');
+    if (event.key !== 'Escape' || !activeRoot || !activeMenu || !accountMenuIsOpen(activeRoot)) return;
+    event.preventDefault();
+    closeAccountMenu(activeRoot, true);
+  });
+  const reposition = () => {
+    const activeRoot = document.querySelector('[data-id-account-root]');
+    if (activeRoot && accountMenuIsOpen(activeRoot)) positionAccountMenu(activeRoot);
+  };
+  window.addEventListener('resize', reposition, { passive: true });
+  window.addEventListener('scroll', reposition, { passive: true });
+  accountMenuListenersBound = true;
+}
+
+function setupAccountNavigation() {
+  const desktopAuth = document.querySelector('.id-nav__auth');
+  const menuButton = desktopAuth?.querySelector('[data-id-menu-open]');
+  const drawerFoot = document.querySelector('.id-drawer__foot');
+  if (!desktopAuth || !menuButton || !drawerFoot) return;
+
+  const guestDesktopActions = Array.from(desktopAuth.children)
+    .filter((child) => child !== menuButton)
+    .map((child) => child.cloneNode(true));
+  const guestDrawerActions = Array.from(drawerFoot.children).map((child) => child.cloneNode(true));
+
+  const render = () => {
+    let user;
+    try {
+      user = getCachedAuthUser();
+    } catch (error) {
+      console.error('Could not read the saved account profile for homepage navigation.', error);
+      return;
+    }
+    const accountRoot = user ? createAccountMenu(user) : null;
+    const desktopActions = accountRoot
+      ? [accountRoot]
+      : guestDesktopActions.map((child) => child.cloneNode(true));
+    desktopAuth.replaceChildren(...desktopActions, menuButton);
+
+    if (user) {
+      const destination = getAccountDestination(user);
+      const mobileIdentity = createAccountIdentity(getAccountName(user), destination.role);
+      mobileIdentity.classList.add('id-account__mobile-identity');
+      drawerFoot.replaceChildren(
+        mobileIdentity,
+        createAccountLink(destination.dashboard, 'id-btn id-btn--primary id-account__mobile-dashboard'),
+      );
+      setupAccountMenu(accountRoot);
+    } else {
+      drawerFoot.replaceChildren(...guestDrawerActions.map((child) => child.cloneNode(true)));
+    }
+  };
+
+  render();
+  window.addEventListener(AUTH_STATE_CHANGED_EVENT, render);
+  window.addEventListener('storage', (event) => {
+    if (event.key === AUTH_USER_STORAGE_KEY) render();
+  });
+}
+
 function setupActionPopover() {
   const trigger = document.querySelector('[data-id-more-trigger]');
   const menu = document.getElementById('idMoreMenu');
@@ -477,6 +716,7 @@ function init() {
   setupReveal();
   setupSlideshowControl();
   setupFooterFaq();
+  setupAccountNavigation();
 }
 
 if (document.readyState === 'loading') {

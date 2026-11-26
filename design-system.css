@@ -525,6 +525,161 @@ body {
   flex: none;
 }
 
+.id-account { position: relative; flex: none; }
+
+.id-account__trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 44px;
+  max-width: 240px;
+  padding: 5px 11px 5px 6px;
+  border: 1px solid color-mix(in srgb, var(--id-ink) 14%, transparent);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--id-ink);
+  font: inherit;
+  cursor: pointer;
+  transition: background-color var(--id-dur-fast) var(--id-ease), border-color var(--id-dur-fast) var(--id-ease);
+}
+
+.id-account__trigger:hover,
+.id-account__trigger[aria-expanded="true"] {
+  border-color: color-mix(in srgb, var(--id-forest) 38%, transparent);
+  background: var(--id-sage-100);
+}
+
+.id-account__trigger:focus-visible,
+.id-account__link:focus-visible {
+  outline: 3px solid var(--id-forest);
+  outline-offset: 3px;
+}
+
+.id-account__identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.id-account__avatar {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--id-sage-200);
+  color: var(--id-forest);
+  font-size: 14px;
+  font-weight: 750;
+}
+
+.id-account__identity-copy {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.id-account__identity-copy strong {
+  overflow: hidden;
+  color: var(--id-ink);
+  font-size: 13px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.id-account__identity-copy small {
+  color: var(--id-ink-soft);
+  font-size: 11px;
+  line-height: 1.3;
+}
+
+.id-account__trigger .id-account__identity-copy strong { max-width: 142px; }
+.id-account__trigger .id-account__identity-copy small { display: none; }
+
+.id-account__trigger::after {
+  width: 7px;
+  height: 7px;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  content: "";
+  transform: translateY(-2px) rotate(45deg);
+}
+
+.id-account__menu {
+  z-index: 140;
+  display: none;
+  width: min(260px, calc(100vw - 24px));
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  padding: 10px;
+  border: 1px solid color-mix(in srgb, var(--id-ink) 12%, transparent);
+  border-radius: 15px;
+  background: #fff;
+  color: var(--id-ink);
+  box-shadow: 0 14px 36px rgba(19, 42, 31, 0.16);
+}
+
+.id-account__menu[data-open="true"] {
+  display: grid;
+  gap: 4px;
+}
+
+@supports selector(:popover-open) {
+  .id-account__menu:popover-open {
+    display: grid;
+    gap: 4px;
+  }
+}
+
+.id-account__menu .id-account__identity {
+  padding: 7px 7px 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--id-ink) 10%, transparent);
+  margin-bottom: 4px;
+}
+
+.id-account__menu .id-account__avatar { width: 38px; height: 38px; }
+
+.id-account__link {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 42px;
+  padding: 8px;
+  border-radius: 9px;
+  color: var(--id-ink);
+  font-size: 13px;
+  font-weight: 620;
+  text-decoration: none;
+}
+
+.id-account__link::after {
+  width: 7px;
+  height: 7px;
+  border-top: 1.5px solid currentColor;
+  border-right: 1.5px solid currentColor;
+  content: "";
+  transform: rotate(45deg);
+}
+
+.id-account__link:hover {
+  background: var(--id-sage-100);
+  color: var(--id-forest);
+}
+
+@supports (position-area: block-end) and selector(:popover-open) {
+  .id-account__menu[popover] {
+    position: fixed;
+    inset: auto;
+    position-area: block-end span-inline-end;
+    position-try-fallbacks: flip-block, flip-inline;
+    margin: 0;
+    margin-block-start: 8px;
+  }
+}
+
 .id-menu-btn {
   display: none;
   align-items: center;
@@ -588,6 +743,10 @@ body {
   padding-inline: 8px;
   white-space: nowrap;
 }
+
+.id-account__mobile-identity,
+.id-account__mobile-dashboard { grid-column: 1 / -1; }
+.id-account__mobile-identity { padding: 2px 4px 4px; }
 
 /* Landing hero ------------------------------------------------------------ */
 .id-hero {
@@ -991,6 +1150,8 @@ body {
 
 @media (max-width: 520px) {
   .id-nav__auth .id-btn--primary { display: none; }
+  .id-account__trigger .id-account__identity-copy { display: none; }
+  .id-account__trigger { padding-inline: 6px; }
 }
 
 /* Accessibility: honour reduced-motion ------------------------------------ */
