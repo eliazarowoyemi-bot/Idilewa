@@ -10,6 +10,7 @@ const supabaseClientSource = await readFile(new URL('../src/supabaseClient.js', 
 const authCallbackSource = await readFile(new URL('../src/authCallback.js', import.meta.url), 'utf8');
 const tutorNavigationSource = await readFile(new URL('../src/tutorNavigation.js', import.meta.url), 'utf8');
 const migrationSource = await readFile(new URL('../supabase/migrations/20261126141500_open_educator_registration.sql', import.meta.url), 'utf8');
+const tutorProfileMigrationSource = await readFile(new URL('../supabase/migrations/20261127120000_private_tutor_profiles.sql', import.meta.url), 'utf8');
 
 test('Tutor Portal provides independent routes for every supplied interface', () => {
   for (const route of [
@@ -92,4 +93,22 @@ test('Tutor Portal has responsive layouts and functional availability and prefer
   assert.match(appSource, /data-form="tutor-availability"/);
   assert.match(appSource, /localStorage\.setItem\(TUTOR_AVAILABILITY_KEY/);
   assert.match(appSource, /data-action="tutor-toggle-preference"/);
+});
+
+test('educator profiles and private images are scoped to the signed-in tutor', () => {
+  const dashboardSource = appSource.slice(appSource.indexOf('function renderTutorDashboard'), appSource.indexOf('function renderTutorFindChild'));
+  assert.match(appSource, /getProfileDetailsStorageKey\(userId = getCurrentUser\(\)\?\.id\)/);
+  assert.match(appSource, /tutorDashboardDataUserId === user\.id/);
+  assert.match(appSource, /data-form="tutor-profile-settings"/);
+  assert.match(appSource, /data-tutor-image="avatar"/);
+  assert.match(appSource, /data-tutor-image="background"/);
+  assert.doesNotMatch(dashboardSource, /Onilude Hammed|onilsonly@gmail\.com|Sample Learners|yoruba-educator-woman\.jpg/);
+  assert.match(supabaseClientSource, /export async function updateEducatorProfile/);
+  assert.match(supabaseClientSource, /\.eq\('id', user\.id\)[\s\S]*?\.eq\('role', 'educator'\)/);
+  assert.match(supabaseClientSource, /createSignedUrl\(path, 60 \* 60\)/);
+  assert.match(supabaseClientSource, /upsert: false/);
+  assert.match(tutorProfileMigrationSource, /'tutor-profile-media'[\s\S]*?FALSE/);
+  assert.match(tutorProfileMigrationSource, /CREATE POLICY "Educators can read their own tutor profile media"[\s\S]*?auth\.uid\(\)::TEXT/);
+  assert.match(tutorProfileMigrationSource, /CREATE POLICY "Educators can upload their own tutor profile media"[\s\S]*?auth\.uid\(\)::TEXT/);
+  assert.match(tutorProfileMigrationSource, /CREATE POLICY "Educators can remove their own tutor profile media"[\s\S]*?auth\.uid\(\)::TEXT/);
 });

@@ -9799,7 +9799,7 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .id-tutor-header-actions { display: flex; align-items: center; gap: 16px; }
 .id-tutor-notifications { position: relative; width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 50%; color: #405c50; background: transparent; cursor: pointer; }
 .id-tutor-notifications b { position: absolute; top: -2px; right: 0; width: 17px; height: 17px; display: grid; place-items: center; border: 2px solid #fff; border-radius: 50%; color: #fff; background: #ff5b5b; font-size: 9px; line-height: 1; }
-.id-tutor-avatar { width: 43px; height: 43px; overflow: hidden; border: 2px solid #e6eee9; border-radius: 50%; color: #fff; background: linear-gradient(145deg, #d2bb8d, #0a6b4c); font-weight: 800; cursor: pointer; }
+.id-tutor-avatar { width: 43px; height: 43px; padding: 0; display: grid; place-items: center; overflow: hidden; border: 2px solid #e6eee9; border-radius: 50%; color: #fff; background: linear-gradient(145deg, #d2bb8d, #0a6b4c); font-weight: 800; cursor: pointer; }
 .id-tutor-avatar img { width: 100%; height: 100%; display: block; border-radius: 50%; object-fit: cover; object-position: 50% 18%; }
 .id-tutor-menu { width: 36px; height: 36px; display: grid; place-items: center; border: 0; color: #18322a; background: transparent; cursor: pointer; }
 .id-tutor-main { width: min(896px, calc(100% - 32px)); margin: 0 auto; padding: 22px 0 92px; }
@@ -9811,7 +9811,9 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .id-tutor-hero-copy p { max-width: 330px; margin: 0 0 22px; font-size: 15px; line-height: 1.42; }
 .id-tutor-profile-button { min-height: 49px; padding: 0 20px; display: inline-flex; align-items: center; gap: 12px; border-radius: 999px; color: #18322a; background: #fff; font-size: 14px; font-weight: 800; box-shadow: 0 7px 18px rgba(8,74,48,.12); }
 .id-tutor-profile-button span { font-size: 22px; line-height: 1; }
-.id-tutor-hero-photo { min-width: 0; background: url("/assets/yoruba-educator-woman.jpg") 64% 30% / cover no-repeat; border-radius: 0 20px 20px 0; }
+.id-tutor-hero-photo { position: relative; min-width: 0; overflow: hidden; background: linear-gradient(145deg, #e0f0df, #a5d0ae 52%, #70af8d); border-radius: 0 20px 20px 0; }
+.id-tutor-hero-photo [data-tutor-cover-image] { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.id-tutor-cover-placeholder { position: absolute; inset: 0; padding: 18px; display: grid; place-items: center; color: #174e38; font-size: 13px; font-weight: 750; text-align: center; }
 .id-tutor-stats { margin: 18px 0 20px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
 .id-tutor-stats article { min-height: 94px; padding: 16px 18px; display: flex; align-items: center; gap: 14px; border: 1px solid #edf2ef; border-radius: 16px; background: #fff; box-shadow: 0 5px 18px rgba(27,67,50,.035); }
 .id-tutor-stat-icon { width: 49px; height: 49px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; }
@@ -9837,7 +9839,7 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .id-tutor-profile-card { padding: 22px 20px; }.id-tutor-profile-card header { display: flex; align-items: center; justify-content: space-between; }
 .id-tutor-profile-card header h2 { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 17px; }.id-tutor-profile-card header a { min-height: 37px; padding: 0 12px; display: inline-flex; align-items: center; gap: 7px; border: 1px solid #e7eee9; border-radius: 999px; font-size: 11px; font-weight: 800; }
 .id-tutor-profile-main { margin: 18px 0 16px; display: grid; grid-template-columns: 112px 1fr; align-items: center; gap: 16px; }
-.id-tutor-profile-photo { width: 112px; height: 112px; border: 4px solid #edf5ef; border-radius: 50%; background: url("/assets/yoruba-educator-woman.jpg") 50% 20% / cover no-repeat; }.id-tutor-profile-main h3 { margin: 0 0 6px; font-size: 17px; }.id-tutor-verified { margin-bottom: 8px; display: inline-flex; align-items: center; gap: 5px; color: #08704d; font-size: 11px; font-weight: 800; }.id-tutor-profile-main p { margin: 7px 0; display: flex; align-items: center; gap: 8px; color: #53675d; font-size: 12px; }
+.id-tutor-profile-photo { width: 112px; height: 112px; display: grid; place-items: center; overflow: hidden; border: 4px solid #edf5ef; border-radius: 50%; color: #075e48; background: #d8eddd; font-size: 30px; font-weight: 800; }.id-tutor-profile-photo img { width: 100%; height: 100%; object-fit: cover; }.id-tutor-profile-main h3 { margin: 0 0 6px; font-size: 17px; }.id-tutor-verified { margin-bottom: 8px; display: inline-flex; align-items: center; gap: 5px; color: #08704d; font-size: 11px; font-weight: 800; }.id-tutor-profile-main p { margin: 7px 0; display: flex; align-items: center; gap: 8px; color: #53675d; font-size: 12px; }
 .id-tutor-profile-card h4 { margin: 0 0 8px; font-size: 13px; }.id-tutor-language { min-height: 36px; padding: 8px 12px; display: inline-flex; align-items: center; border-radius: 999px; color: #08704d; background: #edf7f0; font-size: 12px; }
 .id-tutor-preview-card { position: relative; overflow: hidden; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; background: linear-gradient(145deg, #f3faf4, #fff 45%, #edf8f0); }
 .id-tutor-preview-card::before,.id-tutor-preview-card::after { content:""; position:absolute; border-radius:50%; background:rgba(104,195,145,.13); }.id-tutor-preview-card::before { width:170px;height:170px;right:-80px;top:-55px }.id-tutor-preview-card::after { width:120px;height:120px;left:-60px;bottom:-45px }
@@ -9865,7 +9867,7 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
   .id-tutor-hero-copy h1 { margin: 12px 0 8px; font-size: 31px; }
   .id-tutor-hero-copy p { margin-bottom: 12px; font-size: 13px; }
   .id-tutor-profile-button { min-height: 43px; }
-  .id-tutor-hero-photo { background-position: 50% 24%; border-radius: 0; }
+  .id-tutor-hero-photo { border-radius: 0; }
   .id-tutor-stats { grid-template-columns: repeat(2, 1fr); gap: 8px; }
   .id-tutor-stats article { min-height: 82px; padding: 10px; gap: 8px; }
   .id-tutor-stat-icon { width: 42px; height: 42px; }
@@ -10013,6 +10015,24 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .tutor-lesson-aside > .tutor-text-link { margin-top: 18px; }
 .tutor-messages-empty { margin: 6px 0; padding: 42px 20px; }
 .tutor-profile-layout { display: grid; grid-template-columns: minmax(190px, .65fr) minmax(0, 1.35fr); gap: 13px; align-items: start; }
+.tutor-profile-media { grid-column: 1 / -1; display: grid; gap: 8px; }
+.tutor-profile-cover { position: relative; min-height: 220px; overflow: hidden; border: 1px solid #dfeae3; border-radius: 11px; background: linear-gradient(145deg, #edf5e9, #cce3d0 54%, #9ac8af); }
+.tutor-profile-cover [data-tutor-cover-image] { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.tutor-cover-placeholder { position: absolute; inset: 0; padding: 20px 150px 20px 135px; display: grid; place-items: center; color: #315a47; font-size: 13px; font-weight: 700; text-align: center; }
+.tutor-profile-cover.has-background .tutor-cover-placeholder { display: none; }
+.tutor-profile-cover .tutor-profile-avatar { position: absolute; z-index: 1; inset-inline-start: 18px; inset-block-end: 14px; width: 98px; height: 98px; margin: 0; border: 4px solid #fff; background: #d8eddd; box-shadow: 0 4px 14px rgba(20, 62, 42, .18); }
+.tutor-profile-avatar img { width: 100%; height: 100%; display: block; border-radius: 50%; object-fit: cover; }
+.tutor-profile-image-actions { position: absolute; z-index: 2; inset-inline-end: 14px; inset-block-end: 14px; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.tutor-image-input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.tutor-image-button { min-height: 44px; padding: 9px 13px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid rgba(255,255,255,.7); border-radius: 8px; color: #fff; background: #124f39; font-size: 12px; font-weight: 750; cursor: pointer; transition: background .16s ease, transform .16s ease; }
+.tutor-image-button:hover { background: #0a6b4c; transform: translateY(-1px); }
+.tutor-image-input:focus-visible + .tutor-image-button { outline: 3px solid #153f30; outline-offset: 3px; }
+.tutor-image-input:disabled + .tutor-image-button { opacity: .6; cursor: wait; }
+.tutor-profile-image-help, .tutor-profile-media-status { margin: 0; color: #50675b; font-size: 12px; line-height: 1.5; }
+.tutor-profile-media-status:empty { display: none; }
+.tutor-image-retry { width: fit-content; min-height: 42px; padding: 8px 12px; border: 1px solid #b9d1c1; border-radius: 8px; color: #0a6549; background: #fff; font: inherit; font-size: 12px; font-weight: 700; cursor: pointer; }
+.tutor-image-retry[hidden] { display: none; }
+.tutor-profile-summary-avatar { flex: 0 0 auto; }
 .tutor-profile-summary { padding: 19px; display: flex; flex-direction: column; align-items: flex-start; }
 .tutor-profile-avatar { width: 59px; height: 59px; margin-bottom: 13px; display: grid; place-items: center; border: 3px solid #e4f2e7; border-radius: 50%; color: #075e48; background: #d8eddd; font-size: 23px; font-weight: 800; }
 .tutor-profile-summary h2 { margin: 5px 0; font-size: 17px; }
@@ -10021,6 +10041,10 @@ body[data-page="index"] .brand { min-width: 0; gap: 8px; }
 .tutor-profile-form { display: grid; gap: 12px; }
 .tutor-profile-form h2 { margin: 2px 0 1px; font-size: 16px; }
 .tutor-profile-form textarea { min-height: 70px; }
+.tutor-profile-form input, .tutor-profile-form textarea, .tutor-profile-form select { min-height: 48px; font-size: max(1rem, 1em); }
+.tutor-profile-form textarea { min-height: 96px; }
+.tutor-profile-form input:focus-visible, .tutor-profile-form textarea:focus-visible, .tutor-profile-form select:focus-visible { outline: 3px solid #137d59; outline-offset: 2px; box-shadow: none; }
+.tutor-profile-form .tutor-button { min-height: 48px; font-size: 14px; }
 .tutor-profile-form > small { color: #78877f; font-size: 8px; line-height: 1.5; }
 .tutor-availability-form { padding: clamp(17px, 3vw, 26px); }
 .tutor-day-grid { margin: 14px 0 19px; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 7px; }

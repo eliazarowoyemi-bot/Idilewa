@@ -103,6 +103,24 @@ The browser bundle reads Supabase config through `envPrefix` in `vite.config.js`
 `SUPABASE_URL` and `SUPABASE_ANON_KEY`, which is why client auth works without
 `VITE_*` variables.
 
+## Private educator profiles and images
+
+Tutor profile edits are stored on the signed-in educator's `public.profiles` row.
+Tutor avatars and cover photos are stored in the private `tutor-profile-media`
+Supabase Storage bucket under `<auth-user-id>/avatar/` or
+`<auth-user-id>/background/`; the app displays short-lived signed URLs. The
+bucket policies restrict reads, uploads, and deletes to the matching educator.
+Apply the migration before deploying code that reads these columns:
+
+```powershell
+npx --yes supabase@latest migration list --project-ref jimiykxrjetomvpeoaeu
+npx --yes supabase@latest db push --dry-run --project-ref jimiykxrjetomvpeoaeu
+npx --yes supabase@latest db push --project-ref jimiykxrjetomvpeoaeu
+```
+
+Confirm the target is the production project `jimiykxrjetomvpeoaeu` and the
+private-profile migration is the only pending migration before applying it.
+
 ## Verify
 
 ```powershell

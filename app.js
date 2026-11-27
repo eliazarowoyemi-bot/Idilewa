@@ -56,10 +56,13 @@ import {
   getCurrentUser,
   getOptionalSessionAccessToken,
   getRoleDashboard,
+  getTutorProfileMedia,
   getAdultLearningSummary,
   submitEducatorConnectionRequest,
   withdrawEducatorConnection,
+  updateEducatorProfile,
   updateUserProfile,
+  uploadTutorProfileImage,
   signOut as signOutAccount,
   restoreAuthSession,
   sendAuthActivityEmail,
@@ -3413,18 +3416,27 @@ import './src/heritageLibrary.css';
 
   const PROFILE_DETAILS_KEY = 'idilewa-profile-details';
 
+  function getProfileDetailsStorageKey(userId = getCurrentUser()?.id) {
+    return `${PROFILE_DETAILS_KEY}:${userId || 'guest'}`;
+  }
+
   function getProfileDetails() {
     const user = getCurrentUser() || {};
     let saved = {};
-    try { saved = JSON.parse(localStorage.getItem(PROFILE_DETAILS_KEY) || '{}'); } catch (_) {}
+    try { saved = JSON.parse(localStorage.getItem(getProfileDetailsStorageKey(user.id)) || '{}'); } catch (_) {}
+    const accountProfile = Boolean(user.id);
     return {
-      name: saved.name || user.name || '',
+      name: accountProfile ? user.name || '' : saved.name || user.name || '',
       email: user.email || '',
-      bio: saved.bio || user.bio || '',
-      goal: saved.goal || user.learning_goal || '',
+      bio: accountProfile ? user.bio || '' : saved.bio || user.bio || '',
+      goal: accountProfile ? user.learning_goal || '' : saved.goal || user.learning_goal || '',
       language: saved.language || user.learning_language || state.currentLang || 'yoruba',
       level: saved.level || user.learning_level || state.level || 'beginner',
-      interests: Array.isArray(saved.interests) ? saved.interests : Array.isArray(user.interests) ? user.interests : []
+      interests: accountProfile
+        ? Array.isArray(user.interests) ? user.interests : []
+        : Array.isArray(saved.interests) ? saved.interests : Array.isArray(user.interests) ? user.interests : [],
+      teachingFocus: user.teachingFocus || user.teachingSubject || user.qualifications || '',
+      teachingLanguage: user.teachingLanguage || ''
     };
   }
 
@@ -3534,12 +3546,120 @@ import './src/heritageLibrary.css';
   const TUTOR_AVAILABILITY_KEY = 'idilewa-tutor-availability';
   const TUTOR_PREFERENCES_KEY = 'idilewa-tutor-preferences';
   let tutorDashboardData = null;
+  let tutorDashboardDataUserId = '';
   let tutorDashboardLoadSequence = 0;
   let tutorDashboardDataPage = '';
   let tutorDashboardLoadPending = false;
+  let tutorDashboardLoadPendingUserId = '';
+  let tutorProfileMediaState = {
+    userId: '',
+    avatarUrl: '',
+    backgroundUrl: '',
+    loadedAt: 0,
+    loading: false,
+    error: ''
+  };
+  let tutorProfileMediaLoadSequence = 0;
 
   function isTutorAccount() {
     return getCurrentUser()?.role === 'educator';
+  }
+
+  function synchronizeTutorAccountCaches(userId) {
+    if (tutorDashboardDataUserId === userId && tutorProfileMediaState.userId === userId) return;
+    tutorDashboardLoadSequence += 1;
+    tutorProfileMediaLoadSequence += 1;
+    tutorDashboardDataUserId = userId;
+    tutorDashboardData = null;
+    tutorDashboardDataPage = '';
+    tutorDashboardLoadPending = false;
+    tutorDashboardLoadPendingUserId = '';
+    tutorProfileMediaState = {
+      userId,
+      avatarUrl: '',
+      backgroundUrl: '',
+      loadedAt: 0,
+      loading: false,
+      error: ''
+    };
+  }
+
+  function getCurrentTutorMedia() {
+    const userId = getCurrentUser()?.id;
+    return tutorProfileMediaState.userId === userId ? tutorProfileMediaState : {};
+  }
+
+  function applyTutorProfileMedia() {
+    const media = getCurrentTutorMedia();
+    const status = document.querySelector('[data-tutor-profile-media-status]');
+    if (status) status.textContent = media.error || '';
+    const retry = document.querySelector('[data-action="tutor-profile-media-retry"]');
+    if (retry) retry.hidden = !media.error;
+
+    document.querySelectorAll('[data-tutor-avatar]').forEach((avatar) => {
+      if (media.avatarUrl) {
+        const image = document.createElement('img');
+        image.src = media.avatarUrl;
+        image.alt = '';
+        avatar.replaceChildren(image);
+      } else {
+        const name = avatar.dataset.avatarName || '';
+        avatar.textContent = name.trim().charAt(0).toUpperCase() || 'T';
+      }
+    });
+
+    document.querySelectorAll('[data-tutor-cover]').forEach((cover) => {
+      let image = cover.querySelector('[data-tutor-cover-image]');
+      if (media.backgroundUrl) {
+        if (!image) {
+          image = document.createElement('img');
+          image.dataset.tutorCoverImage = '';
+          image.alt = '';
+          image.setAttribute('aria-hidden', 'true');
+          cover.prepend(image);
+          image.addEventListener('error', () => {
+            cover.classList.remove('has-background');
+          }, { once: true });
+        }
+        image.src = media.backgroundUrl;
+        cover.classList.add('has-background');
+      } else {
+        image?.remove();
+        cover.classList.remove('has-background');
+      }
+    });
+  }
+
+  async function loadTutorProfileMedia(force = false) {
+    const user = getCurrentUser();
+    if (!user?.id || user.role !== 'educator') return;
+    if (tutorProfileMediaState.userId !== user.id) synchronizeTutorAccountCaches(user.id);
+    if (tutorProfileMediaState.loading) return;
+    if (!force && tutorProfileMediaState.loadedAt && Date.now() - tutorProfileMediaState.loadedAt < 50 * 60 * 1000) return;
+
+    const sequence = ++tutorProfileMediaLoadSequence;
+    tutorProfileMediaState = { ...tutorProfileMediaState, loading: true, error: '' };
+    applyTutorProfileMedia();
+    try {
+      const media = await getTutorProfileMedia(user.id);
+      if (sequence !== tutorProfileMediaLoadSequence || getCurrentUser()?.id !== user.id) return;
+      tutorProfileMediaState = {
+        ...media,
+        userId: user.id,
+        loadedAt: Date.now(),
+        loading: false,
+        error: ''
+      };
+    } catch (error) {
+      if (sequence !== tutorProfileMediaLoadSequence || getCurrentUser()?.id !== user.id) return;
+      tutorProfileMediaState = {
+        ...tutorProfileMediaState,
+        loadedAt: Date.now(),
+        loading: false,
+        error: error instanceof Error ? error.message : 'Your private profile images could not be loaded.'
+      };
+    }
+    applyTutorProfileMedia();
   }
 
   function renderTutorBrand() {
@@ -3580,45 +3700,47 @@ import './src/heritageLibrary.css';
 
   function renderTutorDashboard() {
     const data = tutorDashboardData || {};
-    const educator = data.educator || {};
     const user = getCurrentUser() || {};
     const profileDetails = getProfileDetails();
-    const tutorName = (profileDetails.name || user.name || educator.name || 'Onilude Hammed').trim();
-    const firstName = tutorName.split(/\s+/)[0];
+    const tutorName = (profileDetails.name || user.name || '').trim();
+    const firstName = tutorName.split(/\s+/)[0] || 'Tutor';
     const requests = Array.isArray(data.requests) ? data.requests : [];
     const learners = Array.isArray(data.learners) ? data.learners : [];
     const approvedCount = learners.length;
     const lessons = learners.reduce((sum, learner) => sum + (Number(learner.completedLessons) || 0), 0);
     const pending = requests.filter((request) => request.status === 'pending').length;
-    const recent = requests.slice(0, 4);
     const availability = getTutorAvailability();
     const isAvailable = availability.days.length > 0;
-    const profileEmail = esc(user.email || 'onilsonly@gmail.com');
-    const profileLanguage = esc(LANGUAGES.find((language) => language.id === (profileDetails.language || 'english'))?.name || 'English');
+    const hasDashboardData = tutorDashboardDataUserId === user.id && Boolean(tutorDashboardData);
+    const metric = (value) => hasDashboardData ? String(value) : '—';
+    const profileEmail = esc(user.email || '');
+    const teachingLanguage = profileDetails.teachingLanguage || profileDetails.language || 'yoruba';
+    const profileLanguage = esc(LANGUAGES.find((language) => language.id === teachingLanguage)?.name || 'Yorùbá');
+    const teachingFocus = profileDetails.teachingFocus || 'Add your teaching focus';
+    const initial = tutorName.charAt(0).toUpperCase() || 'T';
     return `<div class="id-tutor-dashboard">
       <header class="id-tutor-header">
         <a class="id-tutor-brand" href="#/tutor-dashboard" data-route="tutor-dashboard" aria-label="Idilewa tutor dashboard">${brandLogo()}</a>
         <div class="id-tutor-header-actions">
-          <button class="id-tutor-notifications" type="button" aria-label="Notifications, 3 unread"><span>${icon('bell', 18)}</span><b>3</b></button>
-          <button class="id-tutor-avatar" type="button" aria-label="Open tutor profile" data-route="tutor-profile"><img src="/assets/yoruba-educator-woman.jpg" alt="" /></button>
+          <button class="id-tutor-avatar" type="button" aria-label="Open ${esc(tutorName || 'tutor')} profile" data-route="tutor-profile" data-tutor-avatar data-avatar-name="${esc(tutorName)}" aria-hidden="false">${esc(initial)}</button>
           <button class="id-tutor-menu" type="button" aria-label="Open tutor menu" aria-expanded="false" data-action="tutor-menu">${icon('menu', 20)}</button>
         </div>
       </header>
       <main class="id-tutor-main">
         <section class="id-tutor-hero">
           <div class="id-tutor-hero-copy">
-            <span class="id-tutor-live"><i></i> Live Tutor</span>
-            <h1>Welcome back,<br>${esc(tutorName.split(/\s+/).pop() || 'Hammed')}!</h1>
-            <p>Your dedication is helping African children learn and thrive. <span aria-hidden="true">❤️</span></p>
+            <span class="id-tutor-live"><i></i> Educator dashboard</span>
+            <h1>Welcome back,<br>${esc(firstName)}!</h1>
+            <p>Your teaching profile and approved learner connections are managed here.</p>
             <a href="#/tutor-profile" data-route="tutor-profile" class="id-tutor-profile-button">View Profile <span aria-hidden="true">→</span></a>
           </div>
-          <div class="id-tutor-hero-photo" role="img" aria-label="Tutor Onilude Hammed"></div>
+          <div class="id-tutor-hero-photo" data-tutor-cover role="img" aria-label="Your profile cover photo"><span class="id-tutor-cover-placeholder">Add a cover photo from My Profile</span></div>
         </section>
-        <section class="id-tutor-stats" aria-label="Tutor statistics">
-          <article><span class="id-tutor-stat-icon green">${icon('people', 20)}</span><div><strong>2</strong><small>Sample Learners</small></div></article>
-          <article><span class="id-tutor-stat-icon blue">${icon('check', 20)}</span><div><strong>17</strong><small>Completed Lessons</small></div></article>
-          <article><span class="id-tutor-stat-icon purple">${icon('calendar', 20)}</span><div><strong>0</strong><small>Lesson Plans</small></div></article>
-          <article><span class="id-tutor-stat-icon gold">${icon('star', 20)}</span><div><strong>80%</strong><small>Tutor Share</small></div></article>
+        <section class="id-tutor-stats" aria-label="Your tutor statistics" aria-live="polite">
+          <article><span class="id-tutor-stat-icon green">${icon('people', 20)}</span><div><strong>${metric(approvedCount)}</strong><small>Approved Learners</small></div></article>
+          <article><span class="id-tutor-stat-icon blue">${icon('check', 20)}</span><div><strong>${metric(lessons)}</strong><small>Completed Lessons</small></div></article>
+          <article><span class="id-tutor-stat-icon purple">${icon('calendar', 20)}</span><div><strong>${metric(pending)}</strong><small>Pending Requests</small></div></article>
+          <article><span class="id-tutor-stat-icon gold">${icon('calendar', 20)}</span><div><strong>${isAvailable ? 'On' : 'Off'}</strong><small>Lesson availability</small></div></article>
         </section>
         <section class="id-tutor-zoom">
           <header>
@@ -3635,14 +3757,14 @@ import './src/heritageLibrary.css';
         <section class="id-tutor-detail-grid" data-learner-privacy="No learner information is shared before consent">
           <article class="id-tutor-profile-card">
             <header><h2><span>${icon('user', 22)}</span> Your Tutor Profile</h2><a href="#/tutor-profile" data-route="tutor-profile">${icon('edit', 15)} Edit Profile</a></header>
-            <div class="id-tutor-profile-main"><div class="id-tutor-profile-photo" role="img" aria-label="${esc(tutorName)}"></div><div><h3>${esc(tutorName || 'Onilude Hammed')}</h3><span class="id-tutor-verified">${icon('check', 12)} Verified Tutor</span><p><span>${icon('mail', 16)}</span> ${profileEmail}</p><p><span>${icon('globe', 16)}</span> ${profileLanguage}</p><p><span>${icon('graduation', 16)}</span> 10 years teaching</p></div></div>
-            <h4>Languages You Teach</h4><span class="id-tutor-language">English</span>
+            <div class="id-tutor-profile-main"><div class="id-tutor-profile-photo" data-tutor-avatar data-avatar-name="${esc(tutorName)}" aria-hidden="true">${esc(initial)}</div><div><h3>${esc(tutorName || 'Tutor')}</h3><span class="id-tutor-verified">${icon('check', 12)} Verified Tutor</span><p><span>${icon('mail', 16)}</span> ${profileEmail}</p><p><span>${icon('globe', 16)}</span> ${profileLanguage}</p><p><span>${icon('graduation', 16)}</span> ${esc(teachingFocus)}</p></div></div>
+            <h4>Primary Teaching Language</h4><span class="id-tutor-language">${profileLanguage}</span>
           </article>
           <aside class="id-tutor-preview-card">
-            <div class="id-tutor-preview-icon" role="img" aria-label="Tutor application document">${icon('search', 24)}</div>
-            <h2>Preview Application</h2>
-            <p>Your application preview is complete.<br>This demo does not transmit or store your details on a server.</p>
-            <a class="id-tutor-primary" href="#/tutor-profile" data-route="tutor-profile">${icon('eye', 18)} Preview Application <span aria-hidden="true">→</span></a>
+            <div class="id-tutor-preview-icon" aria-hidden="true">${icon('lock', 24)}</div>
+            <h2>Your profile is private</h2>
+            <p>Your educator details and profile photos are saved to your account. Other tutors cannot view your dashboard profile.</p>
+            <a class="id-tutor-primary" href="#/tutor-profile" data-route="tutor-profile">${icon('edit', 18)} Update My Profile <span aria-hidden="true">→</span></a>
           </aside>
         </section>
       </main>
@@ -3694,8 +3816,102 @@ import './src/heritageLibrary.css';
     const details = getProfileDetails();
     const name = details.name || user.name || '';
     const initial = name.trim().charAt(0).toUpperCase() || 'T';
+    const teachingLanguage = details.teachingLanguage || 'yoruba';
+    const mediaState = getCurrentTutorMedia();
     return renderTutorWorkspace('tutor-profile', 'My Profile', `${renderTutorHeading('Your educator profile', 'My Profile', 'Manage your name and teaching details. Your sign-in email is managed by your Idilewa account.')}
-      <section class="tutor-profile-layout"><aside class="tutor-panel tutor-profile-summary"><span class="tutor-profile-avatar">${esc(initial)}</span><span class="tutor-eyebrow">Verified educator account</span><h2>${esc(name || 'Tutor')}</h2><p>${esc(user.email || '')}</p><span class="tutor-profile-tag">${icon('check', 13)} Educator</span><a class="tutor-button tutor-button-outline" href="#/tutor-availability" data-route="tutor-availability">Manage availability</a></aside><form class="tutor-panel tutor-profile-form" data-form="profile-settings"><span class="tutor-eyebrow">Profile information</span><h2>About you</h2><label>Full Name<input name="name" maxlength="60" required value="${esc(details.name || user.name || '')}" placeholder="Enter your name" /></label><label>Email Address<input type="email" value="${esc(user.email || '')}" readonly /></label><label>Teaching introduction<textarea name="bio" rows="4" maxlength="500" placeholder="Share your teaching approach">${esc(details.bio || '')}</textarea></label><label>Teaching focus<textarea name="goal" rows="3" maxlength="240" placeholder="Languages or skills you teach">${esc(details.goal || '')}</textarea></label><div class="tutor-profile-language"><label>Primary language<select name="language">${LANGUAGES.map((language) => `<option value="${language.id}" ${details.language === language.id ? 'selected' : ''}>${esc(language.name)}</option>`).join('')}</select></label></div><button type="submit" class="tutor-button tutor-button-primary">${icon('check', 14)} Save Profile</button><small>Your profile details are saved to your Idilewa account when signed in.</small></form></section>`);
+      <section class="tutor-profile-layout">
+        <section class="tutor-profile-media tutor-panel" aria-label="Profile pictures">
+          <div class="tutor-profile-cover" data-tutor-cover>
+            <span class="tutor-cover-placeholder">Add a cover picture to personalize your profile</span>
+            <span class="tutor-profile-avatar" data-tutor-avatar data-avatar-name="${esc(name)}" aria-hidden="true">${esc(initial)}</span>
+            <div class="tutor-profile-image-actions">
+              <input id="tutor-avatar-input" class="tutor-image-input" type="file" accept="image/jpeg,image/png,image/webp" data-tutor-image="avatar" aria-describedby="tutor-profile-media-help" />
+              <label class="tutor-image-button" for="tutor-avatar-input">${icon('edit', 14)} Change profile picture</label>
+              <input id="tutor-background-input" class="tutor-image-input" type="file" accept="image/jpeg,image/png,image/webp" data-tutor-image="background" aria-describedby="tutor-profile-media-help" />
+              <label class="tutor-image-button" for="tutor-background-input">${icon('image', 14)} Change cover picture</label>
+            </div>
+          </div>
+          <p id="tutor-profile-media-help" class="tutor-profile-image-help">Choose a JPG, PNG or WebP image up to 10 MB. Images are resized and stored in your private tutor account.</p>
+          <p class="tutor-profile-media-status" data-tutor-profile-media-status role="status" aria-live="polite">${esc(mediaState.error || '')}</p>
+          <button type="button" class="tutor-image-retry" data-action="tutor-profile-media-retry" ${mediaState.error ? '' : 'hidden'}>Try loading photos again</button>
+        </section>
+        <aside class="tutor-panel tutor-profile-summary"><span class="tutor-profile-avatar tutor-profile-summary-avatar" data-tutor-avatar data-avatar-name="${esc(name)}" aria-hidden="true">${esc(initial)}</span><span class="tutor-eyebrow">Verified educator account</span><h2>${esc(name || 'Tutor')}</h2><p>${esc(user.email || '')}</p><span class="tutor-profile-tag">${icon('check', 13)} Educator</span><a class="tutor-button tutor-button-outline" href="#/tutor-availability" data-route="tutor-availability">Manage availability</a></aside>
+        <form class="tutor-panel tutor-profile-form" data-form="tutor-profile-settings">
+          <span class="tutor-eyebrow">Profile information</span><h2>About you</h2>
+          <label>Full Name<input name="name" autocomplete="name" maxlength="60" required value="${esc(details.name || user.name || '')}" placeholder="Enter your name" /></label>
+          <label>Email Address<input type="email" autocomplete="email" value="${esc(user.email || '')}" readonly /></label>
+          <label>Teaching introduction<textarea name="bio" rows="4" maxlength="500" placeholder="Share your teaching approach">${esc(details.bio || '')}</textarea></label>
+          <label>Teaching focus<textarea name="teachingFocus" rows="3" maxlength="240" placeholder="Languages or skills you teach">${esc(details.teachingFocus)}</textarea></label>
+          <div class="tutor-profile-language"><label>Primary teaching language<select name="teachingLanguage">${LANGUAGES.map((language) => `<option value="${language.id}" ${teachingLanguage === language.id ? 'selected' : ''}>${esc(language.name)}</option>`).join('')}</select></label></div>
+          <button type="submit" class="tutor-button tutor-button-primary">${icon('check', 14)} Save Profile</button>
+          <small>Your details and photos are saved to your educator account and are not shared with other tutors.</small>
+        </form>
+      </section>`);
+  }
+
+  async function prepareTutorProfileImage(file, kind) {
+    if (!(file instanceof File) || !['image/jpeg', 'image/png', 'image/webp'].includes(file.type) || file.size < 1 || file.size > 10 * 1024 * 1024) {
+      throw new Error('Choose a JPG, PNG or WebP image no larger than 10 MB.');
+    }
+
+    const imageUrl = URL.createObjectURL(file);
+    const image = new Image();
+    try {
+      await new Promise((resolve, reject) => {
+        image.onload = resolve;
+        image.onerror = () => reject(new Error('This image could not be opened. Choose a different picture.'));
+        image.src = imageUrl;
+      });
+      if (!image.naturalWidth || !image.naturalHeight) throw new Error('This image has no usable dimensions.');
+
+      const maxDimension = kind === 'avatar' ? 640 : 1920;
+      const scale = Math.min(1, maxDimension / Math.max(image.naturalWidth, image.naturalHeight));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+      const context = canvas.getContext('2d');
+      if (!context) throw new Error('Your browser could not prepare this image.');
+      context.drawImage(image, 0, 0, canvas.width, canvas.height);
+
+      for (const quality of [0.82, 0.68, 0.54]) {
+        let output = await new Promise((resolve) => canvas.toBlob(resolve, 'image/webp', quality));
+        if (output?.type !== 'image/webp') {
+          output = await new Promise((resolve) => canvas.toBlob(resolve, 'image/jpeg', quality));
+        }
+        if (output && output.size <= 2 * 1024 * 1024) return output;
+      }
+      throw new Error('This image is still larger than 2 MB after resizing. Choose a simpler image.');
+    } finally {
+      URL.revokeObjectURL(imageUrl);
+    }
+  }
+
+  async function saveTutorProfileImage(file, kind, input) {
+    const user = getCurrentUser();
+    const status = document.querySelector('[data-tutor-profile-media-status]');
+    if (!user?.id || user.role !== 'educator') {
+      showToast('Sign in with your tutor account before changing profile pictures.', 'error');
+      return;
+    }
+    if (input) input.disabled = true;
+    if (status) status.textContent = 'Preparing your private profile image…';
+    try {
+      const image = await prepareTutorProfileImage(file, kind);
+      if (status) status.textContent = 'Uploading your image securely…';
+      const result = await uploadTutorProfileImage(image, kind, { expectedUserId: user.id });
+      if (getCurrentUser()?.id !== user.id) return;
+      tutorProfileMediaState.loadedAt = 0;
+      await loadTutorProfileMedia(true);
+      const message = result.cleanupWarning || `${kind === 'avatar' ? 'Profile picture' : 'Cover picture'} updated.`;
+      if (status && !tutorProfileMediaState.error) status.textContent = message;
+      showToast(message, result.cleanupWarning ? 'error' : 'success');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Your profile image could not be saved.';
+      if (status) status.textContent = message;
+      showToast(message, 'error');
+    } finally {
+      if (input?.isConnected) input.disabled = false;
+    }
   }
 
   function getTutorAvailability() {
@@ -3738,19 +3954,27 @@ import './src/heritageLibrary.css';
 
   async function loadTutorPortalData() {
     const page = parseLocation().page;
-    if (!['tutor-dashboard', 'tutor-students', 'tutor-find-child', 'tutor-consent'].includes(page) || !isTutorAccount()) return;
-    if (tutorDashboardDataPage === page || tutorDashboardLoadPending) return;
+    const user = getCurrentUser();
+    if (!['tutor-dashboard', 'tutor-students', 'tutor-find-child', 'tutor-consent'].includes(page) || user?.role !== 'educator') return;
+    if (tutorDashboardDataUserId !== user.id) synchronizeTutorAccountCaches(user.id);
+    if (tutorDashboardData && tutorDashboardDataUserId === user.id) {
+      tutorDashboardDataPage = page;
+      return;
+    }
+    if (tutorDashboardLoadPending && tutorDashboardLoadPendingUserId === user.id) return;
     const sequence = ++tutorDashboardLoadSequence;
     tutorDashboardLoadPending = true;
+    tutorDashboardLoadPendingUserId = user.id;
     try {
       const data = await getRoleDashboard('/api/dashboard/educator');
-      if (sequence !== tutorDashboardLoadSequence) return;
+      if (sequence !== tutorDashboardLoadSequence || getCurrentUser()?.id !== user.id) return;
       tutorDashboardData = data;
+      tutorDashboardDataUserId = user.id;
       const currentPage = parseLocation().page;
       tutorDashboardDataPage = currentPage;
       if (['tutor-dashboard', 'tutor-students', 'tutor-consent'].includes(currentPage)) render();
     } catch (error) {
-      if (sequence !== tutorDashboardLoadSequence) return;
+      if (sequence !== tutorDashboardLoadSequence || getCurrentUser()?.id !== user.id) return;
       const currentPage = parseLocation().page;
       tutorDashboardDataPage = currentPage;
       const feedback = currentPage === 'tutor-find-child' ? document.querySelector('[data-tutor-connection-feedback]') : null;
@@ -3760,9 +3984,11 @@ import './src/heritageLibrary.css';
     } finally {
       if (sequence === tutorDashboardLoadSequence) {
         tutorDashboardLoadPending = false;
+        tutorDashboardLoadPendingUserId = '';
         const currentPage = parseLocation().page;
         if (isTutorAccount()
           && ['tutor-dashboard', 'tutor-students', 'tutor-find-child', 'tutor-consent'].includes(currentPage)
+          && !tutorDashboardData
           && tutorDashboardDataPage !== currentPage) {
           void loadTutorPortalData();
         }
@@ -6250,6 +6476,8 @@ import './src/heritageLibrary.css';
       return;
     }
     const { page, params } = location;
+    const tutorUserId = page.startsWith('tutor') && isTutorAccount() ? getCurrentUser().id : '';
+    synchronizeTutorAccountCaches(tutorUserId);
     const outgoingPage = document.body.dataset.page || '';
     if (outgoingPage === 'ai-conversation' && page !== 'ai-conversation') cleanupAiConversation();
     if (outgoingPage && outgoingPage !== page && page === 'ai-conversation') {
@@ -6291,7 +6519,10 @@ import './src/heritageLibrary.css';
         document.getElementById(`owe-${params.section}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
     }
-    if (page.startsWith('tutor')) loadTutorPortalData();
+    if (page.startsWith('tutor')) {
+      void loadTutorPortalData();
+      if (page === 'tutor-dashboard' || page === 'tutor-profile') void loadTutorProfileMedia();
+    }
     if (page.startsWith('parent-') && !['parent-login', 'parent-signup', 'parent-welcome'].includes(page)
       && getCurrentUser()?.role === 'parent' && !parentDashboardData && !parentDashboardError) {
       void loadParentPortalData();
@@ -7402,6 +7633,10 @@ import './src/heritageLibrary.css';
     }
     const actionEl = event.target.closest('[data-action]');
     if (actionEl) {
+      if (actionEl.dataset.action === 'tutor-profile-media-retry') {
+        void loadTutorProfileMedia(true);
+        return;
+      }
       if (actionEl.dataset.action === 'close-modal') {
         if (event.target === actionEl || actionEl.tagName.toLowerCase() === 'button') handleAction('close-modal', actionEl);
         return;
@@ -7412,6 +7647,13 @@ import './src/heritageLibrary.css';
 
   document.addEventListener('change', (event) => {
     const el = event.target;
+    if (el.matches('[data-tutor-image]')) {
+      const file = el.files?.[0];
+      const kind = el.dataset.tutorImage;
+      el.value = '';
+      if (file) void saveTutorProfileImage(file, kind, el);
+      return;
+    }
     if (handleHeritageFieldChange(el)) return;
     if (el.matches('[data-heritage-filter]')) {
       updateHeritageCatalogue();
@@ -7817,7 +8059,7 @@ import './src/heritageLibrary.css';
       };
       try {
         if (getCurrentUser()) await updateUserProfile(metadata);
-        localStorage.setItem(PROFILE_DETAILS_KEY, JSON.stringify(profile));
+        localStorage.setItem(getProfileDetailsStorageKey(getCurrentUser()?.id), JSON.stringify(profile));
         state.currentLang = LANGUAGES.some((item) => item.id === profile.language) ? profile.language : 'yoruba';
         state.level = ['beginner', 'intermediate', 'advanced'].includes(profile.level) ? profile.level : 'beginner';
         saveState();
@@ -7825,6 +8067,35 @@ import './src/heritageLibrary.css';
         showToast(getCurrentUser() ? 'Your profile was saved to your account.' : 'Your profile was saved on this device. Sign in to sync it.', 'success');
       } catch (error) {
         showToast(error instanceof Error ? error.message : 'Could not save your profile.', 'error');
+      }
+    } else if (type === 'tutor-profile-settings') {
+      const user = getCurrentUser();
+      const submitButton = form.querySelector('button[type="submit"]');
+      const originalMarkup = submitButton?.innerHTML || '';
+      if (!user?.id || user.role !== 'educator') {
+        showToast('Sign in with your tutor account before updating this profile.', 'error');
+        return;
+      }
+      if (submitButton) {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Saving profile…';
+      }
+      try {
+        await updateEducatorProfile({
+          name: String(data.get('name') || '').trim(),
+          bio: String(data.get('bio') || '').trim(),
+          teaching_focus: String(data.get('teachingFocus') || '').trim(),
+          teaching_language: String(data.get('teachingLanguage') || '')
+        }, { expectedUserId: user.id });
+        render();
+        showToast('Your educator profile was saved to your private account.', 'success');
+      } catch (error) {
+        showToast(error instanceof Error ? error.message : 'Your educator profile could not be saved.', 'error');
+      } finally {
+        if (submitButton?.isConnected) {
+          submitButton.disabled = false;
+          submitButton.innerHTML = originalMarkup;
+        }
       }
     } else if (type === 'educator-connection-request') {
       const childEmail = String(data.get('childEmail') || '').trim();

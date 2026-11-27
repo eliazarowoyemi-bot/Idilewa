@@ -99,6 +99,8 @@ const LOCAL_STORAGE_KEY_PROGRESS = 'idilewa_db_progress';
 const LOCAL_STORAGE_KEY_CODE = 'idilewa_db_code';
 const LOCAL_STORAGE_KEY_VOICE = 'idilewa_db_voice';
 const SESSION_STORAGE_KEY_TUTOR_GOOGLE_SIGNUP = 'idilewa_tutor_google_signup';
+const TUTOR_PROFILE_MEDIA_BUCKET = 'tutor-profile-media';
+const TUTOR_PROFILE_IMAGE_MAX_BYTES = 2 * 1024 * 1024;
 let authStateSubscription = null;
 
 function getLocalItem(key, fallback = []) {
@@ -227,7 +229,11 @@ function mapAuthUser(authUser, metadata = authUser.user_metadata || {}) {
     teachingExperience: metadata.teaching_experience || '',
     qualifications: metadata.qualifications || '',
     avatar: metadata.avatar_url || '',
+    profileAvatarPath: metadata.profile_avatar_path || '',
+    profileBackgroundPath: metadata.profile_background_path || '',
     bio: metadata.bio || '',
+    teachingFocus: metadata.teaching_focus || '',
+    teachingLanguage: metadata.teaching_language || '',
     learning_goal: metadata.learning_goal || '',
     learning_language: metadata.learning_language || 'yoruba',
     learning_level: metadata.learning_level || 'beginner',
@@ -241,7 +247,7 @@ function mapAuthUser(authUser, metadata = authUser.user_metadata || {}) {
 async function loadAccountProfile(client, authUser) {
   const { data: profile, error } = await client
     .from('profiles')
-    .select('name, role, avatar_url, points, streak, parent_consent_request_id')
+    .select('name, role, avatar_url, profile_avatar_path, profile_background_path, bio, teaching_focus, teaching_language, points, streak, parent_consent_request_id')
     .eq('id', authUser.id)
     .maybeSingle();
   if (error) throw new Error('Your account profile could not be loaded.', { cause: error });
@@ -258,6 +264,7 @@ async function loadAccountProfile(client, authUser) {
   return mapAuthUser(authUser, {
     ...authUser.user_metadata,
     ...profile,
+    bio: profile.bio || authUser.user_metadata?.bio || '',
     avatar_url: profile.avatar_url || authUser.user_metadata?.avatar_url,
   });
 }
@@ -831,6 +838,163 @@ export async function updateUserProfile(profile) {
   const updated = { ...current, ...profile, id: data.user.id, email: data.user.email };
   setLocalItem(LOCAL_STORAGE_KEY_USER, updated);
   return updated;
+}
+
+function isTutorProfileImagePath(path, userId, kind) {
+  if (typeof path !== 'string' || typeof userId !== 'string' || !userId) return false;
+  const folder = kind === 'avatar' ? 'avatar' : kind === 'background' ? 'background' : '';
+  return Boolean(folder)
+    && new RegExp(`^${userId}/${folder}/[0-9a-f-]{36}[.](webp|jpg)$`, 'i').test(path);
+}
+
+async function requireCurrentAuthUser(expectedUserId) {
+  const client = requireSupabase();
+  const { data, error } = await client.auth.getUser();
+  if (error) throw new Error('Your signed-in account could not be verified.', { cause: error });
+  if (!data?.user) throw new Error('Sign in with your tutor account before updating your profile.');
+  if (expectedUserId && data.user.id !== expectedUserId) {
+    throw new Error('Your account changed while this profile update was in progress. Please try again.');
+  }
+  return { client, user: data.user };
+}
+
+export async function updateEducatorProfile(profile, { expectedUserId } = {}) {
+  const { client, user } = await requireCurrentAuthUser(expectedUserId);
+  const payload = {};
+  const allowedFields = ['name', 'bio', 'teaching_focus', 'teaching_language', 'profile_avatar_path', 'profile_background_path'];
+  for (const field of Object.keys(profile || {})) {
+    if (!allowedFields.includes(field)) throw new Error('This profile field cannot be changed here.');
+  }
+
+  if (Object.hasOwn(profile || {}, 'name')) {
+    const name = typeof profile.name === 'string' ? profile.name.trim() : '';
+    if (!name || name.length > 60) throw new Error('Enter a name between 1 and 60 characters.');
+    payload.name = name;
+  }
+  if (Object.hasOwn(profile || {}, 'bio')) {
+    if (typeof profile.bio !== 'string' || profile.bio.length > 500) {
+      throw new Error('Your teaching introduction must be 500 characters or fewer.');
+    }
+    payload.bio = profile.bio.trim();
+  }
+  if (Object.hasOwn(profile || {}, 'teaching_focus')) {
+    if (typeof profile.teaching_focus !== 'string' || profile.teaching_focus.length > 240) {
+      throw new Error('Your teaching focus must be 240 characters or fewer.');
+    }
+    payload.teaching_focus = profile.teaching_focus.trim();
+  }
+  if (Object.hasOwn(profile || {}, 'teaching_language')) {
+    if (typeof profile.teaching_language !== 'string' || !/^[a-z][a-z-]{1,39}$/.test(profile.teaching_language)) {
+      throw new Error('Choose a valid primary teaching language.');
+    }
+    payload.teaching_language = profile.teaching_language;
+  }
+  for (const [field, kind] of [
+    ['profile_avatar_path', 'avatar'],
+    ['profile_background_path', 'background'],
+  ]) {
+    if (!Object.hasOwn(profile || {}, field)) continue;
+    if (profile[field] !== null && !isTutorProfileImagePath(profile[field], user.id, kind)) {
+      throw new Error('The selected profile image is not stored in your private account folder.');
+    }
+    payload[field] = profile[field];
+  }
+  if (!Object.keys(payload).length) throw new Error('There are no profile changes to save.');
+
+  const { data, error } = await client
+    .from('profiles')
+    .update(payload)
+    .eq('id', user.id)
+    .eq('role', 'educator')
+    .select('id, name, role, avatar_url, profile_avatar_path, profile_background_path, bio, teaching_focus, teaching_language, points, streak')
+    .maybeSingle();
+  if (error) throw new Error('Your educator profile could not be saved.', { cause: error });
+  if (!data) throw new Error('Only the signed-in educator can update this profile.');
+
+  const updated = mapAuthUser(user, { ...user.user_metadata, ...data });
+  setLocalItem(LOCAL_STORAGE_KEY_USER, updated);
+  return updated;
+}
+
+export async function getTutorProfileMedia(expectedUserId) {
+  const { client, user } = await requireCurrentAuthUser(expectedUserId);
+  const { data: profile, error } = await client
+    .from('profiles')
+    .select('id, role, profile_avatar_path, profile_background_path')
+    .eq('id', user.id)
+    .eq('role', 'educator')
+    .maybeSingle();
+  if (error) throw new Error('Your private profile images could not be loaded.', { cause: error });
+  if (!profile) throw new Error('Only the signed-in educator can access these profile images.');
+
+  const storage = client.storage.from(TUTOR_PROFILE_MEDIA_BUCKET);
+  const signedUrl = async (path, kind) => {
+    if (!path) return '';
+    if (!isTutorProfileImagePath(path, user.id, kind)) {
+      throw new Error('A saved profile image is outside your private account folder.');
+    }
+    const { data, error: signedUrlError } = await storage.createSignedUrl(path, 60 * 60);
+    if (signedUrlError) throw new Error('A private profile image could not be opened.', { cause: signedUrlError });
+    if (!data?.signedUrl) throw new Error('The private image service returned no profile image URL.');
+    return data.signedUrl;
+  };
+  const [avatarUrl, backgroundUrl] = await Promise.all([
+    signedUrl(profile.profile_avatar_path, 'avatar'),
+    signedUrl(profile.profile_background_path, 'background'),
+  ]);
+  return {
+    avatarPath: profile.profile_avatar_path || '',
+    backgroundPath: profile.profile_background_path || '',
+    avatarUrl,
+    backgroundUrl,
+  };
+}
+
+export async function uploadTutorProfileImage(image, kind, { expectedUserId } = {}) {
+  if (!['avatar', 'background'].includes(kind)) throw new Error('Choose a profile picture or cover picture.');
+  if (!(image instanceof Blob) || !['image/webp', 'image/jpeg'].includes(image.type) || image.size < 1 || image.size > TUTOR_PROFILE_IMAGE_MAX_BYTES) {
+    throw new Error('The prepared image must be a WebP or JPEG file no larger than 2 MB.');
+  }
+  const { client, user } = await requireCurrentAuthUser(expectedUserId);
+  const { data: profile, error: profileError } = await client
+    .from('profiles')
+    .select('id, role, profile_avatar_path, profile_background_path')
+    .eq('id', user.id)
+    .eq('role', 'educator')
+    .maybeSingle();
+  if (profileError) throw new Error('Your educator profile could not be verified for image upload.', { cause: profileError });
+  if (!profile) throw new Error('Only the signed-in educator can upload profile images.');
+
+  const imageId = globalThis.crypto?.randomUUID?.();
+  if (!imageId) throw new Error('Secure image naming is unavailable in this browser. Try a current browser.');
+  const extension = image.type === 'image/webp' ? 'webp' : 'jpg';
+  const path = `${user.id}/${kind}/${imageId}.${extension}`;
+  const previousPath = kind === 'avatar' ? profile.profile_avatar_path : profile.profile_background_path;
+  const storage = client.storage.from(TUTOR_PROFILE_MEDIA_BUCKET);
+  const { error: uploadError } = await storage.upload(path, image, {
+    cacheControl: '3600',
+    contentType: image.type,
+    upsert: false,
+  });
+  if (uploadError) throw new Error('Your profile image could not be uploaded.', { cause: uploadError });
+
+  const profileField = kind === 'avatar' ? 'profile_avatar_path' : 'profile_background_path';
+  try {
+    await updateEducatorProfile({ [profileField]: path }, { expectedUserId: user.id });
+  } catch (error) {
+    const { error: cleanupError } = await storage.remove([path]);
+    if (cleanupError) {
+      throw new Error(`${error instanceof Error ? error.message : 'Your profile image could not be saved.'} The unused upload could not be removed.`, { cause: error });
+    }
+    throw error;
+  }
+
+  let cleanupWarning = '';
+  if (previousPath && previousPath !== path && isTutorProfileImagePath(previousPath, user.id, kind)) {
+    const { error: removeError } = await storage.remove([previousPath]);
+    if (removeError) cleanupWarning = 'Your new image is saved, but the previous image could not be removed automatically.';
+  }
+  return { path, cleanupWarning };
 }
 
 export async function saveProgress({ userId, lessonType, lessonId, meta = {} }) {
