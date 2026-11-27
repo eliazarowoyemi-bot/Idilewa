@@ -26,6 +26,8 @@ test('tutor account pages offer Google sign-in and open Google registration', ()
   assert.match(authDialogSource, /data-auth-google-action="\$\{signup \? 'signup' : 'signin'\}"/);
   assert.match(authDialogSource, /data-google-required required/);
   assert.match(authDialogSource, /beginEducatorGoogleSignup\(\{/);
+  assert.match(authDialogSource, /returnToHomepage: state\.returnToHomepage/);
+  assert.match(authClientSource, /await signInWithGoogle\(\{ redirectRoute: 'tutor-login', returnToHomepage \}\)/);
   assert.doesNotMatch(authDialogSource, /verifyEducatorInvite|inviteCode|id-auth-tutor-invite/);
   assert.match(authClientSource, /signInWithOAuth\(\{\s*provider: 'google'/);
   assert.doesNotMatch(authClientSource, /verifyEducatorInvite|educator_invite_id/);
@@ -37,6 +39,7 @@ test('Google OAuth callback completes only verified educator accounts', () => {
   assert.match(callbackSource, /completeEducatorGoogleSignup\(\{/);
   assert.match(callbackSource, /user\?\.role !== 'educator'/);
   assert.match(callbackSource, /callback\.user\.role === 'educator'/);
+  assert.match(callbackSource, /returnToHomepage\s*\?\s*'\/'/);
   assert.match(callbackSource, /This Google account is ready/);
   assert.match(apiSource, /user\.app_metadata\?\.providers/);
   assert.match(apiSource, /user\.email_confirmed_at/);

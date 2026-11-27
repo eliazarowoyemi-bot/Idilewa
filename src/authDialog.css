@@ -274,6 +274,10 @@
   cursor: pointer;
 }
 
+.id-auth-close[hidden] {
+  display: none;
+}
+
 .id-auth-close svg {
   width: 18px;
   height: 18px;

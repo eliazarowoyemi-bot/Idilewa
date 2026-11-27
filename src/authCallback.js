@@ -53,7 +53,9 @@ async function initializeAuthCallback() {
     status.textContent = 'Your email is verified. Choose a new password to finish recovery.';
     recoveryForm.hidden = false;
   } else if (callback) {
-    const next = new URLSearchParams(window.location.search).get('next');
+    const callbackParams = new URLSearchParams(window.location.search);
+    const next = callbackParams.get('next');
+    const returnToHomepage = callbackParams.get('returnTo') === 'index';
     const destination = ['index', 'login', 'profile', 'tutor-login', 'parent-dashboard', 'parent-signup'].includes(next || '') ? next : 'index';
     if (destination === 'parent-signup') {
       try {
@@ -66,7 +68,7 @@ async function initializeAuthCallback() {
         if (user?.role !== 'parent') {
           throw new Error('Google sign-in succeeded, but the parent role could not be confirmed.');
         }
-        window.location.replace('/parents.html#/parent-dashboard');
+        window.location.replace(returnToHomepage ? '/' : '/parents.html#/parent-dashboard');
       } catch (error) {
         try {
           await signOutAccount({ notify: false });
@@ -104,7 +106,7 @@ async function initializeAuthCallback() {
           if (user?.role !== 'educator') {
             throw new Error('Google sign-in succeeded, but the educator role could not be confirmed.');
           }
-          window.location.replace('/educator-portal.html#/tutor-dashboard');
+          window.location.replace(returnToHomepage ? '/' : '/educator-portal.html#/tutor-dashboard');
         } catch (error) {
           try {
             await signOutAccount({ notify: false });
@@ -118,9 +120,11 @@ async function initializeAuthCallback() {
       }
 
       if (callback.user.role === 'educator') {
-        window.location.replace(isGoogleAccount
-          ? '/educator-portal.html#/tutor-dashboard'
-          : '/educator-portal.html#/tutor-login');
+        window.location.replace(returnToHomepage
+          ? '/'
+          : isGoogleAccount
+            ? '/educator-portal.html#/tutor-dashboard'
+            : '/educator-portal.html#/tutor-login');
         return;
       }
 

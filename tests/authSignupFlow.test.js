@@ -13,8 +13,10 @@ test('parent, tutor, and child flows share the popup while child profiles remain
   assert.match(authDialogSource, /closedby="any"/);
   assert.match(authDialogSource, /currentDialog\.showModal\(\)/);
   assert.match(authDialogSource, /if \(!\('closedBy' in HTMLDialogElement\.prototype\)\)/);
+  assert.match(authDialogSource, /dialog\.setAttribute\('closedby', state\.authRequired \? 'none' : 'any'\)/);
+  assert.match(authDialogSource, /dialog\.addEventListener\('cancel', \(event\) => \{\s*if \(state\.authRequired\) event\.preventDefault\(\);/);
   assert.doesNotMatch(authDialogSource, /dialog\.show\(\)|dialog\.open\s*=|dialog\.setAttribute\(['"]open/);
-  assert.doesNotMatch(authDialogSource, /dialog\.addEventListener\(['"](?:keydown|cancel)['"]/);
+  assert.doesNotMatch(authDialogSource, /dialog\.addEventListener\(['"]keydown['"]/);
   assert.match(authDialogSource, /data-auth-form="parent"/);
   assert.match(authDialogSource, /data-auth-form="tutor"/);
   assert.match(authDialogSource, /function childForm\(\)/);
@@ -28,7 +30,7 @@ test('parent, tutor, and child flows share the popup while child profiles remain
   assert.doesNotMatch(childSignupSource, /<form[^>]*action="\/api\/guardian\/children"/);
   assert.match(childSignupSource, /src="\/src\/authDialogLoader\.js"/);
   assert.match(authDialogSource, /if \(role === 'parent' && mode === 'signup'\)/);
-  assert.match(authDialogSource, /role: 'parent',\s*redirectRoute: 'parent-dashboard'/);
+  assert.match(authDialogSource, /redirectRoute: state\.returnToHomepage \? 'index' : 'parent-dashboard'/);
   assert.match(appSource, /case 'consent-signup': navigate\('parent-signup'\); break;/);
   assert.doesNotMatch(appSource, /data-form="parent-auth"/);
   assert.doesNotMatch(appSource, /renderTutorAuth|data-form="tutor-(?:login|signup)"/);
@@ -67,6 +69,14 @@ test('auth callback exchanges confirmation sessions and safely routes recovery',
   assert.match(callbackSource, /includes\(next \|\| ''\)/);
   assert.match(callbackSource, /destination === 'tutor-login'\s*\? '\/educator-portal\.html#\/tutor-login'/);
   assert.match(viteConfigSource, /'auth-callback'/);
+});
+
+test('homepage waits for authoritative auth verification and keeps the signup dialog mandatory', async () => {
+  const homepageSyncSource = await readFile(new URL('../src/homepageProgressSync.js', import.meta.url), 'utf8');
+  assert.match(homepageSyncSource, /onAuthSessionChecked\(\{ user, error: null \}\)/);
+  assert.match(homepageSyncSource, /required: true,\s*returnToHomepage: true/);
+  assert.match(authDialogSource, /if \(!state\.authRequired \|\| !getCurrentUser\(\)\?\.id\) return;\s*state\.authRequired = false;\s*window\.location\.replace\('\/'\)/);
+  assert.match(authDialogSource, /if \(state\.authRequired\) \{\s*dialog\.showModal\(\);\s*return;/);
 });
 
 test('homepage hero and language cards use their supplied images in language order', async () => {

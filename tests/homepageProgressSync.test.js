@@ -13,6 +13,7 @@ test('homepage academy stages load and save through the signed-in progress accou
   const calls = [];
   const applied = [];
   const statuses = [];
+  const sessionChecks = [];
   const existing = {
     lessonType: 'homepage-academy-stage',
     lessonId: 'old-stage',
@@ -30,6 +31,7 @@ test('homepage academy stages load and save through the signed-in progress accou
     },
     applyProgress: (records) => applied.push(records),
     setStatus: (message) => statuses.push(message),
+    onAuthSessionChecked: (result) => sessionChecks.push(result),
   });
 
   await sync.initialize();
@@ -37,6 +39,7 @@ test('homepage academy stages load and save through the signed-in progress accou
 
   assert.deepEqual(calls[0], ['load', 'learner-1']);
   assert.equal(applied[0].length, 1);
+  assert.deepEqual(sessionChecks, [{ user: { id: 'learner-1' }, error: null }]);
   assert.equal(applied[0][0].lessonType, 'homepage-academy-stage');
   assert.deepEqual(calls[1], ['save', {
     userId: 'learner-1',
@@ -46,6 +49,27 @@ test('homepage academy stages load and save through the signed-in progress accou
   }]);
   assert.equal(applied[1].length, 2);
   assert.equal(statuses.at(-1), 'Stage progress synced to your account.');
+});
+
+test('homepage progress reports guest and failed session checks for the sign-up gate', async () => {
+  const sessionChecks = [];
+  const statuses = [];
+  const guestSync = createHomepageProgressSync({
+    restoreSession: async () => null,
+    onAuthSessionChecked: (result) => sessionChecks.push(result),
+  });
+  await guestSync.initialize();
+  assert.deepEqual(sessionChecks, [{ user: null, error: null }]);
+
+  const failure = new Error('Session verification failed.');
+  const failedSync = createHomepageProgressSync({
+    restoreSession: async () => { throw failure; },
+    onAuthSessionChecked: (result) => sessionChecks.push(result),
+    setStatus: (message) => statuses.push(message),
+  });
+  await failedSync.initialize();
+  assert.deepEqual(sessionChecks[1], { user: null, error: failure });
+  assert.match(statuses.at(-1), /account progress could not be loaded/i);
 });
 
 test('homepage academy progress stays local for guests and reports account write failures', async () => {

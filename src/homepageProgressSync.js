@@ -25,6 +25,7 @@ export function createHomepageProgressSync({
   save = saveProgress,
   setStatus = () => {},
   applyProgress = () => {},
+  onAuthSessionChecked = () => {},
 } = {}) {
   let accountTask = null;
   let accountRecords = [];
@@ -32,7 +33,14 @@ export function createHomepageProgressSync({
   async function loadAccount() {
     if (!accountTask) {
       accountTask = (async () => {
-        const user = await restoreSession();
+        let user;
+        try {
+          user = await restoreSession();
+        } catch (error) {
+          onAuthSessionChecked({ user: null, error });
+          throw error;
+        }
+        onAuthSessionChecked({ user, error: null });
         if (!user?.id) return null;
 
         const records = await getProgress(user.id);
@@ -192,6 +200,25 @@ export function installHomepageProgressSync({
       status.hidden = !message;
     },
     applyProgress: renderAccountProgress,
+    onAuthSessionChecked({ user, error }) {
+      if (user?.id) return;
+      const initialErrorMessage = error
+        ? 'We could not verify your saved sign-in. Please sign in to continue to the homepage.'
+        : '';
+      void import('./authDialog.js').then(({ openAuthDialog }) => {
+        openAuthDialog({
+          role: 'parent',
+          mode: error ? 'signin' : 'signup',
+          required: true,
+          returnToHomepage: true,
+          initialErrorMessage,
+        });
+      }).catch((loadError) => {
+        console.error('The homepage account dialog could not be opened.', loadError);
+        status.textContent = 'Sign in or create an account to continue. Reload the page to try again.';
+        status.hidden = false;
+      });
+    },
   });
 
   windowObject.renderProgress = function renderProgressWithAccountData(...args) {

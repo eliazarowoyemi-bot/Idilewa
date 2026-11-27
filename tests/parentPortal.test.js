@@ -25,7 +25,7 @@ test('Family portal exposes landing, account, dashboard, learning and settings r
 });
 
 test('Parent account registration and email confirmation return to the protected family dashboard', () => {
-  assert.match(authDialogSource, /role: 'parent',\s*redirectRoute: 'parent-dashboard'/);
+  assert.match(authDialogSource, /redirectRoute: state\.returnToHomepage \? 'index' : 'parent-dashboard'/);
   assert.match(authDialogSource, /expectedRole = role === 'tutor' \? 'educator' : 'parent'/);
   assert.match(clientSource, /role === 'parent' && phone/);
   assert.match(clientSource, /'parent-dashboard'\]\.includes\(redirectRoute\)/);

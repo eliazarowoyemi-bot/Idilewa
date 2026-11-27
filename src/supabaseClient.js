@@ -379,7 +379,12 @@ export async function signUp({
   };
 }
 
-export async function beginEducatorGoogleSignup({ educatorProfile, firstName, lastName }) {
+export async function beginEducatorGoogleSignup({
+  educatorProfile,
+  firstName,
+  lastName,
+  returnToHomepage = false,
+}) {
   const client = requireSupabase();
   const normalizedFirstName = typeof firstName === 'string' ? firstName.trim() : '';
   const normalizedLastName = typeof lastName === 'string' ? lastName.trim() : '';
@@ -400,22 +405,27 @@ export async function beginEducatorGoogleSignup({ educatorProfile, firstName, la
     throw new Error('Your tutor signup details could not be saved for Google sign-in. Please enable session storage and try again.', { cause: error });
   }
   try {
-    await signInWithGoogle({ redirectRoute: 'tutor-login' });
+    await signInWithGoogle({ redirectRoute: 'tutor-login', returnToHomepage });
   } catch (error) {
     clearPendingEducatorGoogleSignup();
     throw error;
   }
 }
 
-export async function signInWithGoogle({ redirectRoute = 'tutor-login' } = {}) {
+export async function signInWithGoogle({
+  redirectRoute = 'tutor-login',
+  returnToHomepage = false,
+} = {}) {
   const client = requireSupabase();
   if (!['tutor-login', 'parent-signup'].includes(redirectRoute)) {
     throw new Error('Choose a supported destination for Google sign-in.');
   }
+  const redirectUrl = new URL(`/auth-callback.html?next=${encodeURIComponent(redirectRoute)}`, window.location.origin);
+  if (returnToHomepage === true) redirectUrl.searchParams.set('returnTo', 'index');
   const { data, error } = await client.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: new URL(`/auth-callback.html?next=${encodeURIComponent(redirectRoute)}`, window.location.origin).toString(),
+      redirectTo: redirectUrl.toString(),
       queryParams: { prompt: 'select_account' },
     },
   });

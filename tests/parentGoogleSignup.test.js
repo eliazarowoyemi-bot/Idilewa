@@ -10,7 +10,7 @@ const apiSource = await readFile(new URL('../api/auth/welcome.js', import.meta.u
 test('parent signup offers Google only while child profiles remain parent-managed', () => {
   assert.match(authDialogSource, /data-auth-google-action="signup"[\s\S]*?Sign up with Google/);
   assert.match(authDialogSource, /state\.role === 'parent' && state\.mode === 'signup'/);
-  assert.match(authDialogSource, /signInWithGoogle\(\{ redirectRoute: 'parent-signup' \}\)/);
+  assert.match(authDialogSource, /signInWithGoogle\(\{\s*redirectRoute: 'parent-signup',\s*returnToHomepage: state\.returnToHomepage/);
   const childForm = authDialogSource.match(/function childForm\(\) \{[\s\S]*?\n\}/)?.[0] || '';
   assert.doesNotMatch(childForm, /data-auth-google-action/);
   assert.match(childForm, /A parent or guardian must approve the account/);
@@ -22,7 +22,8 @@ test('parent Google callback verifies provider and confirms the parent role befo
   assert.match(callbackSource, /'parent-signup'\]\.includes/);
   assert.match(callbackSource, /completeParentGoogleSignup\(\{ accessToken: callback\.session\.access_token \}\)/);
   assert.match(callbackSource, /user\?\.role !== 'parent'/);
-  assert.match(callbackSource, /\/parents\.html#\/parent-dashboard/);
+  assert.match(callbackSource, /returnToHomepage \? '\/' : '\/parents\.html#\/parent-dashboard'/);
+  assert.match(authClientSource, /returnToHomepage === true\) redirectUrl\.searchParams\.set\('returnTo', 'index'\)/);
 });
 
 test('parent Google role promotion accepts only verified Google sessions and adult profiles', () => {

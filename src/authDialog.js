@@ -1,4 +1,5 @@
 import './authDialog.css';
+import { AUTH_STATE_CHANGED_EVENT } from './authState.js';
 import { getAuthIntent } from './authIntent.js';
 import {
   beginEducatorGoogleSignup,
@@ -30,6 +31,8 @@ const state = {
   cordY: 300,
   draggingCord: false,
   suppressCordClick: false,
+  authRequired: false,
+  returnToHomepage: false,
 };
 
 let dialog;
@@ -400,6 +403,7 @@ function ensureDialog() {
   dialog.addEventListener('submit', handleDialogSubmit);
   if (!('closedBy' in HTMLDialogElement.prototype)) {
     dialog.addEventListener('click', (event) => {
+      if (state.authRequired) return;
       if (event.target !== dialog) return;
       const bounds = dialog.getBoundingClientRect();
       const clickedOutside = event.clientX < bounds.left
@@ -409,17 +413,26 @@ function ensureDialog() {
       if (clickedOutside) dialog.close('dismissed');
     });
   }
+  dialog.addEventListener('cancel', (event) => {
+    if (state.authRequired) event.preventDefault();
+  });
+  window.addEventListener(AUTH_STATE_CHANGED_EVENT, handleRequiredAuthStateChange);
   dialog.addEventListener('input', (event) => {
     if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement || event.target instanceof HTMLTextAreaElement) {
       clearFeedback();
     }
   });
   dialog.addEventListener('close', () => {
+    if (state.authRequired) {
+      dialog.showModal();
+      return;
+    }
     dialog.returnValue = '';
     dialog.querySelectorAll('input[type="password"]').forEach((input) => { input.value = ''; });
     state.feedback = null;
     state.result = null;
     state.screen = 'form';
+    state.returnToHomepage = false;
   });
   attachCordInteraction(dialog);
   renderPanel();
@@ -429,6 +442,15 @@ function ensureDialog() {
 function renderPanel() {
   if (!dialog) return;
   dialog.dataset.lampOn = String(Boolean(dialog.dataset.lampOn === 'true'));
+  dialog.setAttribute('closedby', state.authRequired ? 'none' : 'any');
+  const description = dialog.querySelector('#id-auth-dialog-description');
+  if (description) {
+    description.textContent = state.authRequired
+      ? 'Create an account or sign in to continue to the Idilewa homepage.'
+      : 'Choose an account type. Every child profile stays under a parent or guardian.';
+  }
+  const closeButton = dialog.querySelector('[data-auth-close]');
+  if (closeButton) closeButton.hidden = state.authRequired;
   dialog.querySelectorAll('[data-auth-role]').forEach((button) => {
     button.setAttribute('aria-pressed', String(button.dataset.authRole === state.role));
   });
@@ -516,15 +538,31 @@ function setRole(role, { pendingChild = false, mode = state.mode } = {}) {
   if (role === 'child') void checkParentAccount();
 }
 
-export function openAuthDialog({ role = 'parent', mode = 'signup', pendingChild = false } = {}) {
+function handleRequiredAuthStateChange() {
+  if (!state.authRequired || !getCurrentUser()?.id) return;
+  state.authRequired = false;
+  window.location.replace('/');
+}
+
+export function openAuthDialog({
+  role = 'parent',
+  mode = 'signup',
+  pendingChild = false,
+  required = false,
+  returnToHomepage = false,
+  initialErrorMessage = '',
+} = {}) {
   const nextRole = ['parent', 'tutor', 'child'].includes(role) ? role : 'parent';
   const nextMode = mode === 'signin' ? 'signin' : 'signup';
   const currentDialog = ensureDialog();
+  state.authRequired = Boolean(required);
+  state.returnToHomepage = Boolean(returnToHomepage);
   setRole(nextRole, { pendingChild, mode: nextMode });
   if (!currentDialog.open) {
     currentDialog.showModal();
     currentDialog.querySelector('#id-auth-dialog-title')?.focus({ preventScroll: true });
   }
+  if (initialErrorMessage) setFeedback(initialErrorMessage);
   return currentDialog;
 }
 
@@ -571,6 +609,7 @@ function handleDialogClick(event) {
   if (!(event.target instanceof Element)) return;
   const closeButton = event.target.closest('[data-auth-close]');
   if (closeButton) {
+    if (state.authRequired) return;
     dialog.close('dismissed');
     return;
   }
@@ -707,7 +746,10 @@ async function startGoogleAuth(action, button) {
   button.textContent = 'Connecting to Google…';
   try {
     if (parentSignup) {
-      await signInWithGoogle({ redirectRoute: 'parent-signup' });
+      await signInWithGoogle({
+        redirectRoute: 'parent-signup',
+        returnToHomepage: state.returnToHomepage,
+      });
     } else if (action === 'signup') {
       const invalidField = [...form.querySelectorAll('[data-google-required]')]
         .find((field) => !field.checkValidity());
@@ -728,9 +770,13 @@ async function startGoogleAuth(action, button) {
           teachingExperience: String(data.get('teachingExperience') || ''),
           qualifications: String(data.get('qualifications') || ''),
         },
+        returnToHomepage: state.returnToHomepage,
       });
     } else {
-      await signInWithGoogle({ redirectRoute: 'tutor-login' });
+      await signInWithGoogle({
+        redirectRoute: 'tutor-login',
+        returnToHomepage: state.returnToHomepage,
+      });
     }
   } catch (error) {
     feedback(error instanceof Error ? error.message : 'Google sign-in could not be started.');
@@ -888,7 +934,7 @@ async function handleDialogSubmit(event) {
         name: String(formData.get('name') || '').trim(),
         phone: String(formData.get('phone') || '').trim(),
         role: 'parent',
-        redirectRoute: 'parent-dashboard',
+        redirectRoute: state.returnToHomepage ? 'index' : 'parent-dashboard',
       });
       if (!session) {
         setConfirmation(
@@ -929,7 +975,7 @@ async function handleDialogSubmit(event) {
           teachingExperience: String(formData.get('teachingExperience') || '').trim(),
           qualifications: String(formData.get('qualifications') || '').trim(),
         },
-        redirectRoute: 'tutor-login',
+        redirectRoute: state.returnToHomepage ? 'index' : 'tutor-login',
       });
       if (!session) {
         setConfirmation('Account created. Confirm your email to finish setting up your tutor account, then sign in.', email);

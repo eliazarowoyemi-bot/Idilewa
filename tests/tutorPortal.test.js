@@ -42,6 +42,7 @@ test('educator registration is open and preserves profile validation and child a
   assert.match(migrationSource, /IF v_role = 'child' THEN[\s\S]*?guardian_access_requests/);
   assert.doesNotMatch(migrationSource, /educator_invites|educator_invite_id/);
   assert.match(authCallbackSource, /'tutor-login'/);
+  assert.match(authDialogSource, /redirectRoute: state\.returnToHomepage \? 'index' : 'tutor-login'/);
 });
 
 test('educator signup captures and validates profile details before authentication', () => {
