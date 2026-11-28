@@ -32,6 +32,20 @@ test('Parent account registration and email confirmation return to the protected
   assert.match(callbackSource, /'parent-dashboard', 'parent-signup'\]\.includes\(next/);
 });
 
+test('Parent dashboard initializes user-scoped data and keeps its workspace navigation valid', () => {
+  assert.match(appSource, /const PARENT_PORTAL_LINKS = \[/);
+  assert.match(appSource, /let parentDashboardData = null;/);
+  assert.match(appSource, /let parentDashboardLoading = false;/);
+  assert.match(appSource, /let parentDashboardError = '';/);
+  assert.match(appSource, /let parentDashboardRequest = 0;/);
+  assert.match(appSource, /function synchronizeParentDashboardCache\(userId\)/);
+  assert.match(appSource, /parentDashboardDataUserId !== user\.id/);
+  assert.match(appSource, /\$\{brandLogo\(\)\}<\/a>\s*<nav class="family-sidebar-nav"/);
+  assert.match(appSource, /<div class="family-workspace-main">/);
+  assert.match(appSource, /aria-labelledby="family-dashboard-children-heading"/);
+  assert.match(styleSource, /\.family-workspace-parent-dashboard \.family-child-card/);
+});
+
 test('Parent views keep learner data behind guardian-approved authentication and consent', () => {
   assert.match(appSource, /getCurrentUser\(\)\?\.role !== 'parent'\) return renderParentAccess\(\)/);
   assert.match(appSource, /parent-withdraw-consent/);

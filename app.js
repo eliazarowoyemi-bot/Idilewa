@@ -4814,25 +4814,47 @@ import './src/heritageLibrary.css';
     return `<div class="family-access-page"><section class="family-access-card"><span class="family-access-icon">${icon('lock', 22)}</span><span class="family-eyebrow">Family portal</span><h1>Sign in to continue</h1><p>Your child’s learning information is only available to their verified parent or guardian.</p><div><a class="family-button family-button-primary" href="#/parent-login" data-route="parent-login">Parent Login</a><a class="family-access-link" href="#/parent-signup" data-route="parent-signup">Create a parent account</a></div></section></div>`;
   }
 
+  const PARENT_PORTAL_LINKS = [
+    { route: 'parent-dashboard', label: 'Overview', icon: 'home' },
+    { route: 'parent-children', label: 'My Children', icon: 'people' },
+    { route: 'parent-progress', label: 'Learning Progress', icon: 'chart' },
+    { route: 'parent-messages', label: 'Family Updates', icon: 'school' },
+    { route: 'parent-settings', label: 'Settings', icon: 'settings' },
+  ];
+  let parentDashboardData = null;
+  let parentDashboardDataUserId = '';
+  let parentDashboardLoading = false;
+  let parentDashboardError = '';
+  let parentDashboardRequest = 0;
+
+  function synchronizeParentDashboardCache(userId) {
+    if (parentDashboardDataUserId === userId) return;
+    parentDashboardRequest += 1;
+    parentDashboardDataUserId = userId;
+    parentDashboardData = null;
+    parentDashboardLoading = false;
+    parentDashboardError = '';
+  }
+
   function renderParentWorkspace(page, content) {
     const user = getCurrentUser();
     const name = user?.name || 'Parent';
     const initial = name.trim().charAt(0).toUpperCase() || 'P';
     const active = page === 'parent-progress' ? 'parent-progress' : page;
     const links = PARENT_PORTAL_LINKS.map((item) => `<a href="#/${item.route}" data-route="${item.route}" class="family-sidebar-link ${item.route === active ? 'is-active' : ''}" ${item.route === active ? 'aria-current="page"' : ''}>${icon(item.icon, 17)}<span>${item.label}</span></a>`).join('');
-    return `<div class="family-workspace">
-      <aside class="family-sidebar"><a class="family-sidebar-brand" href="#/parent-dashboard" data-route="parent-dashboard" aria-label="Ìdíléwa home">${brandLogo()}
+    return `<div class="family-workspace ${page === 'parent-dashboard' ? 'family-workspace-parent-dashboard' : ''}">
+      <aside class="family-sidebar"><a class="family-sidebar-brand" href="#/parent-dashboard" data-route="parent-dashboard" aria-label="Ìdíléwa home">${brandLogo()}</a>
         <nav class="family-sidebar-nav" aria-label="Family portal">${links}</nav>
         <button type="button" class="family-sidebar-user" data-action="profile-sign-out"><span class="family-avatar">${esc(initial)}</span><span><strong>${esc(name)}</strong><small>Parent</small></span>${icon('arrow', 14)}</button>
       </aside>
-      <main class="family-workspace-main"><header class="family-topbar"><div><a href="#/parent-dashboard" data-route="parent-dashboard">Family Portal</a><span class="breadcrumb-sep" aria-hidden="true"></span><strong>${esc(LABELS[page] || 'Dashboard')}</strong></div><div class="family-topbar-actions"><span class="family-secure-status"><i></i> Family space</span><a href="#/parent-settings" data-route="parent-settings" class="family-topbar-avatar" aria-label="Open settings">${esc(initial)}</a></div></header>
+      <div class="family-workspace-main"><header class="family-topbar"><div><a href="#/parent-dashboard" data-route="parent-dashboard">Family Portal</a><span class="breadcrumb-sep" aria-hidden="true"></span><strong>${esc(LABELS[page] || 'Dashboard')}</strong></div><div class="family-topbar-actions"><span class="family-secure-status"><i></i> Family space</span><a href="#/parent-settings" data-route="parent-settings" class="family-topbar-avatar" aria-label="Open settings">${esc(initial)}</a></div></header>
         <div class="family-workspace-content">${content}</div>
-      </main>
+      </div>
     </div>`;
   }
 
   function renderParentHeading(kicker, title, description, actions = '') {
-    return `<header class="family-page-heading"><div><span class="family-eyebrow">${esc(kicker)}</span><h1>${esc(title)}</h1><p>${esc(description)}</p></div>${actions ? `<div class="family-heading-actions">${actions}</div>` : ''}</header>`;
+    return `<header class="family-page-heading"><div>${kicker ? `<span class="family-eyebrow">${esc(kicker)}</span>` : ''}<h1>${esc(title)}</h1><p>${esc(description)}</p></div>${actions ? `<div class="family-heading-actions">${actions}</div>` : ''}</header>`;
   }
 
   function familyChildren() {
@@ -4870,28 +4892,20 @@ import './src/heritageLibrary.css';
 
   function renderParentDashboard() {
     const children = familyChildren();
-    const totalLessons = children.reduce((sum, child) => sum + (Number(child.completedLessons) || 0), 0);
-    const totalCoding = children.reduce((sum, child) => sum + (Number(child.codingSessions) || 0), 0);
-    const voiceScores = children.map((child) => child.averageVoiceScore).filter(Number.isFinite);
-    const averageVoice = voiceScores.length
-      ? `${Math.round(voiceScores.reduce((sum, score) => sum + score, 0) / voiceScores.length)}%`
-      : '—';
     const name = getCurrentUser()?.name?.trim().split(/\s+/)[0] || 'Parent';
-    const stat = (label, value, note, tone = '') => `<article class="family-stat-card ${tone}"><span>${icon('sparkles', 16)} ${label}</span><strong>${value}</strong><small>${note}</small></article>`;
     const childSection = children.length
       ? `<div class="family-child-grid">${children.slice(0, 4).map(renderParentChildCard).join('')}</div>`
       : parentDashboardLoading || parentDashboardError
         ? ''
-        : `<div class="family-empty-card"><span>${icon('heart', 23)}</span><h3>Your family space is ready</h3><p>When a child finishes guardian-approved sign-up, their learning progress will appear here.</p><a class="family-button family-button-outline" href="#/consent" data-route="consent">Learn about family approval ${icon('arrow', 14)}</a></div>`;
+        : `<div class="family-empty-card"><span>${icon('people', 23)}</span><h2>Your family space is ready</h2><p>Create a child profile to get started. Their learning activity appears here after guardian approval.</p><div class="family-empty-actions"><a class="family-button family-button-primary" href="/kids-signup.html">Create child profile ${icon('arrow', 14)}</a><a class="family-button family-button-outline" href="#/consent" data-route="consent">How approval works</a></div></div>`;
     const loading = parentDashboardLoading
-      ? '<div class="family-data-state" role="status">Loading your family dashboard…</div>'
+      ? '<div class="family-data-state" role="status" aria-live="polite">Loading your family dashboard…</div>'
       : parentDashboardError
         ? `<div class="family-data-state is-error" role="alert">${esc(parentDashboardError)} <button type="button" data-action="parent-refresh">Try again</button></div>`
         : '';
-    return renderParentWorkspace('parent-dashboard', `${renderParentHeading('Your family learning space', `Welcome back, ${name}.`, 'Here’s how your children are growing with Idilewa.', `<a class="family-button family-button-outline" href="/kids-signup.html">Add child profile</a><a class="family-button family-button-outline" href="/family-tasks.html">Family Tasks</a><a class="family-button family-button-outline" href="#/parent-progress" data-route="parent-progress">View Analytics ${icon('arrow', 14)}</a>`)}
-      <section class="family-stat-grid" aria-label="Family learning overview">${stat('My Children', children.length, 'Parent-managed and approved profiles')}${stat('Lessons Completed', totalLessons, 'Across your family', 'is-mint')}${stat('Coding Sessions', totalCoding, 'Saved practice attempts', 'is-blue')}${stat('Average Voice Score', averageVoice, 'When available', 'is-peach')}</section>
-      <section class="family-dashboard-section"><div class="family-section-heading"><div><span class="family-eyebrow">Your learners</span><h2>My Children</h2></div><div class="family-heading-actions"><a class="family-text-link" href="/kids-signup.html">Add child profile</a><a class="family-text-link" href="#/parent-children" data-route="parent-children">View all ${icon('arrow', 13)}</a></div></div>${loading}${childSection}</section>
-      <section class="family-dashboard-lower"><article class="family-insight-card"><span class="family-insight-icon">${icon('globe', 20)}</span><div><span class="family-eyebrow">A little every day</span><h2>Building a global voice, one child at a time.</h2><p>Celebrate each lesson, story and new word along the way.</p></div><a href="#/parent-progress" data-route="parent-progress" aria-label="Open learning analytics">${icon('arrow', 15)}</a></article><aside class="family-activity-panel"><div class="family-section-heading"><div><span class="family-eyebrow">Family updates</span><h2>Connection requests</h2></div><a class="family-text-link" href="#/parent-messages" data-route="parent-messages">View all ${icon('arrow', 13)}</a></div>${renderParentRequestSummary()}</aside></section>`);
+    return renderParentWorkspace('parent-dashboard', `${renderParentHeading('', `Welcome back, ${name}.`, 'See your children’s learning progress and family connection requests.', `<a class="family-button family-button-primary" href="/kids-signup.html">Add child profile ${icon('arrow', 14)}</a><a class="family-button family-button-outline" href="/family-tasks.html">Family Tasks</a><a class="family-heading-link" href="#/parent-progress" data-route="parent-progress">View learning progress ${icon('arrow', 14)}</a>`)}
+      <section class="family-dashboard-section" aria-labelledby="family-dashboard-children-heading"><div class="family-section-heading"><h2 id="family-dashboard-children-heading">My Children</h2><a class="family-text-link" href="#/parent-children" data-route="parent-children">View all ${icon('arrow', 13)}</a></div>${loading}${childSection}</section>
+      <section class="family-dashboard-lower"><aside class="family-insight-card"><span class="family-insight-icon">${icon('lock', 20)}</span><div><h2>Child progress stays private.</h2><p>Only learning activity shared through guardian-approved family connections appears here.</p><a class="family-text-link" href="#/consent" data-route="consent">How family approval works ${icon('arrow', 13)}</a></div></aside><section class="family-activity-panel" aria-labelledby="family-dashboard-requests-heading"><div class="family-section-heading"><h2 id="family-dashboard-requests-heading">Connection requests</h2><a class="family-text-link" href="#/parent-messages" data-route="parent-messages">View all ${icon('arrow', 13)}</a></div>${renderParentRequestSummary()}</section></section>`);
   }
 
   function renderParentRequestSummary() {
@@ -5037,17 +5051,21 @@ import './src/heritageLibrary.css';
   }
 
   async function loadParentPortalData() {
-    if (parentDashboardLoading || parentDashboardData || getCurrentUser()?.role !== 'parent') return;
+    const user = getCurrentUser();
+    if (parentDashboardLoading || parentDashboardData || user?.role !== 'parent' || parentDashboardDataUserId !== user.id) return;
     parentDashboardLoading = true;
     parentDashboardError = '';
     const sequence = ++parentDashboardRequest;
     render();
     try {
-      parentDashboardData = await getRoleDashboard('/api/dashboard/parent');
+      const data = await getRoleDashboard('/api/dashboard/parent');
+      if (sequence !== parentDashboardRequest || getCurrentUser()?.id !== user.id) return;
+      parentDashboardData = data;
     } catch (error) {
+      if (sequence !== parentDashboardRequest || getCurrentUser()?.id !== user.id) return;
       parentDashboardError = error instanceof Error ? error.message : 'Your family dashboard could not be loaded.';
     } finally {
-      if (sequence !== parentDashboardRequest) return;
+      if (sequence !== parentDashboardRequest || getCurrentUser()?.id !== user.id) return;
       parentDashboardLoading = false;
       const page = parseLocation().page;
       if (page.startsWith('parent-') && page !== 'parent-login' && page !== 'parent-signup' && page !== 'parent-welcome') render();
@@ -6476,8 +6494,11 @@ import './src/heritageLibrary.css';
       return;
     }
     const { page, params } = location;
-    const tutorUserId = page.startsWith('tutor') && isTutorAccount() ? getCurrentUser().id : '';
+    const currentUser = getCurrentUser();
+    const tutorUserId = page.startsWith('tutor') && isTutorAccount() ? currentUser.id : '';
+    const parentUserId = currentUser?.role === 'parent' ? currentUser.id : '';
     synchronizeTutorAccountCaches(tutorUserId);
+    synchronizeParentDashboardCache(parentUserId);
     const outgoingPage = document.body.dataset.page || '';
     if (outgoingPage === 'ai-conversation' && page !== 'ai-conversation') cleanupAiConversation();
     if (outgoingPage && outgoingPage !== page && page === 'ai-conversation') {
