@@ -51,7 +51,7 @@ test('homepage academy stages load and save through the signed-in progress accou
   assert.equal(statuses.at(-1), 'Stage progress synced to your account.');
 });
 
-test('homepage progress reports guest and failed session checks for the sign-up gate', async () => {
+test('homepage progress reports guest and failed session checks without requiring sign-in', async () => {
   const sessionChecks = [];
   const statuses = [];
   const guestSync = createHomepageProgressSync({

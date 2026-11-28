@@ -156,6 +156,9 @@ export function normalizeAuthError(error, operation) {
   if (/over_.*rate|rate limit|too many requests/.test(`${code} ${message}`)) {
     return 'Too many attempts. Wait a little before trying again.';
   }
+  if (operation === 'password-reset' && status >= 500) {
+    return 'We could not send your password reset email right now. Please try again shortly.';
+  }
   if (operation === 'signup' && status >= 500) {
     return 'Your account could not be created because profile setup failed. Please try again later or contact Idilewa support.';
   }
@@ -163,6 +166,9 @@ export function normalizeAuthError(error, operation) {
     return 'The account service is temporarily unavailable. Please try again shortly.';
   }
   if (error instanceof TypeError || /failed to fetch|networkerror/.test(message)) {
+    if (operation === 'password-reset') {
+      return 'We could not reach the password recovery service. Check your connection and try again.';
+    }
     return 'Could not reach the account service. Check your connection and try again.';
   }
   return typeof error?.message === 'string' && error.message.trim()
@@ -642,7 +648,7 @@ export async function requestPasswordReset(email) {
   const { error } = await client.auth.resetPasswordForEmail(normalizedEmail, {
     redirectTo: new URL('/auth-callback.html?next=index', window.location.origin).toString(),
   });
-  if (error) throw new Error(normalizeAuthError(error, 'signin'), { cause: error });
+  if (error) throw new Error(normalizeAuthError(error, 'password-reset'), { cause: error });
 }
 
 export async function signIn({ email, password, expectedRole }) {

@@ -14,17 +14,52 @@ const status = document.getElementById('authCallbackStatus');
 const recoveryForm = document.getElementById('authRecoveryForm');
 const recoveryError = document.getElementById('authRecoveryError');
 const loginLink = document.getElementById('authCallbackLogin');
+const tutorSignupForm = document.getElementById('authTutorSignupForm');
+const tutorSignupEmail = document.getElementById('authTutorSignupEmail');
+const tutorSignupError = document.getElementById('authTutorSignupError');
+const title = document.getElementById('authCallbackTitle');
+let tutorSignupSession = null;
+let tutorSignupReturnToHomepage = false;
 
 function showError(message) {
   status.textContent = message;
   loginLink.hidden = false;
 }
 
-function showTutorSignup(message) {
+function showTutorSignupLink(message) {
   status.textContent = message;
   loginLink.href = '/educator-portal.html#/tutor-signup';
   loginLink.textContent = 'Continue tutor sign-up';
   loginLink.hidden = false;
+}
+
+function showTutorSignupForm(message, session, returnToHomepage, pendingSignup = null) {
+  if (!session?.access_token) {
+    showTutorSignupLink('Sign in with Google to complete tutor registration.');
+    return;
+  }
+  title.textContent = 'Complete your tutor sign-up';
+  status.textContent = message;
+  tutorSignupSession = session;
+  tutorSignupReturnToHomepage = returnToHomepage;
+  tutorSignupEmail.textContent = session.user?.email || 'Verified Google account';
+  tutorSignupForm.hidden = false;
+  loginLink.href = '/';
+  loginLink.textContent = 'Return to homepage';
+  loginLink.hidden = false;
+
+  const values = {
+    firstName: pendingSignup?.firstName || '',
+    lastName: pendingSignup?.lastName || '',
+    country: pendingSignup?.profile?.country || '',
+    timeZone: pendingSignup?.profile?.timeZone || '',
+    teachingSubject: pendingSignup?.profile?.teachingSubject || '',
+    teachingExperience: pendingSignup?.profile?.teachingExperience || '',
+    qualifications: pendingSignup?.profile?.qualifications || '',
+  };
+  for (const [name, value] of Object.entries(values)) {
+    tutorSignupForm.elements.namedItem(name).value = value;
+  }
 }
 
 function showTutorLogin(message) {
@@ -93,28 +128,45 @@ async function initializeAuthCallback() {
 
       if (pendingSignup) {
         if (!isGoogleAccount) {
-          showTutorSignup('This tutor signup was started with Google. Return to the tutor signup page and try again.');
+          showTutorSignupLink('This tutor signup was started with Google. Return to the tutor signup page and try again.');
           return;
         }
+        try {
+          clearPendingEducatorGoogleSignup();
+        } catch (error) {
+          showTutorSignupForm(
+            error instanceof Error ? error.message : 'Your tutor details could not be prepared for completion.',
+            callback.session,
+            returnToHomepage,
+            pendingSignup,
+          );
+          return;
+        }
+        let signupCompleted = false;
         try {
           await completeEducatorGoogleSignup({
             accessToken: callback.session.access_token,
             ...pendingSignup,
           });
-          clearPendingEducatorGoogleSignup();
+          signupCompleted = true;
           const user = await restoreAuthSession();
           if (user?.role !== 'educator') {
             throw new Error('Google sign-in succeeded, but the educator role could not be confirmed.');
           }
           window.location.replace(returnToHomepage ? '/' : '/educator-portal.html#/tutor-dashboard');
         } catch (error) {
-          try {
-            await signOutAccount({ notify: false });
-          } catch (signOutError) {
-            showTutorLogin(`${error instanceof Error ? error.message : 'Google tutor sign-up could not be completed.'} Your sign-in could not be cleared; contact Idilewa support.`);
-            return;
+          if (signupCompleted) {
+            showTutorLogin(
+              `${error instanceof Error ? error.message : 'Your tutor account is ready.'} Sign in again to continue.`,
+            );
+          } else {
+            showTutorSignupForm(
+              `${error instanceof Error ? error.message : 'Google tutor sign-up could not be completed.'} Review your details and try again.`,
+              callback.session,
+              returnToHomepage,
+              pendingSignup,
+            );
           }
-          showTutorSignup(error instanceof Error ? error.message : 'Google tutor sign-up could not be completed. Review your details and try again.');
         }
         return;
       }
@@ -129,7 +181,11 @@ async function initializeAuthCallback() {
       }
 
       if (isGoogleAccount && callback.user.role === 'adult') {
-        showTutorSignup('This Google account is ready. Complete the tutor details to register as an educator.');
+        showTutorSignupForm(
+          'Your Google account is ready. Complete these tutor details to finish registration.',
+          callback.session,
+          returnToHomepage,
+        );
         return;
       }
 
@@ -152,6 +208,61 @@ async function initializeAuthCallback() {
 }
 
 void initializeAuthCallback();
+
+tutorSignupForm.addEventListener('submit', async (event) => {
+  event.preventDefault();
+  tutorSignupError.hidden = true;
+  if (!tutorSignupSession?.access_token) {
+    showTutorSignupLink('Your Google session expired. Sign in with Google again to complete tutor registration.');
+    return;
+  }
+  if (!tutorSignupForm.reportValidity()) return;
+
+  const formData = new FormData(tutorSignupForm);
+  const submitButton = tutorSignupForm.querySelector('button[type="submit"]');
+  submitButton.disabled = true;
+  submitButton.textContent = 'Completing tutor sign-up…';
+  let signupCompleted = false;
+  try {
+    await completeEducatorGoogleSignup({
+      accessToken: tutorSignupSession.access_token,
+      firstName: String(formData.get('firstName') || ''),
+      lastName: String(formData.get('lastName') || ''),
+      educatorProfile: {
+        country: String(formData.get('country') || ''),
+        timeZone: String(formData.get('timeZone') || ''),
+        teachingSubject: String(formData.get('teachingSubject') || ''),
+        teachingExperience: String(formData.get('teachingExperience') || ''),
+        qualifications: String(formData.get('qualifications') || ''),
+      },
+    });
+    signupCompleted = true;
+    const user = await restoreAuthSession();
+    if (user?.role !== 'educator') {
+      throw new Error('Your tutor account is ready, but your educator profile could not be confirmed.');
+    }
+    window.location.replace(tutorSignupReturnToHomepage
+      ? '/'
+      : '/educator-portal.html#/tutor-dashboard');
+  } catch (error) {
+    if (signupCompleted) {
+      showTutorLogin(
+        `${error instanceof Error ? error.message : 'Your tutor account is ready.'} Sign in again to continue.`,
+      );
+      return;
+    }
+    tutorSignupError.textContent = error instanceof Error
+      ? error.message
+      : 'Your tutor account could not be completed. Review your details and try again.';
+    tutorSignupError.hidden = false;
+    tutorSignupError.focus();
+  } finally {
+    if (submitButton.isConnected && !signupCompleted) {
+      submitButton.disabled = false;
+      submitButton.textContent = 'Complete tutor sign-up';
+    }
+  }
+});
 
 recoveryForm.addEventListener('submit', async (event) => {
   event.preventDefault();

@@ -9,6 +9,7 @@ const authClientSource = await readFile(new URL('../src/supabaseClient.js', impo
 const callbackSource = await readFile(new URL('../src/authCallback.js', import.meta.url), 'utf8');
 const apiSource = await readFile(new URL('../src/server/educatorVerifyInvite.js', import.meta.url), 'utf8');
 const migrationSource = await readFile(new URL('../supabase/migrations/20261126141500_open_educator_registration.sql', import.meta.url), 'utf8');
+const callbackHtmlSource = await readFile(new URL('../auth-callback.html', import.meta.url), 'utf8');
 
 test('tutor signup uses the shared responsive popup and Idilewa visual identity', () => {
   assert.match(authDialogSource, /<dialog class="id-auth-dialog"/);
@@ -37,10 +38,17 @@ test('tutor account pages offer Google sign-in and open Google registration', ()
 test('Google OAuth callback completes only verified educator accounts', () => {
   assert.match(callbackSource, /getPendingEducatorGoogleSignup\(\)/);
   assert.match(callbackSource, /completeEducatorGoogleSignup\(\{/);
+  assert.match(callbackSource, /showTutorSignupForm\(/);
+  assert.match(callbackSource, /Complete tutor sign-up/);
+  assert.match(callbackHtmlSource, /id="authTutorSignupForm"/);
+  assert.match(callbackHtmlSource, /id="authTutorSignupEmail"/);
+  assert.doesNotMatch(callbackHtmlSource.match(/<form id="authTutorSignupForm"[\s\S]*?<\/form>/)?.[0] || '', /type="email"|name="email"/);
+  assert.match(callbackHtmlSource, /autocomplete="given-name"/);
+  assert.match(callbackHtmlSource, /I agree to follow Idilewa’s child-safeguarding and privacy requirements/);
   assert.match(callbackSource, /user\?\.role !== 'educator'/);
   assert.match(callbackSource, /callback\.user\.role === 'educator'/);
   assert.match(callbackSource, /returnToHomepage\s*\?\s*'\/'/);
-  assert.match(callbackSource, /This Google account is ready/);
+  assert.match(callbackSource, /Your Google account is ready/);
   assert.match(apiSource, /user\.app_metadata\?\.providers/);
   assert.match(apiSource, /user\.email_confirmed_at/);
   assert.match(apiSource, /complete_educator_google_signup/);

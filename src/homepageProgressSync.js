@@ -200,25 +200,6 @@ export function installHomepageProgressSync({
       status.hidden = !message;
     },
     applyProgress: renderAccountProgress,
-    onAuthSessionChecked({ user, error }) {
-      if (user?.id) return;
-      const initialErrorMessage = error
-        ? 'We could not verify your saved sign-in. Please sign in to continue to the homepage.'
-        : '';
-      void import('./authDialog.js').then(({ openAuthDialog }) => {
-        openAuthDialog({
-          role: 'parent',
-          mode: error ? 'signin' : 'signup',
-          required: true,
-          returnToHomepage: true,
-          initialErrorMessage,
-        });
-      }).catch((loadError) => {
-        console.error('The homepage account dialog could not be opened.', loadError);
-        status.textContent = 'Sign in or create an account to continue. Reload the page to try again.';
-        status.hidden = false;
-      });
-    },
   });
 
   windowObject.renderProgress = function renderProgressWithAccountData(...args) {

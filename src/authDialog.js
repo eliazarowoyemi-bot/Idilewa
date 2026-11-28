@@ -96,8 +96,8 @@ function parentForm() {
       <label class="id-auth-field${signup ? '' : ' id-auth-span'}" for="id-auth-parent-email">Email address
         <input id="id-auth-parent-email" name="email" type="email" autocomplete="${signup ? 'email' : 'username'}" autocapitalize="none" spellcheck="false" maxlength="254" required />
       </label>
-      ${signup ? `<label class="id-auth-field" for="id-auth-parent-phone">Phone number
-        <input id="id-auth-parent-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" pattern="[+]?[0-9() -]{7,24}" maxlength="24" required />
+      ${signup ? `<label class="id-auth-field" for="id-auth-parent-phone">Phone number (optional)
+        <input id="id-auth-parent-phone" name="phone" type="tel" autocomplete="tel" inputmode="tel" pattern="[+]?[0-9() -]{7,24}" maxlength="24" />
       </label>` : ''}
       ${passwordField({
         id: 'id-auth-parent-password',
@@ -893,7 +893,7 @@ async function handleDialogSubmit(event) {
 
   if (role === 'parent' && mode === 'signup') {
     const phone = String(formData.get('phone') || '').trim();
-    if (!/^\+?[0-9\s()-]{7,24}$/.test(phone)) {
+    if (phone && !/^\+?[0-9\s()-]{7,24}$/.test(phone)) {
       setFeedback('Enter a valid phone number.');
       form.querySelector('[name="phone"]')?.focus();
       return;

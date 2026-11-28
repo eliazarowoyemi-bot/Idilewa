@@ -71,12 +71,11 @@ test('auth callback exchanges confirmation sessions and safely routes recovery',
   assert.match(viteConfigSource, /'auth-callback'/);
 });
 
-test('homepage waits for authoritative auth verification and keeps the signup dialog mandatory', async () => {
+test('homepage remains public when account progress cannot be verified', async () => {
   const homepageSyncSource = await readFile(new URL('../src/homepageProgressSync.js', import.meta.url), 'utf8');
   assert.match(homepageSyncSource, /onAuthSessionChecked\(\{ user, error: null \}\)/);
-  assert.match(homepageSyncSource, /required: true,\s*returnToHomepage: true/);
-  assert.match(authDialogSource, /if \(!state\.authRequired \|\| !getCurrentUser\(\)\?\.id\) return;\s*state\.authRequired = false;\s*window\.location\.replace\('\/'\)/);
-  assert.match(authDialogSource, /if \(state\.authRequired\) \{\s*dialog\.showModal\(\);\s*return;/);
+  assert.doesNotMatch(homepageSyncSource, /openAuthDialog|required:\s*true/);
+  assert.match(homepageSyncSource, /Your lesson remains saved on this device/);
 });
 
 test('homepage hero and language cards use their supplied images in language order', async () => {
@@ -117,6 +116,11 @@ test('legacy login routes redirect to the family auth screens', () => {
 test('family auth screens keep their heading, email label and form mode in sync', () => {
   assert.match(authDialogSource, /id-auth-dialog-title/);
   assert.match(authDialogSource, /id="id-auth-parent-email" name="email" type="email"/);
+  const parentPhoneField = authDialogSource.match(/<input id="id-auth-parent-phone"[^>]+>/)?.[0] || '';
+  assert.match(authDialogSource, /Phone number \(optional\)/);
+  assert.ok(parentPhoneField);
+  assert.doesNotMatch(parentPhoneField, /\brequired\b/);
+  assert.match(authDialogSource, /if \(phone && !/);
   assert.match(authDialogSource, /data-auth-form="parent" data-mode="\$\{state\.mode\}"/);
   assert.match(appSource, /return renderAuthRoutePlaceholder\('parent', signup \? 'signup' : 'signin'\)/);
   assert.doesNotMatch(appSource, /forgot-link|form-label-row|authPageHeading/);

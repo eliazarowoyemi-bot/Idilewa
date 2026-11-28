@@ -34,4 +34,12 @@ test('temporary service and network errors are actionable without exposing provi
     /temporarily unavailable/i,
   );
   assert.match(normalizeAuthError(new TypeError('Failed to fetch'), 'signin'), /check your connection/i);
+  assert.match(
+    normalizeAuthError({ message: 'email provider unavailable', status: 503 }, 'password-reset'),
+    /could not send your password reset email/i,
+  );
+  assert.match(
+    normalizeAuthError(new TypeError('Failed to fetch'), 'password-reset'),
+    /password recovery service/i,
+  );
 });
